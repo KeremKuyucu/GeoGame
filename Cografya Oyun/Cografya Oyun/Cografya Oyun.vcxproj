@@ -122,12 +122,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)\imgui\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -135,15 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Baskent_Oyun.h" />
-    <ClInclude Include="Bilgiler.h" />
-    <ClInclude Include="Giris.h" />
+    <ClInclude Include="Bayrak_Oyun.h" />
+    <ClInclude Include="Sehir_Oyun.h" />
     <ClInclude Include="Mesafe_Oyun.h" />
-    <ClInclude Include="Ozellikler.h" />
-    <ClInclude Include="Renkler.h" />
     <ClInclude Include="Ulke_Oyun.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="log.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,8 @@
-using namespace std;
-
 void Ulke() {
+	Music yasasinirkimiz; if (!yasasinirkimiz.openFromFile("dosyalar/sesler/yasasinirkimiz.ogg")) {};
+	Music dogru; if (!dogru.openFromFile("dosyalar/sesler/dogru.ogg")) {};
+	Music yanlis; if (!yanlis.openFromFile("dosyalar/sesler/yanlis.ogg")) {};
+	Music yenitur; if (!yenitur.openFromFile("dosyalar/sesler/yenitur.ogg")) {};
 	string komut, sayi;
 	clock_t start_time, end_time;
 	bool oyun = true, bitis = false;
@@ -28,6 +30,7 @@ void Ulke() {
 			cout << red << "Baþlamak için " << yellow << "\"Baþla\"" << red << " ülke isimlerini öðrenmek için " << yellow << "\"Ülkeler\"" << red << " oyunu bitirmek için " << yellow << "\"Bitir\"" << red << " yazýnýz: " << yellow << endl;
 		}
 		else if (komut == "Basla" || komut == "Bala" || komut == "Start") {
+			yenitur.play();
 			cout << yellow << "Oyun Baþlýyor" << endl;
 			cout << blue << "---------------------------------------------------------" << endl;
 			oyun = 1;
@@ -35,11 +38,13 @@ void Ulke() {
 			break;
 		}
 		else if (komut == "Bitir") {
+			yanlis.play();
 			cout << yellow << "Daha oyun baþlamadý nereye." << endl;
 			cout << red << "Baþlamak için " << yellow << "\"Baþla\"" << red << " ülke isimlerini öðrenmek için " << yellow << "\"Ülkeler\"" << red << " oyunu bitirmek için " << yellow << "\"Bitir\"" << red << " yazýnýz: " << white << endl;
 			cout << blue << "---------------------------------------------------------" << yellow << endl;
 		}
 		else {
+			yanlis.play();
 			cout << red << "Geçersiz Komut" << endl;
 			cout << red << "Baþlamak için " << yellow << "\"Baþla\"" << red << " ülke isimlerini öðrenmek için " << yellow << "\"Ülkeler\"" << red << " oyunu bitirmek için " << yellow << "\"Bitir\"" << red << " yazýnýz: " << white << endl;
 			cout << blue << "---------------------------------------------------------" << yellow << endl;
@@ -49,15 +54,16 @@ void Ulke() {
 		srand(static_cast<unsigned int>(time(0)));
 		do { randomSayi = rand() % ulke.size(); } while (randomSayi == oncekiRandomSayi); // Ayný ülke gelirse tekrar seç
 		const Ulkeler& seciliUlke = ulke[randomSayi];
-		Ulkeler kalici(seciliUlke.trisim, seciliUlke.isim, seciliUlke.enisim, seciliUlke.din, seciliUlke.kita, seciliUlke.yonetimbicimi, seciliUlke.baskent, seciliUlke.yuzolcum, seciliUlke.nufus, seciliUlke.ekonomi, seciliUlke.enlem, seciliUlke.boylam);
-		Ulkeler gecici("a", "b", "c", "d", "e", "f", "g", "h", "i", "j","k","l");
+		Ulkeler kalici(seciliUlke.bayrak,seciliUlke.trisim, seciliUlke.isim, seciliUlke.enisim, seciliUlke.din, seciliUlke.kita, seciliUlke.yonetimbicimi, seciliUlke.baskent, seciliUlke.yuzolcum, seciliUlke.nufus, seciliUlke.ekonomi, seciliUlke.enlem, seciliUlke.boylam);
+		Ulkeler gecici("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m");
 		oncekiRandomSayi = randomSayi; // Önceki seçilen ülkeyi güncelle
 		puan = 100;
 		while (true) {
 			end_time = clock();
 			elapsed_time = static_cast<int>(end_time - start_time) / CLOCKS_PER_SEC;
 			if (elapsed_time <= sure) {
-				cout << red << "Kalan Süre: " << yellow << sure - elapsed_time << red << " Saniye" << endl;
+				cout << green << "Soru Sorarak ülkenin doðru bilgisini bulursanýz burdaki bilgiler güncellenir. \n(Sayýsal bilgiler en yakýn tahminleri gösterir.)";
+				cout << red << "  Kalan Süre: " << yellow << sure - elapsed_time << red << " Saniye" << endl;
 				cout << yellow << "1" << green << " Dini ile ilgili soru" << endl;
 				cout << yellow << "2" << green << " Bulunduðu kýta ile ilgili soru" << endl;
 				cout << yellow << "3" << green << " Yönetim biçimi ile ilgili soru" << endl;
@@ -72,7 +78,7 @@ void Ulke() {
 				for (size_t a = 0;a < (ulke.size());a++) {
 					const Ulkeler& secilenulke = ulke[a];
 					if (ulke[a].ks(komut)) {
-						gecici = Ulkeler(secilenulke.trisim, secilenulke.isim, secilenulke.enisim, secilenulke.din, secilenulke.kita, secilenulke.yonetimbicimi, secilenulke.baskent, secilenulke.yuzolcum, secilenulke.nufus, secilenulke.ekonomi,secilenulke.enlem,secilenulke.boylam);
+						gecici = Ulkeler(secilenulke.bayrak, secilenulke.trisim, secilenulke.isim, secilenulke.enisim, secilenulke.din, secilenulke.kita, secilenulke.yonetimbicimi, secilenulke.baskent, secilenulke.yuzolcum, secilenulke.nufus, secilenulke.ekonomi,secilenulke.enlem,secilenulke.boylam);
 						break; // Eþleþme bulundu, döngüden çýk
 					}
 				}
@@ -118,6 +124,7 @@ void Ulke() {
 				string e = "Hinduizm";
 				string f = "Dinsiz";
 				string aa = "dini ";
+				cout << blue << "---------------------------------------------------------" << endl;
 				cout << yellow << "1" << green << " Ülkenin " << aa << a << " mý ?" << endl;
 				cout << yellow << "2" << green << " Ülkenin " << aa << b << " mý ?" << endl;
 				cout << yellow << "3" << green << " Ülkenin " << aa << c << " mi ?" << endl;
@@ -127,46 +134,76 @@ void Ulke() {
 				cout << red << "Lütfen bir soru sayisi giriniz: " << yellow;
 				getline(cin, sayi);
 				if (sayi == "1") {
-					if (kalici.din == a)
-						cout << green << "Ülkenin " << aa << a<< endl;
+					if (kalici.din == a) {
+						cout << green << "Ülkenin " << aa << a << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << a << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "2") {
-					if (kalici.din == b)
-						cout << green << "Ülkenin " << aa << b<< endl;
+					if (kalici.din == b) {
+						cout << green << "Ülkenin " << aa << b << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << b << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "3") {
-					if (kalici.din == c)
+					if (kalici.din == c) {
 						cout << green << "Ülkenin " << aa << c << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << c << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "4") {
-					if (kalici.din == d)
+					if (kalici.din == d) {
 						cout << green << "Ülkenin " << aa << d << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << d << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "5") {
-					if (kalici.din == e)
+					if (kalici.din == e) {
 						cout << green << "Ülkenin " << aa << e << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << e << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "6") {
-					if (kalici.din == f)
+					if (kalici.din == f) {
 						cout << green << "Ülkenin " << aa << f << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << f << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else
 					cout << red << "Hata!" << endl;
-				puan -= 5;
 				cout << blue << "---------------------------------------------------------" << endl;
-				sayi = "";
+				puan -= 5;
+				sayi = "0";
 			}
 			if (sayi == "2") {
 				string a = "Avrupa";
@@ -176,6 +213,7 @@ void Ulke() {
 				string e = "Guney Amerika";
 				string f = "Avusturalya";
 				string aa = "kýtasý ";
+				cout << blue << "---------------------------------------------------------" << endl;
 				cout << yellow << "1" << green << " Ülkenin " << aa << a << " mý ?" << endl;
 				cout << yellow << "2" << green << " Ülkenin " << aa << b << " mý ?" << endl;
 				cout << yellow << "3" << green << " Ülkenin " << aa << c << " mi ?" << endl;
@@ -185,215 +223,305 @@ void Ulke() {
 				cout << red << "Lütfen bir soru sayisi giriniz: " << yellow;
 				getline(cin, sayi);
 				if (sayi == "1") {
-					if (kalici.din == a)
+					if (kalici.din == a) {
 						cout << green << "Ülkenin " << aa << a << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << a << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "2") {
-					if (kalici.din == b)
+					if (kalici.din == b) {
 						cout << green << "Ülkenin " << aa << b << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << b << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "3") {
-					if (kalici.din == c)
+					if (kalici.din == c) {
 						cout << green << "Ülkenin " << aa << c << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << c << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "4") {
-					if (kalici.din == d)
+					if (kalici.din == d) {
 						cout << green << "Ülkenin " << aa << d << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << d << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "5") {
-					if (kalici.din == e)
+					if (kalici.din == e) {
 						cout << green << "Ülkenin " << aa << e << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << e << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "6") {
-					if (kalici.din == f)
+					if (kalici.din == f) {
 						cout << green << "Ülkenin " << aa << f << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << f << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else
 					cout << red << "Hata!" << endl;
-				puan -= 5;
 				cout << blue << "---------------------------------------------------------" << endl;
-				sayi = "";
+				puan -= 5;
+				sayi = "0";
 			}
 			if (sayi == "3") {
 				string a = "Federal cumhuriyet";
-				string b = "Tek parti sosyalist cumhuriyet";
 				string c = "Parlamentar monarsi";
 				string d = "Federal parlamentar cumhuriyet";
 				string e = "Yari baskanlik cumhruriyeti";
 				string f = "Cumhuriyet";
-				string g = "Feoderal cumhuriyet";
 				string h = "Mutlak monarsi";
 				string j = "Özerk";
 				string k = "Parlamentar cumhuriyet";
 				string l = "Parlementar monarsi";
-				string m = "Yarý baþkanlýk cumhuriyeti";
 				string n = "Sosyalist cumhuriyet";
 				string o = "Baþkanlýk cumhuriyeti";
 				string aa = "yönetim biçimi ";
-				cout << yellow << "1" << green << " Ülkenin " << aa << a << " mý ?" << endl;
-				cout << yellow << "2" << green << " Ülkenin " << aa << b << " mý ?" << endl;
+				cout << blue << "---------------------------------------------------------" << endl;
+				cout << yellow << "1" << green << " Ülkenin " << aa << a << " mi ?" << endl;
 				cout << yellow << "3" << green << " Ülkenin " << aa << c << " mi ?" << endl;
 				cout << yellow << "4" << green << " Ülkenin " << aa << d << " mi ?" << endl;
 				cout << yellow << "5" << green << " Ülkenin " << aa << e << " mi ?" << endl;
 				cout << yellow << "6" << green << " Ülkenin " << aa << f << " mi ?" << endl;
-				cout << yellow << "7" << green << " Ülkenin " << aa << g << " mý ?" << endl;
-				cout << yellow << "8" << green << " Ülkenin " << aa << h << " mý ?" << endl;
-				cout << yellow << "9" << green << " Ülkenin " << aa << j << " mi ?" << endl;
-				cout << yellow << "10" << green << " Ülkenin " << aa << k << " mi ?" << endl;
-				cout << yellow << "11" << green << " Ülkenin " << aa << l << " mi ?" << endl;
-				cout << yellow << "12" << green << " Ülkenin " << aa << m << " mi ?" << endl;
-				cout << yellow << "13" << green << " Ülkenin " << aa << n << " mi ?" << endl;
-				cout << yellow << "14" << green << " Ülkenin " << aa << o << " mi ?" << endl;
+				cout << yellow << "7" << green << " Ülkenin " << aa << h << " mý ?" << endl;
+				cout << yellow << "8" << green << " Ülkenin " << aa << j << " mi ?" << endl;
+				cout << yellow << "9" << green << " Ülkenin " << aa << k << " mi ?" << endl;
+				cout << yellow << "10" << green << " Ülkenin " << aa << l << " mi ?" << endl;
+				cout << yellow << "11" << green << " Ülkenin " << aa << n << " mi ?" << endl;
+				cout << yellow << "12" << green << " Ülkenin " << aa << o << " mi ?" << endl;
 				cout << red << "Lütfen bir soru sayisi giriniz: " << yellow;
 				getline(cin, sayi);
 				if (sayi == "1") {
-					if (kalici.din == a)
+					if (kalici.din == a) {
 						cout << green << "Ülkenin " << aa << a << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << a << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "2") {
-					if (kalici.din == b)
-						cout << green << "Ülkenin " << aa << b << endl;
+					if (kalici.din == c) {
+						cout << green << "Ülkenin " << aa << c << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << b << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << c << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "3") {
-					if (kalici.din == c)
-						cout << green << "Ülkenin " << aa << c << endl;
+					if (kalici.din == d) {
+						cout << green << "Ülkenin " << aa << d << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << c << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << d << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "4") {
-					if (kalici.din == d)
-						cout << green << "Ülkenin " << aa << d << endl;
+					if (kalici.din == e) {
+						cout << green << "Ülkenin " << aa << e << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << d << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << e << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "5") {
-					if (kalici.din == e)
-						cout << green << "Ülkenin " << aa << e << endl;
+					if (kalici.din == f) {
+						cout << green << "Ülkenin " << aa << f << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << e << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << f << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "6") {
-					if (kalici.din == f)
-						cout << green << "Ülkenin " << aa << f << endl;
+					if (kalici.din == h) {
+						cout << green << "Ülkenin " << aa << h << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << f << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << h << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "7") {
-					if (kalici.din == g)
-						cout << green << "Ülkenin " << aa << g << endl;
+					if (kalici.din == j) {
+						cout << green << "Ülkenin " << aa << j << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << g << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << j << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "8") {
-					if (kalici.din == h)
-						cout << green << "Ülkenin " << aa << h << endl;
+					if (kalici.din == k) {
+						cout << green << "Ülkenin " << aa << k << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << h << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << k << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "9") {
-					if (kalici.din == j)
-						cout << green << "Ülkenin " << aa << j << endl;
+					if (kalici.din == l) {
+						cout << green << "Ülkenin " << aa << l << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << j << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << l << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "10") {
-					if (kalici.din == k)
-						cout << green << "Ülkenin " << aa << k << endl;
+					if (kalici.din == n) {
+						cout << green << "Ülkenin " << aa << n << endl;
+						dogru.play();
+					}
 					else
-						cout << red << "Ülkenin " << aa << k << " deðil" << endl;
+					{
+						cout << red << "Ülkenin " << aa << n << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else if (sayi == "11") {
-					if (kalici.din == l)
-						cout << green << "Ülkenin " << aa << l << endl;
-					else
-						cout << red << "Ülkenin " << aa << l << " deðil" << endl;
-				}
-				else if (sayi == "12") {
-					if (kalici.din == m)
-						cout << green << "Ülkenin " << aa << m << endl;
-					else
-						cout << red << "Ülkenin " << aa << m << " deðil" << endl;
-				}
-				else if (sayi == "13") {
-					if (kalici.din == n)
-						cout << green << "Ülkenin " << aa << f << endl;
-					else
-						cout << red << "Ülkenin " << aa << f << " deðil" << endl;
-				}
-				else if (sayi == "14") {
-					if (kalici.din == o)
+					if (kalici.din == o) {
 						cout << green << "Ülkenin " << aa << o << endl;
+						dogru.play();
+					}
 					else
+					{
 						cout << red << "Ülkenin " << aa << o << " deðil" << endl;
+						yanlis.play();
+					}
 				}
 				else
 					cout << red << "Hata!" << endl;
-				puan -= 5;
 				cout << blue << "---------------------------------------------------------" << endl;
-				sayi = "";
+				puan -= 5;
+				sayi = "0";
 			}
 			if (sayi == "4") {
-				cout << red << "Yüzölçüm tahminini girer iken aralara nokta koymayýn." << endl;
-				cout << red << "En az yüzölçüm 316 km²\nEn fazla yüzölçüm 17,125,191 km²" << endl;
-				getline(cin, komut);
-				komut = temizle(komut);
-				if (komut > temizle(kalici.yuzolcum))
-					cout << green << "Ülkenin yüzölçümü daha küçük" << endl;
-				if (komut < temizle(kalici.yuzolcum))
-					cout << green << "Ülkenin yüzölçümü daha büyük" << endl;
-				if (komut == temizle(kalici.yuzolcum))
-					cout << yellow << "Ülkenin yüzölçümü eþit" << endl;
 				cout << blue << "---------------------------------------------------------" << endl;
-				sayi = "";
+				cout << green << "Yüzölçüm tahminini girer iken aralara nokta koymayýn." << endl;
+				cout << green << "En az yüzölçüm 316 km²\nEn fazla yüzölçüm 17,125,191 km²" << endl << yellow;
+				getline(cin, komut);
+
+				try {
+					double komutt = stod(temizle(komut));
+					cout << red << "Ülkenin Yüzölçümü: " << yellow << komutt << (komutt > stod(temizle(kalici.yuzolcum)) ? red : green) << (komutt > stod(temizle(kalici.yuzolcum)) ? "'dan Daha Düþük" : "'dan Daha Yüksek") << endl;
+				}
+				catch (const std::invalid_argument& e) {
+					cerr << "Hata: Geçersiz argüman: " << e.what() << endl;
+				}
+				catch (const std::out_of_range& e) {
+					cerr << "Hata: Aralýk dýþý deðer: " << e.what() << endl;
+				}
+
+				cout << blue << "---------------------------------------------------------" << endl;
 				puan -= 5;
+				sayi = "0";
 			}
 			if (sayi == "5") {
-				cout << red << "Nüfus tahminini girer iken milyon cinsinden sýfýr kullanmadan yazýn. Küsürat için nokta kullanabilirsiniz." << endl;
-				cout << red << "En az nüfus 0.5 milyon\nEn fazla nüfus 1410 milyon" << endl;
-				getline(cin, komut);
-				komut = temizle(komut);
-				if (komut > temizle(kalici.nufus))
-					cout << green << "Ülkenin nüfusu daha küçük" << endl;
-				if (komut < temizle(kalici.nufus))
-					cout << green << "Ülkenin nüfusu daha büyük" << endl;
-				if (komut == temizle(kalici.nufus))
-					cout << yellow << "Ülkenin nüfusu eþit" << endl;
 				cout << blue << "---------------------------------------------------------" << endl;
-				sayi = "";
+				cout << green << "Nüfus tahminini girer iken milyon cinsinden sýfýr kullanmadan yazýn. Küsürat için nokta kullanabilirsiniz." << endl;
+				cout << green << "En az nüfus 0.5 milyon\nEn fazla nüfus 1410 milyon" << endl << yellow;
+
+				string komut;
+				getline(cin, komut);
+
+				try {
+					double komutt = stod(temizle(komut));
+					cout << red << "  Ülkenin Nüfusu: " << yellow << komutt;
+					cout << (komutt > stod(temizle(kalici.nufus)) ? red : green);
+					cout << (komutt > stod(temizle(kalici.nufus)) ? "'dan Daha Düþük" : "'dan Daha Yüksek") << endl;
+				}
+				catch (const std::invalid_argument& e) {
+					cerr << "Hata: Geçersiz argüman: " << e.what() << endl;
+				}
+				catch (const std::out_of_range& e) {
+					cerr << "Hata: Aralýk dýþý deðer: " << e.what() << endl;
+				}
+
+				cout << blue << "---------------------------------------------------------" << endl;
 				puan -= 5;
+				sayi = "0";
 			}
 			if (sayi == "6") {
-				cout << red << "Ekonomi tahminini girer iken milyar cinsinden sýfýr kullanmadan yazýn. Küsürat için nokta kullanabilirsiniz." << endl;
-				cout << red << "En az ekonomi 8 milyar \nEn fazla ekonomi 220000 milyar" << endl;
-				getline(cin, komut);
-				komut = temizle(komut);
-				if (komut > temizle(kalici.ekonomi))
-					cout << green << "Ülkenin ekonomisi daha küçük" << endl;
-				if (komut < temizle(kalici.ekonomi))
-					cout << green << "Ülkenin ekonomisi daha büyük" << endl;
-				if (komut == temizle(kalici.ekonomi))
-					cout << yellow << "Ülkenin ekonomisi eþit" << endl;
 				cout << blue << "---------------------------------------------------------" << endl;
-				sayi = "";
+				cout << green << "Ekonomi tahminini girer iken milyar cinsinden sýfýr kullanmadan yazýn. Küsürat için nokta kullanabilirsiniz." << endl;
+				cout << green << "En az ekonomi 8 milyar \nEn fazla ekonomi 22000 milyar" << endl << yellow;
+
+				string komut;
+				getline(cin, komut);
+
+				try {
+					double komutt = stod(temizle(komut));
+					cout << red << "  Ülkenin Ekonomisi: " << yellow << komutt;
+					cout << (komutt > stod(temizle(kalici.ekonomi)) ? red : green);
+					cout << (komutt > stod(temizle(kalici.ekonomi)) ? "'dan Daha Düþük" : "'dan Daha Yüksek") << endl;
+				}
+				catch (const std::invalid_argument& e) {
+					cerr << "Hata: Geçersiz argüman: " << e.what() << endl;
+				}
+				catch (const std::out_of_range& e) {
+					cerr << "Hata: Aralýk dýþý deðer: " << e.what() << endl;
+				}
+
+				cout << blue << "---------------------------------------------------------" << endl;
 				puan -= 5;
+				sayi = "0";
 			}
 			if (kalici.ks(gecici.isim)) {
+				dogru.play();
+				cout << blue << "---------------------------------------------------------" << endl;
 				cout << red << "Ülkenin Ýngilizce Ýsmi: " << yellow << kalici.enisim << endl;
 				cout << red << "Ülkenin Dini: " << yellow << kalici.din << endl;
 				cout << red << "Ülkenin bulunduðu Kýta: " << yellow << kalici.kita << endl;
@@ -412,11 +540,14 @@ void Ulke() {
 			}
 			else if (gecici.ks(komut)) {
 				yanlýs--;
+				yanlis.play();
 				cout << red << "Yanlýþ tahmin. Yanlýþ hakkýn 1 azaldý. Kalan hakkýn: " << yellow << yanlýs << endl;
 				if (yanlýs < 0)
 					bitis = true;
 			}
 			if (sayi == "7") {
+				yenitur.play();
+				cout << blue << "---------------------------------------------------------" << endl;
 				cout << red << "Geçilen ülke: " << yellow << kalici.isim << endl;
 				cout << red << "Ülkenin Ýngilizce Ýsmi: " << yellow << kalici.enisim << endl;
 				cout << red << "Ülkenin Dini: " << yellow << kalici.din << endl;
@@ -427,18 +558,21 @@ void Ulke() {
 				cout << red << "Ülkenin Ekonomisi: " << yellow << kalici.ekonomi << endl;
 				cout << green << "Yeni bir ülke seçildi oyuna devam edin." << endl;
 				cout << blue << "---------------------------------------------------------" << endl;
+				sayi = "0";
 				break;
 			}
 			if (sayi == "8") {
 				if (joker > 0) {
 					joker -= 1;
+					cout << blue << "---------------------------------------------------------" << endl;
 					cout << red << "Ulkenin Baskenti: " << yellow << kalici.baskent << endl;
 					cout << yellow << joker << red << " joker hakkýnýz kaldý." << endl;
 					cout << blue << "---------------------------------------------------------" << endl;
 					puan -= 25;
 				}
 				else {
-					cout << red << "Joker Hakkýnýz Bitmiþtir." << endl;
+					cout << blue << "---------------------------------------------------------" << endl;
+					cout << yellow << "Joker Hakkýnýz Bitmiþtir." << endl;
 					cout << blue << "---------------------------------------------------------" << endl;
 				}
 			}
@@ -447,9 +581,12 @@ void Ulke() {
 			if (sayi == "10") { ulkeyaz(); }
 
 			if ( !(gecici.ks(komut)) &&
-				komut != "1" && komut != "2" && komut != "3" && komut != "4" && komut != "5" && komut != "6" && 
+				sayi != "0" && sayi != "1" && sayi != "2" && sayi != "3" && sayi != "4" && sayi != "5" && sayi != "6" &&
+				sayi != "7" && sayi != "8" && sayi != "9" && sayi != "10" && sayi != "11" &&
+				komut != "1" && komut != "2" && komut != "3" && komut != "4" && komut != "5" && komut != "6" &&
 				komut != "7" && komut != "8" && komut != "9" && komut != "10" && komut != "11") {
-				cout << red << "Böyle bir komut bulunamadý. " << yellow << "\"Ülkeler\"" << red << " yazarak ülke listesine bakabilirsiniz." << endl;
+				yanlis.play();
+				cout << yellow << "Geçersiz komut. "<< endl;
 				cout << blue << "---------------------------------------------------------" << endl;
 			}
 		}

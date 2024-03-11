@@ -1,18 +1,19 @@
-void Baskent() {
+void Sehir() {
 	Music yasasinirkimiz; if (!yasasinirkimiz.openFromFile("dosyalar/sesler/yasasinirkimiz.ogg")) {};
 	Music dogru; if (!dogru.openFromFile("dosyalar/sesler/dogru.ogg")) {};
 	Music yanlis; if (!yanlis.openFromFile("dosyalar/sesler/yanlis.ogg")) {};
 	Music yenitur; if (!yenitur.openFromFile("dosyalar/sesler/yenitur.ogg")) {};
 	string komut;
 	clock_t start_time, end_time;
-	bool oyun = true, bitis = false;
+	bool oyun = true, bitis = false, bilgi=false;
 	int joker = 3, winstreak = 0, toplampuan = 0, puan = 0, randomSayi = 0, oncekiRandomSayi = -1, elapsed_time, sure = 300;
 	//Oyunla Ýlgili Açýklamalarýn Yazdýðý Yer
-	cout << yellow << "Baþkent Bilme Oyunu\n";
-	cout << green << "Baþkent Bilme Oyununa hoþ geldiniz. \nAmacýnýz, 50 ülkeden rastgele seçilen bir ülkenin baþkentini bilmek.\n";
+	cout << red << trharita << endl;
+	cout << yellow << "Þehir Bilme Oyunu" << endl;
+	cout << green << "Þehir Bilme Oyununa hoþ geldiniz. \nAmacýnýz, 81 ili teker teker yazmak." << endl;
 	cout << green << "Önceki Sýralamalara bakmak için " << yellow << "\"Liste\"" << green << " yazabilirsiniz." << endl;
 	cout << yellow << "Puan Sistemi:" << endl;
-	cout << green << "Her turda puanýnýz 50 den baþlar her yanlýþ tahminde 10 azarlýr.3 Tahminden sonra kazanýlan puan 20'e sabitlenir tur \nbitince tekrar 50'den baþlar." << endl;
+	cout << green << "Her þehir 10 puan." << endl;
 	cout << yellow << "Süre:" << endl << green << "Oyun süresi 5 dakikadýr. Ne kadar sürenin kaldýðýna bakmak için komut yazmadan önce süreye bakmanýz yeterlidir." << endl;
 	cout << blue << "---------------------------------------------------------" << endl;
 	cout << red << "Baþlamak için " << yellow << "\"Baþla\"" << red << " ülke isimlerini öðrenmek için " << yellow << "\"Ülkeler\"" << red << " oyunu bitirmek için " << yellow << "\"Bitir\"" << red << " yazýnýz: " << yellow << endl;
@@ -29,9 +30,9 @@ void Baskent() {
 		}
 		else if (komut == "Basla" || komut == "Bala" || komut == "Start") {
 			cout << yellow << "Oyun Baþlýyor" << endl;
+			yenitur.play();
 			cout << blue << "---------------------------------------------------------" << endl;
 			oyun = 1;
-			yenitur.play();
 			start_time = clock(); // Baþlangýç zamanýný al
 			break;
 		}
@@ -49,42 +50,59 @@ void Baskent() {
 		}
 	}
 	while (oyun) {
-		srand(static_cast<unsigned int>(time(0)));
-		do { randomSayi = rand() % ulke.size(); } while (randomSayi == oncekiRandomSayi); // Ayný ülke gelirse tekrar seç
-		const Ulkeler& seciliUlke = ulke[randomSayi];
-		Ulkeler kalici(seciliUlke.bayrak, seciliUlke.trisim, seciliUlke.isim, seciliUlke.enisim, seciliUlke.din, seciliUlke.kita, seciliUlke.yonetimbicimi, seciliUlke.baskent, seciliUlke.yuzolcum, seciliUlke.nufus, seciliUlke.ekonomi, seciliUlke.enlem, seciliUlke.boylam);
-		Ulkeler gecici("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l","m");
-		oncekiRandomSayi = randomSayi; // Önceki seçilen ülkeyi güncelle
-		puan = 50;
 		while (true) {
 			end_time = clock();
+			bilgi = false;
 			elapsed_time = static_cast<int>(end_time - start_time) / CLOCKS_PER_SEC;
 			if (elapsed_time <= sure) {
 				cout << red << "Kalan Süre: " << yellow << sure - elapsed_time << red << " Saniye" << endl;
-				cout << green << "Baþkent Adý: " << yellow << kalici.baskent << endl;
+				bolgeyaz("Akdeniz Bölgesi", 1);
+				bolgeyaz("Doðu Anadolu Bölgesi", 2);
+				bolgeyaz("Ege Bölgesi", 3);
+				bolgeyaz("Güneydoðu Anadolu Bölgesi", 4);
+				bolgeyaz("Ýç Anadolu Bölgesi", 5);
+				bolgeyaz("Karadeniz Bölgesi", 6);
+				bolgeyaz("Marmara Bölgesi", 7);
 				cout << red << "Lütfen bir tahmin giriniz: " << yellow;
 				getline(cin, komut);
 				komut = kelimeDuzelt(komut);
-				for (size_t a = 0;a < (ulke.size());a++) {
-					const Ulkeler& secilenulke = ulke[a];
-					if (ulke[a].ks(komut)) {
-						gecici = Ulkeler(secilenulke.bayrak, secilenulke.trisim, secilenulke.isim, secilenulke.enisim, secilenulke.din, secilenulke.kita, secilenulke.yonetimbicimi, secilenulke.baskent, secilenulke.yuzolcum, secilenulke.nufus, secilenulke.ekonomi,secilenulke.enlem, secilenulke.boylam);
-						break; // Eþleþme bulundu, döngüden çýk
+				for (int i = 0; i< sehir.size(); i++) {
+					if (sehir[i].ks(komut)) {
+						if (sehir[i].bilgi == true) {
+							cout << yellow << "Bu þehri zaten yazdýn.";
+							yanlis.play();
+						}
+						else {
+							sehir[i].bilgi = true;
+							winstreak++;
+							dogru.play();
+							toplampuan += 10;
+						}
+						bilgi = true;
+						break;
 					}
 				}
 			}
 			else
 				bitis = true;
+			if (bilgi == false)
+				cout << yellow << "Þehir bulunamadý!" << endl;
 			end_time = clock();
 			elapsed_time = static_cast<int>(end_time - start_time) / CLOCKS_PER_SEC;
 			if (elapsed_time > sure) {
 				cout << red << "Süre bitti!" << endl;
 				bitis = true;
-				cout << red << "Doðru Ülke: " << kalici.isim << endl;
+			}
+			for (int i = 0; i < sehir.size(); i++) {
+				if (sehir[i].bilgi == false) {
+					break;
+				}
+				else
+					bitis = true;
 			}
 			if (komut == "Bitir" || bitis) {
 				cout << red << "Oyun Bitti." << yellow << " Yapan Kerem Kuyucu" << endl;
-				cout << red << "Doðru Ülke Sayýnýz: " << yellow << winstreak << endl;
+				cout << red << "Doðru Þehir Sayýnýz: " << yellow << winstreak << endl;
 				cout << red << "Puanýnýz: " << yellow << toplampuan << endl;
 				cout << green << "Sýralamaya adýnýzý yazdýrmak istermisiniz: (Evet/Hayýr) " << yellow;
 				getline(cin, komut);
@@ -92,47 +110,15 @@ void Baskent() {
 				if (komut == "Evet") {
 					cout << red << "Ýsminizi nasýl yazmak istersiniz? (Türkçe karakter Kullanmayýnýz.) " << yellow;
 					getline(cin, komut);
-					dosyayaz(komut, toplampuan, winstreak,"baskent");
+					dosyayaz(komut, toplampuan, winstreak, "sehir");
 				}
 				else
-					dosyayaz("Yok", toplampuan, winstreak,"baskent");
+					dosyayaz("Yok", toplampuan, winstreak, "sehir");
 				oyun = 0;
 				break;
 			}
-			if (komut == "Liste") 
+			if (komut == "Liste")
 				dosyaoku();
-			if (komut != "Ulkeler" && komut != "Lkeler" && komut != "Pas" && komut != "Bitir" &&
-				komut != "Sure" && komut != "Sre" && komut != "Liste" && !gecici.ks(komut)) {
-				yanlis.play();
-				cout << red << "Böyle bir ülke bulunamadý. " << yellow << "\"Ülkeler\"" << red << " yazarak ülke listesine bakabilirsiniz." << endl;
-				cout << blue << "---------------------------------------------------------" << endl;
-			}
-			if (gecici.isim == kalici.isim || gecici.trisim == kalici.trisim || gecici.enisim == kalici.enisim) {
-				dogru.play();
-				cout << green << "Doðru ülkeyi buldun Tebrikler!! Yeni bir ülke seçildi oyuna devam edin." << endl;
-				cout << blue << "---------------------------------------------------------" << endl;
-				if (puan < 20)
-					toplampuan += 20;
-				else
-					toplampuan += puan;
-				winstreak++;
-				break;
-			}
-			if (gecici.ks(komut)) {
-				yanlis.play();
-				cout << red << "Yanlýþ Tahmin!" << endl;
-				puan -= 10;
-			}
-			if (komut == "Ulkeler" || komut == "Lkeler") 
-				ulkeyaz();
-			if (komut == "Pas") {
-				yenitur.play();
-				cout << red << "Geçilen ülke: " << yellow << kalici.isim << endl;
-				cout << red << "Baþkenti: " << yellow << kalici.baskent << endl;
-				cout << green << "Yeni bir ülke seçildi oyuna devam edin." << endl;
-				cout << blue << "---------------------------------------------------------" << endl;
-				break;
-			}
 		}
 	}
 }

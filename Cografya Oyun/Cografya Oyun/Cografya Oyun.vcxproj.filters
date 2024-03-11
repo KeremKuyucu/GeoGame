@@ -23,28 +23,17 @@
     <ClInclude Include="Mesafe_Oyun.h">
       <Filter>Kaynak Dosyaları</Filter>
     </ClInclude>
-    <ClInclude Include="Ozellikler.h">
-      <Filter>Kaynak Dosyaları</Filter>
-    </ClInclude>
-    <ClInclude Include="Renkler.h">
-      <Filter>Kaynak Dosyaları</Filter>
-    </ClInclude>
     <ClInclude Include="Ulke_Oyun.h">
       <Filter>Kaynak Dosyaları</Filter>
     </ClInclude>
     <ClInclude Include="Baskent_Oyun.h">
       <Filter>Kaynak Dosyaları</Filter>
     </ClInclude>
-    <ClInclude Include="Bilgiler.h">
+    <ClInclude Include="Sehir_Oyun.h">
       <Filter>Kaynak Dosyaları</Filter>
     </ClInclude>
-    <ClInclude Include="Giris.h">
-      <Filter>Kaynak Dosyaları</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="log.txt">
+    <ClInclude Include="Bayrak_Oyun.h">
       <Filter>Üst Bilgi Dosyaları</Filter>
-    </Text>
+    </ClInclude>
   </ItemGroup>
 </Project>
