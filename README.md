@@ -1,1 +1,0 @@
-Çalışması İçin Sfml Gerekli
