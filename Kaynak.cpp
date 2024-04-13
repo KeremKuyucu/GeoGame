@@ -3,7 +3,6 @@
 #include <vector>
 #include <algorithm> 
 #include <fstream>
-#include <cURL/curl/curl.h>
 #include <windows.h>
 #include <filesystem>
 using namespace std;
@@ -27,7 +26,7 @@ int main(void) {
 	system("mkdir C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\bayraklar");
 	system("mkdir C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler");
 	setlocale(LC_ALL, "Turkish");
-	cout << yellow << "Dosyalar Yükleniyor..." << endl << red;
+	cout << yellow << "Dosyalar YÃ¼kleniyor..." << endl << red;
 	int i = 1;
 	for (const Ulkeler& secilenulke : ulke) {
 		const std::string url = "https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/" + secilenulke.isim + ".png?v=1712566998750";
@@ -66,6 +65,6 @@ int main(void) {
 		cout << yellow << "arkaplan.png indirildi." << endl << red;
 		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arkaplan2.png?v=1712610926441", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arkaplan2.png");
 		cout << yellow << "arkaplan2.png indirildi." << endl << red;
-		cout << yellow << red << "Dosyalar baþarýlý þekilde indirildi." << endl << red;
+		cout << yellow << red << "Dosyalar baÃ¾arÃ½lÃ½ Ã¾ekilde indirildi." << endl << red;
 	return 0;
 }
