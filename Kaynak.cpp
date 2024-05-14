@@ -1,149 +1,318 @@
 #include <iostream>
-#include <vector>
 #include <fstream>
-#include <string>
-#include <windows.h>
-#include <cstdlib>
+#include <future>
 #include <filesystem>
+#include <Windows.h>
 using namespace std;
-#ifndef _LMCONS_H
-#define _LMCONS_H
-#define UNLEN 256  // Kullanýcý adýnýn maksimum uzunluðu
-#endif
-inline std::ostream& blue(std::ostream& s) { HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE); SetConsoleTextAttribute(hStdout, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY); return s; }
-inline std::ostream& red(std::ostream& s) { HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE); SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_INTENSITY);	return s; }
-inline std::ostream& green(std::ostream& s) { HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE); SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY); return s; }
-inline std::ostream& yellow(std::ostream& s) { HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE); SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY); return s; }
-inline std::ostream& white(std::ostream& s) { HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE); SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); return s; }
-struct color { color(WORD attribute) :m_color(attribute) {};	WORD m_color; };
-template <class _Elem, class _Traits> std::basic_ostream<_Elem, _Traits>& operator<<(std::basic_ostream<_Elem, _Traits>& i, color& c) { HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE); 	SetConsoleTextAttribute(hStdout, c.m_color); 	return i; }
-struct Ulkeler {
-	string isim;
+using namespace filesystem;
+vector<future<void>> futures;
+bool versionControl = false, kerem = false, result;
+string remoteVersion, localVersion;
+struct FileData {
+	string url;
+	string fileName;
+	bool kesinlik;
+	int dosyaboyut;
 };
-vector<Ulkeler> ulke = { {"amerika"}, {"cin"}, {"japonya"}, {"almanya"}, {"hindistan"}, {"ingiltere"}, {"fransa"}, {"rusya"}, {"brezilya"}, {"italya"}, {"kanada"}, {"guneykore"}, {"avusturalya"}, {"ispanya"}, {"meksika"}, {"endonezya"}, {"turkiye"}, {"hollanda"}, {"arabistan"}, {"isvicre"}, {"tayvan"}, {"polonya"}, {"arjantin"}, {"isvec"}, {"pakistan"}, {"belcika"}, {"norvec"}, {"guneyafrika"}, {"malezya"}, {"katar"}, {"misir"}, {"sili"}, {"yunanistan"}, {"iran"}, {"israil"}, {"romanya"}, {"ukrayna"}, {"kazakistan"}, {"finlandiya"}, {"azerbaycan"}, {"singapur"}, {"gurcistan"}, {"vietnam"}, {"avusturya"}, {"nijerya"}, {"kuba"}, {"kirgizistan"}, {"cezayir"}, {"malta"}, {"panama"}, };
-void download(const std::string& url, const std::string& file) {
-	std::string powershellCommand = "powershell -Command \"Invoke-WebRequest -Uri '" + url + "' -OutFile '" + file + "'\"";
-	int result = system(powershellCommand.c_str());
-	if (result == 0) {
-		std::cout << yellow << file << ", " << green<< "Baþarý ile indirildi" << endl;
-	}
-	else {
-		std::cout << yellow << file << ", " << red << "Ýndirme Hatasý" << std::endl;
+void download(const string& url, const string& filename, const bool& kesinlik, const int& dosyaboyut) {
+	string file = "C:\\Users\\Public\\Documents\\cografyaoyun\\" + filename;
+	create_directories(path(file).parent_path());
+	if (kesinlik || (!exists(file)) || (dosyaboyut != 0 && dosyaboyut != file_size(file))) {
+		int systemResult = system(("powershell -Command \"Invoke-WebRequest -Uri '" + url + "' -OutFile '" + file + "'\"").c_str());
+		cout << "\033[1;34m" << file << (systemResult == 0 ? "\033[1;32m,   indirildi.\033[0m" : "\033[1;31m,   indirilemedi.\033[0m") << endl;
 	}
 }
-bool dosyaVarMi(const std::string& dosyaYolu) {
-	std::string komut = "dir /B " + dosyaYolu + " > nul 2>&1";
-	return system(komut.c_str()); // Komut baþarýlý ise 0 döner
+bool checkVersions() {
+	if (!versionControl)
+		download("https://drive.usercontent.google.com/download?id=1KIYUZBqnagJmmD0WcfIYdVFjlb3ExyVM", "dosyalar\\remoteVersion.txt", 1, 0);
+	std::ifstream file1("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\remoteVersion.txt"); getline(file1, remoteVersion); 	file1.close();
+	std::ifstream file2("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\localVersion.txt"); 	getline(file2, localVersion); 	file2.close();
+	versionControl = true;
+	return remoteVersion != localVersion;
 }
-bool checkInternetConnection() {
-	// Ping komutunu kullanarak google.com'a bir ICMP isteði gönder ve cevap al
-	int result = std::system("ping -n 1 google.com > nul");
-
-	// Eðer ping baþarýlý olduysa (0 döndüyse), internet baðlantýsý var demektir
-	return result == 0;
-}
+vector<FileData> files = {
+{"https://flagcdn.com/w320/md.png","dosyalar\\bayraklar\\moldova.png",0,2600},
+{"https://flagcdn.com/w320/us.png","dosyalar\\bayraklar\\amerikabirlesikdevletleri.png",0,1289},
+{"https://flagcdn.com/w320/yt.png","dosyalar\\bayraklar\\mayotte.png",0,8185},
+{"https://flagcdn.com/w320/nr.png","dosyalar\\bayraklar\\nauru.png",0,651},
+{"https://flagcdn.com/w320/mz.png","dosyalar\\bayraklar\\mozambik.png",0,2298},
+{"https://flagcdn.com/w320/br.png","dosyalar\\bayraklar\\brezilya.png",0,2883},
+{"https://flagcdn.com/w320/cv.png","dosyalar\\bayraklar\\yesilburun.png",0,909},
+{"https://flagcdn.com/w320/gq.png","dosyalar\\bayraklar\\ekvatorginesi.png",0,1923},
+{"https://flagcdn.com/w320/al.png","dosyalar\\bayraklar\\arnavutluk.png",0,3044},
+{"https://flagcdn.com/w320/vi.png","dosyalar\\bayraklar\\abdvirjinadalari.png",0,9362},
+{"https://flagcdn.com/w320/nu.png","dosyalar\\bayraklar\\niue.png",0,1457},
+{"https://flagcdn.com/w320/pw.png","dosyalar\\bayraklar\\palau.png",0,738},
+{"https://flagcdn.com/w320/ng.png","dosyalar\\bayraklar\\nijerya.png",0,157},
+{"https://flagcdn.com/w320/vg.png","dosyalar\\bayraklar\\virjinadalari.png",0,4437},
+{"https://flagcdn.com/w320/gm.png","dosyalar\\bayraklar\\gambiya.png",0,248},
+{"https://flagcdn.com/w320/so.png","dosyalar\\bayraklar\\somali.png",0,693},
+{"https://flagcdn.com/w320/ye.png","dosyalar\\bayraklar\\yemen.png",0,153},
+{"https://flagcdn.com/w320/my.png","dosyalar\\bayraklar\\malezya.png",0,1139},
+{"https://flagcdn.com/w320/dm.png","dosyalar\\bayraklar\\dominika.png",0,1715},
+{"https://flagcdn.com/w320/gb.png","dosyalar\\bayraklar\\birlesikkrallik.png",0,980},
+{"https://flagcdn.com/w320/mg.png","dosyalar\\bayraklar\\madagaskar.png",0,266},
+{"https://flagcdn.com/w320/eh.png","dosyalar\\bayraklar\\sahrademokratikarapcumhuriyeti.png",0,1083},
+{"https://flagcdn.com/w320/cy.png","dosyalar\\bayraklar\\kibris.png",0,2172},
+{"https://flagcdn.com/w320/ag.png","dosyalar\\bayraklar\\antiguavebarbuda.png",0,2325},
+{"https://flagcdn.com/w320/ie.png","dosyalar\\bayraklar\\irlanda.png",0,219},
+{"https://flagcdn.com/w320/py.png","dosyalar\\bayraklar\\paraguay.png",0,1190},
+{"https://flagcdn.com/w320/lk.png","dosyalar\\bayraklar\\srilanka.png",0,3493},
+{"https://flagcdn.com/w320/za.png","dosyalar\\bayraklar\\guneyafrika.png",0,985},
+{"https://flagcdn.com/w320/kw.png","dosyalar\\bayraklar\\kuveyt.png",0,527},
+{"https://flagcdn.com/w320/dz.png","dosyalar\\bayraklar\\cezayir.png",0,989},
+{"https://flagcdn.com/w320/hr.png","dosyalar\\bayraklar\\hirvatistan.png",0,1810},
+{"https://flagcdn.com/w320/mq.png","dosyalar\\bayraklar\\martinik.png",0,957},
+{"https://flagcdn.com/w320/sl.png","dosyalar\\bayraklar\\sierraleone.png",0,153},
+{"https://flagcdn.com/w320/mp.png","dosyalar\\bayraklar\\kuzeymarianaadalari.png",0,9029},
+{"https://flagcdn.com/w320/rw.png","dosyalar\\bayraklar\\ruanda.png",0,1180},
+{"https://flagcdn.com/w320/sy.png","dosyalar\\bayraklar\\suriye.png",0,819},
+{"https://flagcdn.com/w320/vc.png","dosyalar\\bayraklar\\saintvincentvegrenadinler.png",0,1087},
+{"https://flagcdn.com/w320/xk.png","dosyalar\\bayraklar\\kosova.png",0,1730},
+{"https://flagcdn.com/w320/lc.png","dosyalar\\bayraklar\\saintlucia.png",0,1552},
+{"https://flagcdn.com/w320/hn.png","dosyalar\\bayraklar\\honduras.png",0,595},
+{"https://flagcdn.com/w320/jo.png","dosyalar\\bayraklar\\urdun.png",0,658},
+{"https://flagcdn.com/w320/tv.png","dosyalar\\bayraklar\\tuvalu.png",0,1820},
+{"https://flagcdn.com/w320/np.png","dosyalar\\bayraklar\\nepal.png",0,3611},
+{"https://flagcdn.com/w320/lr.png","dosyalar\\bayraklar\\liberya.png",0,606},
+{"https://flagcdn.com/w320/hm.png","dosyalar\\bayraklar\\heardadasivemcdonaldadalari.png",0,1577},
+{"https://flagcdn.com/w320/at.png","dosyalar\\bayraklar\\avusturya.png",0,118},
+{"https://flagcdn.com/w320/gg.png","dosyalar\\bayraklar\\guernsey.png",0,570},
+{"https://flagcdn.com/w320/cf.png","dosyalar\\bayraklar\\ortaafrikacumhuriyeti.png",0,622},
+{"https://flagcdn.com/w320/mr.png","dosyalar\\bayraklar\\moritanya.png",0,1002},
+{"https://flagcdn.com/w320/dj.png","dosyalar\\bayraklar\\cibuti.png",0,1474},
+{"https://flagcdn.com/w320/fj.png","dosyalar\\bayraklar\\fiji.png",0,3250},
+{"https://flagcdn.com/w320/no.png","dosyalar\\bayraklar\\norvec.png",0,323},
+{"https://flagcdn.com/w320/lv.png","dosyalar\\bayraklar\\letonya.png",0,112},
+{"https://flagcdn.com/w320/fk.png","dosyalar\\bayraklar\\falklandmalvinaadalari.png",0,5318},
+{"https://flagcdn.com/w320/kz.png","dosyalar\\bayraklar\\kazakistan.png",0,2960},
+{"https://flagcdn.com/w320/ax.png","dosyalar\\bayraklar\\Oland.png",0,311},
+{"https://flagcdn.com/w320/tm.png","dosyalar\\bayraklar\\turkmenistan.png",0,7750},
+{"https://flagcdn.com/w320/cc.png","dosyalar\\bayraklar\\cocoskeelingadalari.png",0,1989},
+{"https://flagcdn.com/w320/bg.png","dosyalar\\bayraklar\\bulgaristan.png",0,151},
+{"https://flagcdn.com/w320/tk.png","dosyalar\\bayraklar\\tokelau.png",0,1418},
+{"https://flagcdn.com/w320/nc.png","dosyalar\\bayraklar\\yenikaledonya.png",0,1715},
+{"https://flagcdn.com/w320/bb.png","dosyalar\\bayraklar\\barbados.png",0,998},
+{"https://flagcdn.com/w320/st.png","dosyalar\\bayraklar\\sÒotomÚveprÿncipe.png",0,1077},
+{"https://flagcdn.com/w320/aq.png","dosyalar\\bayraklar\\antarktika.png",0,1354},
+{"https://flagcdn.com/w320/bn.png","dosyalar\\bayraklar\\brunei.png",0,3402},
+{"https://flagcdn.com/w320/bt.png","dosyalar\\bayraklar\\butan.png",0,8230},
+{"https://flagcdn.com/w320/cm.png","dosyalar\\bayraklar\\kamerun.png",0,637},
+{"https://flagcdn.com/w320/ar.png","dosyalar\\bayraklar\\arjantin.png",0,1578},
+{"https://flagcdn.com/w320/az.png","dosyalar\\bayraklar\\azerbaycan.png",0,706},
+{"https://flagcdn.com/w320/mx.png","dosyalar\\bayraklar\\meksika.png",0,3655},
+{"https://flagcdn.com/w320/ma.png","dosyalar\\bayraklar\\fas.png",0,928},
+{"https://flagcdn.com/w320/gt.png","dosyalar\\bayraklar\\guatemala.png",0,2518},
+{"https://flagcdn.com/w320/ke.png","dosyalar\\bayraklar\\kenya.png",0,1966},
+{"https://flagcdn.com/w320/mt.png","dosyalar\\bayraklar\\malta.png",0,1073},
+{"https://flagcdn.com/w320/cz.png","dosyalar\\bayraklar\\cekya.png",0,940},
+{"https://flagcdn.com/w320/gi.png","dosyalar\\bayraklar\\cebelitarik.png",0,2033},
+{"https://flagcdn.com/w320/aw.png","dosyalar\\bayraklar\\aruba.png",0,735},
+{"https://flagcdn.com/w320/bl.png","dosyalar\\bayraklar\\saintbarthÚlemy.png",0,11667},
+{"https://flagcdn.com/w320/mc.png","dosyalar\\bayraklar\\monako.png",0,124},
+{"https://flagcdn.com/w320/ae.png","dosyalar\\bayraklar\\birlesikarapemirlikleri.png",0,233},
+{"https://flagcdn.com/w320/ss.png","dosyalar\\bayraklar\\guneysudan.png",0,1000},
+{"https://flagcdn.com/w320/pr.png","dosyalar\\bayraklar\\portoriko.png",0,1474},
+{"https://flagcdn.com/w320/sv.png","dosyalar\\bayraklar\\elsalvador.png",0,2363},
+{"https://flagcdn.com/w320/fr.png","dosyalar\\bayraklar\\fransa.png",0,253},
+{"https://flagcdn.com/w320/ne.png","dosyalar\\bayraklar\\nijer.png",0,645},
+{"https://flagcdn.com/w320/ci.png","dosyalar\\bayraklar\\fildisisahili.png",0,252},
+{"https://flagcdn.com/w320/gs.png","dosyalar\\bayraklar\\guneygeorgiaveguneysandwichadalari.png",0,6026},
+{"https://flagcdn.com/w320/bw.png","dosyalar\\bayraklar\\botsvana.png",0,199},
+{"https://flagcdn.com/w320/io.png","dosyalar\\bayraklar\\britanyahintokyanusutopraklari.png",0,7213},
+{"https://flagcdn.com/w320/uz.png","dosyalar\\bayraklar\\ozbekistan.png",0,760},
+{"https://flagcdn.com/w320/tn.png","dosyalar\\bayraklar\\tunus.png",0,1128},
+{"https://flagcdn.com/w320/hk.png","dosyalar\\bayraklar\\hongkong.png",0,2045},
+{"https://flagcdn.com/w320/mk.png","dosyalar\\bayraklar\\kuzeymakedonya.png",0,1613},
+{"https://flagcdn.com/w320/sr.png","dosyalar\\bayraklar\\surinam.png",0,686},
+{"https://flagcdn.com/w320/be.png","dosyalar\\bayraklar\\belcika.png",0,292},
+{"https://flagcdn.com/w320/as.png","dosyalar\\bayraklar\\amerikansamoasi.png",0,3763},
+{"https://flagcdn.com/w320/sb.png","dosyalar\\bayraklar\\solomonadalari.png",0,1446},
+{"https://flagcdn.com/w320/ua.png","dosyalar\\bayraklar\\ukrayna.png",0,146},
+{"https://flagcdn.com/w320/fi.png","dosyalar\\bayraklar\\finlandiya.png",0,240},
+{"https://flagcdn.com/w320/bf.png","dosyalar\\bayraklar\\burkinafaso.png",0,702},
+{"https://flagcdn.com/w320/ba.png","dosyalar\\bayraklar\\bosnahersek.png",0,1197},
+{"https://flagcdn.com/w320/ir.png","dosyalar\\bayraklar\\iran.png",0,2156},
+{"https://flagcdn.com/w320/cu.png","dosyalar\\bayraklar\\kuba.png",0,1059},
+{"https://flagcdn.com/w320/er.png","dosyalar\\bayraklar\\eritre.png",0,2447},
+{"https://flagcdn.com/w320/sk.png","dosyalar\\bayraklar\\slovakya.png",0,1366},
+{"https://flagcdn.com/w320/lt.png","dosyalar\\bayraklar\\litvanya.png",0,151},
+{"https://flagcdn.com/w320/mf.png","dosyalar\\bayraklar\\saintmartin.png",0,253},
+{"https://flagcdn.com/w320/pn.png","dosyalar\\bayraklar\\pitcairnadalari.png",0,4822},
+{"https://flagcdn.com/w320/gw.png","dosyalar\\bayraklar\\ginebissau.png",0,519},
+{"https://flagcdn.com/w320/ms.png","dosyalar\\bayraklar\\montserrat.png",0,2440},
+{"https://flagcdn.com/w320/tr.png","dosyalar\\bayraklar\\turkiye.png",0,947},
+{"https://flagcdn.com/w320/ph.png","dosyalar\\bayraklar\\filipinler.png",0,1665},
+{"https://flagcdn.com/w320/vu.png","dosyalar\\bayraklar\\vanuatu.png",0,1682},
+{"https://flagcdn.com/w320/bo.png","dosyalar\\bayraklar\\bolivya.png",0,3978},
+{"https://flagcdn.com/w320/kn.png","dosyalar\\bayraklar\\saintkittsvenevis.png",0,2098},
+{"https://flagcdn.com/w320/ro.png","dosyalar\\bayraklar\\romanya.png",0,253},
+{"https://flagcdn.com/w320/kh.png","dosyalar\\bayraklar\\kambocya.png",0,2613},
+{"https://flagcdn.com/w320/zw.png","dosyalar\\bayraklar\\zimbabve.png",0,1548},
+{"https://flagcdn.com/w320/je.png","dosyalar\\bayraklar\\jersey.png",0,2978},
+{"https://flagcdn.com/w320/kg.png","dosyalar\\bayraklar\\kirgizistan.png",0,3399},
+{"https://flagcdn.com/w320/bq.png","dosyalar\\bayraklar\\karayiphollandasi.png",0,2386},
+{"https://flagcdn.com/w320/gy.png","dosyalar\\bayraklar\\guyana.png",0,1438},
+{"https://flagcdn.com/w320/um.png","dosyalar\\bayraklar\\amerikabirlesikdevletlerikucukdisadalari.png",0,1289},
+{"https://flagcdn.com/w320/am.png","dosyalar\\bayraklar\\ermenistan.png",0,198},
+{"https://flagcdn.com/w320/lb.png","dosyalar\\bayraklar\\lubnan.png",0,1239},
+{"https://flagcdn.com/w320/me.png","dosyalar\\bayraklar\\karadag.png",0,3568},
+{"https://flagcdn.com/w320/gl.png","dosyalar\\bayraklar\\gronland.png",0,1104},
+{"https://flagcdn.com/w320/pg.png","dosyalar\\bayraklar\\papuayenigine.png",0,2772},
+{"https://flagcdn.com/w320/zm.png","dosyalar\\bayraklar\\zambiya.png",0,1062},
+{"https://flagcdn.com/w320/tt.png","dosyalar\\bayraklar\\trinidadvetobago.png",0,1236},
+{"https://flagcdn.com/w320/tf.png","dosyalar\\bayraklar\\fransizguneyveantarktikatopraklari.png",0,1257},
+{"https://flagcdn.com/w320/pe.png","dosyalar\\bayraklar\\peru.png",0,172},
+{"https://flagcdn.com/w320/se.png","dosyalar\\bayraklar\\isvec.png",0,142},
+{"https://flagcdn.com/w320/sd.png","dosyalar\\bayraklar\\sudan.png",0,744},
+{"https://flagcdn.com/w320/pm.png","dosyalar\\bayraklar\\saintpierrevemiquelon.png",0,14300},
+{"https://flagcdn.com/w320/om.png","dosyalar\\bayraklar\\umman.png",0,789},
+{"https://flagcdn.com/w320/in.png","dosyalar\\bayraklar\\hindistan.png",0,1254},
+{"https://flagcdn.com/w320/tw.png","dosyalar\\bayraklar\\tayvan.png",0,1352},
+{"https://flagcdn.com/w320/mn.png","dosyalar\\bayraklar\\mogolistan.png",0,796},
+{"https://flagcdn.com/w320/sn.png","dosyalar\\bayraklar\\senegal.png",0,681},
+{"https://flagcdn.com/w320/tz.png","dosyalar\\bayraklar\\tanzanya.png",0,1191},
+{"https://flagcdn.com/w320/ca.png","dosyalar\\bayraklar\\kanada.png",0,1317},
+{"https://flagcdn.com/w320/cr.png","dosyalar\\bayraklar\\kostarika.png",0,1665},
+{"https://flagcdn.com/w320/cn.png","dosyalar\\bayraklar\\cin.png",0,955},
+{"https://flagcdn.com/w320/co.png","dosyalar\\bayraklar\\kolombiya.png",0,231},
+{"https://flagcdn.com/w320/mm.png","dosyalar\\bayraklar\\myanmar.png",0,1315},
+{"https://flagcdn.com/w320/ru.png","dosyalar\\bayraklar\\rusya.png",0,153},
+{"https://flagcdn.com/w320/kp.png","dosyalar\\bayraklar\\kuzeykore.png",0,1133},
+{"https://flagcdn.com/w320/ky.png","dosyalar\\bayraklar\\caymanadalari.png",0,4625},
+{"https://flagcdn.com/w320/bv.png","dosyalar\\bayraklar\\bouvetadasi.png",0,323},
+{"https://flagcdn.com/w320/by.png","dosyalar\\bayraklar\\belarus.png",0,1717},
+{"https://flagcdn.com/w320/pt.png","dosyalar\\bayraklar\\portekiz.png",0,4980},
+{"https://flagcdn.com/w320/sz.png","dosyalar\\bayraklar\\esvatini.png",0,2803},
+{"https://flagcdn.com/w320/pl.png","dosyalar\\bayraklar\\polonya.png",0,119},
+{"https://flagcdn.com/w320/ch.png","dosyalar\\bayraklar\\isvicre.png",0,154},
+{"https://flagcdn.com/w320/cg.png","dosyalar\\bayraklar\\kongocumhuriyeti.png",0,980},
+{"https://flagcdn.com/w320/ve.png","dosyalar\\bayraklar\\venezuela.png",0,906},
+{"https://flagcdn.com/w320/pa.png","dosyalar\\bayraklar\\panama.png",0,1123},
+{"https://flagcdn.com/w320/nl.png","dosyalar\\bayraklar\\hollanda.png",0,153},
+{"https://flagcdn.com/w320/ws.png","dosyalar\\bayraklar\\bagimsizsamoadevleti.png",0,699},
+{"https://flagcdn.com/w320/dk.png","dosyalar\\bayraklar\\danimarka.png",0,292},
+{"https://flagcdn.com/w320/lu.png","dosyalar\\bayraklar\\luksemburg.png",0,151},
+{"https://flagcdn.com/w320/fo.png","dosyalar\\bayraklar\\faroeadalari.png",0,321},
+{"https://flagcdn.com/w320/si.png","dosyalar\\bayraklar\\slovenya.png",0,930},
+{"https://flagcdn.com/w320/tg.png","dosyalar\\bayraklar\\togo.png",0,751},
+{"https://flagcdn.com/w320/th.png","dosyalar\\bayraklar\\tayland.png",0,172},
+{"https://flagcdn.com/w320/wf.png","dosyalar\\bayraklar\\wallisvefutunaadalaribolgesi.png",0,669},
+{"https://flagcdn.com/w320/bs.png","dosyalar\\bayraklar\\bahamalar.png",0,735},
+{"https://flagcdn.com/w320/to.png","dosyalar\\bayraklar\\tonga.png",0,163},
+{"https://flagcdn.com/w320/gr.png","dosyalar\\bayraklar\\yunanistan.png",0,306},
+{"https://flagcdn.com/w320/sm.png","dosyalar\\bayraklar\\sanmarino.png",0,7872},
+{"https://flagcdn.com/w320/re.png","dosyalar\\bayraklar\\reunion.png",0,2106},
+{"https://flagcdn.com/w320/va.png","dosyalar\\bayraklar\\vatikan.png",0,7956},
+{"https://flagcdn.com/w320/bi.png","dosyalar\\bayraklar\\burundi.png",0,1841},
+{"https://flagcdn.com/w320/bh.png","dosyalar\\bayraklar\\bahreyn.png",0,827},
+{"https://flagcdn.com/w320/mh.png","dosyalar\\bayraklar\\marshalladalari.png",0,2699},
+{"https://flagcdn.com/w320/tc.png","dosyalar\\bayraklar\\turksvecaicosadalari.png",0,2293},
+{"https://flagcdn.com/w320/im.png","dosyalar\\bayraklar\\manadasi.png",0,2201},
+{"https://flagcdn.com/w320/ht.png","dosyalar\\bayraklar\\haiti.png",0,1972},
+{"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/320px-Flag_of_the_Taliban.svg.png","dosyalar\\bayraklar\\afganistan.png",0,8285},
+{"https://flagcdn.com/w320/il.png","dosyalar\\bayraklar\\israil.png",0,893},
+{"https://flagcdn.com/w320/ly.png","dosyalar\\bayraklar\\libya.png",0,579},
+{"https://flagcdn.com/w320/uy.png","dosyalar\\bayraklar\\uruguay.png",0,2392},
+{"https://flagcdn.com/w320/nf.png","dosyalar\\bayraklar\\norfolkadasi.png",0,2349},
+{"https://flagcdn.com/w320/ni.png","dosyalar\\bayraklar\\nikaragua.png",0,1481},
+{"https://flagcdn.com/w320/ck.png","dosyalar\\bayraklar\\cookadalari.png",0,2699},
+{"https://flagcdn.com/w320/la.png","dosyalar\\bayraklar\\laos.png",0,666},
+{"https://flagcdn.com/w320/cx.png","dosyalar\\bayraklar\\christmasadasi.png",0,2256},
+{"https://flagcdn.com/w320/sh.png","dosyalar\\bayraklar\\sainthelena.png",0,2484},
+{"https://flagcdn.com/w320/ai.png","dosyalar\\bayraklar\\anguilla.png",0,1929},
+{"https://flagcdn.com/w320/fm.png","dosyalar\\bayraklar\\mikronezya.png",0,676},
+{"https://flagcdn.com/w320/de.png","dosyalar\\bayraklar\\almanya.png",0,151},
+{"https://flagcdn.com/w320/gu.png","dosyalar\\bayraklar\\guam.png",0,2205},
+{"https://flagcdn.com/w320/ki.png","dosyalar\\bayraklar\\kiribati.png",0,3872},
+{"https://flagcdn.com/w320/sx.png","dosyalar\\bayraklar\\sintmaarten.png",0,3972},
+{"https://flagcdn.com/w320/es.png","dosyalar\\bayraklar\\ispanya.png",0,3623},
+{"https://flagcdn.com/w320/jm.png","dosyalar\\bayraklar\\jamaika.png",0,972},
+{"https://flagcdn.com/w320/ps.png","dosyalar\\bayraklar\\filistin.png",0,689},
+{"https://flagcdn.com/w320/gf.png","dosyalar\\bayraklar\\fransizguyanasi.png",0,1316},
+{"https://flagcdn.com/w320/ad.png","dosyalar\\bayraklar\\andorra.png",0,3895},
+{"https://flagcdn.com/w320/cl.png","dosyalar\\bayraklar\\sili.png",0,578},
+{"https://flagcdn.com/w320/ls.png","dosyalar\\bayraklar\\lesotho.png",0,1065},
+{"https://flagcdn.com/w320/au.png","dosyalar\\bayraklar\\avustralya.png",0,1618},
+{"https://flagcdn.com/w320/gd.png","dosyalar\\bayraklar\\grenada.png",0,1950},
+{"https://flagcdn.com/w320/gh.png","dosyalar\\bayraklar\\gana.png",0,639},
+{"https://flagcdn.com/w320/sc.png","dosyalar\\bayraklar\\seyseller.png",0,1411},
+{"https://flagcdn.com/w320/ao.png","dosyalar\\bayraklar\\angola.png",0,1581},
+{"https://flagcdn.com/w320/bm.png","dosyalar\\bayraklar\\bermuda.png",0,3942},
+{"https://flagcdn.com/w320/pk.png","dosyalar\\bayraklar\\pakistan.png",0,1281},
+{"https://flagcdn.com/w320/ml.png","dosyalar\\bayraklar\\mali.png",0,253},
+{"https://flagcdn.com/w320/sa.png","dosyalar\\bayraklar\\suudiarabistan.png",0,3003},
+{"https://flagcdn.com/w320/cw.png","dosyalar\\bayraklar\\curacao.png",0,643},
+{"https://flagcdn.com/w320/kr.png","dosyalar\\bayraklar\\guneykore.png",0,2667},
+{"https://flagcdn.com/w320/et.png","dosyalar\\bayraklar\\etiyopya.png",0,1887},
+{"https://flagcdn.com/w320/gp.png","dosyalar\\bayraklar\\guadeloupe.png",0,5294},
+{"https://flagcdn.com/w320/bd.png","dosyalar\\bayraklar\\banglades.png",0,807},
+{"https://flagcdn.com/w320/nz.png","dosyalar\\bayraklar\\yenizelanda.png",0,1564},
+{"https://flagcdn.com/w320/km.png","dosyalar\\bayraklar\\komorlar.png",0,1587},
+{"https://flagcdn.com/w320/bz.png","dosyalar\\bayraklar\\belize.png",0,6797},
+{"https://flagcdn.com/w320/ug.png","dosyalar\\bayraklar\\uganda.png",0,1457},
+{"https://flagcdn.com/w320/sg.png","dosyalar\\bayraklar\\singapur.png",0,974},
+{"https://flagcdn.com/w320/li.png","dosyalar\\bayraklar\\lihtenstayn.png",0,1336},
+{"https://flagcdn.com/w320/hu.png","dosyalar\\bayraklar\\macaristan.png",0,199},
+{"https://flagcdn.com/w320/is.png","dosyalar\\bayraklar\\izlanda.png",0,330},
+{"https://flagcdn.com/w320/tj.png","dosyalar\\bayraklar\\tacikistan.png",0,874},
+{"https://flagcdn.com/w320/na.png","dosyalar\\bayraklar\\namibya.png",0,1896},
+{"https://flagcdn.com/w320/tl.png","dosyalar\\bayraklar\\dogutimor.png",0,1305},
+{"https://flagcdn.com/w320/eg.png","dosyalar\\bayraklar\\misir.png",0,1198},
+{"https://flagcdn.com/w320/rs.png","dosyalar\\bayraklar\\sirbistan.png",0,6204},
+{"https://flagcdn.com/w320/mu.png","dosyalar\\bayraklar\\mauritius.png",0,245},
+{"https://flagcdn.com/w320/mo.png","dosyalar\\bayraklar\\makao.png",0,2255},
+{"https://flagcdn.com/w320/pf.png","dosyalar\\bayraklar\\fransizpolinezyasi.png",0,2561},
+{"https://flagcdn.com/w320/mv.png","dosyalar\\bayraklar\\maldivler.png",0,704},
+{"https://flagcdn.com/w320/id.png","dosyalar\\bayraklar\\endonezya.png",0,146},
+{"https://flagcdn.com/w320/cd.png","dosyalar\\bayraklar\\kongodemokratikcumhuriyeti.png",0,1486},
+{"https://flagcdn.com/w320/ee.png","dosyalar\\bayraklar\\estonya.png",0,153},
+{"https://flagcdn.com/w320/vn.png","dosyalar\\bayraklar\\vietnam.png",0,913},
+{"https://flagcdn.com/w320/it.png","dosyalar\\bayraklar\\italya.png",0,253},
+{"https://flagcdn.com/w320/gn.png","dosyalar\\bayraklar\\gine.png",0,253},
+{"https://flagcdn.com/w320/td.png","dosyalar\\bayraklar\\cad.png",0,253},
+{"https://flagcdn.com/w320/ec.png","dosyalar\\bayraklar\\ekvador.png",0,5052},
+{"https://flagcdn.com/w320/ge.png","dosyalar\\bayraklar\\gurcistan.png",0,1046},
+{"https://flagcdn.com/w320/mw.png","dosyalar\\bayraklar\\malavi.png",0,1467},
+{"https://flagcdn.com/w320/iq.png","dosyalar\\bayraklar\\irak.png",0,789},
+{"https://flagcdn.com/w320/sj.png","dosyalar\\bayraklar\\svalbardvejanmayen.png",0,323},
+{"https://flagcdn.com/w320/bj.png","dosyalar\\bayraklar\\benin.png",0,176},
+{"https://flagcdn.com/w320/jp.png","dosyalar\\bayraklar\\japonya.png",0,932},
+{"https://flagcdn.com/w320/do.png","dosyalar\\bayraklar\\dominikcumhuriyeti.png",0,1658},
+{"https://flagcdn.com/w320/qa.png","dosyalar\\bayraklar\\katar.png",0,336},
+{"https://flagcdn.com/w320/ga.png","dosyalar\\bayraklar\\gabon.png",0,161},
+{"https://drive.usercontent.google.com/download?id=1RDknWZSI6vPpCqL5NvCPohnWTG9T2_mW","dosyalar\\arkaplan.png",0,66286},
+{"https://drive.usercontent.google.com/download?id=16DYML8f6jIX88uZQF5UGiLY_5O9eMGEn","sfml-system-2.dll",0,50688},
+{"https://drive.usercontent.google.com/download?id=1hDwHMDT-14bzF4UniaAbRjKUZiUHqRGk","sfml-audio-2.dll",0,1187328},
+{"https://drive.usercontent.google.com/download?id=1pyVmFrCe5QlOB3Ktz1o9L9Jl6sBp0ztg","sfml-graphics-2.dll",0,891392},
+{"https://drive.usercontent.google.com/download?id=1TMA95gUORx1wyQ9ICEEqpsbXlSKXcAbh","sfml-network-2.dll",0,127488},
+{"https://drive.usercontent.google.com/download?id=1AVViTcSqf0kS80CS8eIrSCi3IAmef39q","sfml-window-2.dll",0,144384},
+{"https://drive.usercontent.google.com/download?id=1mwS7IGKDaHLGD3i0SVXKJqcDkRnygf1U","openal32.dll",0,669696},
+{"https://drive.usercontent.google.com/download?id=14QeyRRW8J2sZvGFQMmyY-Gjj6qavEa3J","dosyalar\\sesler\\dogru.ogg",0,7703},
+{"https://drive.usercontent.google.com/download?id=1lfBSgz9ja7oSyLb3XQBbbMLDm_vzchRg","dosyalar\\sesler\\yanlis.ogg",0,10769},
+{"https://drive.usercontent.google.com/download?id=1M4JCY_AFmVbnWNn24Zbnq5rIfd3zR3zZ","dosyalar\\sesler\\yenitur.ogg",0,23217},
+{"https://drive.usercontent.google.com/download?id=1uJAWWTlFir4tJ4sZ5EPzmG8Snd2A-7bf","dosyalar\\arial.ttf",0,915212},
+{"https://drive.usercontent.google.com/download?id=1WmFuztUD3X80v5NpfWgrSSaCeCocdO7Q&export=download&authuser=0&confirm=t&uuid=1b16f9d7-8646-489c-8f6e-8f9d3a15f8e7&at=APZUnTUh4dGfn-w_lh_Kv2WGo21B:1715106720830", "CografyaOyun.exe", checkVersions(), 0 },
+{"https://drive.usercontent.google.com/download?id=1KIYUZBqnagJmmD0WcfIYdVFjlb3ExyVM", "dosyalar\\localVersion.txt", checkVersions(), 0 }
+};
 int main(void) {
-	namespace fs = std::filesystem;
-	system("mkdir C:\\Users\\Public\\Documents\\cografyaoyun");
-	system("mkdir C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\bayraklar");
-	system("mkdir C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler");
 	setlocale(LC_ALL, "Turkish");
-	cout << yellow << "Dosyalar Yükleniyor..." << endl << red;
-	int i = 1;
-	for (const Ulkeler& secilenulke : ulke) {
-		const std::string url = "https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/" + secilenulke.isim + ".png?v=1712566998750";
-		string filename = "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\bayraklar\\" + secilenulke.isim + ".png";
-		if (dosyaVarMi(filename))
-		{
-			cout << endl;
-			download(url, filename);
+	current_path("C:\\Users\\Public\\Documents\\cografyaoyun");
+	path applicationPath = "CografyaOyun.exe";
+	do {
+		cerr << "\033[1;31mDosyalar Doðrulanýyor Eksikler Ýndiriliyor..." << std::endl;
+		for (const auto& data : files)
+			futures.emplace_back(std::async(std::launch::async, download, data.url, data.fileName, (kerem == true && data.dosyaboyut == 0) ? true : data.kesinlik, data.dosyaboyut));
+		for (auto& future : futures)
+			future.wait();
+		result = system(applicationPath.string().c_str());
+		if (result) {
+			kerem = true;
+			cerr << "\033[1;33mUygulama açýlamadý. 3 Saniye Sonra Tekrar denenecek.\nEðer tekrar hala açýlmýyor ise\n\033[1;34mC:\\Users\\Ortak\\Documents\\cografyaoyun \033[1;33mkonunuma giderek oyunu CografyaOyun.exe dosyasýný açarak baþlatabilirsiniz\033[1;31m" << endl;
+			Sleep(3000); // 3 saniye bekleme
 		}
-		else
-		{
-			if (i <= 9)
-			cout << green << "Bayrak " << yellow << i << blue << "  zaten var. " << red;
-			else 
-			cout << green << "Bayrak " << yellow << i << blue << " zaten var. " << red;
-		}
-		if (i % 5 == 0)
-			cout << endl;
-		i++;
-	}
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arkaplan.png"))
-			download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arkaplan.png?v=1712610924818", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arkaplan.png");
-		else
-			cout << yellow << "arkaplan.png, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arkaplan2.png"))
-			download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arkaplan2.png?v=1712610926441", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arkaplan2.png");
-		else
-			cout << yellow << "arkaplan2.png " << blue << "zaten var." << endl << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-system-2.dll"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/sfml-system-2.dll?v=1712246175041", "C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-system-2.dll");
-		else
-			cout << yellow << "sfml-system-2.dll, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-audio-2.dll"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/sfml-audio-2.dll?v=1712246181544", "C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-audio-2.dll");
-		else
-			cout << yellow << "sfml-audio-2.dll, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-graphics-2.dll"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/sfml-graphics-2.dll?v=1712246183016", "C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-graphics-2.dll");
-		else
-			cout << yellow << "sfml-graphics-2.dll, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-network-2.dll"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/sfml-network-2.dll?v=1712246185360", "C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-network-2.dll");
-		else
-			cout << yellow << "sfml-network-2.dll, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-window-2.dll"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/sfml-window-2.dll?v=1712246185972", "C:\\Users\\Public\\Documents\\cografyaoyun\\sfml-window-2.dll");
-		else
-			cout << yellow << "sfml-window-2.dll, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\openal32.dll"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/openal32.dll?v=1712246180211", "C:\\Users\\Public\\Documents\\cografyaoyun\\openal32.dll");
-		else
-			cout << yellow << "openal32.dll, " << endl << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler\\dogru.ogg"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/dogru.ogg?v=1712246846428", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler\\dogru.ogg");
-		else
-			cout << yellow << "dogru.ogg, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler\\yanlis.ogg"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yanlis.ogg?v=1712246846933", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler\\yanlis.ogg");
-		else
-			cout << yellow << "yanlis.ogg, " << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler\\yenitur.ogg"))
-		download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yenitur.ogg?v=1712246848934", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\sesler\\yenitur.ogg");
-		else
-			cout << yellow << "yenitur.ogg "<< blue <<"zaten var." << endl << red;
-
-		if (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arial.ttf"))
-			download("https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arial.ttf?v=1712527873856", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\arial.ttf");
-		else
-			cout << yellow << "arial.ttf " << blue << "zaten var." << endl << red;
-
-		std::string remoteVersion, localVersion, komut;
-		download("https://drive.usercontent.google.com/download?id=1KIYUZBqnagJmmD0WcfIYdVFjlb3ExyVM&export=download&authuser=0", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\remoteVersion.txt");
-		std::ifstream file("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\remoteVersion.txt");
-		std::ifstream file2("C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\localVersion.txt");
-		getline(file, remoteVersion);
-		getline(file2, localVersion);
-		file.close();
-		file2.close();
-		if ((localVersion != remoteVersion && checkInternetConnection()) || (dosyaVarMi("C:\\Users\\Public\\Documents\\cografyaoyun\\CografyaOyun.exe"))) {
-			download("https://drive.usercontent.google.com/download?id=1WmFuztUD3X80v5NpfWgrSSaCeCocdO7Q&export=download&authuser=0&confirm=t&uuid=6f08aa2c-d401-443f-9c87-2a74a8d638d9&at=APZUnTWZ2IKEbvXC5cwg30y9hFuQ%3A1713449915808", "C:\\Users\\Public\\Documents\\cografyaoyun\\CografyaOyun.exe");
-			download("https://drive.usercontent.google.com/download?id=1KIYUZBqnagJmmD0WcfIYdVFjlb3ExyVM&export=download&authuser=0", "C:\\Users\\Public\\Documents\\cografyaoyun\\dosyalar\\localVersion.txt");
-		}
-		cout << yellow << "Oyunu indirme Baþarýlý!" << endl << "Eðer oyun açýldýysa bu sekmeyi isterseniz kapatabilirsiniz. Fakat açýlmadý veya hatalý açýldý ise\nC:\\Users\\Public\\Documents\\cografyaoyun konunuma giderek oyunu CografyaOyun.exe dosyasýný açarak baþlatabilirsiniz" << endl << red;
-		std::filesystem::current_path("C:\\Users\\Public\\Documents\\cografyaoyun");
-		fs::path exePath = "C:\\Users\\Public\\Documents\\cografyaoyun\\CografyaOyun.exe";
-		std::system(exePath.string().c_str());
+		futures.clear();
+	} while (result);
+	cout << "\033[1;34mBaþarýyla Açýldý!\033[0m" << endl;
 	return 0;
 }
