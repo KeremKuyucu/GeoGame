@@ -93,7 +93,7 @@ vector<FileData> files = {
 {"https://flagcdn.com/w320/tk.png","dosyalar\\bayraklar\\tokelau.png",0,1418},
 {"https://flagcdn.com/w320/nc.png","dosyalar\\bayraklar\\yenikaledonya.png",0,1715},
 {"https://flagcdn.com/w320/bb.png","dosyalar\\bayraklar\\barbados.png",0,998},
-{"https://flagcdn.com/w320/st.png","dosyalar\\bayraklar\\s“otom⁄veprˇncipe.png",0,1077},
+{"https://flagcdn.com/w320/st.png","dosyalar\\bayraklar\\s√íotom√övepr√øncipe.png",0,1077},
 {"https://flagcdn.com/w320/aq.png","dosyalar\\bayraklar\\antarktika.png",0,1354},
 {"https://flagcdn.com/w320/bn.png","dosyalar\\bayraklar\\brunei.png",0,3402},
 {"https://flagcdn.com/w320/bt.png","dosyalar\\bayraklar\\butan.png",0,8230},
@@ -108,7 +108,7 @@ vector<FileData> files = {
 {"https://flagcdn.com/w320/cz.png","dosyalar\\bayraklar\\cekya.png",0,940},
 {"https://flagcdn.com/w320/gi.png","dosyalar\\bayraklar\\cebelitarik.png",0,2033},
 {"https://flagcdn.com/w320/aw.png","dosyalar\\bayraklar\\aruba.png",0,735},
-{"https://flagcdn.com/w320/bl.png","dosyalar\\bayraklar\\saintbarth⁄lemy.png",0,11667},
+{"https://flagcdn.com/w320/bl.png","dosyalar\\bayraklar\\saintbarth√ölemy.png",0,11667},
 {"https://flagcdn.com/w320/mc.png","dosyalar\\bayraklar\\monako.png",0,124},
 {"https://flagcdn.com/w320/ae.png","dosyalar\\bayraklar\\birlesikarapemirlikleri.png",0,233},
 {"https://flagcdn.com/w320/ss.png","dosyalar\\bayraklar\\guneysudan.png",0,1000},
@@ -300,7 +300,7 @@ int main(void) {
 	current_path("C:\\Users\\Public\\Documents\\cografyaoyun");
 	path applicationPath = "CografyaOyun.exe";
 	do {
-		cerr << "\033[1;31mDosyalar Dorulan˝yor Eksikler ›ndiriliyor..." << std::endl;
+		cerr << "\033[1;31mDosyalar Do√∞rulan√Ωyor Eksikler √ùndiriliyor..." << std::endl;
 		for (const auto& data : files)
 			futures.emplace_back(std::async(std::launch::async, download, data.url, data.fileName, (kerem == true && data.dosyaboyut == 0) ? true : data.kesinlik, data.dosyaboyut));
 		for (auto& future : futures)
@@ -308,11 +308,11 @@ int main(void) {
 		result = system(applicationPath.string().c_str());
 		if (result) {
 			kerem = true;
-			cerr << "\033[1;33mUygulama aÁ˝lamad˝. 3 Saniye Sonra Tekrar denenecek.\nEer tekrar hala aÁ˝lm˝yor ise\n\033[1;34mC:\\Users\\Ortak\\Documents\\cografyaoyun \033[1;33mkonunuma giderek oyunu CografyaOyun.exe dosyas˝n˝ aÁarak ba˛latabilirsiniz\033[1;31m" << endl;
+			cerr << "\033[1;33mUygulama a√ß√Ωlamad√Ω. 3 Saniye Sonra Tekrar denenecek.\nE√∞er tekrar hala a√ß√Ωlm√Ωyor ise\n\033[1;34mC:\\Users\\Ortak\\Documents\\cografyaoyun \033[1;33mkonunuma giderek oyunu CografyaOyun.exe dosyas√Ωn√Ω a√ßarak ba√ælatabilirsiniz\033[1;31m" << endl;
 			Sleep(3000); // 3 saniye bekleme
 		}
 		futures.clear();
 	} while (result);
-	cout << "\033[1;34mBa˛ar˝yla AÁ˝ld˝!\033[0m" << endl;
+	cout << "\033[1;34mBa√æar√Ωyla A√ß√Ωld√Ω!\033[0m" << endl;
 	return 0;
 }
