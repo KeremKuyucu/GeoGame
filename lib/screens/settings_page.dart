@@ -51,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _toggleBackgroundMusic(bool play) async {
-    final url = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arkafon.ogg?v=1725181484436';
+    final url = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arkafon.mp3?v=1725557913852';
     if (play) {
       try {
         await _audioPlayer.play(UrlSource(url));

@@ -34,26 +34,6 @@ class Ulkeler {
     return yapilantahmin == trisim || yapilantahmin == isim || yapilantahmin == enisim;
   }
 }
-class BackgroundWidget extends StatelessWidget {
-final Widget child;
-final String backgroundImage;
-
-BackgroundWidget({required this.child, this.backgroundImage = 'assets/images/background.jpg'});
-
-@override
-Widget build(BuildContext context) {
-  return Stack(
-    fit: StackFit.expand,
-    children: <Widget>[
-      Image.asset(
-        backgroundImage,
-        fit: BoxFit.cover,
-      ),
-      child,
-    ],
-  );
-}
-}
 final random = Random();
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true;
 bool yazmamodu = false;
@@ -103,9 +83,9 @@ Future<void> playSoundEffect(String url) async {
     print('Ses çalma hatası: $e');
   }
 }
-final String dogru = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/dogru.ogg?v=1725181484784';
-final String yanlis = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yanlis.ogg?v=1725181485184';
-final String yenitur = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yenitur.ogg?v=1725181485596';
+final String dogru = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/dogru.mp3?v=1725557914217';
+final String yanlis = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yanlis.mp3?v=1725557908777';
+final String yenitur = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yenitur.mp3?v=1725557915077';
 Future<void> yeniulkesec() async {
   int randomNumber = 0;
   int butonRandomNumber = random.nextInt(4); // Doğru cevabın pozisyonu rastgele belirlenir

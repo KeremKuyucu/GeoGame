@@ -6,6 +6,8 @@ import 'package:GeoGame/screens/mesafeoyun.dart';
 import 'package:GeoGame/screens/settings_page.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class GeoGameLobi extends StatefulWidget {
   @override
@@ -18,8 +20,8 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     '2. Bayraktan Ülke Bilme Oyunu',
     '3. Mesafeden Ülke Bilme Oyunu',
     '4. Ayarlar',
+    '5. Sıralama'
   ];
-
   @override
   void initState() {
     super.initState();
@@ -31,22 +33,22 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
    setState(() {
      _selectedOption = index;
    });
-   if (index == 0 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   if (_selectedOption == 0 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => BaskentOyun()),
      );
-   } else if (index == 1 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   } else if (_selectedOption == 1 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => BayrakOyun()),
      );
-   } else if (index == 2 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   } else if (_selectedOption == 2 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => MesafeOyun()),
      );
-   }else if (index == 3 || false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   }else if (_selectedOption == 3 || false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -111,7 +113,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle, color: Colors.pink),
+              leading: FaIcon(FontAwesomeIcons.instagram),
               title: Text('Instagram Hesabım'),
               onTap: () async {
                 await EasyLauncher.url(
@@ -120,8 +122,15 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.web, color: Colors.red),
+              leading: Icon(Icons.public, color: Colors.red),
               title: Text('Oyunun İnternet Sitesi'),
+              onTap: () async {
+                await EasyLauncher.url(url: "https://geogame.glitch.me/");
+              },
+            ),
+            ListTile(
+              leading: FaIcon(FontAwesomeIcons.github),
+              title: Text('Oyunun Github Sayfası'),
               onTap: () async {
                 await EasyLauncher.url(url: "https://geogame.glitch.me/");
               },
