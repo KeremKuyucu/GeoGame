@@ -1,6 +1,7 @@
-# geogame
+# GeoGame
 
-Cografya Oyunu
+Ülkeler hakkında bilginizi geliştirmek istiyorsanız tam sizlik oyun.
+İnternet Sayfası: https://geogame.glitch.me/
 
 ## Getting Started
 
