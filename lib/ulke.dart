@@ -41,6 +41,7 @@ bool backgroundMusicPlaying = false;
 int toplampuan=0;
 List<String> butonAnahtarlar = ['', '', '', ''];
 List<int> butonnumaralari = [-1,-2,-3,-4];
+String isim = '';
 Ulkeler gecici = Ulkeler(
   bayrak: '',
   trisim: '',
@@ -158,7 +159,7 @@ Future<void> readFromFile(Function updateState) async {
     final contents = await file.readAsString();
     final lines = contents.split('\n');
 
-    if (lines.length >= 10) {
+    if (lines.length >= 10) { // İsmi de eklediğimiz için uzunluk 11 olacak
       // Callback ile durumu güncelle
       updateState(() {
         amerikakitasi = lines[0] == 'true';
@@ -192,6 +193,7 @@ Future<void> writeToFile() async {
     yazmamodu.toString(),
     backgroundMusicPlaying.toString(),
     toplampuan.toString(),
+    isim, // İsmi dosyaya yazma
   ].join('\n');
   await file.writeAsString(data);
 }

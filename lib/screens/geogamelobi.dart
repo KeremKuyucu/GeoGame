@@ -8,7 +8,6 @@ import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 class GeoGameLobi extends StatefulWidget {
   @override
   _GeoGameLobiState createState() => _GeoGameLobiState();
@@ -20,7 +19,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     '2. Bayraktan Ülke Bilme Oyunu',
     '3. Mesafeden Ülke Bilme Oyunu',
     '4. Ayarlar',
-    '5. Sıralama'
   ];
   @override
   void initState() {
@@ -48,7 +46,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
        context,
        MaterialPageRoute(builder: (context) => MesafeOyun()),
      );
-   }else if (_selectedOption == 3 || false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   } else if (_selectedOption == 3 || false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => SettingsPage()),

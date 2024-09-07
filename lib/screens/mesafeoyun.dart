@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:GeoGame/ulke.dart';
 
 class MesafeOyun extends StatefulWidget {
-
   MesafeOyun();
-
   @override
   _MesafeOyunState createState() => _MesafeOyunState();
 }
@@ -97,6 +95,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
 
   void _pasButtonPressed() {
+    puan=50;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Geçilen Ülke: ${kalici.isim}'),

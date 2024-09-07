@@ -91,6 +91,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
   }
 
   void _pasButtonPressed() {
+    puan=50;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Geçilen Ülke: ${kalici.isim}'),
