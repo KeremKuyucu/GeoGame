@@ -1,8 +1,10 @@
 import "package:flutter/material.dart";
 import 'dart:math';
 import 'dart:io';
+import 'package:ftpconnect/ftpConnect.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 class Ulkeler {
   String bayrak;
   String trisim;
@@ -196,6 +198,19 @@ Future<void> writeToFile() async {
     isim, // İsmi dosyaya yazma
   ].join('\n');
   await file.writeAsString(data);
+}
+void ftpdownload(String yereladi,String ftpadi) async{
+  FTPConnect ftpConnect = FTPConnect(dotenv.env['FTP_HOST'] ?? '', user: dotenv.env['FTP_USER'] ?? '', pass: dotenv.env['FTP_PASSWORD'] ?? '');
+  await ftpConnect.connect();
+  await ftpConnect.downloadFileWithRetry(yereladi, File(ftpadi));
+  await ftpConnect.disconnect();
+}
+void ftpupload(File gonderilcekad) async{
+  FTPConnect ftpConnect = FTPConnect(dotenv.env['FTP_HOST'] ?? '', user: dotenv.env['FTP_USER'] ?? '', pass: dotenv.env['FTP_PASSWORD'] ?? '');
+  File fileToUpload = File('fileToUpload.txt');
+  await ftpConnect.connect();
+  bool res = await ftpConnect.uploadFileWithRetry(fileToUpload, pRetryCount: 2);
+  await ftpConnect.disconnect();
 }
 double mesafeHesapla(double latitude1, double longitude1, double latitude2, double longitude2) {
   const double PI = 3.14159265358979323846264338327950288;
