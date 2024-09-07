@@ -7,7 +7,7 @@ import 'package:GeoGame/screens/settings_page.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart'; // üşenmedeğim bir zaman eklicem
 class GeoGameLobi extends StatefulWidget {
   @override
   _GeoGameLobiState createState() => _GeoGameLobiState();

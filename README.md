@@ -2,6 +2,7 @@
 
 Ülkeler hakkında bilginizi geliştirmek istiyorsanız tam sizlik oyun.
 İnternet Sayfası: https://geogame.glitch.me/
+Ftp verileri .env dosyasında saklanmaktadır.
 
 ## Getting Started
 
