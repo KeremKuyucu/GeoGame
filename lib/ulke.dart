@@ -1,4 +1,3 @@
-import "package:flutter/material.dart";
 import 'dart:math';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
@@ -36,7 +35,7 @@ class Ulkeler {
 }
 final random = Random();
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true;
-bool yazmamodu = false;
+bool yazmamodu = true;
 bool backgroundMusicPlaying = false;
 int toplampuan=0;
 List<String> butonAnahtarlar = ['', '', '', ''];
@@ -158,8 +157,7 @@ Future<void> readFromFile(Function updateState) async {
     final contents = await file.readAsString();
     final lines = contents.split('\n');
 
-    if (lines.length >= 10) { // İsmi de eklediğimiz için uzunluk 11 olacak
-      // Callback ile durumu güncelle
+    if (lines.length >= 9) { //
       updateState(() {
         amerikakitasi = lines[0] == 'true';
         asyakitasi = lines[1] == 'true';
@@ -169,8 +167,7 @@ Future<void> readFromFile(Function updateState) async {
         antartikakitasi = lines[5] == 'true';
         bmuyeligi = lines[6] == 'true';
         yazmamodu = lines[7] == 'true';
-        backgroundMusicPlaying = lines[8] == 'true';
-        toplampuan = int.parse(lines[9]);
+        toplampuan = int.parse(lines[8]);
       });
     }
   } else {
@@ -190,7 +187,6 @@ Future<void> writeToFile() async {
     antartikakitasi.toString(),
     bmuyeligi.toString(),
     yazmamodu.toString(),
-    backgroundMusicPlaying.toString(),
     toplampuan.toString(),
   ].join('\n');
   await file.writeAsString(data);
