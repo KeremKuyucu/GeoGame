@@ -7,6 +7,13 @@ import 'package:GeoGame/screens/settings_page.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import "package:theme_mode_builder/theme_mode_builder.dart";
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 class GeoGameLobi extends StatefulWidget {
   @override
   _GeoGameLobiState createState() => _GeoGameLobiState();
@@ -22,30 +29,94 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   @override
   void initState() {
     super.initState();
-    setState(() {
+      surumkiyasla();
+      ThemeModeBuilderConfig.setSystem();
       readFromFile((update) => setState(update));
-    });
+  }
+
+  Future<void> surumkiyasla() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String localVersion = packageInfo.version;
+    String? remoteVersion;
+    String? apkUrl;
+
+    // Verileri fetch eden asenkron fonksiyon
+    Future<void> _fetchData() async {
+      try {
+        final response = await http.get(Uri.parse('https://raw.githubusercontent.com/keremlolgg/GeoGame/main/latest_version.json'));
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          setState(() {
+            remoteVersion = data['latest_version'];
+            apkUrl = data['apk_url'];
+          });
+        } else {
+          throw Exception('Failed to load data');
+        }
+      } catch (e) {
+        print('Error: $e');
+      }
+    }
+
+    await _fetchData();
+
+    void showUpdateDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Yeni Sürüm Var'),
+            content: Text('Lütfen internet sitesinden uygulamayı tekrar indirerek güncelleyiniz.'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Şimdi Değil'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Siteye Git'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  EasyLauncher.url(
+                    url: apkUrl!,
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+    if (remoteVersion != null && apkUrl != null && remoteVersion != localVersion) {
+      showUpdateDialog(context);
+    }
   }
   void _selectOption(int index) async {
    setState(() {
      _selectedOption = index;
    });
    if (_selectedOption == 0 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+     Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => BaskentOyun()),
      );
    } else if (_selectedOption == 1 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+     Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => BayrakOyun()),
      );
    } else if (_selectedOption == 2 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+     Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => MesafeOyun()),
      );
    } else if (_selectedOption == 3 || false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+     Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -213,10 +284,14 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           Card(
             margin: EdgeInsets.all(16.0),
             elevation: 4.0,
-            child: Padding(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
+            ),
+            child: Container(
+              color: Colors.grey.shade800,
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Bayrak Oyununda Bayraklar Yüklenmiyorsa İnternet Bağlantınızı Kontrol Edin. Ayarlardan Şarkı Açabilirsiniz(İnternet Gerekli)',
+                'Ayarlardan Şarkı Açabilirsiniz.\nSes efektleri için şarkı gerekmektedir.',
                 style: TextStyle(fontSize: 16.0, color: Colors.white),
               ),
             ),

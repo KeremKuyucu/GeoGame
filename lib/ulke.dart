@@ -1,7 +1,9 @@
+import 'package:path_provider/path_provider.dart';
+import 'package:just_audio/just_audio.dart';
 import 'dart:math';
 import 'dart:io';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:path_provider/path_provider.dart';
+import 'dart:async';
+// Tanımlamalar
 class Ulkeler {
   String bayrak;
   String trisim;
@@ -33,11 +35,55 @@ class Ulkeler {
     return yapilantahmin == trisim || yapilantahmin == isim || yapilantahmin == enisim;
   }
 }
-final random = Random();
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true;
-bool yazmamodu = true;
-bool backgroundMusicPlaying = false;
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true, yazmamodu = true, backgroundMusicPlaying = false;
 int toplampuan=0;
+final random = Random();
+final dogru = AudioPlayer(); final yanlis = AudioPlayer(); final yenitur = AudioPlayer(); final arkafon = AudioPlayer();
+Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
+  try {
+    await player.setAsset(assetPath);
+    player.play();
+  } catch (e) {
+    print('Yerel dosya yüklenirken hata oluştu: $e');
+    try {
+      // URL’den çalmayı dene
+      await player.setUrl(url);
+      player.play();
+    } catch (urlError) {
+      print('URL’den ses yüklenirken hata oluştu: $urlError');
+    }
+  }
+}
+Future<void> Dogru() async {
+  await playAudioFromAssetOrUrl(
+      dogru,
+      'assets/sesler/dogru.mp3', // Yerel dosya yolu
+      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3' // URL
+  );
+}
+Future<void> Yanlis() async {
+  await playAudioFromAssetOrUrl(
+      yanlis,
+      'assets/sesler/yanlis.mp3',
+      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3'
+  );
+}
+Future<void> Yenitur() async {
+  await playAudioFromAssetOrUrl(
+      yenitur,
+      'assets/sesler/yenitur.mp3',
+      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3'
+  );
+}
+Future<void> Arkafon() async {
+  await arkafon.setLoopMode(LoopMode.one);
+  await playAudioFromAssetOrUrl(
+      arkafon,
+      'assets/sesler/arkafon.mp3',
+      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'
+  );
+}
+Future<void> Arkafondurdur() async { await arkafon.stop(); }
 List<String> butonAnahtarlar = ['', '', '', ''];
 List<int> butonnumaralari = [-1,-2,-3,-4];
 Ulkeler gecici = Ulkeler(
@@ -68,29 +114,11 @@ Ulkeler kalici = Ulkeler(
   boylam: 0.0,
   dosyaboyut: 0,
 );
-Future<void> playSoundEffect(String url) async {
-  try {
-    final soundPlayer = AudioPlayer();
-    await soundPlayer.play(UrlSource(url));
-    soundPlayer.setVolume(1);
-    soundPlayer.onPlayerStateChanged.listen((PlayerState state) {
-      if (state == PlayerState.completed) {
-        soundPlayer.dispose();
-      }
-    });
-  } catch (e) {
-    print('Ses çalma hatası: $e');
-  }
-}
-final String dogru = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/dogru.mp3?v=1725557914217';
-final String yanlis = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yanlis.mp3?v=1725557908777';
-final String yenitur = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/yenitur.mp3?v=1725557915077';
+// Fonksiyonlar
 Future<void> yeniulkesec() async {
   int randomNumber = 0;
-  int butonRandomNumber = random.nextInt(4); // Doğru cevabın pozisyonu rastgele belirlenir
+  int butonRandomNumber = random.nextInt(4);
   bool gecicibilgi = false;
-
-  // Ülke seçimi yaparken geçici bilgiyi belirle
   do {
     randomNumber = random.nextInt(ulke.length);
     for (var u in ulke) {
@@ -220,36 +248,7 @@ String kelimeDuzelt(String kelime) {
   }
   return sonuc;
 }
-String bulunanBenzerUlke(String komut, List<Ulkeler> ulke) {
-  int enYuksekBenzerlik = 0;
-  String enBenzerUlke = '';
-  String duzeltilmisKomut = kelimeDuzelt(komut);
-
-  for (var ulke in ulke) {
-    int benzerlik(String ulkeAd) {
-      int benzerlikDegeri = 0;
-      for (int i = 0; i < duzeltilmisKomut.length && i < ulkeAd.length; i++) {
-        if (duzeltilmisKomut[i].toLowerCase() == ulkeAd[i].toLowerCase()) {
-          benzerlikDegeri++;
-        } else {
-          break;
-        }
-      }
-      return benzerlikDegeri;
-    }
-
-    int benzerlikToplam = benzerlik(ulke.isim) + benzerlik(ulke.trisim) + benzerlik(ulke.enisim);
-    if (benzerlikToplam > enYuksekBenzerlik) {
-      enYuksekBenzerlik = benzerlikToplam;
-      enBenzerUlke = ulke.isim;
-    }
-  }
-  if(enBenzerUlke=='Amerikabirlesikdevletlerikucukdisadalari')
-    return 'Amerikabirlesikdevletleri';
-  if(enBenzerUlke=='Amerikabirlesikdevletleri')
-    return 'Amerikabirlesikdevletlerikucukdisadalari';
-  return enBenzerUlke;
-}
+// Ulkeler
 List<Ulkeler> ulke = [
   Ulkeler(
       bayrak: "dosyalar/bayraklar/moldova.png",
@@ -284,7 +283,7 @@ List<Ulkeler> ulke = [
       trisim: "Mayotte",
       enisim: "Mayotte",
       isim: "Mayotte",
-      baskent: "Mamoudzou",
+      baskent: "Mamutzu",
       kita: "Africa",
       url: "https://flagcdn.com/w320/yt.png",
       bilgi: false,
@@ -340,7 +339,7 @@ List<Ulkeler> ulke = [
       trisim: "Yeilburun",
       enisim: "Capeverde",
       isim: "Yesilburun",
-      baskent: "Praia",
+      baskent: "Praya",
       kita: "Africa",
       url: "https://flagcdn.com/w320/cv.png",
       bilgi: false,
@@ -1110,7 +1109,7 @@ List<Ulkeler> ulke = [
       trisim: "Saotomeandprincipe",
       enisim: "Saotomeandprincipe",
       isim: "Saotomeandprincipe",
-      baskent: "Saotome",
+      baskent: "Sao Tome",
       kita: "Africa",
       url: "https://flagcdn.com/w320/st.png",
       bilgi: false,
@@ -1152,7 +1151,7 @@ List<Ulkeler> ulke = [
       trisim: "Butan",
       enisim: "Bhutan",
       isim: "Butan",
-      baskent: "Timpu",
+      baskent: "Thimphu",
       kita: "Asia",
       url: "https://flagcdn.com/w320/bt.png",
       bilgi: false,
@@ -1208,7 +1207,7 @@ List<Ulkeler> ulke = [
       trisim: "Meksika",
       enisim: "Mexico",
       isim: "Meksika",
-      baskent: "Mexicocity",
+      baskent: "Meksiko",
       kita: "Americas",
       url: "https://flagcdn.com/w320/mx.png",
       bilgi: false,
@@ -1376,7 +1375,7 @@ List<Ulkeler> ulke = [
       trisim: "Portoriko",
       enisim: "Puertorico",
       isim: "Portoriko",
-      baskent: "Sanjuan",
+      baskent: "San juan",
       kita: "Americas",
       url: "https://flagcdn.com/w320/pr.png",
       bilgi: false,
@@ -1390,7 +1389,7 @@ List<Ulkeler> ulke = [
       trisim: "Elsalvador",
       enisim: "Elsalvador",
       isim: "Elsalvador",
-      baskent: "Sansalvador",
+      baskent: "San salvador",
       kita: "Americas",
       url: "https://flagcdn.com/w320/sv.png",
       bilgi: false,
@@ -1516,7 +1515,7 @@ List<Ulkeler> ulke = [
       trisim: "Hongkong",
       enisim: "Hongkong",
       isim: "Hongkong",
-      baskent: "Cityofvictoria",
+      baskent: "Victoria",
       kita: "Asia",
       url: "https://flagcdn.com/w320/hk.png",
       bilgi: false,
@@ -1530,7 +1529,7 @@ List<Ulkeler> ulke = [
       trisim: "Kuzeymakedonya",
       enisim: "Northmacedonia",
       isim: "Kuzeymakedonya",
-      baskent: "Skopje",
+      baskent: "Üsküp",
       kita: "Europe",
       url: "https://flagcdn.com/w320/mk.png",
       bilgi: false,
@@ -1810,7 +1809,7 @@ List<Ulkeler> ulke = [
       trisim: "Vanuatu",
       enisim: "Vanuatu",
       isim: "Vanuatu",
-      baskent: "Portvila",
+      baskent: "Port villa",
       kita: "Oceania",
       url: "https://flagcdn.com/w320/vu.png",
       bilgi: false,
@@ -2020,7 +2019,7 @@ List<Ulkeler> ulke = [
       trisim: "Papuayenigine",
       enisim: "Papuanewguinea",
       isim: "Papuayenigine",
-      baskent: "Portmoresby",
+      baskent: "Port moresby",
       kita: "Oceania",
       url: "https://flagcdn.com/w320/pg.png",
       bilgi: false,
@@ -2048,7 +2047,7 @@ List<Ulkeler> ulke = [
       trisim: "Trinidadvetobago",
       enisim: "Trinidadandtobago",
       isim: "Trinidadvetobago",
-      baskent: "Portofspain",
+      baskent: "Port Of Spain",
       kita: "Americas",
       url: "https://flagcdn.com/w320/tt.png",
       bilgi: false,
@@ -2062,7 +2061,7 @@ List<Ulkeler> ulke = [
       trisim: "Franszgneyveantarktikatopraklar",
       enisim: "Frenchsouthernandantarcticlands",
       isim: "Fransizguneyveantarktikatopraklari",
-      baskent: "Portauxfranais",
+      baskent: "Port-aux-Français",
       kita: "Antarctic",
       url: "https://flagcdn.com/w320/tf.png",
       bilgi: false,
@@ -2118,7 +2117,7 @@ List<Ulkeler> ulke = [
       trisim: "Saintpierrevemiquelon",
       enisim: "Saintpierreandmiquelon",
       isim: "Saintpierrevemiquelon",
-      baskent: "Saintpierre",
+      baskent: "Saint-pierre",
       kita: "Americas",
       url: "https://flagcdn.com/w320/pm.png",
       bilgi: false,
@@ -2328,7 +2327,7 @@ List<Ulkeler> ulke = [
       trisim: "Bouvetadas",
       enisim: "Bouvetisland",
       isim: "Bouvetadasi",
-      baskent: "",
+      baskent: "Bouvetadasi",
       kita: "Antarctic",
       url: "https://flagcdn.com/w320/bv.png",
       bilgi: false,
@@ -2510,7 +2509,7 @@ List<Ulkeler> ulke = [
       trisim: "Faroeadalar",
       enisim: "Faroeislands",
       isim: "Faroeadalari",
-      baskent: "T¾rshavn",
+      baskent: "Tórshavn",
       kita: "Europe",
       url: "https://flagcdn.com/w320/fo.png",
       bilgi: false,
@@ -2622,7 +2621,7 @@ List<Ulkeler> ulke = [
       trisim: "Sanmarino",
       enisim: "Sanmarino",
       isim: "Sanmarino",
-      baskent: "Cityofsanmarino",
+      baskent: "San Marino",
       kita: "Europe",
       url: "https://flagcdn.com/w320/sm.png",
       bilgi: false,
@@ -2650,7 +2649,7 @@ List<Ulkeler> ulke = [
       trisim: "Vatikan",
       enisim: "Vaticancity",
       isim: "Vatikan",
-      baskent: "Vaticancity",
+      baskent: "Vatikan",
       kita: "Europe",
       url: "https://flagcdn.com/w320/va.png",
       bilgi: false,
@@ -2748,7 +2747,7 @@ List<Ulkeler> ulke = [
       trisim: "Afganistan",
       enisim: "Afghanistan",
       isim: "Afganistan",
-      baskent: "Kabul",
+      baskent: "Kabil",
       kita: "Asia",
       url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/320px-Flag_of_the_Taliban.svg.png",
       bilgi: false,
@@ -2762,7 +2761,7 @@ List<Ulkeler> ulke = [
       trisim: "Srail",
       enisim: "Israel",
       isim: "Israil",
-      baskent: "Jerusalem",
+      baskent: "Tel Aviv",
       kita: "Asia",
       url: "https://flagcdn.com/w320/il.png",
       bilgi: false,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:GeoGame/screens/geogamelobi.dart';
+import "package:theme_mode_builder/theme_mode_builder.dart";
 
 void main() {
   runApp(Geogame());
@@ -7,21 +8,32 @@ void main() {
 
 class Geogame extends StatefulWidget {
   @override
-  State<Geogame> createState() => _QuizAppState();
+  State<Geogame> createState() => GeoGame();
 }
-
-class _QuizAppState extends State<Geogame> {
+class GeoGame extends State<Geogame> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.red,
-        ),
-        scaffoldBackgroundColor: Colors.grey.shade900,
-      ),
-      home: GeoGameLobi(),
+    return ThemeModeBuilder(
+      builder: (BuildContext context, ThemeMode themeMode) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: "GeoGame",
+          themeMode: themeMode,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              brightness: Brightness.light,
+              seedColor: Colors.red,
+            ),
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              brightness: Brightness.dark,
+              seedColor: Colors.deepPurple,
+            ),
+          ),
+          home: GeoGameLobi(),
+        );
+      },
     );
   }
 }

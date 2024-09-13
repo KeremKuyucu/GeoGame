@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:GeoGame/ulke.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -8,13 +7,9 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  late final AudioPlayer _audioPlayer;
-
   @override
   void initState() {
     super.initState();
-    playSoundEffect(yenitur);
-    _audioPlayer = AudioPlayer();
     readFromFile((update) => setState(update));
     if(false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)){
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -25,7 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Uyarı'),
@@ -50,28 +45,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _toggleBackgroundMusic(bool play) async {
-    final url = 'https://cdn.glitch.global/71699e1d-0b18-447f-880a-38316c508937/arkafon.mp3?v=1725557913852';
-    if (play) {
-      try {
-        await _audioPlayer.play(UrlSource(url));
-        _audioPlayer.setVolume(1);
-        setState(() {
-          backgroundMusicPlaying = true;
-        });
-      } catch (e) {
-        print('Ses çalma hatası: $e');
-      }
-    } else {
-      if (backgroundMusicPlaying) {
-        await _audioPlayer.stop();
-        setState(() {
-          backgroundMusicPlaying = false;
-        });
-      }
-    }
-    await writeToFile(); // Güncellenmiş durumu dosyaya yaz
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,17 +105,27 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
               }),
               buildSwitch('Arka Fon Şarkı', backgroundMusicPlaying, (value) {
-                _toggleBackgroundMusic(value);
+                setState(() {
+                  if(backgroundMusicPlaying){
+                    Arkafondurdur();
+                    backgroundMusicPlaying = !backgroundMusicPlaying;
+                  }
+                  else{
+                    Arkafon();
+                    backgroundMusicPlaying = !backgroundMusicPlaying;
+                  }
+                });
               }),
               Card(
                 margin: EdgeInsets.all(16.0),
                 elevation: 4.0,
-                child: Padding(
+                child: Container(
+                  color: Colors.grey.shade800,
                   padding: const EdgeInsets.all(16.0),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return Text(
-                        'Web Sürümünde Ayarları Kayıt Etme Özelliği Çalışmamakta Eğer Ülke Filtrelemek İsterseniz Mobil veya Windows Sürümünü Yükleyin. Şarkı Çalmıyorsa Şarkıyı Aç Kapat Yapabilirsiniz.',
+                        'Şarkı kapanmama sorunu varsa uygulamayı kapatıp tekrar açabilirsiniz',
                         style: TextStyle(fontSize: 16.0, color: Colors.white),
                       );
                     },

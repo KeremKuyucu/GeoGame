@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:GeoGame/ulke.dart';
+import 'package:searchfield/searchfield.dart';
 
 class MesafeOyun extends StatefulWidget {
   MesafeOyun();
@@ -10,24 +11,28 @@ class MesafeOyun extends StatefulWidget {
 class _MesafeOyunState extends State<MesafeOyun> {
   String message='';
   late TextEditingController _controller;
-  String suggestedText = '';
+  String _currentInput = '';
+  bool _isSearching = false;
   int puan=100;
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _controller.addListener(() {
+      setState(() {
+        _currentInput = _controller.text.trim();
+      });
+    });
     _initializeGame();
   }
-
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     await yeniulkesec();
-    await playSoundEffect(yenitur);
     await mesafeoyunkurallari();
   }
-  void _updateSuggestedText(String text) {
+  void _toggleSearch() {
     setState(() {
-      suggestedText = bulunanBenzerUlke(kelimeDuzelt(text), ulke);
+      _isSearching = !_isSearching;
     });
   }
   Future<void> mesafeoyunkurallari() async {
@@ -73,7 +78,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         _controller.clear();
         message='';
         yeniulkesec();
-        playSoundEffect(dogru);
+        Dogru();
         setState(() {
           toplampuan+=puan;
           writeToFile();
@@ -82,7 +87,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         puan-=10;
         if(puan<20)
           puan=20;
-        playSoundEffect(yanlis);
+        Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Yanlış cevap. Tekrar deneyin.'),
@@ -93,7 +98,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
       }
     });
   }
-
   void _pasButtonPressed() {
     puan=50;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -105,7 +109,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
     );
     setState(() {
       yeniulkesec();
-      playSoundEffect(yenitur);
+      Yenitur();
       _controller.clear();
     });
   }
@@ -127,22 +131,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: (text) {
-                      _updateSuggestedText(text);
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Tahmininizi girin',
-                    ),
-                  ),
-                ),
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Butonlar arasında eşit boşluk bırakır
                 children: [
@@ -164,13 +152,72 @@ class _MesafeOyunState extends State<MesafeOyun> {
                   ),
                 ],
               ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _controller.text = bulunanBenzerUlke(kelimeDuzelt(_controller.text.trim()), ulke);
-                  });
-                },
-                child: Text('Şunu mu Demek İstediniz: $suggestedText'),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text('Şuanda Yazılan: $_currentInput'),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: _toggleSearch,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Butonun arka plan rengi
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                          textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
+                        ),
+                        child: Text(_isSearching ? 'Arama Kutusunu Gizle' : 'Arama Kutusunu Göster'),
+                      ),
+                      SizedBox(height: 20),
+                      if (_isSearching)
+                        SearchField<Ulkeler>(
+                          suggestions: ulke
+                              .where((e) => e.isim.toLowerCase().contains(_currentInput.toLowerCase()))
+                              .map(
+                                (e) => SearchFieldListItem<Ulkeler>(
+                              e.isim,
+                              item: e,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(e.url),
+                                      radius: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        e.isim,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                              .toList(),
+                          controller: _controller,
+                          onSuggestionTap: (value) {
+                            setState(() {
+                              _controller.text = value.searchKey;
+                              _currentInput = value.searchKey; // Güncellenmiş metni ayarla
+                            });
+                          },
+                        ),
+                    ],
+                  ),
+                ),
               ),
               SizedBox(height: 20),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:GeoGame/ulke.dart';
 import 'dart:io';
+import 'package:searchfield/searchfield.dart';
 
 class BayrakOyun extends StatefulWidget {
 
@@ -12,29 +13,38 @@ class BayrakOyun extends StatefulWidget {
 
 class _BayrakOyunState extends State<BayrakOyun> {
   late TextEditingController _controller;
-  String suggestedText = '';
+  String _currentInput = '';
+  bool _isSearching = false;
   int puan=50;
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _controller.addListener(() {
+      setState(() {
+        _currentInput = _controller.text.trim();
+      });
+    });
     _initializeGame();
   }
 
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     await yeniulkesec();
-    await playSoundEffect(yenitur);
     await bayrakoyunkurallari();
   }
-  Future<bool> _fileExists(String filePath) async {
-    final file = File(filePath);
-    return await file.exists();
-  }
-  void _updateSuggestedText(String text) {
+  void _toggleSearch() {
     setState(() {
-      suggestedText = bulunanBenzerUlke(kelimeDuzelt(text), ulke);
+      _isSearching = !_isSearching;
     });
+  }
+  Future<bool> _fileExists(String path) async {
+    try {
+      return File(path).existsSync();
+    } catch (e) {
+      print('dosya bulunamadi');
+      return false;
+    }
   }
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
@@ -69,7 +79,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear(); // Giriş alanını temizle
         yeniulkesec();
-        playSoundEffect(dogru);
+        Dogru();
         setState(() {
           toplampuan+=puan;
           writeToFile();
@@ -78,7 +88,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         puan-=10;
         if(puan<20)
           puan=20;
-        playSoundEffect(yanlis);
+        Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Yanlış cevap. Tekrar deneyin.'),
@@ -89,7 +99,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
       }
     });
   }
-
   void _pasButtonPressed() {
     puan=50;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -101,11 +110,10 @@ class _BayrakOyunState extends State<BayrakOyun> {
     );
     setState(()  {
       yeniulkesec();
-      playSoundEffect(yenitur);
+      Yenitur();
       _controller.clear();
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,64 +127,119 @@ class _BayrakOyunState extends State<BayrakOyun> {
             children: <Widget>[
               SizedBox(
                 width: 320,
-                child: FutureBuilder<bool>(
-                  future: _fileExists(kalici.bayrak),
-                  builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError || !snapshot.data!) {
-                      return Image.network(
-                        kalici.url,
-                        fit: BoxFit.contain,
-                        width: 320,
-                      );
-                    } else {
-                      return Image.asset(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      width: 320,
+                      child: Image.asset(
                         kalici.bayrak,
                         fit: BoxFit.contain,
                         width: 320,
-                      );
-                    }
-                  },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.network(
+                            kalici.url,
+                            fit: BoxFit.contain,
+                            width: 320,
+                            errorBuilder: (context, error, stackTrace) {
+                              // İnternet hatası durumunda, kullanıcıya hata mesajı göster
+                              return Center(
+                                child: Text(
+                                  'İnternet Hatası',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: _checkAnswer,
+                    child: Text('Tahmini Kontrol Et'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _pasButtonPressed,
+                    child: Text('Pas'),
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.8,
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: (text) {
-                      _updateSuggestedText(text);
-                    },
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Tahmininizi girin',
-                    ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text('Şuanda Yazılan: $_currentInput'),
+                        ],
+                      ),
+                      ElevatedButton(
+                        onPressed: _toggleSearch,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue, // Butonun arka plan rengi
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                          textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
+                        ),
+                        child: Text(_isSearching ? 'Arama Kutusunu Gizle' : 'Arama Kutusunu Göster'),
+                      ),
+                      SizedBox(height: 20),
+                      if (_isSearching)
+                        SearchField<Ulkeler>(
+                          suggestions: ulke
+                              .where((e) => e.isim.toLowerCase().contains(_currentInput.toLowerCase()))
+                              .map(
+                                (e) => SearchFieldListItem<Ulkeler>(
+                              e.isim,
+                              item: e,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(e.url),
+                                      radius: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        e.isim,
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                              .toList(),
+                          controller: _controller,
+                          onSuggestionTap: (value) {
+                            setState(() {
+                              _controller.text = value.searchKey;
+                              _currentInput = value.searchKey; // Güncellenmiş metni ayarla
+                            });
+                          },
+                        ),
+                    ],
                   ),
                 ),
-              ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Butonlar arasında eşit boşluk bırakır
-            children: [
-              ElevatedButton(
-                onPressed: _checkAnswer,
-                child: Text('Tahmini Kontrol Et'),
-              ),
-              ElevatedButton(
-                onPressed: _pasButtonPressed,
-                child: Text('Pas'),
-              ),
-            ],
-          ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _controller.text = bulunanBenzerUlke(kelimeDuzelt(_controller.text.trim()), ulke);
-                  });
-                },
-                child: Text('Şunu mu Demek İstediniz: $suggestedText'),
               ),
               SizedBox(height: 20),
               if (yazmamodu)

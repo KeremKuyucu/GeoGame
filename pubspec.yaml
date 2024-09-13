@@ -1,7 +1,7 @@
 name: GeoGame
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.2
+version: 1.0.3
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -9,14 +9,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.2
   path_provider: ^2.1.4
-  audioplayers: ^6.0.0
-  connectivity_plus: ^3.0.6
+  just_audio: ^0.9.40
   easy_url_launcher: ^0.0.7
-  share_plus: ^8.0.0
+  share_plus: ^10.0.2
   font_awesome_flutter: ^10.3.0
-
+  theme_mode_builder: ^2.0.0
+  searchfield: ^1.1.0
+  http: ^1.2.2
+  package_info_plus: ^8.0.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
@@ -25,6 +26,8 @@ dev_dependencies:
 
 flutter_icons:
   android: true
+  windows: true
+  web: true
   image_path: "dosyalar/logo.png"
 
 flutter:
@@ -32,4 +35,8 @@ flutter:
   assets:
     - dosyalar/bayraklar/
     - dosyalar/sesler/
+    - dosyalar/sesler/arkafon.mp3
+    - dosyalar/sesler/dogru.mp3
+    - dosyalar/sesler/yanlis.mp3
+    - dosyalar/sesler/yenitur.mp3
     - dosyalar/
