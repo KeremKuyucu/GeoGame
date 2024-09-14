@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:GeoGame/ulke.dart';
 import 'package:GeoGame/screens/geogamelobi.dart';
+import "package:theme_mode_builder/theme_mode_builder.dart";
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -8,10 +9,17 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _isDarkMode = false;
+  String _selectedTheme = 'Light';
+  void _toggleTheme(bool value) {
+    setState(() {
+      _isDarkMode = value;
+      _selectedTheme = value ? 'Dark' : 'Light'; // Temayı güncelle
+    });
+  }
   @override
   void initState() {
     super.initState();
-    didChangeDependencies();
     readFromFile((update) => setState(update));
     if (false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi ||
         okyanusyakitasi || antartikakitasi)) {
@@ -21,12 +29,15 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
   void restartApp() {
+    Yazi.loadDil(isEnglish ? 'en' : 'tr');
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => GeoGameLobi()),
     );
   }
   Future<void> _showMyDialog() async {
+    Yazi.loadDil(isEnglish ? 'en' : 'tr');
+    print(Yazi.get('kitauyari'));
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -65,6 +76,25 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
+              Card(
+                margin: EdgeInsets.all(16.0),
+                elevation: 8.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Container(
+                  color: Colors.grey.shade800,
+                  padding: const EdgeInsets.all(16.0),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Text(
+                        Yazi.get('ayarlarlist10'),
+                        style: TextStyle(fontSize: 16.0, color: Colors.white),
+                      );
+                    },
+                  ),
+                ),
+              ),
               _buildSectionTitle(Yazi.get('ayarlarlist12')),
               buildSwitch(Yazi.get('ayarlarlist8'), yazmamodu, (value) {
                 setState(() {
@@ -89,8 +119,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   isEnglish = value;
                   writeToFile();
                 });
-                didChangeDependencies();
                 restartApp();
+              }),
+              buildSwitch(Yazi.get('ayarlarlist14')+(darktema ? 'Dark': 'Light'), darktema, (value) {
+                setState(() {
+                  darktema = value;
+                  if(darktema)
+                    ThemeModeBuilderConfig.setDark();
+                  else
+                    ThemeModeBuilderConfig.setLight();
+                  writeToFile();
+                });
               }),
               _buildSectionTitle(Yazi.get('ayarlarlist13')),
               buildSwitch(Yazi.get('ayarlarlist1'), amerikakitasi, (value) {
@@ -135,25 +174,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   writeToFile();
                 });
               }),
-              Card(
-                margin: EdgeInsets.all(16.0),
-                elevation: 8.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Container(
-                  color: Colors.grey.shade800,
-                  padding: const EdgeInsets.all(16.0),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Text(
-                        Yazi.get('ayarlarlist10'),
-                        style: TextStyle(fontSize: 16.0, color: Colors.white),
-                      );
-                    },
-                  ),
-                ),
-              ),
             ],
           ),
         ),

@@ -15,19 +15,18 @@ class _BayrakOyunState extends State<BayrakOyun> {
   @override
   void initState() {
     super.initState();
+    _initializeGame();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-    _initializeGame();
   }
-
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
-    await yeniulkesec();
-    await bayrakoyunkurallari();
+    yeniulkesec();
+    bayrakoyunkurallari();
   }
   void _toggleSearch() {
     setState(() {
@@ -190,10 +189,10 @@ class _BayrakOyunState extends State<BayrakOyun> {
                       if (_isSearching)
                         SearchField<Ulkeler>(
                           suggestions: ulke
-                              .where((e) => e.isim.toLowerCase().contains(_currentInput.toLowerCase()))
+                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
                               .map(
                                 (e) => SearchFieldListItem<Ulkeler>(
-                              e.isim,
+                                  (isEnglish ? e.enisim : e.isim),
                               item: e,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -206,7 +205,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                                     SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
-                                        e.isim,
+                                        (isEnglish ? e.enisim : e.isim),
                                         style: TextStyle(fontSize: 16),
                                       ),
                                     ),

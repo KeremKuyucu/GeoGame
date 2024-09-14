@@ -68,9 +68,10 @@
     "ayarlarlist8": "Şıklı Bilme Modu",
     "ayarlarlist9": "Arka Fon Şarkı",
     "ayarlarlist10": "Şarkı kapanmama sorunu varsa uygulamayı kapatıp tekrar açabilirsiniz",
-    "ayarlarlist11": "Oyun Dili Türkçe",
+    "ayarlarlist11": "Seçilen Dil: Türkçe",
     "ayarlarlist12": "Diğer Ayarlar",
-    "ayarlarlist13": "Kıta Seçenekleri"
+    "ayarlarlist13": "Kıta Seçenekleri",
+    "ayarlarlist14": "Seçilen Tema "
   },
   "en": {
     "game1": "Guess the Country by Capital Game",
@@ -126,10 +127,10 @@
     "mesafekural3": "Scoring System: Your score starts at 100 in each round and decreases by 10 for each wrong guess.\nAfter 8 guesses, the earned score is fixed at 20. After the round ends, the score will reset to 100.",
     "tahmin1": "Enter Guess",
     "tahmin2": "Clear Guesses",
-    "kitayari": "Warning",
-    "kitayari1": "No continent is active.",
-    "kitayari2": "Please activate at least one continent.",
-    "kitayari3": "OK",
+    "kitauyari": "Warning",
+    "kitauyari1": "No continent is active.",
+    "kitauyari2": "Please activate at least one continent.",
+    "kitauyari3": "OK",
     "ayarlarlist": "Settings",
     "ayarlarlist1": "Countries in America",
     "ayarlarlist2": "Countries in Asia",
@@ -141,8 +142,9 @@
     "ayarlarlist8": "Option Selection Mode",
     "ayarlarlist9": "Background Song",
     "ayarlarlist10": "If you have issues with the song not stopping, you can close and reopen the app.",
-    "ayarlarlist11": "Game Language is English",
+    "ayarlarlist11": "Selected language: English",
     "ayarlarlist12": "Other Settings",
-    "ayarlarlist13": "Continent Options"
+    "ayarlarlist13": "Continent Options",
+    "ayarlarlist14": "Selected Thema "
   }
 }

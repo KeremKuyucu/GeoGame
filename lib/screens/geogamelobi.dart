@@ -18,15 +18,19 @@ class GeoGameLobi extends StatefulWidget {
 }
 class _GeoGameLobiState extends State<GeoGameLobi> {
   int _selectedOption = 0;
-  final List<String> options = [
-    Yazi.get('game1'),
-    Yazi.get('game2'),
-    Yazi.get('game3'),
-    Yazi.get('game4'),
-  ];
+  List<String> options = List.filled(4, '');
   @override
   void initState() {
     super.initState();
+    surumkiyasla();
+    readFromFile((update) => setState(update));
+    dilDegistir();
+    if(darktema)
+      ThemeModeBuilderConfig.setDark();
+    else
+      ThemeModeBuilderConfig.setLight();
+  }
+  void dilDegistir() {
     Yazi.loadDil(isEnglish ? 'en' : 'tr').then((_) {
       setState(() {
         options[0] = Yazi.get('game1');
@@ -35,9 +39,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         options[3] = Yazi.get('game4');
       });
     });
-      surumkiyasla();
-      ThemeModeBuilderConfig.setSystem();
-      readFromFile((update) => setState(update));
   }
   Future<void> surumkiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();

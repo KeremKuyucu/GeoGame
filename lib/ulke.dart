@@ -92,7 +92,8 @@ class Yazi {
     return _localizedStrings?[key] ?? 'N/A';
   }
 }
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true, yazmamodu = true, backgroundMusicPlaying = false, isEnglish = false;
+
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true, yazmamodu = true, backgroundMusicPlaying = false, isEnglish = false, darktema=true;
 int toplampuan=0;
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
@@ -187,7 +188,7 @@ Future<void> readFromFile(Function updateState) async {
     final contents = await file.readAsString();
     final lines = contents.split('\n');
 
-    if (lines.length >= 10) { //
+    if (lines.length >= 11) { //
       updateState(() {
         amerikakitasi = lines[0] == 'true';
         asyakitasi = lines[1] == 'true';
@@ -198,7 +199,8 @@ Future<void> readFromFile(Function updateState) async {
         bmuyeligi = lines[6] == 'true';
         yazmamodu = lines[7] == 'true';
         isEnglish = lines[8] == 'true';
-        toplampuan = int.parse(lines[9]);
+        darktema = lines[9] == 'true';
+        toplampuan = int.parse(lines[10]);
       });
     }
   } else {
@@ -219,6 +221,7 @@ Future<void> writeToFile() async {
     bmuyeligi.toString(),
     yazmamodu.toString(),
     isEnglish.toString(),
+    darktema.toString(),
     toplampuan.toString(),
   ].join('\n');
   await file.writeAsString(data);
