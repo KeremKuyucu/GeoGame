@@ -34,7 +34,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
       _isSearching = !_isSearching;
     });
   }
-
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
       context: context,

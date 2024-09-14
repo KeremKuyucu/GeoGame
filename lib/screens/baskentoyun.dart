@@ -62,7 +62,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
       },
     );
   }
-
   void _checkAnswer() {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
