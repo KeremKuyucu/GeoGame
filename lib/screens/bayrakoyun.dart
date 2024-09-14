@@ -133,7 +133,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
                                 child: Text(
-                                  'İnternet Hatası',
+                                  'İnternet Hatası\n Pas tuşuna pas düzelmiyorsa internetini kontrol et.',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.red,
