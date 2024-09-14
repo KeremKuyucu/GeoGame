@@ -130,7 +130,9 @@ class _MesafeOyunState extends State<MesafeOyun> {
     double brng = atan2(sin(lon2 - lon1) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)) * 180 / PI;
     brng = (brng + 360) % 360;
 
-    const List<String> yonler = ["Kuzey", "Kuzeydoğu", "Doğu", "Güneydoğu", "Güney", "Güneybatı", "Batı", "Kuzeybatı"];
+    const List<String> yonlerTR = ["Kuzey", "Kuzeydoğu", "Doğu", "Güneydoğu", "Güney", "Güneybatı", "Batı", "Kuzeybatı"];
+    const List<String> yonlerEN = ["North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest"];
+    List<String> yonler = isEnglish ? yonlerEN : yonlerTR;
     return yonler[((brng + 22.5) / 45.0).floor() % 8];
   }
   @override
