@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:GeoGame/ulke.dart';
+import 'package:GeoGame/screens/geogamelobi.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -10,12 +11,20 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    didChangeDependencies();
     readFromFile((update) => setState(update));
-    if(false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)){
+    if (false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi ||
+        okyanusyakitasi || antartikakitasi)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showMyDialog();
       });
     }
+  }
+  void restartApp() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => GeoGameLobi()),
+    );
   }
   Future<void> _showMyDialog() async {
     return showDialog<void>(
@@ -23,18 +32,18 @@ class _SettingsPageState extends State<SettingsPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Uyarı'),
-          content: const SingleChildScrollView(
+          title: Text(Yazi.get('kitauyari')),
+          content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Hiçbir kıta aktif değil.'),
-                Text('Lütfen en az bir kıta aktif edin.'),
+                Text(Yazi.get('kitauyari1')),
+                Text(Yazi.get('kitauyari2')),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Tamam'),
+              child: Text(Yazi.get('kitauyari3')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -49,83 +58,96 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ayarlar'),
+        title: Text(Yazi.get('ayarlarlist')),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              buildSwitch('Amerika Kıtasında Olan Ülkeler', amerikakitasi, (value) {
-                setState(() {
-                  amerikakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('Asya Kıtasında Olan Ülkeler', asyakitasi, (value) {
-                setState(() {
-                  asyakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('Afrika Kıtasında Olan Ülkeler', afrikakitasi, (value) {
-                setState(() {
-                  afrikakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('Avrupa Kıtasında Olan Ülkeler', avrupakitasi, (value) {
-                setState(() {
-                  avrupakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('Okyanusya Kıtasında Olan Ülkeler', okyanusyakitasi, (value) {
-                setState(() {
-                  okyanusyakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('Antartika Kıtasında Olan Ülkeler', antartikakitasi, (value) {
-                setState(() {
-                  antartikakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('BM Üyeliği Olmayan Ülkeler', bmuyeligi, (value) {
-                setState(() {
-                  bmuyeligi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch('Şıklı Bilme Modu', yazmamodu, (value) {
+              _buildSectionTitle(Yazi.get('ayarlarlist12')),
+              buildSwitch(Yazi.get('ayarlarlist8'), yazmamodu, (value) {
                 setState(() {
                   yazmamodu = value;
                   writeToFile();
                 });
               }),
-              buildSwitch('Arka Fon Şarkı', backgroundMusicPlaying, (value) {
+              buildSwitch(
+                  Yazi.get('ayarlarlist9'), backgroundMusicPlaying, (value) {
                 setState(() {
-                  if(backgroundMusicPlaying){
+                  if (backgroundMusicPlaying) {
                     Arkafondurdur();
                     backgroundMusicPlaying = !backgroundMusicPlaying;
-                  }
-                  else{
+                  } else {
                     Arkafon();
                     backgroundMusicPlaying = !backgroundMusicPlaying;
                   }
                 });
               }),
+              buildSwitch(Yazi.get('ayarlarlist11'), isEnglish, (value) {
+                setState(() {
+                  isEnglish = value;
+                  writeToFile();
+                });
+                didChangeDependencies();
+                restartApp();
+              }),
+              _buildSectionTitle(Yazi.get('ayarlarlist13')),
+              buildSwitch(Yazi.get('ayarlarlist1'), amerikakitasi, (value) {
+                setState(() {
+                  amerikakitasi = value;
+                  writeToFile();
+                });
+              }),
+              buildSwitch(Yazi.get('ayarlarlist2'), asyakitasi, (value) {
+                setState(() {
+                  asyakitasi = value;
+                  writeToFile();
+                });
+              }),
+              buildSwitch(Yazi.get('ayarlarlist3'), afrikakitasi, (value) {
+                setState(() {
+                  afrikakitasi = value;
+                  writeToFile();
+                });
+              }),
+              buildSwitch(Yazi.get('ayarlarlist4'), avrupakitasi, (value) {
+                setState(() {
+                  avrupakitasi = value;
+                  writeToFile();
+                });
+              }),
+              buildSwitch(Yazi.get('ayarlarlist5'), okyanusyakitasi, (value) {
+                setState(() {
+                  okyanusyakitasi = value;
+                  writeToFile();
+                });
+              }),
+              buildSwitch(Yazi.get('ayarlarlist6'), antartikakitasi, (value) {
+                setState(() {
+                  antartikakitasi = value;
+                  writeToFile();
+                });
+              }),
+              buildSwitch(Yazi.get('ayarlarlist7'), bmuyeligi, (value) {
+                setState(() {
+                  bmuyeligi = value;
+                  writeToFile();
+                });
+              }),
               Card(
                 margin: EdgeInsets.all(16.0),
-                elevation: 4.0,
+                elevation: 8.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
                 child: Container(
                   color: Colors.grey.shade800,
                   padding: const EdgeInsets.all(16.0),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return Text(
-                        'Şarkı kapanmama sorunu varsa uygulamayı kapatıp tekrar açabilirsiniz',
+                        Yazi.get('ayarlarlist10'),
                         style: TextStyle(fontSize: 16.0, color: Colors.white),
                       );
                     },
@@ -138,7 +160,19 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-  Widget buildSwitch(String title, bool currentValue, ValueChanged<bool> onChanged) {
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget buildSwitch(String title, bool currentValue,
+      ValueChanged<bool> onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(

@@ -1,7 +1,9 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:just_audio/just_audio.dart';
-import 'dart:math';
+import 'package:flutter/services.dart' show rootBundle;
 import 'dart:io';
+import 'dart:math';
+import 'dart:convert';
 import 'dart:async';
 // Tanımlamalar
 class Ulkeler {
@@ -35,57 +37,6 @@ class Ulkeler {
     return yapilantahmin == trisim || yapilantahmin == isim || yapilantahmin == enisim;
   }
 }
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true, yazmamodu = true, backgroundMusicPlaying = false;
-int toplampuan=0;
-final random = Random();
-final dogru = AudioPlayer(); final yanlis = AudioPlayer(); final yenitur = AudioPlayer(); final arkafon = AudioPlayer();
-Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
-  try {
-    await player.setAsset(assetPath);
-    player.play();
-  } catch (e) {
-    print('Yerel dosya yüklenirken hata oluştu: $e');
-    try {
-      // URL’den çalmayı dene
-      await player.setUrl(url);
-      player.play();
-    } catch (urlError) {
-      print('URL’den ses yüklenirken hata oluştu: $urlError');
-    }
-  }
-}
-Future<void> Dogru() async {
-  await playAudioFromAssetOrUrl(
-      dogru,
-      'assets/sesler/dogru.mp3', // Yerel dosya yolu
-      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3' // URL
-  );
-}
-Future<void> Yanlis() async {
-  await playAudioFromAssetOrUrl(
-      yanlis,
-      'assets/sesler/yanlis.mp3',
-      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3'
-  );
-}
-Future<void> Yenitur() async {
-  await playAudioFromAssetOrUrl(
-      yenitur,
-      'assets/sesler/yenitur.mp3',
-      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3'
-  );
-}
-Future<void> Arkafon() async {
-  await arkafon.setLoopMode(LoopMode.one);
-  await playAudioFromAssetOrUrl(
-      arkafon,
-      'assets/sesler/arkafon.mp3',
-      'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'
-  );
-}
-Future<void> Arkafondurdur() async { await arkafon.stop(); }
-List<String> butonAnahtarlar = ['', '', '', ''];
-List<int> butonnumaralari = [-1,-2,-3,-4];
 Ulkeler gecici = Ulkeler(
   bayrak: '',
   trisim: '',
@@ -114,6 +65,57 @@ Ulkeler kalici = Ulkeler(
   boylam: 0.0,
   dosyaboyut: 0,
 );
+class Yazi {
+  static Map<String, dynamic>? _localizedStrings;
+  static String _currentLanguage = 'tr';
+
+  static Future<void> loadDil(String dilKodu) async {
+    if (_currentLanguage == dilKodu && _localizedStrings != null) {
+      return;
+    }
+    try {
+      String jsonString = await rootBundle.loadString('dosyalar/dil.json');
+      Map<String, dynamic> jsonMap = json.decode(jsonString);
+      if (jsonMap.containsKey(dilKodu)) {
+        _localizedStrings = jsonMap[dilKodu];
+      } else {
+        _localizedStrings = {};
+      }
+      _currentLanguage = dilKodu;
+    } catch (e) {
+      print('Dosya bulunamadı veya JSON okuma hatası: $e');
+      _localizedStrings = {};
+    }
+  }
+  static String get(String key) {
+    Yazi.loadDil(isEnglish ? 'en' : 'tr');
+    return _localizedStrings?[key] ?? 'N/A';
+  }
+}
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true, yazmamodu = true, backgroundMusicPlaying = false, isEnglish = false;
+int toplampuan=0;
+final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
+Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
+  if(assetPath=='assets/sesler/arkafon.mp3')
+    await arkafon.setLoopMode(LoopMode.one);
+  try {
+    await player.setAsset(assetPath);
+    player.play();
+  } catch (e) {
+    try {
+      await player.setUrl(url);
+      player.play();
+    } catch (urlError) {
+    }
+  }
+}
+Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3');}
+Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3');}
+Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3');}
+Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3');}
+Future<void> Arkafondurdur() async { await arkafon.stop(); }
+List<String> butonAnahtarlar = ['', '', '', ''];
+List<int> butonnumaralari = [-1,-2,-3,-4];
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
   int randomNumber = 0;
@@ -155,7 +157,7 @@ Future<void> yeniulkesec() async {
 
   // Şıklar için benzersiz ülke seçimi
   Set<int> selectedIndices = {randomNumber}; // Kalıcı ülkenin indexi listeye eklenir
-  butonAnahtarlar[butonRandomNumber] = kalici.isim;
+  butonAnahtarlar[butonRandomNumber] = isEnglish ? kalici.enisim : kalici.isim;
 
   for (int i = 0; i < 4; i++) {
     if (i == butonRandomNumber) continue; // Kalıcı ülkeyi geç
@@ -172,7 +174,7 @@ Future<void> yeniulkesec() async {
         (!bmuyeligi && !ulke[randomNumber].bm) ||
         selectedIndices.contains(randomNumber)); // Tekrar seçilen ülke kontrolü
 
-    butonAnahtarlar[i] = ulke[randomNumber].isim;
+    butonAnahtarlar[i] = isEnglish ? ulke[randomNumber].enisim : ulke[randomNumber].isim;
     selectedIndices.add(randomNumber); // Seçilen ülkeyi listeye ekle
   }
 }
@@ -185,7 +187,7 @@ Future<void> readFromFile(Function updateState) async {
     final contents = await file.readAsString();
     final lines = contents.split('\n');
 
-    if (lines.length >= 9) { //
+    if (lines.length >= 10) { //
       updateState(() {
         amerikakitasi = lines[0] == 'true';
         asyakitasi = lines[1] == 'true';
@@ -195,7 +197,8 @@ Future<void> readFromFile(Function updateState) async {
         antartikakitasi = lines[5] == 'true';
         bmuyeligi = lines[6] == 'true';
         yazmamodu = lines[7] == 'true';
-        toplampuan = int.parse(lines[8]);
+        isEnglish = lines[8] == 'true';
+        toplampuan = int.parse(lines[9]);
       });
     }
   } else {
@@ -215,29 +218,10 @@ Future<void> writeToFile() async {
     antartikakitasi.toString(),
     bmuyeligi.toString(),
     yazmamodu.toString(),
+    isEnglish.toString(),
     toplampuan.toString(),
   ].join('\n');
   await file.writeAsString(data);
-}
-double mesafeHesapla(double latitude1, double longitude1, double latitude2, double longitude2) {
-  const double PI = 3.14159265358979323846264338327950288;
-  double theta = longitude1 - longitude2;
-  double distance = acos(sin(latitude1 * PI / 180.0) * sin(latitude2 * PI / 180.0) +
-      cos(latitude1 * PI / 180.0) * cos(latitude2 * PI / 180.0) * cos(theta * PI / 180.0)) * 180.0 / PI;
-  distance *= 60 * 1.1515 * 1.609344; // Miles to kilometers conversion
-  return distance.roundToDouble();
-}
-String pusula(double lat1, double lon1, double lat2, double lon2) {
-  const double PI = 3.14159265358979323846264338327950288;
-  lat1 *= PI / 180.0;
-  lon1 *= PI / 180.0;
-  lat2 *= PI / 180.0;
-  lon2 *= PI / 180.0;
-  double brng = atan2(sin(lon2 - lon1) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)) * 180 / PI;
-  brng = (brng + 360) % 360;
-
-  const List<String> yonler = ["Kuzey", "Kuzeydoğu", "Doğu", "Güneydoğu", "Güney", "Güneybatı", "Batı", "Kuzeybatı"];
-  return yonler[((brng + 22.5) / 45.0).floor() % 8];
 }
 String kelimeDuzelt(String kelime) {
   String sonuc = '';
@@ -3461,7 +3445,7 @@ List<Ulkeler> ulke = [
       trisim: "Makao",
       enisim: "Macau",
       isim: "Makao",
-      baskent: "",
+      baskent: "Makao",
       kita: "Asia",
       url: "https://flagcdn.com/w320/mo.png",
       bilgi: false,

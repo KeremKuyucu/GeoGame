@@ -35,8 +35,4 @@ flutter:
   assets:
     - dosyalar/bayraklar/
     - dosyalar/sesler/
-    - dosyalar/sesler/arkafon.mp3
-    - dosyalar/sesler/dogru.mp3
-    - dosyalar/sesler/yanlis.mp3
-    - dosyalar/sesler/yenitur.mp3
     - dosyalar/

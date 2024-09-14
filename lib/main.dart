@@ -42,6 +42,7 @@ class GeoGame extends State<Geogame> {
 /*
 flutter pub run flutter_launcher_icons:main
 flutter build apk
-adb install C:\Users\KeremK\StudioProjects\geogame\build\app\outputs\flutter-apk\app-release.apk
+
+adb install build\app\outputs\flutter-apk\app-release.apk
 
  */

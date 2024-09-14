@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:GeoGame/ulke.dart';
-import 'dart:io';
 import 'package:searchfield/searchfield.dart';
 
 class BayrakOyun extends StatefulWidget {
-
-  BayrakOyun();
-
   @override
   _BayrakOyunState createState() => _BayrakOyunState();
 }
@@ -38,33 +34,26 @@ class _BayrakOyunState extends State<BayrakOyun> {
       _isSearching = !_isSearching;
     });
   }
-  Future<bool> _fileExists(String path) async {
-    try {
-      return File(path).existsSync();
-    } catch (e) {
-      print('dosya bulunamadi');
-      return false;
-    }
-  }
+
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Kurallar'),
-          content: const SingleChildScrollView(
+          title: Text(Yazi.get('bayrakkural')),
+          content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Bayrak Bilme Oyunu'),
-                Text('Bayrak Bilme Oyununa hos geldiniz.\nAmaciniz, 250 ulkeden rastgele secilen bir ulkenin bayragini bilmek.'),
-                Text('Puan Sistemi: Her turda puaniniz 50 den baslar her yanlis tahminde 10 puan azalir.\n3 Tahminden sonra kazanilan puan 20\'e sabitlenir tur bitince tekrar 50\'den baslar.'),
+                Text(Yazi.get('bayrakkural1')),
+                Text(Yazi.get('bayrakkural2')),
+                Text(Yazi.get('bayrakkural3')),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Tamam'),
+              child: Text(Yazi.get('bayrakkural4')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -77,7 +66,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
   void _checkAnswer() {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-        _controller.clear(); // Giriş alanını temizle
+        _controller.clear();
         yeniulkesec();
         Dogru();
         setState(() {
@@ -91,7 +80,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Yanlış cevap. Tekrar deneyin.'),
+            content: Text(Yazi.get('yanlis')),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -103,7 +92,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
     puan=50;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Geçilen Ülke: ${kalici.isim}'),
+        content: Text(Yazi.get('yazilan')+kalici.isim),
         backgroundColor: Colors.yellow,
         duration: Duration(seconds: 2),
       ),
@@ -118,7 +107,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bayrak Oyun'),
+        title: Text(Yazi.get('bayrak')),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -142,7 +131,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
                             fit: BoxFit.contain,
                             width: 320,
                             errorBuilder: (context, error, stackTrace) {
-                              // İnternet hatası durumunda, kullanıcıya hata mesajı göster
                               return Center(
                                 child: Text(
                                   'İnternet Hatası',
@@ -166,11 +154,11 @@ class _BayrakOyunState extends State<BayrakOyun> {
                 children: [
                   ElevatedButton(
                     onPressed: _checkAnswer,
-                    child: Text('Tahmini Kontrol Et'),
+                    child: Text(Yazi.get('tahmin')),
                   ),
                   ElevatedButton(
                     onPressed: _pasButtonPressed,
-                    child: Text('Pas'),
+                    child: Text(Yazi.get('pas')),
                   ),
                 ],
               ),
@@ -184,7 +172,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text('Şuanda Yazılan: $_currentInput'),
+                          Text(Yazi.get('yazilan') +_currentInput),
                         ],
                       ),
                       ElevatedButton(
@@ -197,7 +185,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                           textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
                         ),
-                        child: Text(_isSearching ? 'Arama Kutusunu Gizle' : 'Arama Kutusunu Göster'),
+                        child: Text(_isSearching ? Yazi.get('aramagizle') : Yazi.get('aramagoster')),
                       ),
                       SizedBox(height: 20),
                       if (_isSearching)
@@ -233,7 +221,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                           onSuggestionTap: (value) {
                             setState(() {
                               _controller.text = value.searchKey;
-                              _currentInput = value.searchKey; // Güncellenmiş metni ayarla
+                              _currentInput = value.searchKey;
                             });
                           },
                         ),
@@ -310,7 +298,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('Şıkları Ayarlardan Kapatabilirsiniz.'), // Boş bir Text widget
+                        Text(Yazi.get('sikgizle')),
                       ],
                     )
                   ],

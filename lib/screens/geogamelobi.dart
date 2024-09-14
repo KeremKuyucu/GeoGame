@@ -10,8 +10,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:theme_mode_builder/theme_mode_builder.dart";
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class GeoGameLobi extends StatefulWidget {
@@ -20,20 +18,27 @@ class GeoGameLobi extends StatefulWidget {
 }
 class _GeoGameLobiState extends State<GeoGameLobi> {
   int _selectedOption = 0;
-  final List<String> _options = [
-    '1. Baskentden Ülke Bilme Oyunu',
-    '2. Bayraktan Ülke Bilme Oyunu',
-    '3. Mesafeden Ülke Bilme Oyunu',
-    '4. Ayarlar',
+  final List<String> options = [
+    Yazi.get('game1'),
+    Yazi.get('game2'),
+    Yazi.get('game3'),
+    Yazi.get('game4'),
   ];
   @override
   void initState() {
     super.initState();
+    Yazi.loadDil(isEnglish ? 'en' : 'tr').then((_) {
+      setState(() {
+        options[0] = Yazi.get('game1');
+        options[1] = Yazi.get('game2');
+        options[2] = Yazi.get('game3');
+        options[3] = Yazi.get('game4');
+      });
+    });
       surumkiyasla();
       ThemeModeBuilderConfig.setSystem();
       readFromFile((update) => setState(update));
   }
-
   Future<void> surumkiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
@@ -167,7 +172,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
             ),
             ListTile(
               title: Text(
-                'Oyunla ilgili şikayet veya önerilerini discord veya instagram yazabilirsiniz.',
+                Yazi.get('sikayet'),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               dense: true,
@@ -175,52 +180,52 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
             Divider(),
             ListTile(
               leading: Icon(Icons.share, color: Color(0xFF5865F2)),
-              title: Text('Uygulamayı Paylaş'),
+              title: Text(Yazi.get('uygpaylas')),
               onTap: () async {
-                await Share.share('GeoGame Adlı Oyunu Oynamak İçin Davet Edildiniz. https://geogame.glitch.me');
+                await Share.share(Yazi.get('davetpromt'));
               },
             ),
             ListTile(
               leading: FaIcon(FontAwesomeIcons.instagram),
-              title: Text('Instagram Hesabım'),
+              title: Text(Yazi.get('instagram')),
               onTap: () async {
                 await EasyLauncher.url(
-                    url: "https://www.instagram.com/kerem_kk0",
+                    url: Yazi.get('instagramurl'),
                     mode: Mode.platformDefault);
               },
             ),
             ListTile(
               leading: Icon(Icons.public, color: Colors.red),
-              title: Text('Oyunun İnternet Sitesi'),
+              title: Text(Yazi.get('website')),
               onTap: () async {
-                await EasyLauncher.url(url: "https://geogame.glitch.me/");
+                await EasyLauncher.url(url: Yazi.get('websiteurl'));
               },
             ),
             ListTile(
               leading: FaIcon(FontAwesomeIcons.github),
-              title: Text('Oyunun Github Sayfası'),
+              title: Text(Yazi.get('github')),
               onTap: () async {
-                await EasyLauncher.url(url: "https://geogame.glitch.me/");
+                await EasyLauncher.url(url: Yazi.get('githuburl'));
               },
             ),
             ListTile(
               leading: Icon(Icons.discord, color: Color(0xFF5865F2)),
-              title: Text('Discord Hesabım'),
+              title: Text(Yazi.get('discord')),
               onTap: () async {
-                await EasyLauncher.url(url: "https://discord.com/users/483678328646270996");
+                await EasyLauncher.url(url: Yazi.get('discordurl'));
               },
             ),
             ListTile(
               leading: Icon(Icons.music_note, color: Colors.red),
-              title: Text('Just Weirdness'),
+              title: Text(Yazi.get('sarki')),
               onTap: () async {
-                await EasyLauncher.url(url: "https://www.youtube.com/watch?v=8HcpPysIDy4");
+                await EasyLauncher.url(url: Yazi.get('sarkiurl'));
               },
             ),
             Divider(),
             ListTile(
               title: Text(
-                'Yapımcı: Kerem Kuyucu',
+                Yazi.get('yapimci'),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               dense: true,
@@ -235,13 +240,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           Container(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Seçeneklerden Birini Seçin:',
+              Yazi.get('secenek'),
               style: TextStyle(fontSize: 24,color: Colors.blue),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: _options.length,
+              itemCount: options.length,
               itemBuilder: (context, index) {
                 return Container(
                   margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
@@ -262,7 +267,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        _options[index],
+                        options[index], // Güncellenmiş veriyi kullan
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -277,7 +282,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           Container(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Toplam Puan:\n${toplampuan}', // max 17 basamak
+              Yazi.get('puan')+toplampuan.toString(), // max 17 basamak
               style: TextStyle(fontSize: 35,color: Colors.green),
             ),
           ),
@@ -291,7 +296,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
               color: Colors.grey.shade800,
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Ayarlardan Şarkı Açabilirsiniz.\nSes efektleri için şarkı gerekmektedir.',
+                Yazi.get('lobiuyari'),
                 style: TextStyle(fontSize: 16.0, color: Colors.white),
               ),
             ),
