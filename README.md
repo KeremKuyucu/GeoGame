@@ -24,11 +24,11 @@ Mobil ve Windows uyumlu
 Aşağıda oyuna ait ekran görüntülerini bulabilirsiniz:
 
 <p align="center">
-  <img src="Resimler/resim1.png" alt="Oyun Ekranı 1" width="200"/>
-  <img src="Resimler/resim2.png" alt="Oyun Ekranı 2" width="200"/>
-  <img src="Resimler/resim3.png" alt="Oyun Ekranı 3" width="200"/>
-  <img src="Resimler/resim4.png" alt="Oyun Ekranı 4" width="200"/>
-  <img src="Resimler/resim5.png" alt="Oyun Ekranı 5" width="200"/>
+  <img src="Resimler/resim2.png" alt="Oyun Ekranı 1" width="200"/>
+  <img src="Resimler/resim3.png" alt="Oyun Ekranı 2" width="200"/>
+  <img src="Resimler/resim4.png" alt="Oyun Ekranı 3" width="200"/>
+  <img src="Resimler/resim5.png" alt="Oyun Ekranı 4" width="200"/>
+  <img src="Resimler/resim1.png" alt="Oyun Ekranı 5" width="200"/>
 
 
 # Kullanılan Teknolojiler
