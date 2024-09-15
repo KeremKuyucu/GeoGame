@@ -1,18 +1,50 @@
-# GeoGame
+İşte güncellenmiş README dosyan:
 
-Ülkeler hakkında bilginizi geliştirmek istiyorsanız tam sizlik oyun.
-İnternet Sayfası: https://geogame.glitch.me/
-Ftp verileri .env dosyasında saklanmaktadır.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+GeoGame
 
-A few resources to get you started if this is your first Flutter project:
+GeoGame, ülkeler hakkında bilginizi geliştirmek için oynayabileceğiniz eğitici bir oyun. Başkentler, bayraklar ve diğer coğrafi bilgilerle kendinizi test edin ve dünya hakkında daha fazla şey öğrenin!
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Demo
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Projeyi deneyimlemek için aşağıdaki linkten oyuna erişebilirsiniz:
+
+GeoGame Web Sayfası
+
+
+Özellikler
+
+Ülkelerin başkentleri, bayrakları ve diğer coğrafi bilgileriyle ilgili sorular
+
+Avrupa, Asya, Afrika ve diğer kıtalar hakkında bilgi edinme
+
+Kullanıcı dostu arayüz ve eğlenceli bir deneyim
+
+Mobil ve web uyumlu
+
+
+Ekran Görüntüleri
+
+Aşağıda oyuna ait ekran görüntülerini bulabilirsiniz:
+
+<p align="center">
+  <img src="resimler/resim1.png" alt="Oyun Ekranı 1" width="200"/>
+  <img src="resimler/resim2.png" alt="Oyun Ekranı 2" width="200"/>
+  <img src="resimler/resim3.png" alt="Oyun Ekranı 3" width="200"/>
+</p>Kurulum
+
+Kullanılan Teknolojiler
+
+Flutter: Mobil ve web uygulama geliştirme çerçevesi
+
+Dart: Uygulamanın yazıldığı programlama dili
+
+Glitch: Web uygulaması barındırma platformu
+
+
+Lisans
+
+Bu proje GPL Lisansı ile lisanslanmıştır. Daha fazla bilgi için LICENSE dosyasına göz atabilirsiniz.
+
