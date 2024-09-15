@@ -42,5 +42,5 @@ Glitch: Web uygulaması barındırma platformu
 
 # Lisans
 
-Bu proje GPL Lisansı ile lisanslanmıştır. Daha fazla bilgi için [LİSANS](LICENSE) dosyasına göz atabilirsiniz.
+Bu proje GPL Lisansı ile lisanslanmıştır. Daha fazla bilgi için [LICENSE](LICENSE) dosyasına göz atabilirsiniz.
 
