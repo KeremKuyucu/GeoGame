@@ -196,7 +196,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                           textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
                         ),
-                        child: Text(_isSearching ? Yazi.get('aramagizle') : Yazi.get('aramagoster')),
+                        child: Text(_isSearching ? Yazi.get('aramagoster') : Yazi.get('aramagizle')),
                       ),
                       SizedBox(height: 20),
                       if (_isSearching)

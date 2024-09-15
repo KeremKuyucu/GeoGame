@@ -5,6 +5,7 @@ import 'package:GeoGame/screens/bayrakoyun.dart';
 import 'package:GeoGame/screens/mesafeoyun.dart';
 import 'package:GeoGame/screens/settings_page.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import "package:theme_mode_builder/theme_mode_builder.dart";
 import 'package:http/http.dart' as http;
@@ -178,6 +179,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
               dense: true,
             ),
             Divider(),
+            ListTile(
+              leading: Icon(Icons.share, color: Color(0xFF5865F2)),
+              title: Text(Yazi.get('uygpaylas')),
+              onTap: () async {
+                await Share.share(Yazi.get('davetpromt'));
+              },
+            ),
             ListTile(
               leading: FaIcon(FontAwesomeIcons.instagram),
               title: Text(Yazi.get('instagram')),
