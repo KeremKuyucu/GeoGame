@@ -1,9 +1,4 @@
-İşte güncellenmiş README dosyan:
-
-
----
-
-GeoGame
+#GeoGame
 
 GeoGame, ülkeler hakkında bilginizi geliştirmek için oynayabileceğiniz eğitici bir oyun. Başkentler, bayraklar ve diğer coğrafi bilgilerle kendinizi test edin ve dünya hakkında daha fazla şey öğrenin!
 
