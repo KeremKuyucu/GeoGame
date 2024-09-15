@@ -27,6 +27,8 @@ Aşağıda oyuna ait ekran görüntülerini bulabilirsiniz:
   <img src="resimler/resim1.png" alt="Oyun Ekranı 1" width="200"/>
   <img src="resimler/resim2.png" alt="Oyun Ekranı 2" width="200"/>
   <img src="resimler/resim3.png" alt="Oyun Ekranı 3" width="200"/>
+  <img src="resimler/resim4.png" alt="Oyun Ekranı 4" width="200"/>
+  <img src="resimler/resim5.png" alt="Oyun Ekranı 5" width="200"/>
 
 
 # Kullanılan Teknolojiler
