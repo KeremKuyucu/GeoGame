@@ -8,6 +8,7 @@ class BayrakOyun extends StatefulWidget {
 }
 
 class _BayrakOyunState extends State<BayrakOyun> {
+  final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
   late TextEditingController _controller;
   String _currentInput = '';
   bool _isSearching = false;
@@ -65,12 +66,21 @@ class _BayrakOyunState extends State<BayrakOyun> {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear();
+        _currentInput='';
         yeniulkesec();
         Dogru();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(Yazi.get('dogrucevap')),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
         setState(() {
           toplampuan+=puan;
           writeToFile();
         });
+        puan=50;
       } else {
         puan-=10;
         if(puan<20)
@@ -78,7 +88,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Yazi.get('yanlis')),
+            content: Text(Yazi.get('yanliscevap')+puan.toString()),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -198,11 +208,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
                                   children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(e.url),
-                                      radius: 20,
-                                    ),
-                                    SizedBox(width: 10),
                                     Expanded(
                                       child: Text(
                                         (isEnglish ? e.enisim : e.isim),
@@ -217,6 +222,31 @@ class _BayrakOyunState extends State<BayrakOyun> {
                               .toList(),
                           controller: _controller,
                           onSuggestionTap: (value) {
+                            void _checkAnswer() {
+                              setState(() {
+                                if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
+                                  _controller.clear();
+                                  yeniulkesec();
+                                  Dogru();
+                                  setState(() {
+                                    toplampuan+=puan;
+                                    writeToFile();
+                                  });
+                                } else {
+                                  puan-=10;
+                                  if(puan<20)
+                                    puan=20;
+                                  Yanlis();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(Yazi.get('yanlis')),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              });
+                            }
                             setState(() {
                               _controller.text = value.searchKey;
                               _currentInput = value.searchKey;
@@ -234,25 +264,23 @@ class _BayrakOyunState extends State<BayrakOyun> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (var color in [butonAnahtarlar[0], butonAnahtarlar[1]])
+                        for (int i = 0; i < 2; i++)
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _controller.text = color;
+                                  _controller.text = butonAnahtarlar[i];
                                   _checkAnswer();
                                 },
                                 child: Text(
-                                  color,
+                                  butonAnahtarlar[i],
                                   style: TextStyle(
-                                      color: Colors.black
+                                    color: Colors.black,
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: color == butonAnahtarlar[0]
-                                      ? Colors.green
-                                      : Colors.yellow,
+                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
@@ -265,25 +293,23 @@ class _BayrakOyunState extends State<BayrakOyun> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (var color in [butonAnahtarlar[2], butonAnahtarlar[3]])
+                        for (int i = 2; i < 4; i++)
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _controller.text = color;
+                                  _controller.text = butonAnahtarlar[i];
                                   _checkAnswer();
                                 },
                                 child: Text(
-                                  color,
+                                  butonAnahtarlar[i],
                                   style: TextStyle(
-                                      color: Colors.black
+                                    color: Colors.black,
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: color == butonAnahtarlar[2]
-                                      ? Colors.blue
-                                      : Colors.red,
+                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),

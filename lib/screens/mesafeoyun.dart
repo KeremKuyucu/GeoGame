@@ -9,6 +9,7 @@ class MesafeOyun extends StatefulWidget {
 }
 
 class _MesafeOyunState extends State<MesafeOyun> {
+  final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
   String message='';
   late TextEditingController _controller;
   String _currentInput = '';
@@ -72,17 +73,26 @@ class _MesafeOyunState extends State<MesafeOyun> {
         }
       }
       message += Yazi.get('mesafetahmin') + gecici.isim + "    ";
-      message += Yazi.get('mesafetahmin1') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " km   ";
+      message += Yazi.get('mesafetahmin1') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
       message += Yazi.get('mesafetahmin2') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear();
+        _currentInput='';
         message='';
         yeniulkesec();
         Dogru();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(Yazi.get('dogrucevap')),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
         setState(() {
           toplampuan+=puan;
           writeToFile();
         });
+        puan=50;
       } else {
         puan-=10;
         if(puan<20)
@@ -90,7 +100,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Yazi.get('mesafetahmin3')),
+            content: Text(Yazi.get('yanliscevap')+puan.toString()),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -232,7 +242,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                           onSuggestionTap: (value) {
                             setState(() {
                               _controller.text = value.searchKey;
-                              _currentInput = value.searchKey; // Güncellenmiş metni ayarla
+                              _currentInput = value.searchKey;
                             });
                           },
                         ),

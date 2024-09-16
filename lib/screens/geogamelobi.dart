@@ -23,6 +23,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   void initState() {
     super.initState();
     surumkiyasla();
+    yeniulkesec();
     readFromFile((update) => setState(update));
     dilDegistir();
     if(darktema)
@@ -103,25 +104,25 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
    setState(() {
      _selectedOption = index;
    });
-   if (_selectedOption == 0 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   if (_selectedOption == 0 && getSelectableCountryCount()>0) {
      Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => BaskentOyun()),
      );
-   } else if (_selectedOption == 1 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   } else if (_selectedOption == 1 && getSelectableCountryCount()>0) {
      Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => BayrakOyun()),
      );
-   } else if (_selectedOption == 2 && true == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   } else if (_selectedOption == 2 && getSelectableCountryCount()>0) {
      Yenitur();
      Navigator.push(
        context,
        MaterialPageRoute(builder: (context) => MesafeOyun()),
      );
-   } else if (_selectedOption == 3 || false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi || okyanusyakitasi || antartikakitasi)) {
+   } else if (_selectedOption == 3 || getSelectableCountryCount()==0) {
      Yenitur();
      Navigator.push(
        context,

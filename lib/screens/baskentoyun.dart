@@ -8,6 +8,7 @@ class BaskentOyun extends StatefulWidget {
 }
 
 class _BaskentOyunState extends State<BaskentOyun> {
+  final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
   late TextEditingController _controller;
   String _currentInput = '';
   bool _isSearching = false;
@@ -66,12 +67,21 @@ class _BaskentOyunState extends State<BaskentOyun> {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear();
+        _currentInput='';
         yeniulkesec();
         Dogru();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(Yazi.get('dogrucevap')),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
         setState(() {
           toplampuan+=puan;
           writeToFile();
         });
+        puan=50;
       } else {
         puan-=10;
         if(puan<20)
@@ -79,7 +89,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
         Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Yazi.get('yanliscevap')),
+            content: Text(Yazi.get('yanliscevap')+puan.toString()),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -150,12 +160,12 @@ class _BaskentOyunState extends State<BaskentOyun> {
                       ElevatedButton(
                         onPressed: _toggleSearch,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Butonun arka plan rengi
+                          backgroundColor: Colors.blue,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                          textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
+                          textStyle: TextStyle(fontSize: 16),
                         ),
                         child: Text(_isSearching ? Yazi.get('aramagoster') : Yazi.get('aramagizle')),
                       ),
@@ -208,25 +218,23 @@ class _BaskentOyunState extends State<BaskentOyun> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (var color in [butonAnahtarlar[0], butonAnahtarlar[1]])
+                        for (int i = 0; i < 2; i++)
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _controller.text = color;
+                                  _controller.text = butonAnahtarlar[i];
                                   _checkAnswer();
                                 },
                                 child: Text(
-                                  color,
+                                  butonAnahtarlar[i],
                                   style: TextStyle(
-                                      color: Colors.black
+                                    color: Colors.black,
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: color == butonAnahtarlar[0]
-                                      ? Colors.green
-                                      : Colors.yellow,
+                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
@@ -239,25 +247,23 @@ class _BaskentOyunState extends State<BaskentOyun> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        for (var color in [butonAnahtarlar[2], butonAnahtarlar[3]])
+                        for (int i = 2; i < 4; i++)
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  _controller.text = color;
+                                  _controller.text = butonAnahtarlar[i];
                                   _checkAnswer();
                                 },
                                 child: Text(
-                                  color,
+                                  butonAnahtarlar[i],
                                   style: TextStyle(
-                                    color: Colors.black
+                                    color: Colors.black,
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: color == butonAnahtarlar[2]
-                                      ? Colors.blue
-                                      : Colors.red,
+                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),

@@ -1,6 +1,7 @@
 import 'package:path_provider/path_provider.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:math';
 import 'dart:convert';
@@ -93,91 +94,79 @@ class Yazi {
   }
 }
 
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = true, yazmamodu = true, backgroundMusicPlaying = false, isEnglish = false, darktema=true;
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, isEnglish = false, darktema=true;
 int toplampuan=0;
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
-  if(assetPath=='assets/sesler/arkafon.mp3')
-    await arkafon.setLoopMode(LoopMode.one);
   try {
-    await player.setAsset(assetPath);
-    player.play();
+    if (await player.state == PlayerState.playing) {
+      await player.stop();
+    }
+    await player.play(AssetSource(assetPath));
   } catch (e) {
     try {
-      await player.setUrl(url);
-      player.play();
+      if (await player.state == PlayerState.playing) {
+        await player.stop();
+      }
+      await player.play(UrlSource(url));
     } catch (urlError) {
+      print('Error playing audio from URL: $urlError');
     }
   }
 }
 Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3');}
 Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3');}
 Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3');}
-Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3');}
+Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'); arkafon.setReleaseMode(ReleaseMode.loop);}
 Future<void> Arkafondurdur() async { await arkafon.stop(); }
 List<String> butonAnahtarlar = ['', '', '', ''];
 List<int> butonnumaralari = [-1,-2,-3,-4];
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
-  int randomNumber = 0;
   int butonRandomNumber = random.nextInt(4);
-  bool gecicibilgi = false;
-  do {
-    randomNumber = random.nextInt(ulke.length);
-    for (var u in ulke) {
-      if (!u.bilgi &&
-          !(u.kita == "Americas" && !amerikakitasi) &&
-          !(u.kita == "Asia" && !asyakitasi) &&
-          !(u.kita == "Africa" && !afrikakitasi) &&
-          !(u.kita == "Europe" && !avrupakitasi) &&
-          !(u.kita == "Oceania" && !okyanusyakitasi) &&
-          !(u.kita == "Antarctic" && !antartikakitasi) &&
-          !(u.bm && !bmuyeligi)) {
-        gecicibilgi = true;
-        break;
-      }
-    }
-    if (!gecicibilgi) {
-      for (var u in ulke) {
-        u.bilgi = false;
-      }
-    }
-  } while (ulke[randomNumber].bilgi ||
-      (!amerikakitasi && ulke[randomNumber].kita == "Americas") ||
-      (!asyakitasi && ulke[randomNumber].kita == "Asia") ||
-      (!afrikakitasi && ulke[randomNumber].kita == "Africa") ||
-      (!avrupakitasi && ulke[randomNumber].kita == "Europe") ||
-      (!okyanusyakitasi && ulke[randomNumber].kita == "Oceania") ||
-      (!antartikakitasi && ulke[randomNumber].kita == "Antarctic") ||
-      (!bmuyeligi && !ulke[randomNumber].bm) ||
-      (ulke[randomNumber].bilgi == true));
-
-  // Kalıcı ülkeyi ayarla
-  ulke[randomNumber].bilgi = true;
-  kalici = ulke[randomNumber];
-
-  // Şıklar için benzersiz ülke seçimi
-  Set<int> selectedIndices = {randomNumber}; // Kalıcı ülkenin indexi listeye eklenir
-  butonAnahtarlar[butonRandomNumber] = isEnglish ? kalici.enisim : kalici.isim;
+  Set<int> selectedIndices = {};
 
   for (int i = 0; i < 4; i++) {
-    if (i == butonRandomNumber) continue; // Kalıcı ülkeyi geç
-
-    do {
-      randomNumber = random.nextInt(ulke.length);
-    } while (ulke[randomNumber].bilgi ||
-        (!amerikakitasi && ulke[randomNumber].kita == "Americas") ||
-        (!asyakitasi && ulke[randomNumber].kita == "Asia") ||
-        (!afrikakitasi && ulke[randomNumber].kita == "Africa") ||
-        (!avrupakitasi && ulke[randomNumber].kita == "Europe") ||
-        (!okyanusyakitasi && ulke[randomNumber].kita == "Oceania") ||
-        (!antartikakitasi && ulke[randomNumber].kita == "Antarctic") ||
-        (!bmuyeligi && !ulke[randomNumber].bm) ||
-        selectedIndices.contains(randomNumber)); // Tekrar seçilen ülke kontrolü
-
+    int randomNumber;
+    if(!sadecebm){
+      do {
+        randomNumber = random.nextInt(ulke.length);
+      } while (((!amerikakitasi && ulke[randomNumber].kita == "Americas") ||
+          (!asyakitasi && ulke[randomNumber].kita == "Asia") ||
+          (!afrikakitasi && ulke[randomNumber].kita == "Africa") ||
+          (!avrupakitasi && ulke[randomNumber].kita == "Europe") ||
+          (!okyanusyakitasi && ulke[randomNumber].kita == "Oceania") ||
+          (!antartikakitasi && ulke[randomNumber].kita == "Antarctic") ||
+          (!bmuyeligi && !ulke[randomNumber].bm) ||
+          selectedIndices.contains(randomNumber)));
+    }
+    else {
+      do {
+        randomNumber = random.nextInt(ulke.length);
+      } while (ulke[randomNumber].bm || selectedIndices.contains(randomNumber));
+    }
+    if (butonRandomNumber == i) {
+      kalici = ulke[randomNumber];
+    }
     butonAnahtarlar[i] = isEnglish ? ulke[randomNumber].enisim : ulke[randomNumber].isim;
-    selectedIndices.add(randomNumber); // Seçilen ülkeyi listeye ekle
+    selectedIndices.add(randomNumber);
   }
+}
+int getSelectableCountryCount() {
+  int count = 0;
+  for (var u in ulke) {
+    if (!u.bilgi &&
+        (u.kita == "Americas" && amerikakitasi ||
+            u.kita == "Asia" && asyakitasi ||
+            u.kita == "Africa" && afrikakitasi ||
+            u.kita == "Europe" && avrupakitasi ||
+            u.kita == "Oceania" && okyanusyakitasi ||
+            u.kita == "Antarctic" && antartikakitasi) &&
+        (u.bm || bmuyeligi)) {
+      count++;
+    }
+  }
+  return count;
 }
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -188,7 +177,7 @@ Future<void> readFromFile(Function updateState) async {
     final contents = await file.readAsString();
     final lines = contents.split('\n');
 
-    if (lines.length >= 11) { //
+    if (lines.length >= 12) {
       updateState(() {
         amerikakitasi = lines[0] == 'true';
         asyakitasi = lines[1] == 'true';
@@ -197,10 +186,11 @@ Future<void> readFromFile(Function updateState) async {
         okyanusyakitasi = lines[4] == 'true';
         antartikakitasi = lines[5] == 'true';
         bmuyeligi = lines[6] == 'true';
-        yazmamodu = lines[7] == 'true';
-        isEnglish = lines[8] == 'true';
-        darktema = lines[9] == 'true';
-        toplampuan = int.parse(lines[10]);
+        sadecebm = lines[7] == 'true';
+        yazmamodu = lines[8] == 'true';
+        isEnglish = lines[9] == 'true';
+        darktema = lines[10] == 'true';
+        toplampuan = int.parse(lines[11]);
       });
     }
   } else {
@@ -219,6 +209,7 @@ Future<void> writeToFile() async {
     okyanusyakitasi.toString(),
     antartikakitasi.toString(),
     bmuyeligi.toString(),
+    sadecebm.toString(),
     yazmamodu.toString(),
     isEnglish.toString(),
     darktema.toString(),

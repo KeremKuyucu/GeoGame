@@ -174,6 +174,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   writeToFile();
                 });
               }),
+              buildSwitch(Yazi.get('ayarlarlist15'), sadecebm, (value) {
+                setState(() {
+                  sadecebm = value;
+                  writeToFile();
+                });
+              }),
             ],
           ),
         ),

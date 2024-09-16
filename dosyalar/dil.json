@@ -26,7 +26,8 @@
     "baskentkural2": "Baskent Bilme Oyununa hos geldiniz.\nAmaciniz 250 ulkeden rastgele secilen bir ulkenin baskentini bilmek.",
     "baskentkural3": "Puan Sistemi: Her turda puaniniz 50 den baslar her yanlis tahminde 10 puan azalir.\n3 Tahminden sonra kazanilan puan 20'e sabitlenir tur bitince tekrar 50'den baslar.",
     "baskentkural4": "Tamam",
-    "yanliscevap": "Yanlış cevap. Tekrar deneyin.",
+    "yanliscevap": "Yanlış cevap. Tekrar deneyin. Sorudan Gelecek Puan: ",
+    "dogrucevap": "Doğru Cevap",
     "gecilenulke": "Geçilen Ülke: ",
     "baskent": "Baskent Oyun",
     "baskent1": "Tahmin Edilecek Ülkenin\n Başkenti: ",
@@ -46,7 +47,6 @@
     "mesafetahmin": "Tahmin: ",
     "mesafetahmin1": "Mesafe: ",
     "mesafetahmin2": "Yön: ",
-    "mesafetahmin3": "Yanlış cevap. Tekrar deneyin.",
     "mesafekural": "Kurallar",
     "mesafekural1": "Mesafeden Ulke Bilme Oyunu",
     "mesafekural2": "Mesafeden ulke bilme oyununa hos geldiniz.\nAmaciniz, 250 ülkeden rastgele secilen bir ulkeyi bilmek.\nMesafeler +-100 Km fark olabilir.\nKonum olarak ülkelerin tam ortalari baz alinmistir.",
@@ -71,7 +71,8 @@
     "ayarlarlist11": "Seçilen Dil: Türkçe",
     "ayarlarlist12": "Diğer Ayarlar",
     "ayarlarlist13": "Kıta Seçenekleri",
-    "ayarlarlist14": "Seçilen Tema "
+    "ayarlarlist14": "Seçilen Tema",
+    "ayarlarlist15": "Sadece BM üyesi olmayan ülkeler"
   },
   "en": {
     "game1": "Guess the Country by Capital Game",
@@ -100,7 +101,8 @@
     "baskentkural2": "Welcome to the Guess the Capital Game.\nYour goal is to guess the capital of a randomly selected country from 250 countries.",
     "baskentkural3": "Scoring System: Your score starts at 50 in each round and decreases by 10 for each wrong guess.\nAfter 3 guesses, the earned score is fixed at 20. After the round ends, the score will reset to 50.",
     "baskentkural4": "OK",
-    "yanliscevap": "Wrong answer. Try again.",
+    "yanliscevap": "Wrong answer. Try again. Future Points for Question: ",
+    "dogrucevap": "Correct Answer",
     "gecilenulke": "Skipped Country: ",
     "baskent": "Capital Game",
     "baskent1": "Capital of the country to be guessed: ",
@@ -120,7 +122,6 @@
     "mesafetahmin": "Guess: ",
     "mesafetahmin1": "Distance: ",
     "mesafetahmin2": "Direction: ",
-    "mesafetahmin3": "Wrong answer. Try again.",
     "mesafekural": "Rules",
     "mesafekural1": "Guess the Country by Distance Game",
     "mesafekural2": "Welcome to the Guess the Country by Distance Game.\nYour goal is to guess a randomly selected country from 250 countries.\nDistances may vary +-100 km.\nThe distances are based on the approximate center of the countries.",
@@ -145,6 +146,7 @@
     "ayarlarlist11": "Selected language: English",
     "ayarlarlist12": "Other Settings",
     "ayarlarlist13": "Continent Options",
-    "ayarlarlist14": "Selected Thema "
+    "ayarlarlist14": "Selected Thema",
+    "ayarlarlist15": "Only non-UN member countries"
   }
 }
