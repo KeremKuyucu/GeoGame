@@ -1,5 +1,5 @@
 import 'package:path_provider/path_provider.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -99,16 +99,19 @@ int toplampuan=0;
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
   try {
-    if (await player.state == PlayerState.playing) {
+    if (player.playing) {
       await player.stop();
     }
-    await player.play(AssetSource(assetPath));
+    await player.setAsset(assetPath);
+    await player.play();
   } catch (e) {
+    print('Error playing asset: $e');
     try {
-      if (await player.state == PlayerState.playing) {
+      if (player.playing) {
         await player.stop();
       }
-      await player.play(UrlSource(url));
+      await player.setUrl(url);
+      await player.play();
     } catch (urlError) {
       print('Error playing audio from URL: $urlError');
     }
@@ -117,7 +120,7 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
 Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3');}
 Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3');}
 Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3');}
-Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'); arkafon.setReleaseMode(ReleaseMode.loop);}
+Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
 Future<void> Arkafondurdur() async { await arkafon.stop(); }
 List<String> butonAnahtarlar = ['', '', '', ''];
 List<int> butonnumaralari = [-1,-2,-3,-4];
