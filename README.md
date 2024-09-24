@@ -8,6 +8,10 @@ Projeyi deneyimlemek için aşağıdaki linkten oyuna erişebilirsiniz:
 
 [GeoGame](https://github.com/keremlolgg/GeoGame/releases/latest)
 
+# Desteklenen Diller
+
+Türkçe, English, Español, Deutsch, Русский, 中文
+
 # Özellikler
 
 Ülkelerin başkentleri, bayrakları ve diğer coğrafi bilgileriyle ilgili sorular
