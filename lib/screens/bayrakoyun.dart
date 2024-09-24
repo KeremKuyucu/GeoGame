@@ -11,7 +11,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
   final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
   late TextEditingController _controller;
   String _currentInput = '';
-  bool _isSearching = false;
   int puan=50;
   @override
   void initState() {
@@ -28,11 +27,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
     await readFromFile((update) => setState(update));
     yeniulkesec();
     bayrakoyunkurallari();
-  }
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-    });
   }
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
@@ -171,93 +165,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
                 ],
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(Yazi.get('yazilan') +_currentInput),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: _toggleSearch,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Butonun arka plan rengi
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                          textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
-                        ),
-                        child: Text(_isSearching ? Yazi.get('aramagoster') : Yazi.get('aramagizle')),
-                      ),
-                      SizedBox(height: 20),
-                      if (_isSearching)
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                                  (isEnglish ? e.enisim : e.isim),
-                              item: e,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        (isEnglish ? e.enisim : e.isim),
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            void _checkAnswer() {
-                              setState(() {
-                                if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-                                  _controller.clear();
-                                  yeniulkesec();
-                                  Dogru();
-                                  setState(() {
-                                    toplampuan+=puan;
-                                    writeToFile();
-                                  });
-                                } else {
-                                  puan-=10;
-                                  if(puan<20)
-                                    puan=20;
-                                  Yanlis();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(Yazi.get('yanlis')),
-                                      backgroundColor: Colors.red,
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              });
-                            }
-                            setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
-                            });
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
               if (yazmamodu)
                 Column(
                   children: [
@@ -326,7 +233,80 @@ class _BayrakOyunState extends State<BayrakOyun> {
                       ],
                     )
                   ],
-                )
+                ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(Yazi.get('yazilan') +_currentInput),
+                        ],
+                      ),
+                        SearchField<Ulkeler>(
+                          suggestions: ulke
+                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
+                              .map(
+                                (e) => SearchFieldListItem<Ulkeler>(
+                                  (isEnglish ? e.enisim : e.isim),
+                              item: e,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        (isEnglish ? e.enisim : e.isim),
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                              .toList(),
+                          controller: _controller,
+                          onSuggestionTap: (value) {
+                            void _checkAnswer() {
+                              setState(() {
+                                if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
+                                  _controller.clear();
+                                  yeniulkesec();
+                                  Dogru();
+                                  setState(() {
+                                    toplampuan+=puan;
+                                    writeToFile();
+                                  });
+                                } else {
+                                  puan-=10;
+                                  if(puan<20)
+                                    puan=20;
+                                  Yanlis();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(Yazi.get('yanlis')),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              });
+                            }
+                            setState(() {
+                              _controller.text = value.searchKey;
+                              _currentInput = value.searchKey;
+                            });
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

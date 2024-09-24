@@ -29,14 +29,14 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
   void restartApp() {
-    Yazi.loadDil(isEnglish ? 'en' : 'tr');
+    Yazi.loadDil(secilenDil);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => GeoGameLobi()),
     );
   }
   Future<void> _showMyDialog() async {
-    Yazi.loadDil(isEnglish ? 'en' : 'tr');
+    Yazi.loadDil(secilenDil);
     print(Yazi.get('kitauyari'));
     return showDialog<void>(
       context: context,
@@ -114,13 +114,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   }
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist11'), isEnglish, (value) {
-                setState(() {
-                  isEnglish = value;
-                  writeToFile();
-                });
-                restartApp();
-              }),
               buildSwitch(Yazi.get('ayarlarlist14')+(darktema ? 'Dark': 'Light'), darktema, (value) {
                 setState(() {
                   darktema = value;
@@ -131,6 +124,47 @@ class _SettingsPageState extends State<SettingsPage> {
                   writeToFile();
                 });
               }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(Yazi.get('ayarlarlist11'), style: TextStyle(fontSize: 16.0)),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      child: DropdownButton<String>(
+                        hint: Text(secilenDil),
+                        isExpanded: true,
+                        items: diller.map((String dil) {
+                          return DropdownMenuItem<String>(
+                            value: dil,
+                            child: Text(dil),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            secilenDil = value.toString();
+                            writeToFile();
+                          });
+                          restartApp();
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('If there is a translation error, please report the error.'),
+                      Text('The translations are machine translations.'),
+                    ],
+                  ),
+                ],
+              ),
               _buildSectionTitle(Yazi.get('ayarlarlist13')),
               buildSwitch(Yazi.get('ayarlarlist1'), amerikakitasi, (value) {
                 setState(() {

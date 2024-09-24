@@ -11,7 +11,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
   final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
   late TextEditingController _controller;
   String _currentInput = '';
-  bool _isSearching = false;
   int puan=50;
   String suggestedText = '';
   @override
@@ -29,11 +28,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
     await readFromFile((update) => setState(update));
     await yeniulkesec();
     await baskentoyunkurallari(context);
-  }
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-    });
   }
   Future<void> baskentoyunkurallari(BuildContext context) async {
     return showDialog<void>(
@@ -145,73 +139,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
                 ],
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(Yazi.get('yazilan') +_currentInput),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: _toggleSearch,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                          textStyle: TextStyle(fontSize: 16),
-                        ),
-                        child: Text(_isSearching ? Yazi.get('aramagoster') : Yazi.get('aramagizle')),
-                      ),
-                      SizedBox(height: 20),
-                      if (_isSearching)
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                                  (isEnglish ? e.enisim : e.isim),
-                              item: e,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(e.url),
-                                      radius: 20,
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        (isEnglish ? e.enisim : e.isim),
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
-                            });
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-             SizedBox(height: 20),
               if (yazmamodu)
                 Column(
                   children: [
@@ -280,7 +207,54 @@ class _BaskentOyunState extends State<BaskentOyun> {
                       ],
                     )
                   ],
-                )
+                ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Column(
+                    children: [
+                        SearchField<Ulkeler>(
+                          suggestions: ulke
+                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
+                              .map(
+                                (e) => SearchFieldListItem<Ulkeler>(
+                                  (isEnglish ? e.enisim : e.isim),
+                              item: e,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(e.url),
+                                      radius: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        (isEnglish ? e.enisim : e.isim),
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                              .toList(),
+                          controller: _controller,
+                          onSuggestionTap: (value) {
+                            setState(() {
+                              _controller.text = value.searchKey;
+                              _currentInput = value.searchKey;
+                            });
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
          ),

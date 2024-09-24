@@ -32,7 +32,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ThemeModeBuilderConfig.setLight();
   }
   void dilDegistir() {
-    Yazi.loadDil(isEnglish ? 'en' : 'tr').then((_) {
+    Yazi.loadDil(secilenDil).then((_) {
       setState(() {
         options[0] = Yazi.get('game1');
         options[1] = Yazi.get('game2');
@@ -40,6 +40,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         options[3] = Yazi.get('game4');
       });
     });
+    isEnglish= (secilenDil != 'Türkçe');
   }
   Future<void> surumkiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -201,6 +202,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
               title: Text(Yazi.get('website')),
               onTap: () async {
                 await EasyLauncher.url(url: Yazi.get('websiteurl'));
+              },
+            ),
+            ListTile(
+              leading: FaIcon(Icons.report),
+              title: Text(Yazi.get('hatabildir')),
+              onTap: () async {
+                await EasyLauncher.url(url: Yazi.get('hatabildirurl'));
               },
             ),
             ListTile(

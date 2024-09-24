@@ -68,7 +68,7 @@ Ulkeler kalici = Ulkeler(
 );
 class Yazi {
   static Map<String, dynamic>? _localizedStrings;
-  static String _currentLanguage = 'tr';
+  static String _currentLanguage = 'Türkçe';
 
   static Future<void> loadDil(String dilKodu) async {
     if (_currentLanguage == dilKodu && _localizedStrings != null) {
@@ -89,12 +89,15 @@ class Yazi {
     }
   }
   static String get(String key) {
-    Yazi.loadDil(isEnglish ? 'en' : 'tr');
+    Yazi.loadDil(secilenDil);
     return _localizedStrings?[key] ?? 'N/A';
   }
 }
 
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, isEnglish = false, darktema=true;
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true;
+final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文'];
+String secilenDil='Türkçe';
+bool isEnglish=false;
 int toplampuan=0;
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
@@ -191,8 +194,8 @@ Future<void> readFromFile(Function updateState) async {
         bmuyeligi = lines[6] == 'true';
         sadecebm = lines[7] == 'true';
         yazmamodu = lines[8] == 'true';
-        isEnglish = lines[9] == 'true';
-        darktema = lines[10] == 'true';
+        darktema = lines[9] == 'true';
+        secilenDil = lines[10];
         toplampuan = int.parse(lines[11]);
       });
     }
@@ -214,8 +217,8 @@ Future<void> writeToFile() async {
     bmuyeligi.toString(),
     sadecebm.toString(),
     yazmamodu.toString(),
-    isEnglish.toString(),
     darktema.toString(),
+    secilenDil,
     toplampuan.toString(),
   ].join('\n');
   await file.writeAsString(data);

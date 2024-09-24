@@ -13,7 +13,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
   String message='';
   late TextEditingController _controller;
   String _currentInput = '';
-  bool _isSearching = false;
   int puan=100;
   @override
   void initState() {
@@ -30,11 +29,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
     await readFromFile((update) => setState(update));
     await yeniulkesec();
     await mesafeoyunkurallari();
-  }
-  void _toggleSearch() {
-    setState(() {
-      _isSearching = !_isSearching;
-    });
   }
   Future<void> mesafeoyunkurallari() async {
     return showDialog<void>(
@@ -190,26 +184,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(Yazi.get('yazilan')+_currentInput),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: _toggleSearch,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue, // Butonun arka plan rengi
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                          textStyle: TextStyle(fontSize: 16), // Buton metni stilini ayarlayın
-                        ),
-                        child: Text(_isSearching ? Yazi.get('aramagoster') : Yazi.get('aramagizle')),
-                      ),
-                      SizedBox(height: 20),
-                      if (_isSearching)
                         SearchField<Ulkeler>(
                           suggestions: ulke
                               .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
