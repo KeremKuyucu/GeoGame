@@ -8,31 +8,11 @@ import 'dart:convert';
 import 'dart:async';
 // Tanımlamalar
 class Ulkeler {
-  String bayrak;
-  String trisim;
-  String enisim;
-  String isim;
-  String baskent;
-  String kita;
-  String url;
-  bool bilgi;
-  bool bm;
-  double enlem;
-  double boylam;
-  int dosyaboyut;
+  String bayrak, trisim, enisim, isim, baskent, kita, url;
+  bool bilgi, bm; double enlem, boylam; int dosyaboyut;
   Ulkeler({
-    required this.bayrak,
-    required this.trisim,
-    required this.enisim,
-    required this.isim,
-    required this.baskent,
-    required this.kita,
-    required this.url,
-    required this.bilgi,
-    required this.bm,
-    required this.enlem,
-    required this.boylam,
-    required this.dosyaboyut,
+    required this.bayrak, required this.trisim, required this.enisim, required this.isim, required this.baskent, required this.kita,
+    required this.url, required this.bilgi, required this.bm, required this.enlem, required this.boylam, required this.dosyaboyut,
   });
   bool ks(String yapilantahmin) {
     return yapilantahmin == trisim || yapilantahmin == isim || yapilantahmin == enisim;
@@ -95,7 +75,7 @@ class Yazi {
 }
 
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true;
-final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文'];
+final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
 String secilenDil='Türkçe';
 bool isEnglish=false;
 int toplampuan=0;

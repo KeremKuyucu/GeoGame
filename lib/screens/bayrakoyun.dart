@@ -241,12 +241,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(Yazi.get('yazilan') +_currentInput),
-                        ],
-                      ),
                         SearchField<Ulkeler>(
                           suggestions: ulke
                               .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))

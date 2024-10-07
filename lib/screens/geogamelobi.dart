@@ -11,6 +11,7 @@ import "package:theme_mode_builder/theme_mode_builder.dart";
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'dart:io';
 
 class GeoGameLobi extends StatefulWidget {
   @override
@@ -48,7 +49,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     String? remoteVersion;
     String? apkUrl;
 
-    // Verileri fetch eden asenkron fonksiyon
     Future<void> _fetchData() async {
       try {
         final response = await http.get(Uri.parse('https://raw.githubusercontent.com/keremlolgg/GeoGame/main/latest_version.json'));
@@ -74,17 +74,17 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Yeni Sürüm Var'),
-            content: Text('Lütfen internet sitesinden uygulamayı tekrar indirerek güncelleyiniz.'),
+            title: Text(Yazi.get('surum1')),
+            content: Text(Yazi.get('surum2')),
             actions: <Widget>[
               TextButton(
-                child: Text('Şimdi Değil'),
+                child: Text(Yazi.get('surum3')),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text('Siteye Git'),
+                child: Text(Yazi.get('surum4')),
                 onPressed: () {
                   Navigator.of(context).pop();
                   EasyLauncher.url(
