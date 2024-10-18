@@ -163,7 +163,7 @@ Future<void> readFromFile(Function updateState) async {
     final contents = await file.readAsString();
     final lines = contents.split('\n');
 
-    if (lines.length >= 12) {
+    if (lines.length >= 11) {
       updateState(() {
         amerikakitasi = lines[0] == 'true';
         asyakitasi = lines[1] == 'true';
@@ -172,11 +172,10 @@ Future<void> readFromFile(Function updateState) async {
         okyanusyakitasi = lines[4] == 'true';
         antartikakitasi = lines[5] == 'true';
         bmuyeligi = lines[6] == 'true';
-        sadecebm = lines[7] == 'true';
-        yazmamodu = lines[8] == 'true';
-        darktema = lines[9] == 'true';
-        secilenDil = lines[10];
-        toplampuan = int.parse(lines[11]);
+        yazmamodu = lines[7] == 'true';
+        darktema = lines[8] == 'true';
+        secilenDil = lines[9];
+        toplampuan = int.parse(lines[10]);
       });
     }
   } else {
@@ -195,7 +194,6 @@ Future<void> writeToFile() async {
     okyanusyakitasi.toString(),
     antartikakitasi.toString(),
     bmuyeligi.toString(),
-    sadecebm.toString(),
     yazmamodu.toString(),
     darktema.toString(),
     secilenDil,

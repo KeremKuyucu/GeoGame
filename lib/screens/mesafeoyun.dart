@@ -191,6 +191,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                                 (e) => SearchFieldListItem<Ulkeler>(
                                   (isEnglish ? e.enisim : e.isim),
                               item: e,
+
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
@@ -217,6 +218,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                             setState(() {
                               _controller.text = value.searchKey;
                               _currentInput = value.searchKey;
+                              _checkAnswer();
                             });
                           },
                         ),

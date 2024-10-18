@@ -8,10 +8,15 @@ class BaskentOyun extends StatefulWidget {
 }
 
 class _BaskentOyunState extends State<BaskentOyun> {
-  final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
+  final List<Color> buttonColors = [
+    Colors.green,
+    Colors.yellow,
+    Colors.blue,
+    Colors.red
+  ];
   late TextEditingController _controller;
   String _currentInput = '';
-  int puan=50;
+  int puan = 50;
   String suggestedText = '';
   @override
   void initState() {
@@ -24,11 +29,13 @@ class _BaskentOyunState extends State<BaskentOyun> {
       });
     });
   }
+
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     await yeniulkesec();
     await baskentoyunkurallari(context);
   }
+
   Future<void> baskentoyunkurallari(BuildContext context) async {
     return showDialog<void>(
       context: context,
@@ -57,11 +64,12 @@ class _BaskentOyunState extends State<BaskentOyun> {
       },
     );
   }
+
   void _checkAnswer() {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear();
-        _currentInput='';
+        _currentInput = '';
         yeniulkesec();
         Dogru();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -72,18 +80,17 @@ class _BaskentOyunState extends State<BaskentOyun> {
           ),
         );
         setState(() {
-          toplampuan+=puan;
+          toplampuan += puan;
           writeToFile();
         });
-        puan=50;
+        puan = 50;
       } else {
-        puan-=10;
-        if(puan<20)
-          puan=20;
+        puan -= 10;
+        if (puan < 20) puan = 20;
         Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Yazi.get('yanliscevap')+puan.toString()),
+            content: Text(Yazi.get('yanliscevap') + puan.toString()),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -91,8 +98,9 @@ class _BaskentOyunState extends State<BaskentOyun> {
       }
     });
   }
+
   void _pasButtonPressed() {
-    puan=50;
+    puan = 50;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(Yazi.get('gecilenulke') + kalici.isim),
@@ -115,149 +123,156 @@ class _BaskentOyunState extends State<BaskentOyun> {
       ),
       body: Center(
         child: SingleChildScrollView(
-         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                Yazi.get('baskent1') + kalici.baskent,
-                style: TextStyle(fontSize: 24),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: _checkAnswer,
-                    child: Text(Yazi.get('tahmin')),
-                  ),
-                  ElevatedButton(
-                    onPressed: _pasButtonPressed,
-                    child: Text(Yazi.get('pas')),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              if (yazmamodu)
-                Column(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  Yazi.get('baskent1') + kalici.baskent,
+                  style: TextStyle(fontSize: 24),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        for (int i = 0; i < 2; i++)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _controller.text = butonAnahtarlar[i];
-                                  _checkAnswer();
-                                },
-                                child: Text(
-                                  butonAnahtarlar[i],
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
+                    ElevatedButton(
+                      onPressed: _checkAnswer,
+                      child: Text(Yazi.get('tahmin')),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        for (int i = 2; i < 4; i++)
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _controller.text = butonAnahtarlar[i];
-                                  _checkAnswer();
-                                },
-                                child: Text(
-                                  butonAnahtarlar[i],
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
+                    ElevatedButton(
+                      onPressed: _pasButtonPressed,
+                      child: Text(Yazi.get('pas')),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(Yazi.get('sikgizle')),
-                      ],
-                    )
                   ],
                 ),
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: Column(
+                SizedBox(height: 20),
+                if (yazmamodu)
+                  Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          for (int i = 0; i < 2; i++)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0, horizontal: 4.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _controller.text = butonAnahtarlar[i];
+                                    _checkAnswer();
+                                  },
+                                  child: Text(
+                                    butonAnahtarlar[i],
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        buttonColors[i], // Buton rengini ayarla
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          for (int i = 2; i < 4; i++)
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 4.0, horizontal: 4.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _controller.text = butonAnahtarlar[i];
+                                    _checkAnswer();
+                                  },
+                                  child: Text(
+                                    butonAnahtarlar[i],
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        buttonColors[i], // Buton rengini ayarla
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(Yazi.get('sikgizle')),
+                        ],
+                      )
+                    ],
+                  ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Column(
+                      children: [
                         SearchField<Ulkeler>(
                           suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
+                              .where((e) => (isEnglish ? e.enisim : e.isim)
+                                  .toLowerCase()
+                                  .contains(_currentInput.toLowerCase()))
                               .map(
                                 (e) => SearchFieldListItem<Ulkeler>(
                                   (isEnglish ? e.enisim : e.isim),
-                              item: e,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(e.url),
-                                      radius: 20,
+                                  item: e,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(e.url),
+                                          radius: 20,
+                                        ),
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            (isEnglish ? e.enisim : e.isim),
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        (isEnglish ? e.enisim : e.isim),
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          )
+                              )
                               .toList(),
                           controller: _controller,
                           onSuggestionTap: (value) {
                             setState(() {
                               _controller.text = value.searchKey;
                               _currentInput = value.searchKey;
+                              _checkAnswer();
                             });
                           },
                         ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-         ),
         ),
       ),
     );

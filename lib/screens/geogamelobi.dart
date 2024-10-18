@@ -17,6 +17,7 @@ class GeoGameLobi extends StatefulWidget {
   @override
   _GeoGameLobiState createState() => _GeoGameLobiState();
 }
+
 class _GeoGameLobiState extends State<GeoGameLobi> {
   int _selectedOption = 0;
   List<String> options = List.filled(4, '');
@@ -27,11 +28,12 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     yeniulkesec();
     readFromFile((update) => setState(update));
     dilDegistir();
-    if(darktema)
+    if (darktema)
       ThemeModeBuilderConfig.setDark();
     else
       ThemeModeBuilderConfig.setLight();
   }
+
   void dilDegistir() {
     Yazi.loadDil(secilenDil).then((_) {
       setState(() {
@@ -41,8 +43,9 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         options[3] = Yazi.get('game4');
       });
     });
-    isEnglish= (secilenDil != 'Türkçe');
+    isEnglish = (secilenDil != 'Türkçe');
   }
+
   Future<void> surumkiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
@@ -51,7 +54,8 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
 
     Future<void> _fetchData() async {
       try {
-        final response = await http.get(Uri.parse('https://raw.githubusercontent.com/keremlolgg/GeoGame/main/latest_version.json'));
+        final response = await http.get(Uri.parse(
+            'https://raw.githubusercontent.com/keremlolgg/GeoGame/main/latest_version.json'));
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           setState(() {
@@ -97,40 +101,45 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         },
       );
     }
-    if (remoteVersion != null && apkUrl != null && remoteVersion != localVersion) {
+
+    if (remoteVersion != null &&
+        apkUrl != null &&
+        remoteVersion != localVersion) {
       showUpdateDialog(context);
     }
   }
+
   void _selectOption(int index) async {
-   setState(() {
-     _selectedOption = index;
-   });
-   if (_selectedOption == 0 && getSelectableCountryCount()>0) {
-     Yenitur();
-     Navigator.push(
-       context,
-       MaterialPageRoute(builder: (context) => BaskentOyun()),
-     );
-   } else if (_selectedOption == 1 && getSelectableCountryCount()>0) {
-     Yenitur();
-     Navigator.push(
-       context,
-       MaterialPageRoute(builder: (context) => BayrakOyun()),
-     );
-   } else if (_selectedOption == 2 && getSelectableCountryCount()>0) {
-     Yenitur();
-     Navigator.push(
-       context,
-       MaterialPageRoute(builder: (context) => MesafeOyun()),
-     );
-   } else if (_selectedOption == 3 || getSelectableCountryCount()==0) {
-     Yenitur();
-     Navigator.push(
-       context,
-       MaterialPageRoute(builder: (context) => SettingsPage()),
-     );
-   }
- }
+    setState(() {
+      _selectedOption = index;
+    });
+    if (_selectedOption == 0 && getSelectableCountryCount() > 0) {
+      Yenitur();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => BaskentOyun()),
+      );
+    } else if (_selectedOption == 1 && getSelectableCountryCount() > 0) {
+      Yenitur();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => BayrakOyun()),
+      );
+    } else if (_selectedOption == 2 && getSelectableCountryCount() > 0) {
+      Yenitur();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MesafeOyun()),
+      );
+    } else if (_selectedOption == 3 || getSelectableCountryCount() == 0) {
+      Yenitur();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SettingsPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,8 +202,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
               title: Text(Yazi.get('instagram')),
               onTap: () async {
                 await EasyLauncher.url(
-                    url: Yazi.get('instagramurl'),
-                    mode: Mode.platformDefault);
+                    url: Yazi.get('instagramurl'), mode: Mode.platformDefault);
               },
             ),
             ListTile(
@@ -244,14 +252,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           ],
         ),
       ),
-
       body: Column(
         children: <Widget>[
           Container(
             padding: EdgeInsets.all(16.0),
             child: Text(
               Yazi.get('secenek'),
-              style: TextStyle(fontSize: 24,color: Colors.blue),
+              style: TextStyle(fontSize: 24, color: Colors.blue),
             ),
           ),
           Expanded(
@@ -261,7 +268,9 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                 return Container(
                   margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
                   decoration: BoxDecoration(
-                    color: _selectedOption == index ? Colors.blueAccent : Colors.grey[800],
+                    color: _selectedOption == index
+                        ? Colors.blueAccent
+                        : Colors.grey[800],
                     borderRadius: BorderRadius.circular(10.0),
                     boxShadow: [
                       BoxShadow(
@@ -292,8 +301,8 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           Container(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              Yazi.get('puan')+toplampuan.toString(), // max 17 basamak
-              style: TextStyle(fontSize: 35,color: Colors.green),
+              Yazi.get('puan') + toplampuan.toString(), // max 17 basamak
+              style: TextStyle(fontSize: 35, color: Colors.green),
             ),
           ),
           Card(

@@ -8,10 +8,15 @@ class BayrakOyun extends StatefulWidget {
 }
 
 class _BayrakOyunState extends State<BayrakOyun> {
-  final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
+  final List<Color> buttonColors = [
+    Colors.green,
+    Colors.yellow,
+    Colors.blue,
+    Colors.red
+  ];
   late TextEditingController _controller;
   String _currentInput = '';
-  int puan=50;
+  int puan = 50;
   @override
   void initState() {
     super.initState();
@@ -23,11 +28,13 @@ class _BayrakOyunState extends State<BayrakOyun> {
       });
     });
   }
+
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     yeniulkesec();
     bayrakoyunkurallari();
   }
+
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
       context: context,
@@ -56,11 +63,12 @@ class _BayrakOyunState extends State<BayrakOyun> {
       },
     );
   }
+
   void _checkAnswer() {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear();
-        _currentInput='';
+        _currentInput = '';
         yeniulkesec();
         Dogru();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,18 +79,17 @@ class _BayrakOyunState extends State<BayrakOyun> {
           ),
         );
         setState(() {
-          toplampuan+=puan;
+          toplampuan += puan;
           writeToFile();
         });
-        puan=50;
+        puan = 50;
       } else {
-        puan-=10;
-        if(puan<20)
-          puan=20;
+        puan -= 10;
+        if (puan < 20) puan = 20;
         Yanlis();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(Yazi.get('yanliscevap')+puan.toString()),
+            content: Text(Yazi.get('yanliscevap') + puan.toString()),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
@@ -90,21 +97,23 @@ class _BayrakOyunState extends State<BayrakOyun> {
       }
     });
   }
+
   void _pasButtonPressed() {
-    puan=50;
+    puan = 50;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(Yazi.get('yazilan')+kalici.isim),
+        content: Text(Yazi.get('yazilan') + kalici.isim),
         backgroundColor: Colors.yellow,
         duration: Duration(seconds: 2),
       ),
     );
-    setState(()  {
+    setState(() {
       yeniulkesec();
       Yenitur();
       _controller.clear();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,7 +183,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
                         for (int i = 0; i < 2; i++)
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
                                 onPressed: () {
                                   _controller.text = butonAnahtarlar[i];
@@ -187,7 +197,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
+                                  backgroundColor:
+                                      buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
@@ -203,7 +214,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
                         for (int i = 2; i < 4; i++)
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
                                 onPressed: () {
                                   _controller.text = butonAnahtarlar[i];
@@ -216,7 +228,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
                                   ),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: buttonColors[i], // Buton rengini ayarla
+                                  backgroundColor:
+                                      buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
@@ -241,62 +254,66 @@ class _BayrakOyunState extends State<BayrakOyun> {
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: Column(
                     children: [
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                                  (isEnglish ? e.enisim : e.isim),
-                              item: e,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        (isEnglish ? e.enisim : e.isim),
-                                        style: TextStyle(fontSize: 16),
+                      SearchField<Ulkeler>(
+                        suggestions: ulke
+                            .where((e) => (isEnglish ? e.enisim : e.isim)
+                                .toLowerCase()
+                                .contains(_currentInput.toLowerCase()))
+                            .map(
+                              (e) => SearchFieldListItem<Ulkeler>(
+                                (isEnglish ? e.enisim : e.isim),
+                                item: e,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          (isEnglish ? e.enisim : e.isim),
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            void _checkAnswer() {
-                              setState(() {
-                                if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-                                  _controller.clear();
-                                  yeniulkesec();
-                                  Dogru();
-                                  setState(() {
-                                    toplampuan+=puan;
-                                    writeToFile();
-                                  });
-                                } else {
-                                  puan-=10;
-                                  if(puan<20)
-                                    puan=20;
-                                  Yanlis();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(Yazi.get('yanlis')),
-                                      backgroundColor: Colors.red,
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              });
-                            }
+                            )
+                            .toList(),
+                        controller: _controller,
+                        onSuggestionTap: (value) {
+                          void _checkAnswer() {
                             setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
+                              if (kalici
+                                  .ks(kelimeDuzelt(_controller.text.trim()))) {
+                                _controller.clear();
+                                yeniulkesec();
+                                Dogru();
+                                setState(() {
+                                  toplampuan += puan;
+                                  writeToFile();
+                                });
+                              } else {
+                                puan -= 10;
+                                if (puan < 20) puan = 20;
+                                Yanlis();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(Yazi.get('yanlis')),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
                             });
-                          },
-                        ),
+                          }
+
+                          setState(() {
+                            _controller.text = value.searchKey;
+                            _currentInput = value.searchKey;
+                            _checkAnswer();
+                          });
+                        },
+                      ),
                     ],
                   ),
                 ),
