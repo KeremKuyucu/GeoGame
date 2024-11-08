@@ -156,50 +156,51 @@ int getSelectableCountryCount() {
 }
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/ulkekurallari.txt';
+  final filePath = '${directory.path}/kurallar.json';
   final file = File(filePath);
 
   if (await file.exists()) {
     final contents = await file.readAsString();
-    final lines = contents.split('\n');
+    final jsonData = jsonDecode(contents);
 
-    if (lines.length >= 11) {
-      updateState(() {
-        amerikakitasi = lines[0] == 'true';
-        asyakitasi = lines[1] == 'true';
-        afrikakitasi = lines[2] == 'true';
-        avrupakitasi = lines[3] == 'true';
-        okyanusyakitasi = lines[4] == 'true';
-        antartikakitasi = lines[5] == 'true';
-        bmuyeligi = lines[6] == 'true';
-        yazmamodu = lines[7] == 'true';
-        darktema = lines[8] == 'true';
-        secilenDil = lines[9];
-        toplampuan = int.parse(lines[10]);
-      });
-    }
+    updateState(() {
+      amerikakitasi = jsonData['amerikakitasi'] == true;
+      asyakitasi = jsonData['asyakitasi'] == true;
+      afrikakitasi = jsonData['afrikkatasi'] == true;
+      avrupakitasi = jsonData['avrupakitasi'] == true;
+      okyanusyakitasi = jsonData['okyanusyakitasi'] == true;
+      antartikakitasi = jsonData['antartikakitasi'] == true;
+      bmuyeligi = jsonData['bmuyeligi'] == true;
+      yazmamodu = jsonData['yazmamodu'] == true;
+      darktema = jsonData['darktema'] == true;
+      secilenDil = jsonData['secilenDil'];
+      toplampuan = jsonData['toplampuan'];
+    });
   } else {
-    print('Dosya bulunamadı. ulkekurallari.txt');
+    print('Dosya bulunamadı: ulkekurallari.json');
   }
 }
 Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/ulkekurallari.txt';
+  final filePath = '${directory.path}/kurallar.json';
   final file = File(filePath);
-  final data = [
-    amerikakitasi.toString(),
-    asyakitasi.toString(),
-    afrikakitasi.toString(),
-    avrupakitasi.toString(),
-    okyanusyakitasi.toString(),
-    antartikakitasi.toString(),
-    bmuyeligi.toString(),
-    yazmamodu.toString(),
-    darktema.toString(),
-    secilenDil,
-    toplampuan.toString(),
-  ].join('\n');
-  await file.writeAsString(data);
+
+  final data = {
+    'amerikakitasi': amerikakitasi,
+    'asyakitasi': asyakitasi,
+    'afrikkatasi': afrikakitasi,
+    'avrupakitasi': avrupakitasi,
+    'okyanusyakitasi': okyanusyakitasi,
+    'antartikakitasi': antartikakitasi,
+    'bmuyeligi': bmuyeligi,
+    'yazmamodu': yazmamodu,
+    'darktema': darktema,
+    'secilenDil': secilenDil,
+    'toplampuan': toplampuan,
+  };
+
+  final jsonData = jsonEncode(data);
+  await file.writeAsString(jsonData);
 }
 String kelimeDuzelt(String kelime) {
   String sonuc = '';

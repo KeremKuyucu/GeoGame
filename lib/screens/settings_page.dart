@@ -159,7 +159,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('If there is a translation error, please report the error.'),
+                      Text('If there is a translation error,'),
+                      Text('please report the error.'),
                       Text('The translations are machine translations.'),
                     ],
                   ),

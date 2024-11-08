@@ -75,7 +75,13 @@
     "ayarlarlist12": "Diğer Ayarlar",
     "ayarlarlist13": "Kıta Seçenekleri",
     "ayarlarlist14": "Seçilen Tema: ",
-    "ayarlarlist15": "Sadece BM üyesi olmayan ülkeler"
+    "ayarlarlist15": "Sadece BM üyesi olmayan ülkeler",
+    "isimsorma1": "Lütfen İsminizi Girin",
+    "isimsorma2": "İsminizi yazın",
+    "isimsorma3": "İptal",
+    "isimsorma4": "Tamam",
+    "isimsorma5": "Hoşgeldin",
+    "isimsorma6": "Lütfen geçerli bir isim girin."
   },
   "English": {
     "game1": "Guess the Country by Capital Game",
@@ -153,7 +159,13 @@
     "ayarlarlist12": "Other Settings",
     "ayarlarlist13": "Continent Options",
     "ayarlarlist14": "Selected Thema: ",
-    "ayarlarlist15": "Only non-UN member countries"
+    "ayarlarlist15": "Only non-UN member countries",
+    "isimsorma1": "Please Enter Your Name",
+    "isimsorma2": "Enter your name",
+    "isimsorma3": "Cancel",
+    "isimsorma4": "Okay",
+    "isimsorma5": "Welcome",
+    "isimsorma6": "Please enter a valid name."
   },
   "Español": {
     "game1": "Adivina el País por la Capital",
@@ -230,7 +242,13 @@
     "ayarlarlist12": "Otras Configuraciones",
     "ayarlarlist13": "Opciones de Continente",
     "ayarlarlist14": "Tema Seleccionado: ",
-    "ayarlarlist15": "Solo países que no son miembros de la ONU"
+    "ayarlarlist15": "Solo países que no son miembros de la ONU",
+    "isimsorma1": "Por Favor, Ingrese Su Nombre",
+    "isimsorma2": "Ingrese su nombre",
+    "isimsorma3": "Cancelar",
+    "isimsorma4": "Aceptar",
+    "isimsorma5": "Bienvenido",
+    "isimsorma6": "Por favor, ingrese un nombre válido."
   },
   "Deutsch": {
     "game1": "Das Land nach Hauptstadt raten",
@@ -307,7 +325,13 @@
     "ayarlarlist12": "Weitere Einstellungen",
     "ayarlarlist13": "Kontinentoptionen",
     "ayarlarlist14": "Ausgewähltes Thema: ",
-    "ayarlarlist15": "Nur Länder, die keine UN-Mitglieder sind"
+    "ayarlarlist15": "Nur Länder, die keine UN-Mitglieder sind",
+    "isimsorma1": "Bitte Geben Sie Ihren Namen Ein",
+    "isimsorma2": "Geben Sie Ihren Namen ein",
+    "isimsorma3": "Abbrechen",
+    "isimsorma4": "Okay",
+    "isimsorma5": "Willkommen",
+    "isimsorma6": "Bitte geben Sie einen gültigen Namen ein."
   },
   "Русский": {
     "game1": "Игра Угадай Страну по Столице",
@@ -385,7 +409,13 @@
     "ayarlarlist12": "Другие настройки",
     "ayarlarlist13": "Опции Континента",
     "ayarlarlist14": "Выбранная тема: ",
-    "ayarlarlist15": "Только страны, не являющиеся членами ООН"
+    "ayarlarlist15": "Только страны, не являющиеся членами ООН",
+    "isimsorma1": "Пожалуйста, Введите Ваше Имя",
+    "isimsorma2": "Введите ваше имя",
+    "isimsorma3": "Отмена",
+    "isimsorma4": "Ок",
+    "isimsorma5": "Добро пожаловать",
+    "isimsorma6": "Пожалуйста, введите действительное имя."
   },
   "中文": {
     "game1": "首都国家猜测游戏",
@@ -463,7 +493,13 @@
     "ayarlarlist12": "其他设置",
     "ayarlarlist13": "洲选项",
     "ayarlarlist14": "所选主题：",
-    "ayarlarlist15": "仅限非联合国成员国"
+    "ayarlarlist15": "仅限非联合国成员国",
+    "isimsorma1": "请输入您的姓名",
+    "isimsorma2": "请输入您的姓名",
+    "isimsorma3": "取消",
+    "isimsorma4": "确定",
+    "isimsorma5": "欢迎",
+    "isimsorma6": "请输入有效的名字。"
   },
   "Kurdî": {
     "game1": "Baskentê Welatê Naskirinê",
@@ -537,7 +573,13 @@
     "ayarlarlist12": "Ayarên Din",
     "ayarlarlist13": "Vebijarkên Kîta",
     "ayarlarlist14": "Tema ya Hilbijartî: ",
-    "ayarlarlist15": "Tenê welatan ku BM-endam ne"
+    "ayarlarlist15": "Tenê welatan ku BM-endam ne",
+    "isimsorma1": "Navê xwe binivîse",
+    "isimsorma2": "Navê xwe binivîse",
+    "isimsorma3": "Bersivdan",
+    "isimsorma4": "Bale",
+    "isimsorma5": "Bi xêr hatî",
+    "isimsorma6": "Ji kerema xwe navê rastî binivîse."
   },
   "Français": {
     "game1": "Jeu de devinette de pays à partir de la capitale",
@@ -615,7 +657,13 @@
     "ayarlarlist12": "Autres paramètres",
     "ayarlarlist13": "Options de continent",
     "ayarlarlist14": "Thème sélectionné : ",
-    "ayarlarlist15": "Uniquement les pays non membres de l'ONU"
+    "ayarlarlist15": "Uniquement les pays non membres de l'ONU",
+    "isimsorma1": "Veuillez Entrer Votre Nom",
+    "isimsorma2": "Entrez votre nom",
+    "isimsorma3": "Annuler",
+    "isimsorma4": "D'accord",
+    "isimsorma5": "Bienvenue",
+    "isimsorma6": "Veuillez entrer un nom valide."
   },
   "Português": {
     "game1": "Jogo de adivinhação do país pela capital",
@@ -693,7 +741,13 @@
     "ayarlarlist12": "Outras configurações",
     "ayarlarlist13": "Opções de continente",
     "ayarlarlist14": "Tema selecionado: ",
-    "ayarlarlist15": "Apenas países não membros da ONU"
+    "ayarlarlist15": "Apenas países não membros da ONU",
+    "isimsorma1": "Por Favor, Insira Seu Nome",
+    "isimsorma2": "Digite seu nome",
+    "isimsorma3": "Cancelar",
+    "isimsorma4": "Ok",
+    "isimsorma5": "Bem-vindo",
+    "isimsorma6": "Por favor, insira um nome válido."
   },
   "العربية": {
     "game1": "لعبة تخمين الدولة من العاصمة",
@@ -771,6 +825,12 @@
     "ayarlarlist12": "إعدادات أخرى",
     "ayarlarlist13": "خيارات القارة",
     "ayarlarlist14": "الموضوع المختار: ",
-    "ayarlarlist15": "فقط الدول غير الأعضاء في الأمم المتحدة"
+    "ayarlarlist15": "فقط الدول غير الأعضاء في الأمم المتحدة",
+    "isimsorma1": "من فضلك أدخل اسمك",
+    "isimsorma2": "أدخل اسمك",
+    "isimsorma3": "إلغاء",
+    "isimsorma4": "موافق",
+    "isimsorma5": "أهلاً وسهلاً",
+    "isimsorma6": "من فضلك أدخل اسمًا صالحًا."
   }
 }
