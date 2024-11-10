@@ -48,6 +48,8 @@ Dart: Uygulamanın yazıldığı programlama dili
 
 Glitch: Web uygulaması barındırma platformu
 
+Discord: Sıralama verilerinin saklandığı ve işlendiği yer
+
 
 # Lisans
 
