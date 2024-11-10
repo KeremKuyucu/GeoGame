@@ -4,6 +4,7 @@ import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'dart:io';
 import 'dart:math';
@@ -66,7 +67,6 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
     if (player.playing) {
       await player.stop();
     }
-    print(assetPath);
     await player.setAsset(assetPath);
     await player.play();
   } catch (e) {
@@ -129,6 +129,11 @@ List<SalomonBottomBarItem> navBarItems = [
     title: const Text(''),
   ),
   SalomonBottomBarItem(
+    icon: const Icon(FontAwesomeIcons.info),
+    selectedColor: Colors.teal,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
     icon: const Icon(Icons.person),
     selectedColor: Colors.teal,
     title: const Text(''),
@@ -188,7 +193,7 @@ int getSelectableCountryCount() {
 }
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/kurallar.json';
+  final filePath = '${directory.path}kurallar.json';
   final file = File(filePath);
 
   if (await file.exists()) {
@@ -218,12 +223,13 @@ Future<void> readFromFile(Function updateState) async {
       baskentpuan = jsonData['baskentpuan'] ?? 0;
     });
   } else {
-    print('Dosya bulunamadı: ulkekurallari.json');
+    print('Dosya bulunamadı: kurallar.json');
+    writeToFile();
   }
 }
 Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/kurallar.json';
+  final filePath = '${directory.path}kurallar.json';
   final file = File(filePath);
   toplampuan=bayrakpuan+baskentpuan+mesafepuan;
   final data = {
@@ -342,18 +348,58 @@ Future<void> saveNameToFile(String name) async {
     print('Error saving name: $e');
   }
 }
-Future<void> sendMessage(String message,bool newusermi) async {
-  final targetUrl = newusermi ? 'http://fresh-arrow-ox.glitch.me/newuser':'http://fresh-arrow-ox.glitch.me/send_message';
-
-  name = await getNameFromFile();
-  PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  String localVersion = packageInfo.version;
-  String country = (await getCountry()).replaceAll('\n', '');
-  String city = (await getCity()).replaceAll('\n', '');
-  String currentTime = await fetchTime();
-
+Future<void> sendNewUserNotification(String name) async {
   try {
-    // Log mesajını oluştur
+    // Yeni kullanıcı bildirimi için gerekli dosya yolunu al
+    Directory tempDir = await getTemporaryDirectory();
+    File file = File('${tempDir.path}/newuser.txt'); // Dosya yolu burada geçici dizine yönlendirildi
+
+    // Dosya mevcut mu kontrol et
+    bool fileExists = await file.exists();
+    if (!fileExists) {
+      // Dosya yoksa, dosyayı oluştur ve içine 'false' yaz
+      await file.writeAsString('false', mode: FileMode.writeOnly);
+      print('Dosya oluşturuldu ve "false" yazıldı');
+    }
+
+    // Dosya okuma işlemi
+    String contents = await file.readAsString();
+    if (contents == 'true') return; // Dosya zaten 'true' içeriyorsa işlem yapma
+
+    // Yeni kullanıcı bildirimi yapılacak URL
+    final targetUrl = 'http://fresh-arrow-ox.glitch.me/newuser';
+
+    // Mesajı gönder
+    final response = await http.post(
+      Uri.parse(targetUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'message': 'Yeni kullanıcı kaydedildi!\nİsmi: $name',
+      }),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      print('Yeni kullanıcı bildirimi başarıyla gönderildi!');
+      // Dosyayı 'true' olarak yaz
+      await file.writeAsString('true', mode: FileMode.writeOnly);
+      print('Dosya başarıyla yazıldı');
+    } else {
+      print('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Hata: $e');
+  }
+}
+Future<void> sendMessage(String message) async {
+  try {
+    String name = await getNameFromFile();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String localVersion = packageInfo.version;
+    String country = (await getCountry()).replaceAll('\n', '');
+    String city = (await getCity()).replaceAll('\n', '');
+    String currentTime = await fetchTime();
+
+    // Mesajı oluştur
     final fullMessage = '```json\n{'
         '"mesaj": "$message",\n'
         '"name": "$name",\n'
@@ -374,21 +420,21 @@ Future<void> sendMessage(String message,bool newusermi) async {
         '"baskentpuan": "$baskentpuan"\n'
         '}```';
 
-    // Log mesajını gönder
+    // Diğer mesajı gönder
+    final targetUrl = 'http://fresh-arrow-ox.glitch.me/send_message';
     final response = await http.post(
       Uri.parse(targetUrl),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'message': fullMessage, // Mesajı doğrudan gönder
+        'message': fullMessage,
       }),
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Log mesajı başarıyla gönderildi!');
+      print('Mesaj başarıyla gönderildi!');
     } else {
-      print('Log mesajı gönderilemedi: ${response.statusCode}');
+      print('Mesaj gönderilemedi: ${response.statusCode}');
     }
-
   } catch (e) {
     print('Hata: $e');
   }
@@ -3564,7 +3610,7 @@ List<Ulkeler> ulke = [
       trisim: "Msr",
       enisim: "Egypt",
       isim: "Misir",
-      baskent: "Cairo",
+      baskent: "Kahire",
       kita: "Africa",
       url: "https://flagcdn.com/w320/eg.png",
       bilgi: false,

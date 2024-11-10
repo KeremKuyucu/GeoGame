@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:GeoGame/ulke.dart';
-import 'package:GeoGame/screens/settings.dart';
-import 'package:GeoGame/screens/geogamelobi.dart';
-import 'package:GeoGame/screens/leadboard.dart';
+import 'package:GeoGame/utilities.dart';
+import 'package:GeoGame/screens/mainscreen/settings.dart';
+import 'package:GeoGame/screens/mainscreen/geogamelobi.dart';
+import 'package:GeoGame/screens/mainscreen/leadboard.dart';
+import 'package:GeoGame/screens/countrys/country.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
@@ -42,8 +43,14 @@ class _ProfilesState extends State<Profiles> {
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
     } else if (selectedIndex == 2 || getSelectableCountryCount() == 0) {
+      Yenitur();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Ulkelerlist()),
+      );
+    } else if (selectedIndex == 3 || getSelectableCountryCount() == 0) {
       //aynı sayfa
-    } else if (selectedIndex == 3 && getSelectableCountryCount() > 0) {
+    } else if (selectedIndex == 4 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.pushReplacement(
         context,

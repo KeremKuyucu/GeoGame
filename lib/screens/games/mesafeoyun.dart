@@ -1,6 +1,6 @@
-import 'package:GeoGame/screens/geogamelobi.dart';
+import 'package:GeoGame/screens/mainscreen/geogamelobi.dart';
 import 'package:flutter/material.dart';
-import 'package:GeoGame/ulke.dart';
+import 'package:GeoGame/utilities.dart';
 import 'package:searchfield/searchfield.dart';
 import 'dart:math';
 import 'package:easy_url_launcher/easy_url_launcher.dart';

@@ -101,13 +101,10 @@
     "profil10": "Başkent Yanlış: ",
     "baskenttitle": "Başkentten Ülke Bilme",
     "baskentdescription": "Başkentten ülkeyi tanıyın",
-    "baskentimage": "assets/baskent.jpg",
     "bayraktitle": "Bayraktan Ülke Bilme",
     "bayrakdescription": "Bayraktan ülkeyi tanıyın",
-    "bayrakimage": "assets/bayrak.jpg",
     "mesafetitle": "Mesafeden Ülke Bilme",
-    "mesafedescription": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
-    "mesafeimage": "assets/mesafe.jpg"
+    "mesafedescription": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin."
   },
   "English": {
     "game1": "Guess the Country by Capital Game",
@@ -205,7 +202,13 @@
     "profil7": "Flag Incorrect: ",
     "profil8": "Capital Score: ",
     "profil9": "Capital Correct: ",
-    "profil10": "Capital Incorrect: "
+    "profil10": "Capital Incorrect: ",
+    "baskenttitle": "Guess the Country from the Capital",
+    "baskentdescription": "Identify the country from the capital",
+    "bayraktitle": "Guess the Country from the Flag",
+    "bayrakdescription": "Identify the country from the flag",
+    "mesafetitle": "Guess the Country from Distance",
+    "mesafedescription": "Guess countries based on distance and direction."
   },
   "Español": {
     "game1": "Adivina el País por la Capital",
@@ -302,7 +305,13 @@
     "profil7": "Bandera Incorrecta: ",
     "profil8": "Puntuación de Capital: ",
     "profil9": "Capital Correcta: ",
-    "profil10": "Capital Incorrecta: "
+    "profil10": "Capital Incorrecta: ",
+    "baskenttitle": "Adivina el País desde la Capital",
+    "baskentdescription": "Identifica el país desde la capital",
+    "bayraktitle": "Adivina el País desde la Bandera",
+    "bayrakdescription": "Identifica el país desde la bandera",
+    "mesafetitle": "Adivina el País desde la Distancia",
+    "mesafedescription": "Adivina los países según la distancia y dirección."
   },
   "Deutsch": {
     "game1": "Das Land nach Hauptstadt raten",
@@ -399,7 +408,13 @@
     "profil7": "Flagge Falsch: ",
     "profil8": "Hauptstadt Punktzahl: ",
     "profil9": "Hauptstadt Richtig: ",
-    "profil10": "Hauptstadt Falsch: "
+    "profil10": "Hauptstadt Falsch: ",
+    "baskenttitle": "Land vom Hauptstadt erraten",
+    "baskentdescription": "Erkenne das Land anhand der Hauptstadt",
+    "bayraktitle": "Land vom Flagge erraten",
+    "bayrakdescription": "Erkenne das Land anhand der Flagge",
+    "mesafetitle": "Land durch Entfernung erraten",
+    "mesafedescription": "Erraten Sie Länder basierend auf Entfernung und Richtung."
   },
   "Русский": {
     "game1": "Игра Угадай Страну по Столице",
@@ -497,7 +512,13 @@
     "profil7": "Флаг Неправильно: ",
     "profil8": "Баллы за Столицу: ",
     "profil9": "Столица Правильно: ",
-    "profil10": "Столица Неправильно: "
+    "profil10": "Столица Неправильно: ",
+    "baskenttitle": "Угадай страну по столице",
+    "baskentdescription": "Определите страну по столице",
+    "bayraktitle": "Угадай страну по флагу",
+    "bayrakdescription": "Определите страну по флагу",
+    "mesafetitle": "Угадай страну по расстоянию",
+    "mesafedescription": "Угадайте страну по расстоянию и направлению."
   },
   "中文": {
     "game1": "首都国家猜测游戏",
@@ -595,7 +616,13 @@
     "profil7": "旗帜错误: ",
     "profil8": "首都分: ",
     "profil9": "首都正确: ",
-    "profil10": "首都错误: "
+    "profil10": "首都错误: ",
+    "baskenttitle": "从首都猜国家",
+    "baskentdescription": "通过首都识别国家",
+    "bayraktitle": "从国旗猜国家",
+    "bayrakdescription": "通过国旗识别国家",
+    "mesafetitle": "通过距离猜国家",
+    "mesafedescription": "根据距离和方向猜测国家。"
   },
   "Kurdî": {
     "game1": "Baskentê Welatê Naskirinê",
@@ -689,7 +716,13 @@
     "profil7": "Ala Çewt: ",
     "profil8": "Puanê Serek: ",
     "profil9": "Serek Rast: ",
-    "profil10": "Serek Çewt: "
+    "profil10": "Serek Çewt: ",
+    "baskenttitle": "Navê Welatê Ji Bajarê Sernavê Bikin",
+    "baskentdescription": "Ji Bajarê Sernavê Welatê Nas Bikin",
+    "bayraktitle": "Navê Welatê Ji Alayê Bikin",
+    "bayrakdescription": "Ji Alîkariya Alayê Welatê Nas Bikin",
+    "mesafetitle": "Navê Welatê Bi Dûrî Bikin",
+    "mesafedescription": "Piştgirî kirina wê herêm û mêyara rêz û ji bo nasandina welat."
   },
   "Français": {
     "game1": "Jeu de devinette de pays à partir de la capitale",
@@ -787,7 +820,13 @@
     "profil7": "Drapeau Incorrect: ",
     "profil8": "Score de Capitale: ",
     "profil9": "Capitale Correcte: ",
-    "profil10": "Capitale Incorrecte: "
+    "profil10": "Capitale Incorrecte: ",
+    "baskenttitle": "Devinez le pays à partir de la capitale",
+    "baskentdescription": "Identifiez le pays à partir de la capitale",
+    "bayraktitle": "Devinez le pays à partir du drapeau",
+    "bayrakdescription": "Identifiez le pays à partir du drapeau",
+    "mesafetitle": "Devinez le pays à partir de la distance",
+    "mesafedescription": "Devinez les pays en fonction de la distance et de la direction."
   },
   "Português": {
     "game1": "Jogo de adivinhação do país pela capital",
@@ -885,7 +924,13 @@
     "profil7": "Bandeira Incorreta: ",
     "profil8": "Pontuação de Capital: ",
     "profil9": "Capital Correta: ",
-    "profil10": "Capital Incorreta: "
+    "profil10": "Capital Incorreta: ",
+    "baskenttitle": "Adivinhe o país pela capital",
+    "baskentdescription": "Identifique o país pela capital",
+    "bayraktitle": "Adivinhe o país pela bandeira",
+    "bayrakdescription": "Identifique o país pela bandeira",
+    "mesafetitle": "Adivinhe o país pela distância",
+    "mesafedescription": "Adivinhe os países com base na distância e direção."
   },
   "العربية": {
     "game1": "لعبة تخمين الدولة من العاصمة",
@@ -983,6 +1028,12 @@
     "profil7": "العلم غير صحيح: ",
     "profil8": "نقاط العاصمة: ",
     "profil9": "العاصمة صحيحة: ",
-    "profil10": "العاصمة غير صحيحة: "
+    "profil10": "العاصمة غير صحيحة: ",
+    "baskenttitle": "تخمين الدولة من العاصمة",
+    "baskentdescription": "تعرف على الدولة من العاصمة",
+    "bayraktitle": "تخمين الدولة من العلم",
+    "bayrakdescription": "تعرف على الدولة من العلم",
+    "mesafetitle": "تخمين الدولة من المسافة",
+    "mesafedescription": "تخمين الدول بناءً على المسافة والاتجاه."
   }
 }

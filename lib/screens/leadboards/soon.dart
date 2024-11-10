@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:GeoGame/ulke.dart';
-import 'package:GeoGame/screens/settings.dart';
-import 'package:GeoGame/screens/geogamelobi.dart';
-import 'package:GeoGame/screens/profiles.dart';
+import 'package:GeoGame/utilities.dart';
+import 'package:GeoGame/screens/mainscreen/settings.dart';
+import 'package:GeoGame/screens/mainscreen/geogamelobi.dart';
+import 'package:GeoGame/screens/mainscreen/profiles.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
