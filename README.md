@@ -5,7 +5,7 @@ GeoGame, ülkeler hakkında bilginizi geliştirmek için oynayabileceğiniz eği
 # Api
 
 Geogame leadboard için discord apilerini kullanır.
-Bot ve sunucu kodları için [Tıkla](https://github.com/keremlolgg/geogame-api))
+Bot ve sunucu kodları için [Tıkla](https://github.com/keremlolgg/geogame-api)
 
 # Demo
 
