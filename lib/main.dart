@@ -3,6 +3,7 @@ import 'package:GeoGame/screens/geogamelobi.dart';
 import "package:theme_mode_builder/theme_mode_builder.dart";
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   disableCertificateVerification();
   runApp(Geogame());
 }

@@ -81,7 +81,11 @@
     "isimsorma3": "İptal",
     "isimsorma4": "Tamam",
     "isimsorma5": "Hoşgeldin",
-    "isimsorma6": "Lütfen geçerli bir isim girin."
+    "isimsorma6": "Lütfen geçerli bir isim girin.",
+    "navigasyonbar1": "Oyunlar",
+    "navigasyonbar2": "Sıralama",
+    "navigasyonbar3": "Ayarlar",
+    "navigasyonbar4": "Profil"
   },
   "English": {
     "game1": "Guess the Country by Capital Game",
@@ -165,7 +169,11 @@
     "isimsorma3": "Cancel",
     "isimsorma4": "Okay",
     "isimsorma5": "Welcome",
-    "isimsorma6": "Please enter a valid name."
+    "isimsorma6": "Please enter a valid name.",
+    "navigasyonbar1": "Games",
+    "navigasyonbar2": "Leaderboard",
+    "navigasyonbar3": "Settings",
+    "navigasyonbar4": "Profile"
   },
   "Español": {
     "game1": "Adivina el País por la Capital",
@@ -248,7 +256,11 @@
     "isimsorma3": "Cancelar",
     "isimsorma4": "Aceptar",
     "isimsorma5": "Bienvenido",
-    "isimsorma6": "Por favor, ingrese un nombre válido."
+    "isimsorma6": "Por favor, ingrese un nombre válido.",
+    "navigasyonbar1": "Juegos",
+    "navigasyonbar2": "Clasificación",
+    "navigasyonbar3": "Configuración",
+    "navigasyonbar4": "Perfil"
   },
   "Deutsch": {
     "game1": "Das Land nach Hauptstadt raten",
@@ -331,7 +343,11 @@
     "isimsorma3": "Abbrechen",
     "isimsorma4": "Okay",
     "isimsorma5": "Willkommen",
-    "isimsorma6": "Bitte geben Sie einen gültigen Namen ein."
+    "isimsorma6": "Bitte geben Sie einen gültigen Namen ein.",
+    "navigasyonbar1": "Spiele",
+    "navigasyonbar2": "Rangliste",
+    "navigasyonbar3": "Einstellungen",
+    "navigasyonbar4": "Profil"
   },
   "Русский": {
     "game1": "Игра Угадай Страну по Столице",
@@ -415,7 +431,11 @@
     "isimsorma3": "Отмена",
     "isimsorma4": "Ок",
     "isimsorma5": "Добро пожаловать",
-    "isimsorma6": "Пожалуйста, введите действительное имя."
+    "isimsorma6": "Пожалуйста, введите действительное имя.",
+    "navigasyonbar1": "Игры",
+    "navigasyonbar2": "Рейтинг",
+    "navigasyonbar3": "Настройки",
+    "navigasyonbar4": "Профиль"
   },
   "中文": {
     "game1": "首都国家猜测游戏",
@@ -499,7 +519,11 @@
     "isimsorma3": "取消",
     "isimsorma4": "确定",
     "isimsorma5": "欢迎",
-    "isimsorma6": "请输入有效的名字。"
+    "isimsorma6": "请输入有效的名字。",
+    "navigasyonbar1": "游戏",
+    "navigasyonbar2": "排行榜",
+    "navigasyonbar3": "设置",
+    "navigasyonbar4": "个人资料"
   },
   "Kurdî": {
     "game1": "Baskentê Welatê Naskirinê",
@@ -579,7 +603,11 @@
     "isimsorma3": "Bersivdan",
     "isimsorma4": "Bale",
     "isimsorma5": "Bi xêr hatî",
-    "isimsorma6": "Ji kerema xwe navê rastî binivîse."
+    "isimsorma6": "Ji kerema xwe navê rastî binivîse.",
+    "navigasyonbar1": "Lîstik",
+    "navigasyonbar2": "Peyman",
+    "navigasyonbar3": "Mîheng",
+    "navigasyonbar4": "Profi"
   },
   "Français": {
     "game1": "Jeu de devinette de pays à partir de la capitale",
@@ -663,7 +691,11 @@
     "isimsorma3": "Annuler",
     "isimsorma4": "D'accord",
     "isimsorma5": "Bienvenue",
-    "isimsorma6": "Veuillez entrer un nom valide."
+    "isimsorma6": "Veuillez entrer un nom valide.",
+    "navigasyonbar1": "Jeux",
+    "navigasyonbar2": "Classement",
+    "navigasyonbar3": "Paramètres",
+    "navigasyonbar4": "Profil"
   },
   "Português": {
     "game1": "Jogo de adivinhação do país pela capital",
@@ -747,7 +779,11 @@
     "isimsorma3": "Cancelar",
     "isimsorma4": "Ok",
     "isimsorma5": "Bem-vindo",
-    "isimsorma6": "Por favor, insira um nome válido."
+    "isimsorma6": "Por favor, insira um nome válido.",
+    "navigasyonbar1": "Jogos",
+    "navigasyonbar2": "Classificação",
+    "navigasyonbar3": "Configurações",
+    "navigasyonbar4": "Perfil"
   },
   "العربية": {
     "game1": "لعبة تخمين الدولة من العاصمة",
@@ -831,6 +867,10 @@
     "isimsorma3": "إلغاء",
     "isimsorma4": "موافق",
     "isimsorma5": "أهلاً وسهلاً",
-    "isimsorma6": "من فضلك أدخل اسمًا صالحًا."
+    "isimsorma6": "من فضلك أدخل اسمًا صالحًا.",
+    "navigasyonbar1": "ألعاب",
+    "navigasyonbar2": "الترتيب",
+    "navigasyonbar3": "الإعدادات",
+    "navigasyonbar4": "الملف الشخصي"
   }
 }

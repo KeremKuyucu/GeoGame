@@ -43,4 +43,4 @@ app.*.map.json
 /android/app/release
 
 # url.json dosyasını dışla
-/dosyalar/url.json
+/assets/url.json

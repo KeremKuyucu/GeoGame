@@ -1,7 +1,10 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'dart:io';
 import 'dart:math';
 import 'dart:convert';
@@ -18,6 +21,87 @@ class Ulkeler {
     return yapilantahmin == trisim || yapilantahmin == isim || yapilantahmin == enisim;
   }
 }
+class Yazi {
+  static Map<String, dynamic>? _localizedStrings;
+  static String _currentLanguage = 'Türkçe';
+
+  static Future<void> loadDil(String dilKodu) async {
+    if (_currentLanguage == dilKodu && _localizedStrings != null) {
+      return;
+    }
+    try {
+      String jsonString = await rootBundle.loadString('assets/dil.json');
+      Map<String, dynamic> jsonMap = json.decode(jsonString);
+      if (jsonMap.containsKey(dilKodu)) {
+        _localizedStrings = jsonMap[dilKodu];
+      } else {
+        _localizedStrings = {};
+      }
+      _currentLanguage = dilKodu;
+    } catch (e) {
+      print('Dosya bulunamadı veya JSON okuma hatası: $e');
+      _localizedStrings = {};
+    }
+  }
+  static String get(String key)  {
+    loadDil(_currentLanguage);
+    return _localizedStrings?[key] ?? 'N/A';
+  }
+}
+class User {
+  final String name;
+  final int puan;
+
+  User({required this.name, required this.puan});
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'],
+      puan: json['puan'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'puan': puan,
+    };
+  }
+}
+
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true;
+final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
+String secilenDil='Türkçe';
+bool isEnglish=false;
+int selectedIndex = 0;
+int toplampuan=0;
+String name = "";
+final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
+Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
+  try {
+    if (player.playing) {
+      await player.stop();
+    }
+    await player.setAsset(assetPath);
+    await player.play();
+  } catch (e) {
+    print('Error playing asset: $e');
+    try {
+      if (player.playing) {
+        await player.stop();
+      }
+      await player.setUrl(url);
+      await player.play();
+    } catch (urlError) {
+      print('Error playing audio from URL: $urlError');
+    }
+  }
+}
+Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3');}
+Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3');}
+Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3');}
+Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
+Future<void> Arkafondurdur() async { await arkafon.stop(); }
 Ulkeler gecici = Ulkeler(
   bayrak: '',
   trisim: '',
@@ -46,67 +130,30 @@ Ulkeler kalici = Ulkeler(
   boylam: 0.0,
   dosyaboyut: 0,
 );
-class Yazi {
-  static Map<String, dynamic>? _localizedStrings;
-  static String _currentLanguage = 'Türkçe';
-
-  static Future<void> loadDil(String dilKodu) async {
-    if (_currentLanguage == dilKodu && _localizedStrings != null) {
-      return;
-    }
-    try {
-      String jsonString = await rootBundle.loadString('dosyalar/dil.json');
-      Map<String, dynamic> jsonMap = json.decode(jsonString);
-      if (jsonMap.containsKey(dilKodu)) {
-        _localizedStrings = jsonMap[dilKodu];
-      } else {
-        _localizedStrings = {};
-      }
-      _currentLanguage = dilKodu;
-    } catch (e) {
-      print('Dosya bulunamadı veya JSON okuma hatası: $e');
-      _localizedStrings = {};
-    }
-  }
-  static String get(String key) {
-    Yazi.loadDil(secilenDil);
-    return _localizedStrings?[key] ?? 'N/A';
-  }
-}
-
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true;
-final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
-String secilenDil='Türkçe';
-bool isEnglish=false;
-int toplampuan=0;
-final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
-Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
-  try {
-    if (player.playing) {
-      await player.stop();
-    }
-    await player.setAsset(assetPath);
-    await player.play();
-  } catch (e) {
-    print('Error playing asset: $e');
-    try {
-      if (player.playing) {
-        await player.stop();
-      }
-      await player.setUrl(url);
-      await player.play();
-    } catch (urlError) {
-      print('Error playing audio from URL: $urlError');
-    }
-  }
-}
-Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3');}
-Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3');}
-Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3');}
-Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
-Future<void> Arkafondurdur() async { await arkafon.stop(); }
 List<String> butonAnahtarlar = ['', '', '', ''];
 List<int> butonnumaralari = [-1,-2,-3,-4];
+List<SalomonBottomBarItem> navBarItems = [
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.home),
+    selectedColor: Colors.purple,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.leaderboard),
+    selectedColor: Colors.pink,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.person),
+    selectedColor: Colors.teal,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.settings),
+    selectedColor: Colors.orange,
+    title: const Text(''),
+  ),
+];
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
   int butonRandomNumber = random.nextInt(4);
@@ -211,6 +258,168 @@ String kelimeDuzelt(String kelime) {
   }
   return sonuc;
 }
+Future<String> getWebhookUrlFromFile() async {
+  // assets/url.json dosyasını oku
+  String jsonString = await rootBundle.loadString('dosyalar/url.json');
+  var jsonResponse = jsonDecode(jsonString);
+
+  // JSON'dan webhook URL'sini al
+  return jsonResponse['webhook_url'];
+}
+Future<String> getCountry() async {
+  final url = Uri.parse('https://am.i.mullvad.net/country');
+  try {
+    // HTTP GET isteği gönderiyoruz
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // İstek başarılıysa, cevabı string olarak döndürüyoruz
+      return response.body;
+    } else {
+      throw Exception('Hata: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Hata oluştu: $e');
+  }
+}
+Future<String> getCity() async {
+  final url = Uri.parse('https://am.i.mullvad.net/city');
+  try {
+    // HTTP GET isteği gönderiyoruz
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // İstek başarılıysa, cevabı string olarak döndürüyoruz
+      return response.body;
+    } else {
+      throw Exception('Hata: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Hata oluştu: $e');
+  }
+}
+Future<String> fetchTime() async {
+  try {
+    final response = await http.get(Uri.parse('http://worldtimeapi.org/api/timezone/Europe/Istanbul'));
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      String datetime = data['datetime'];
+      return 'İstanbul saati: $datetime';
+    } else {
+      return 'Saat bilgisi alınamadı. Sunucu hatası: ${response.statusCode}';
+    }
+  } catch (e) {
+    return 'Saat bilgisi alınamadı. Bağlantı hatası: $e';
+  }
+}
+Future<String> getNameFromFile() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/dosyalar/isim.json');
+    if (!await file.exists()) return "";
+
+    final content = await file.readAsString();
+    final data = json.decode(content);
+    return data['isim'];
+  } catch (e) {
+    print('Error reading name: $e');
+    return "";
+  }
+}
+Future<List<User>> loadUsers() async {
+  try {
+    String data = await rootBundle.loadString('assets/users.json');
+    List<dynamic> jsonResult = json.decode(data);
+
+    List<User> users = jsonResult.map((e) => User.fromJson(e)).toList();
+
+    users.sort((a, b) => b.puan.compareTo(a.puan)); // azalan sıralama
+    return users;
+  } catch (e) {
+    throw Exception("JSON okuma hatası: $e");
+  }
+}
+Future<void> saveNameToFile(String name) async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/dosyalar/isim.json');
+    final data = {'isim': name};
+
+    await file.create(recursive: true);
+    await file.writeAsString(json.encode(data));
+  } catch (e) {
+    print('Error saving name: $e');
+  }
+}
+Future<void> sendMessage(String message) async {
+  final targetUrl = 'http://fresh-arrow-ox.glitch.me/send_message';
+
+  name = await getNameFromFile();
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String localVersion = packageInfo.version;
+  String country = (await getCountry()).replaceAll('\n', '');
+  String city = (await getCity()).replaceAll('\n', '');
+  String currentTime = await fetchTime();
+
+  try {
+    // Mesajı oluştur
+    final fullMessage = '```json\n{'
+        '"mesaj": "$message",\n'
+        '"name": "$name",\n'
+        '"toplampuan": "$toplampuan",\n'
+        '"dil": "$secilenDil",\n'
+        '"surum": "$localVersion",\n'
+        '"ulke": "$country",\n'
+        '"sehir": "$city",\n'
+        '"saat": "$currentTime"\n'
+        '}```';
+
+    // Log mesajını gönder
+    final response = await http.post(
+      Uri.parse(targetUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'message': fullMessage, // Mesajı doğrudan gönder
+      }),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      print('Log mesajı başarıyla gönderildi!');
+    } else {
+      print('Log mesajı gönderilemedi: ${response.statusCode}');
+    }
+
+  } catch (e) {
+    print('Hata: $e');
+  }
+}
+Future<String> getMessage() async {
+  final Uri url = Uri.parse('http://fresh-arrow-ox.glitch.me/get_messages'); // Sunucu URL'nizi burada güncelleyin
+
+  try {
+    // API isteği yapıyoruz
+    final response = await http.get(url);
+
+    // Sunucudan başarılı bir yanıt alırsak
+    if (response.statusCode == 200) {
+      // JSON yanıtını çözümlüyoruz
+      final Map<String, dynamic> data = json.decode(response.body);
+      print(data.toString());  // JSON çıktısını konsola yazdırıyoruz
+
+      // Mesajı döndürüyoruz
+      return data['message'];  // 'message' anahtarındaki veriyi döndürür
+
+    } else {
+      // Hata durumunda bir mesaj döndürüyoruz
+      return 'Mesaj alınırken hata oluştu. Status code: ${response.statusCode}';
+    }
+  } catch (e) {
+    // Eğer hata oluşursa, hata mesajını döndürüyoruz
+    return 'Hata: $e';
+  }
+}
+
 // Ulkeler
 List<Ulkeler> ulke = [
   Ulkeler(
