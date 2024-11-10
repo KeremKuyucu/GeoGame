@@ -45,32 +45,16 @@ class Yazi {
   }
   static String get(String key)  {
     loadDil(_currentLanguage);
-    return _localizedStrings?[key] ?? 'N/A';
-  }
-}
-class User {
-  final String name;
-  final int puan;
-
-  User({required this.name, required this.puan});
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      name: json['name'],
-      puan: json['puan'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'puan': puan,
-    };
+    return _localizedStrings?[key] ?? '';
   }
 }
 
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true;
 final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
+int mesafedogru=0,mesafeyanlis=0;
+int bayrakdogru=0,bayrakyanlis=0;
+int baskentdogru=0,baskentyanlis=0;
+int mesafepuan=0,bayrakpuan=0,baskentpuan=0;
 String secilenDil='Türkçe';
 bool isEnglish=false;
 int selectedIndex = 0;
@@ -82,6 +66,7 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
     if (player.playing) {
       await player.stop();
     }
+    print(assetPath);
     await player.setAsset(assetPath);
     await player.play();
   } catch (e) {
@@ -97,10 +82,10 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
     }
   }
 }
-Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/dogru.mp3');}
-Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yanlis.mp3');}
-Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/yenitur.mp3');}
-Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/dosyalar/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
+Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/dogru.mp3');}
+Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yanlis.mp3');}
+Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yenitur.mp3');}
+Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
 Future<void> Arkafondurdur() async { await arkafon.stop(); }
 Ulkeler gecici = Ulkeler(
   bayrak: '',
@@ -221,7 +206,16 @@ Future<void> readFromFile(Function updateState) async {
       yazmamodu = jsonData['yazmamodu'] == true;
       darktema = jsonData['darktema'] == true;
       secilenDil = jsonData['secilenDil'];
-      toplampuan = jsonData['toplampuan'];
+      toplampuan = jsonData['toplampuan']?? 0;
+      mesafedogru = jsonData['mesafedogru'] ?? 0;
+      mesafeyanlis = jsonData['mesafeyanlis'] ?? 0;
+      bayrakdogru = jsonData['bayrakdogru'] ?? 0;
+      bayrakyanlis = jsonData['bayrakyanlis'] ?? 0;
+      baskentdogru = jsonData['baskentdogru'] ?? 0;
+      baskentyanlis = jsonData['baskentyanlis'] ?? 0;
+      mesafepuan = jsonData['mesafepuan'] ?? 0;
+      bayrakpuan = jsonData['bayrakpuan'] ?? 0;
+      baskentpuan = jsonData['baskentpuan'] ?? 0;
     });
   } else {
     print('Dosya bulunamadı: ulkekurallari.json');
@@ -231,7 +225,7 @@ Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
   final filePath = '${directory.path}/kurallar.json';
   final file = File(filePath);
-
+  toplampuan=bayrakpuan+baskentpuan+mesafepuan;
   final data = {
     'amerikakitasi': amerikakitasi,
     'asyakitasi': asyakitasi,
@@ -244,6 +238,15 @@ Future<void> writeToFile() async {
     'darktema': darktema,
     'secilenDil': secilenDil,
     'toplampuan': toplampuan,
+    'mesafedogru': mesafedogru,
+    'mesafeyanlis': mesafeyanlis,
+    'bayrakdogru': bayrakdogru,
+    'bayrakyanlis': bayrakyanlis,
+    'baskentdogru': baskentdogru,
+    'baskentyanlis': baskentyanlis,
+    'mesafepuan': mesafepuan,
+    'bayrakpuan': bayrakpuan,
+    'baskentpuan': baskentpuan,
   };
 
   final jsonData = jsonEncode(data);
@@ -327,19 +330,6 @@ Future<String> getNameFromFile() async {
     return "";
   }
 }
-Future<List<User>> loadUsers() async {
-  try {
-    String data = await rootBundle.loadString('assets/users.json');
-    List<dynamic> jsonResult = json.decode(data);
-
-    List<User> users = jsonResult.map((e) => User.fromJson(e)).toList();
-
-    users.sort((a, b) => b.puan.compareTo(a.puan)); // azalan sıralama
-    return users;
-  } catch (e) {
-    throw Exception("JSON okuma hatası: $e");
-  }
-}
 Future<void> saveNameToFile(String name) async {
   try {
     final directory = await getApplicationDocumentsDirectory();
@@ -352,8 +342,8 @@ Future<void> saveNameToFile(String name) async {
     print('Error saving name: $e');
   }
 }
-Future<void> sendMessage(String message) async {
-  final targetUrl = 'http://fresh-arrow-ox.glitch.me/send_message';
+Future<void> sendMessage(String message,bool newusermi) async {
+  final targetUrl = newusermi ? 'http://fresh-arrow-ox.glitch.me/newuser':'http://fresh-arrow-ox.glitch.me/send_message';
 
   name = await getNameFromFile();
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -363,16 +353,25 @@ Future<void> sendMessage(String message) async {
   String currentTime = await fetchTime();
 
   try {
-    // Mesajı oluştur
+    // Log mesajını oluştur
     final fullMessage = '```json\n{'
         '"mesaj": "$message",\n'
         '"name": "$name",\n'
-        '"toplampuan": "$toplampuan",\n'
         '"dil": "$secilenDil",\n'
         '"surum": "$localVersion",\n'
         '"ulke": "$country",\n'
         '"sehir": "$city",\n'
-        '"saat": "$currentTime"\n'
+        '"saat": "$currentTime",\n'
+        '"toplampuan": "$toplampuan",\n'
+        '"mesafedogru": "$mesafedogru",\n'
+        '"mesafeyanlis": "$mesafeyanlis",\n'
+        '"bayrakdogru": "$bayrakdogru",\n'
+        '"bayrakyanlis": "$bayrakyanlis",\n'
+        '"baskentdogru": "$baskentdogru",\n'
+        '"baskentyanlis": "$baskentyanlis",\n'
+        '"mesafepuan": "$mesafepuan",\n'
+        '"bayrakpuan": "$bayrakpuan",\n'
+        '"baskentpuan": "$baskentpuan"\n'
         '}```';
 
     // Log mesajını gönder
@@ -394,32 +393,6 @@ Future<void> sendMessage(String message) async {
     print('Hata: $e');
   }
 }
-Future<String> getMessage() async {
-  final Uri url = Uri.parse('http://fresh-arrow-ox.glitch.me/get_messages'); // Sunucu URL'nizi burada güncelleyin
-
-  try {
-    // API isteği yapıyoruz
-    final response = await http.get(url);
-
-    // Sunucudan başarılı bir yanıt alırsak
-    if (response.statusCode == 200) {
-      // JSON yanıtını çözümlüyoruz
-      final Map<String, dynamic> data = json.decode(response.body);
-      print(data.toString());  // JSON çıktısını konsola yazdırıyoruz
-
-      // Mesajı döndürüyoruz
-      return data['message'];  // 'message' anahtarındaki veriyi döndürür
-
-    } else {
-      // Hata durumunda bir mesaj döndürüyoruz
-      return 'Mesaj alınırken hata oluştu. Status code: ${response.statusCode}';
-    }
-  } catch (e) {
-    // Eğer hata oluşursa, hata mesajını döndürüyoruz
-    return 'Hata: $e';
-  }
-}
-
 // Ulkeler
 List<Ulkeler> ulke = [
   Ulkeler(

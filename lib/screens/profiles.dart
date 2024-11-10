@@ -56,7 +56,7 @@ class _ProfilesState extends State<Profiles> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profil Değişecek"),
+        title: Text(Yazi.get('navigasyonbar4')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -197,15 +197,106 @@ class _ProfilesState extends State<Profiles> {
                     color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
                     thickness: 1.2, // Divider'ın kalınlığı
                   ),
-                  SizedBox(height: 15.0),
+                  SizedBox(height: 10.0),
 
                   // Kullanıcı puanı
                   Text(
-                    'Puan: $toplampuan',
+                    '${Yazi.get('profil1')} $toplampuan',
                     style: TextStyle(
                       fontSize: 20.0,
                       color: Colors.purpleAccent,
                       fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+
+                  // Mesafe puan doğru / yanlış
+                  Divider(
+                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
+                    thickness: 1.2, // Divider'ın kalınlığı
+                  ),
+                  Text(
+                    '${Yazi.get('profil2')} $mesafepuan',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.tealAccent,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    '${Yazi.get('profil3')} $mesafedogru',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    '${Yazi.get('profil4')} $mesafeyanlis',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.red,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Divider(
+                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
+                    thickness: 1.2, // Divider'ın kalınlığı
+                  ),
+                  // Bayrak puan doğru / yanlış
+                  Text(
+                    '${Yazi.get('profil5')} $bayrakpuan',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.tealAccent,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    '${Yazi.get('profil6')} $bayrakdogru',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    '${Yazi.get('profil7')} $bayrakyanlis',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.red,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Divider(
+                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
+                    thickness: 1.2, // Divider'ın kalınlığı
+                  ),
+                  // Başkent puan doğru / yanlış
+                  Text(
+                    '${Yazi.get('profil8')} $baskentpuan',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.tealAccent,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    '${Yazi.get('profil9')} $baskentdogru',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  Text(
+                    '${Yazi.get('profil10')} $baskentyanlis',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.red,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],

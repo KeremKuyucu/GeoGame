@@ -75,6 +75,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         _currentInput = '';
         yeniulkesec();
         Dogru();
+        bayrakdogru++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('dogrucevap')),
@@ -83,7 +84,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
           ),
         );
         setState(() {
-          toplampuan += puan;
+          bayrakpuan += puan;
           writeToFile();
         });
         puan = 50;
@@ -91,6 +92,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
+        bayrakyanlis++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap') + puan.toString()),

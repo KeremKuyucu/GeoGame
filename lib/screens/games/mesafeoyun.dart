@@ -79,6 +79,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         message='';
         yeniulkesec();
         Dogru();
+        mesafedogru++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('dogrucevap')),
@@ -87,7 +88,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
           ),
         );
         setState(() {
-          toplampuan+=puan;
+          mesafepuan+=puan;
           writeToFile();
         });
         puan=50;
@@ -96,6 +97,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         if(puan<20)
           puan=20;
         Yanlis();
+        mesafeyanlis++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap')+puan.toString()),

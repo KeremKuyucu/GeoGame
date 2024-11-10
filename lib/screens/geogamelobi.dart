@@ -38,37 +38,37 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   List<String> options = List.filled(3, '');
   final List<Map<String, String>> modes = [
     {
-      "title": "Başkentten Ülke Bilme",
-      "description": "Başkentten ülkeyi tanıyın",
-      "image": "dosyalar/baskent.jpg",
+      "title": Yazi.get('baskenttitle'),
+      "description": Yazi.get('baskentdescription'),
+      "image": Yazi.get('baskentimage'),
     },
     {
-      "title": "Bayraktan Ülke Bilme",
-      "description": "Bayraktan ülkeyi tanıyın",
-      "image": "dosyalar/bayrak.jpg",
+      "title": Yazi.get('bayraktitle'),
+      "description": Yazi.get('bayrakdescription'),
+      "image": Yazi.get('bayrakimage'),
     },
     {
-      "title": "Mesafeden Ülke Bilme",
-      "description": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
-      "image": "dosyalar/mesafe.jpg",
+      "title": Yazi.get('mesafetitle'),
+      "description": Yazi.get('mesafedescription'),
+      "image": Yazi.get('mesafeimage'),
     },
   ];
   @override
   void initState() {
     super.initState();
-    surumkiyasla();
-    yeniulkesec();
-    readFromFile((update) {
-      if (mounted) {
-        setState(update);
-      }
-    });
     dilDegistir();
+    _initializeGame();
     if (darktema)
       ThemeModeBuilderConfig.setDark();
     else
       ThemeModeBuilderConfig.setLight();
-    istatistik(context);
+  }
+
+  Future<void> _initializeGame() async {
+    await surumkiyasla();
+    await yeniulkesec();
+    await readFromFile((update) => setState(update));
+    await istatistik(context);
   }
   void dilDegistir() {
     Yazi.loadDil(secilenDil).then((_) {
@@ -169,9 +169,9 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
 
     if (name.isEmpty) {
       await isimgirbox(context);
-      await sendMessage('Yeni bir kullanıcı oyunu yükledi');
+      await sendMessage('Yeni bir kullanıcı oyunu yükledi',true);
     } else {
-      await sendMessage('Log mesajı');
+      await sendMessage('Log mesajı',false);
     }
   }
   Future<void> isimgirbox(BuildContext context) async {

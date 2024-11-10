@@ -1,4 +1,7 @@
 {
+  "Diller": {
+    "diller": ["Türkçe", "English", "Español", "Deutsch", "Русский", "中文", "Kurdî", "Français", "Português", "العربية"]
+  },
   "Türkçe": {
     "game1": "Baskentten Ülke Bilme Oyunu",
     "game2": "Bayraktan Ülke Bilme Oyunu",
@@ -85,7 +88,26 @@
     "navigasyonbar1": "Oyunlar",
     "navigasyonbar2": "Sıralama",
     "navigasyonbar3": "Ayarlar",
-    "navigasyonbar4": "Profil"
+    "navigasyonbar4": "Profil",
+    "profil1": "Toplam Puan: ",
+    "profil2": "Mesafe Puan: ",
+    "profil3": "Mesafe Doğru: ",
+    "profil4": "Mesafe Yanlış: ",
+    "profil5": "Bayrak Puan: ",
+    "profil6": "Bayrak Doğru: ",
+    "profil7": "Bayrak Yanlış: ",
+    "profil8": "Başkent Puan: ",
+    "profil9": "Başkent Doğru: ",
+    "profil10": "Başkent Yanlış: ",
+    "baskenttitle": "Başkentten Ülke Bilme",
+    "baskentdescription": "Başkentten ülkeyi tanıyın",
+    "baskentimage": "assets/baskent.jpg",
+    "bayraktitle": "Bayraktan Ülke Bilme",
+    "bayrakdescription": "Bayraktan ülkeyi tanıyın",
+    "bayrakimage": "assets/bayrak.jpg",
+    "mesafetitle": "Mesafeden Ülke Bilme",
+    "mesafedescription": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
+    "mesafeimage": "assets/mesafe.jpg"
   },
   "English": {
     "game1": "Guess the Country by Capital Game",
@@ -173,7 +195,17 @@
     "navigasyonbar1": "Games",
     "navigasyonbar2": "Leaderboard",
     "navigasyonbar3": "Settings",
-    "navigasyonbar4": "Profile"
+    "navigasyonbar4": "Profile",
+    "profil1": "Total Score: ",
+    "profil2": "Distance Score: ",
+    "profil3": "Distance Correct: ",
+    "profil4": "Distance Incorrect: ",
+    "profil5": "Flag Score: ",
+    "profil6": "Flag Correct: ",
+    "profil7": "Flag Incorrect: ",
+    "profil8": "Capital Score: ",
+    "profil9": "Capital Correct: ",
+    "profil10": "Capital Incorrect: "
   },
   "Español": {
     "game1": "Adivina el País por la Capital",
@@ -260,7 +292,17 @@
     "navigasyonbar1": "Juegos",
     "navigasyonbar2": "Clasificación",
     "navigasyonbar3": "Configuración",
-    "navigasyonbar4": "Perfil"
+    "navigasyonbar4": "Perfil",
+    "profil1": "Puntuación Total: ",
+    "profil2": "Puntuación de Distancia: ",
+    "profil3": "Distancia Correcta: ",
+    "profil4": "Distancia Incorrecta: ",
+    "profil5": "Puntuación de Bandera: ",
+    "profil6": "Bandera Correcta: ",
+    "profil7": "Bandera Incorrecta: ",
+    "profil8": "Puntuación de Capital: ",
+    "profil9": "Capital Correcta: ",
+    "profil10": "Capital Incorrecta: "
   },
   "Deutsch": {
     "game1": "Das Land nach Hauptstadt raten",
@@ -347,7 +389,17 @@
     "navigasyonbar1": "Spiele",
     "navigasyonbar2": "Rangliste",
     "navigasyonbar3": "Einstellungen",
-    "navigasyonbar4": "Profil"
+    "navigasyonbar4": "Profil",
+    "profil1": "Gesamtpunktzahl: ",
+    "profil2": "Abstandspunktzahl: ",
+    "profil3": "Abstand Korrekt: ",
+    "profil4": "Abstand Falsch: ",
+    "profil5": "Flaggenpunktzahl: ",
+    "profil6": "Flagge Richtig: ",
+    "profil7": "Flagge Falsch: ",
+    "profil8": "Hauptstadt Punktzahl: ",
+    "profil9": "Hauptstadt Richtig: ",
+    "profil10": "Hauptstadt Falsch: "
   },
   "Русский": {
     "game1": "Игра Угадай Страну по Столице",
@@ -435,7 +487,17 @@
     "navigasyonbar1": "Игры",
     "navigasyonbar2": "Рейтинг",
     "navigasyonbar3": "Настройки",
-    "navigasyonbar4": "Профиль"
+    "navigasyonbar4": "Профиль",
+    "profil1": "Общий Балл: ",
+    "profil2": "Баллы за Расстояние: ",
+    "profil3": "Правильно по Расстоянию: ",
+    "profil4": "Неправильно по Расстоянию: ",
+    "profil5": "Баллы за Флаг: ",
+    "profil6": "Флаг Правильно: ",
+    "profil7": "Флаг Неправильно: ",
+    "profil8": "Баллы за Столицу: ",
+    "profil9": "Столица Правильно: ",
+    "profil10": "Столица Неправильно: "
   },
   "中文": {
     "game1": "首都国家猜测游戏",
@@ -523,7 +585,17 @@
     "navigasyonbar1": "游戏",
     "navigasyonbar2": "排行榜",
     "navigasyonbar3": "设置",
-    "navigasyonbar4": "个人资料"
+    "navigasyonbar4": "个人资料",
+    "profil1": "总分: ",
+    "profil2": "距离分: ",
+    "profil3": "距离正确: ",
+    "profil4": "距离错误: ",
+    "profil5": "旗帜分: ",
+    "profil6": "旗帜正确: ",
+    "profil7": "旗帜错误: ",
+    "profil8": "首都分: ",
+    "profil9": "首都正确: ",
+    "profil10": "首都错误: "
   },
   "Kurdî": {
     "game1": "Baskentê Welatê Naskirinê",
@@ -607,7 +679,17 @@
     "navigasyonbar1": "Lîstik",
     "navigasyonbar2": "Peyman",
     "navigasyonbar3": "Mîheng",
-    "navigasyonbar4": "Profi"
+    "navigasyonbar4": "Profi",
+    "profil1": "Puan Giştî: ",
+    "profil2": "Puanê Dûrî: ",
+    "profil3": "Dûrî Rast: ",
+    "profil4": "Dûrî Çewt: ",
+    "profil5": "Puanê Ala: ",
+    "profil6": "Ala Rast: ",
+    "profil7": "Ala Çewt: ",
+    "profil8": "Puanê Serek: ",
+    "profil9": "Serek Rast: ",
+    "profil10": "Serek Çewt: "
   },
   "Français": {
     "game1": "Jeu de devinette de pays à partir de la capitale",
@@ -695,7 +777,17 @@
     "navigasyonbar1": "Jeux",
     "navigasyonbar2": "Classement",
     "navigasyonbar3": "Paramètres",
-    "navigasyonbar4": "Profil"
+    "navigasyonbar4": "Profil",
+    "profil1": "Score Total: ",
+    "profil2": "Score de Distance: ",
+    "profil3": "Distance Correcte: ",
+    "profil4": "Distance Incorrecte: ",
+    "profil5": "Score de Drapeau: ",
+    "profil6": "Drapeau Correct: ",
+    "profil7": "Drapeau Incorrect: ",
+    "profil8": "Score de Capitale: ",
+    "profil9": "Capitale Correcte: ",
+    "profil10": "Capitale Incorrecte: "
   },
   "Português": {
     "game1": "Jogo de adivinhação do país pela capital",
@@ -783,7 +875,17 @@
     "navigasyonbar1": "Jogos",
     "navigasyonbar2": "Classificação",
     "navigasyonbar3": "Configurações",
-    "navigasyonbar4": "Perfil"
+    "navigasyonbar4": "Perfil",
+    "profil1": "Pontuação Total: ",
+    "profil2": "Pontuação de Distância: ",
+    "profil3": "Distância Correta: ",
+    "profil4": "Distância Incorreta: ",
+    "profil5": "Pontuação de Bandeira: ",
+    "profil6": "Bandeira Correta: ",
+    "profil7": "Bandeira Incorreta: ",
+    "profil8": "Pontuação de Capital: ",
+    "profil9": "Capital Correta: ",
+    "profil10": "Capital Incorreta: "
   },
   "العربية": {
     "game1": "لعبة تخمين الدولة من العاصمة",
@@ -871,6 +973,16 @@
     "navigasyonbar1": "ألعاب",
     "navigasyonbar2": "الترتيب",
     "navigasyonbar3": "الإعدادات",
-    "navigasyonbar4": "الملف الشخصي"
+    "navigasyonbar4": "الملف الشخصي",
+    "profil1": "النقاط الإجمالية: ",
+    "profil2": "نقاط المسافة: ",
+    "profil3": "المسافة صحيحة: ",
+    "profil4": "المسافة غير صحيحة: ",
+    "profil5": "نقاط العلم: ",
+    "profil6": "العلم صحيح: ",
+    "profil7": "العلم غير صحيح: ",
+    "profil8": "نقاط العاصمة: ",
+    "profil9": "العاصمة صحيحة: ",
+    "profil10": "العاصمة غير صحيحة: "
   }
 }

@@ -16,14 +16,14 @@ class Leadboard extends StatefulWidget {
 }
 
 class _LeadboardState extends State<Leadboard> {
-  List<dynamic> users = [];
+  List<Map<String, dynamic>> users = [];
   @override
   void initState() {
     super.initState();
+    _fetchData();
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    fetchData();
     await readFromFile((update) => setState(update));
   }
   void _selectIndex(int index) async {
@@ -52,17 +52,16 @@ class _LeadboardState extends State<Leadboard> {
       );
     }
   }
-  Future<void> fetchData() async {
+  Future<void> _fetchData() async {
     try {
-      final response = await http.get(
-        Uri.parse('https://fresh-arrow-ox.glitch.me/download_file'),
-      );
+      final response = await http.get(Uri.parse(
+          'https://fresh-arrow-ox.glitch.me/download_file'));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          users = data['users'];
-          users.sort((a, b) => int.parse(b['puan']) - int.parse(a['puan']));
+          // Bu alanda gelen veriyi işleyebilirsiniz
+          print(data);
         });
       } else {
         throw Exception('Failed to load data');
@@ -71,19 +70,6 @@ class _LeadboardState extends State<Leadboard> {
       print('Error: $e');
     }
   }
-  Color _getBackgroundColor(int index) {
-    switch (index) {
-      case 0:
-        return Colors.amber; // Altın renk
-      case 1:
-        return Colors.grey[300]!; // Gümüş renk
-      case 2:
-        return Colors.deepOrangeAccent; // Bronz renk
-      default:
-        return Colors.blueAccent; // Diğerleri için standart renk
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,65 +177,7 @@ class _LeadboardState extends State<Leadboard> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: users.isEmpty
-            ? Center(child: CircularProgressIndicator())
-            : ListView.builder(
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            return Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              elevation: 5,
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      child: Text(
-                        '${index + 1}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      radius: 30,
-                      backgroundColor: _getBackgroundColor(index),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            users[index]['name'],
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Score: ${users[index]['puan']}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
