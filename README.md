@@ -2,6 +2,11 @@
 
 GeoGame, ülkeler hakkında bilginizi geliştirmek için oynayabileceğiniz eğitici bir oyun. Başkentler, bayraklar ve diğer coğrafi bilgilerle kendinizi test edin ve dünya hakkında daha fazla şey öğrenin!
 
+# Api
+
+Geogame leadboard için discord apilerini kullanır.
+Bot ve sunucu kodları için [Tıkla](https://github.com/keremlolgg/geogame-api))
+
 # Demo
 
 Projeyi deneyimlemek için aşağıdaki linkten oyuna erişebilirsiniz:
