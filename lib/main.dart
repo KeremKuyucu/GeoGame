@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:GeoGame/screens/mainscreen/geogamelobi.dart';
-import "package:theme_mode_builder/theme_mode_builder.dart";
+import 'package:GeoGame/util.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

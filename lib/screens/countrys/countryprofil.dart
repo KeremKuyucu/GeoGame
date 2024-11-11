@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:GeoGame/utilities.dart';
-import 'package:GeoGame/screens/mainscreen/geogamelobi.dart';
-import 'package:easy_url_launcher/easy_url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:GeoGame/util.dart';
 
 class UlkelerProfiles extends StatefulWidget {
   @override
@@ -41,10 +36,7 @@ class _UlkelerProfilesState extends State<UlkelerProfiles> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              Navigator.pop(
-                context,
-                MaterialPageRoute(builder: (context) => GeoGameLobi()),
-              );
+              Navigator.pop(context);
             },
           ),
         ],

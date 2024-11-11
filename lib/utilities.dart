@@ -1,16 +1,6 @@
-import 'package:path_provider/path_provider.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter/material.dart';
+import 'package:GeoGame/util.dart';
 import 'package:http/http.dart' as http;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'dart:io';
-import 'dart:math';
-import 'dart:convert';
-import 'dart:async';
-// Tanımlamalar
+
 class Ulkeler {
   String bayrak, trisim, enisim, isim, baskent, kita, url;
   bool bilgi, bm; double enlem, boylam; int dosyaboyut;
@@ -49,18 +39,109 @@ class Yazi {
     return _localizedStrings?[key] ?? '';
   }
 }
+class DrawerWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            decoration: BoxDecoration(),
+            child: Text(
+              'GeoGame',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    offset: Offset(2.0, 2.0),
+                    blurRadius: 3.0,
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          ListTile(
+            title: Text(
+              Yazi.get('sikayet'),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            dense: true,
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.share, color: Color(0xFF5865F2)),
+            title: Text(Yazi.get('uygpaylas')),
+            onTap: () async {
+              await Share.share(Yazi.get('davetpromt'));
+            },
+          ),
+          ListTile(
+            leading: FaIcon(FontAwesomeIcons.instagram),
+            title: Text(Yazi.get('instagram')),
+            onTap: () async {
+              await EasyLauncher.url(
+                  url: Yazi.get('instagramurl'), mode: Mode.platformDefault);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.public, color: Colors.red),
+            title: Text(Yazi.get('website')),
+            onTap: () async {
+              await EasyLauncher.url(url: Yazi.get('websiteurl'));
+            },
+          ),
+          ListTile(
+            leading: FaIcon(Icons.report),
+            title: Text(Yazi.get('hatabildir')),
+            onTap: () async {
+              await EasyLauncher.url(url: Yazi.get('hatabildirurl'));
+            },
+          ),
+          ListTile(
+            leading: FaIcon(FontAwesomeIcons.github),
+            title: Text(Yazi.get('github')),
+            onTap: () async {
+              await EasyLauncher.url(url: Yazi.get('githuburl'));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.discord, color: Color(0xFF5865F2)),
+            title: Text(Yazi.get('discord')),
+            onTap: () async {
+              await EasyLauncher.url(url: Yazi.get('discordurl'));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.music_note, color: Colors.red),
+            title: Text(Yazi.get('sarki')),
+            onTap: () async {
+              await EasyLauncher.url(url: Yazi.get('sarkiurl'));
+            },
+          ),
+          Divider(),
+          ListTile(
+            title: Text(
+              Yazi.get('yapimci'),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            dense: true,
+          ),
+          SizedBox(height: 20), // Boşluk bırakır
+        ],
+      ),
+    );
+  }
+}
 
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true;
+bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
 final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
-int mesafedogru=0,mesafeyanlis=0;
-int bayrakdogru=0,bayrakyanlis=0;
-int baskentdogru=0,baskentyanlis=0;
-int mesafepuan=0,bayrakpuan=0,baskentpuan=0;
-String secilenDil='Türkçe';
-bool isEnglish=false;
-int selectedIndex = 0;
-int toplampuan=0;
-String name = "";
+int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
+String name = "", secilenDil='Türkçe';
+List<dynamic> users = [];
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
   try {
@@ -87,63 +168,6 @@ Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesl
 Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yenitur.mp3');}
 Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
 Future<void> Arkafondurdur() async { await arkafon.stop(); }
-Ulkeler gecici = Ulkeler(
-  bayrak: '',
-  trisim: '',
-  enisim: '',
-  isim: '',
-  baskent: '',
-  kita: '',
-  url: '',
-  bilgi: false,
-  bm: false,
-  enlem: 0.0,
-  boylam: 0.0,
-  dosyaboyut: 0,
-);
-Ulkeler kalici = Ulkeler(
-  bayrak: '',
-  trisim: '',
-  enisim: '',
-  isim: '',
-  baskent: '',
-  kita: '',
-  url: '',
-  bilgi: false,
-  bm: false,
-  enlem: 0.0,
-  boylam: 0.0,
-  dosyaboyut: 0,
-);
-List<String> butonAnahtarlar = ['', '', '', ''];
-List<int> butonnumaralari = [-1,-2,-3,-4];
-List<SalomonBottomBarItem> navBarItems = [
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.home),
-    selectedColor: Colors.purple,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.leaderboard),
-    selectedColor: Colors.pink,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(FontAwesomeIcons.info),
-    selectedColor: Colors.teal,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.person),
-    selectedColor: Colors.teal,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.settings),
-    selectedColor: Colors.orange,
-    title: const Text(''),
-  ),
-];
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
   int butonRandomNumber = random.nextInt(4);
@@ -307,21 +331,6 @@ Future<String> getCity() async {
     throw Exception('Hata oluştu: $e');
   }
 }
-Future<String> fetchTime() async {
-  try {
-    final response = await http.get(Uri.parse('http://worldtimeapi.org/api/timezone/Europe/Istanbul'));
-
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      String datetime = data['datetime'];
-      return 'İstanbul saati: $datetime';
-    } else {
-      return 'Saat bilgisi alınamadı. Sunucu hatası: ${response.statusCode}';
-    }
-  } catch (e) {
-    return 'Saat bilgisi alınamadı. Bağlantı hatası: $e';
-  }
-}
 Future<String> getNameFromFile() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
@@ -350,7 +359,6 @@ Future<void> saveNameToFile(String name) async {
 }
 Future<void> sendNewUserNotification(String name) async {
   try {
-    // Yeni kullanıcı bildirimi için gerekli dosya yolunu al
     Directory tempDir = await getTemporaryDirectory();
     File file = File('${tempDir.path}/newuser.txt'); // Dosya yolu burada geçici dizine yönlendirildi
 
@@ -397,7 +405,6 @@ Future<void> sendMessage(String message) async {
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
     String city = (await getCity()).replaceAll('\n', '');
-    String currentTime = await fetchTime();
 
     // Mesajı oluştur
     final fullMessage = '```json\n{'
@@ -407,7 +414,6 @@ Future<void> sendMessage(String message) async {
         '"surum": "$localVersion",\n'
         '"ulke": "$country",\n'
         '"sehir": "$city",\n'
-        '"saat": "$currentTime",\n'
         '"toplampuan": "$toplampuan",\n'
         '"mesafedogru": "$mesafedogru",\n'
         '"mesafeyanlis": "$mesafeyanlis",\n'
@@ -439,7 +445,64 @@ Future<void> sendMessage(String message) async {
     print('Hata: $e');
   }
 }
-// Ulkeler
+// Listeler
+Ulkeler gecici = Ulkeler(
+  bayrak: '',
+  trisim: '',
+  enisim: '',
+  isim: '',
+  baskent: '',
+  kita: '',
+  url: '',
+  bilgi: false,
+  bm: false,
+  enlem: 0.0,
+  boylam: 0.0,
+  dosyaboyut: 0,
+);
+Ulkeler kalici = Ulkeler(
+  bayrak: '',
+  trisim: '',
+  enisim: '',
+  isim: '',
+  baskent: '',
+  kita: '',
+  url: '',
+  bilgi: false,
+  bm: false,
+  enlem: 0.0,
+  boylam: 0.0,
+  dosyaboyut: 0,
+);
+List<String> butonAnahtarlar = ['', '', '', ''];
+List<int> butonnumaralari = [-1,-2,-3,-4];
+List<SalomonBottomBarItem> navBarItems = [
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.home),
+    selectedColor: Colors.purple,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.leaderboard),
+    selectedColor: Colors.pink,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(FontAwesomeIcons.info),
+    selectedColor: Colors.teal,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.person),
+    selectedColor: Colors.teal,
+    title: const Text(''),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.settings),
+    selectedColor: Colors.orange,
+    title: const Text(''),
+  ),
+];
 List<Ulkeler> ulke = [
   Ulkeler(
       bayrak: "dosyalar/bayraklar/moldova.png",
