@@ -51,7 +51,7 @@ Glitch: Web uygulaması barındırma platformu
 Discord: Sıralama verilerinin saklandığı ve işlendiği yer
 
 
-#Backend tarafı
+# Backend tarafı
 
 Uygulama githubdan çektiği anlık api linki ile discordda puan durumunu gönderir arka tarafda serverde çalışan kod puanı alır tabloya ekler ve discordda yükler ve gerektiğinde çekmesi için webhook mesajını düzenler
 
