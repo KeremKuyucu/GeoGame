@@ -53,7 +53,7 @@ Discord: Sıralama verilerinin saklandığı ve işlendiği yer
 
 # Backend tarafı
 
-Uygulama githubdan çektiği anlık api linki ile discordda puan durumunu gönderir arka tarafda serverde çalışan kod puanı alır tabloya ekler ve discordda yükler ve gerektiğinde çekmesi için webhook mesajını düzenler
+Uygulama githubdan çektiği anlık api linki ile discordda puan durumunu gönderir arka tarafda serverde çalışan uygulama puanı alır tabloya ekler ve discordda yükler ve gerektiğinde çekmesi için webhook mesajını düzenler
 
 # Lisans
 
