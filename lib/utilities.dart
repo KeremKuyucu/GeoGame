@@ -141,6 +141,7 @@ bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi 
 final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
 String name = "", secilenDil='Türkçe';
+String apiserver = "";
 List<dynamic> users = [];
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
@@ -375,7 +376,7 @@ Future<void> sendNewUserNotification(String name) async {
     if (contents == 'true') return; // Dosya zaten 'true' içeriyorsa işlem yapma
 
     // Yeni kullanıcı bildirimi yapılacak URL
-    final targetUrl = 'http://fresh-arrow-ox.glitch.me/newuser';
+    final targetUrl = '${apiserver}/newuser';
 
     // Mesajı gönder
     final response = await http.post(
@@ -398,7 +399,7 @@ Future<void> sendNewUserNotification(String name) async {
     print('Hata: $e');
   }
 }
-Future<void> sendMessage(String message) async {
+Future<void> sendLog() async {
   try {
     String name = await getNameFromFile();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -408,7 +409,7 @@ Future<void> sendMessage(String message) async {
 
     // Mesajı oluştur
     final fullMessage = '```json\n{'
-        '"mesaj": "$message",\n'
+        '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
         '"dil": "$secilenDil",\n'
         '"surum": "$localVersion",\n'
@@ -427,7 +428,7 @@ Future<void> sendMessage(String message) async {
         '}```';
 
     // Diğer mesajı gönder
-    final targetUrl = 'http://fresh-arrow-ox.glitch.me/send_message';
+    final targetUrl = '${apiserver}/send_message';
     final response = await http.post(
       Uri.parse(targetUrl),
       headers: {'Content-Type': 'application/json'},

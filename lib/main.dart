@@ -2,7 +2,7 @@ import 'package:GeoGame/util.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  disableCertificateVerification();
+  disableCertificateVerification(); // Özel işlemlerinizi başlatın
   runApp(Geogame());
 }
 
@@ -10,7 +10,13 @@ class Geogame extends StatefulWidget {
   @override
   State<Geogame> createState() => GeoGame();
 }
+
 class GeoGame extends State<Geogame> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ThemeModeBuilder(

@@ -24,7 +24,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   @override
   void initState() {
     super.initState();
-    dilDegistir();
     _initializeGame();
     if (darktema)
       ThemeModeBuilderConfig.setDark();
@@ -33,12 +32,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   }
 
   Future<void> _initializeGame() async {
-    await surumkiyasla();
-    await yeniulkesec();
+    await dilDegistir();
     await readFromFile((update) => setState(update));
-    await istatistik(context);
+    surumkiyasla();
+    yeniulkesec();
+    istatistik(context);
   }
-  void dilDegistir() {
+  Future<void> dilDegistir() async {
     Yazi.loadDil(secilenDil).then((_) {
       setState(() {
         options[0] = Yazi.get('game1');
@@ -87,10 +87,17 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
             'https://raw.githubusercontent.com/keremlolgg/GeoGame/main/latest_version.json'));
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
-          setState(() {
-            remoteVersion = data['latest_version'];
-            apkUrl = data['apk_url'];
-          });
+
+          // Null kontrolü ve verinin geçerliliği
+          if (data != null && data.containsKey('latest_version') && data.containsKey('apk_url') && data.containsKey('apiserver')) {
+            setState(() {
+              remoteVersion = data['latest_version'] ?? 'N/A';
+              apkUrl = data['apk_url'] ?? 'N/A';
+              apiserver = data['apiserver'] ?? 'N/A';
+            });
+          } else {
+            throw Exception('Missing keys in the JSON data');
+          }
         } else {
           throw Exception('Failed to load data');
         }
@@ -138,12 +145,11 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   }
   Future<void> istatistik(BuildContext context) async {
     name = await getNameFromFile();
-
     if (name.isEmpty) {
-      await isimgirbox(context);
+      isimgirbox(context);
     } else {
-      await sendNewUserNotification(name);
-      await sendMessage('Log mesajı');
+      sendLog();
+      sendNewUserNotification(name);
     }
   }
   Future<void> isimgirbox(BuildContext context) async {
