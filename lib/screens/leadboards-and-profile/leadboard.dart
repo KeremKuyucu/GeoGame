@@ -51,7 +51,7 @@ class _LeadboardState extends State<Leadboard> {
   Future<void> fetchData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiserver}/download_file'),
+        Uri.parse('${apiserver}/get_leadboard'),
       );
 
       if (response.statusCode == 200) {

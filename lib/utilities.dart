@@ -143,6 +143,7 @@ int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0
 String name = "", secilenDil='Türkçe';
 String apiserver = "";
 List<dynamic> users = [];
+FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
   try {
@@ -292,32 +293,8 @@ String kelimeDuzelt(String kelime) {
   }
   return sonuc;
 }
-Future<String> getWebhookUrlFromFile() async {
-  // assets/url.json dosyasını oku
-  String jsonString = await rootBundle.loadString('dosyalar/url.json');
-  var jsonResponse = jsonDecode(jsonString);
-
-  // JSON'dan webhook URL'sini al
-  return jsonResponse['webhook_url'];
-}
 Future<String> getCountry() async {
   final url = Uri.parse('https://am.i.mullvad.net/country');
-  try {
-    // HTTP GET isteği gönderiyoruz
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      // İstek başarılıysa, cevabı string olarak döndürüyoruz
-      return response.body;
-    } else {
-      throw Exception('Hata: ${response.statusCode}');
-    }
-  } catch (e) {
-    throw Exception('Hata oluştu: $e');
-  }
-}
-Future<String> getCity() async {
-  final url = Uri.parse('https://am.i.mullvad.net/city');
   try {
     // HTTP GET isteği gönderiyoruz
     final response = await http.get(url);
@@ -346,6 +323,24 @@ Future<String> getNameFromFile() async {
     return "";
   }
 }
+/*
+Future<void> getTokens() async {
+  try {
+    final response = await http.get(
+      Uri.parse('${apiserver}/7a2d56a9f1d4e8656df7bfe1ff234cbf'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+    } else {
+      throw Exception('Veri yüklenemedi.');
+    }
+  } catch (e) {
+    print('Hata: $e');
+  }
+}
+*/
 Future<void> saveNameToFile(String name) async {
   try {
     final directory = await getApplicationDocumentsDirectory();
@@ -405,16 +400,15 @@ Future<void> sendLog() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
-    String city = (await getCity()).replaceAll('\n', '');
+    String token = await firebaseMessaging.getToken() ?? '';
 
-    // Mesajı oluştur
     final fullMessage = '```json\n{'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
+        '"token": "$token",\n'
         '"dil": "$secilenDil",\n'
         '"surum": "$localVersion",\n'
         '"ulke": "$country",\n'
-        '"sehir": "$city",\n'
         '"toplampuan": "$toplampuan",\n'
         '"mesafedogru": "$mesafedogru",\n'
         '"mesafeyanlis": "$mesafeyanlis",\n'
@@ -428,7 +422,7 @@ Future<void> sendLog() async {
         '}```';
 
     // Diğer mesajı gönder
-    final targetUrl = '${apiserver}/send_message';
+    final targetUrl = '${apiserver}/post_leadboard';
     final response = await http.post(
       Uri.parse(targetUrl),
       headers: {'Content-Type': 'application/json'},
@@ -438,9 +432,9 @@ Future<void> sendLog() async {
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Mesaj başarıyla gönderildi!');
+      print('Log başarıyla gönderildi!');
     } else {
-      print('Mesaj gönderilemedi: ${response.statusCode}');
+      print('Log gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
     print('Hata: $e');

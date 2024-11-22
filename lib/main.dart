@@ -1,12 +1,15 @@
 import 'package:GeoGame/util.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  disableCertificateVerification(); // Özel işlemlerinizi başlatın
+  await Firebase.initializeApp();
+  disableCertificateVerification();
   runApp(Geogame());
 }
 
 class Geogame extends StatefulWidget {
+  static var navigatorKey;
+
   @override
   State<Geogame> createState() => GeoGame();
 }

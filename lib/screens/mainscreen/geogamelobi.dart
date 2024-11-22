@@ -24,19 +24,38 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   @override
   void initState() {
     super.initState();
+    _initializeFirebaseMessaging();
     _initializeGame();
     if (darktema)
       ThemeModeBuilderConfig.setDark();
     else
       ThemeModeBuilderConfig.setLight();
   }
-
   Future<void> _initializeGame() async {
     await dilDegistir();
     await readFromFile((update) => setState(update));
     surumkiyasla();
     yeniulkesec();
     istatistik(context);
+  }
+  Future<void> _initializeFirebaseMessaging() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    await firebaseMessaging.requestPermission();
+
+    // Uygulama ön planda iken bildirim almak için
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("Mesaj Alındı: ${message.notification?.title} ___ ${message.notification?.body}");
+      Bildirimgoruntule(context,message.notification?.title, message.notification?.body);
+    });
+    FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+
+  }
+  Future<void> backgroundHandler(RemoteMessage message) async {
+    print("Arka planda mesaj alındı: ${message.notification?.title}");
+    Bildirimgoruntule(context,message.notification?.title, message.notification?.body);
   }
   Future<void> dilDegistir() async {
     Yazi.loadDil(secilenDil).then((_) {
@@ -194,6 +213,25 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       },
     );
   }
+  void Bildirimgoruntule(BuildContext context, String? baslik, String? metin) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(baslik ?? 'Başlık Yok'),
+          content: Text(metin ?? 'Mesaj İçeriği Yok'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Kapat'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _selectOption(int index) async {
     setState(() {
@@ -271,7 +309,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           ),
         ),
       ),
-      drawer: DrawerWidget(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
@@ -337,6 +374,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           },
         ),
       ),
+      drawer: DrawerWidget(),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
