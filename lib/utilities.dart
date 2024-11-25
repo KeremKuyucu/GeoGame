@@ -143,7 +143,6 @@ int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0
 String name = "", secilenDil='Türkçe';
 String apiserver = "";
 List<dynamic> users = [];
-FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
   try {
@@ -323,24 +322,6 @@ Future<String> getNameFromFile() async {
     return "";
   }
 }
-/*
-Future<void> getTokens() async {
-  try {
-    final response = await http.get(
-      Uri.parse('${apiserver}/7a2d56a9f1d4e8656df7bfe1ff234cbf'),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-    } else {
-      throw Exception('Veri yüklenemedi.');
-    }
-  } catch (e) {
-    print('Hata: $e');
-  }
-}
-*/
 Future<void> saveNameToFile(String name) async {
   try {
     final directory = await getApplicationDocumentsDirectory();
@@ -400,12 +381,10 @@ Future<void> sendLog() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
-    String token = await firebaseMessaging.getToken() ?? '';
 
     final fullMessage = '```json\n{'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
-        '"token": "$token",\n'
         '"dil": "$secilenDil",\n'
         '"surum": "$localVersion",\n'
         '"ulke": "$country",\n'

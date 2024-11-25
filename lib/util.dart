@@ -11,8 +11,6 @@ export 'package:share_plus/share_plus.dart';
 export 'package:theme_mode_builder/theme_mode_builder.dart';
 export 'package:searchfield/searchfield.dart';
 export 'package:firebase_core/firebase_core.dart';
-export 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 export 'dart:convert';
 export 'dart:io';

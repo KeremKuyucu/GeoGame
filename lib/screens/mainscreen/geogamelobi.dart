@@ -24,7 +24,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   @override
   void initState() {
     super.initState();
-    _initializeFirebaseMessaging();
     _initializeGame();
     if (darktema)
       ThemeModeBuilderConfig.setDark();
@@ -38,25 +37,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     yeniulkesec();
     istatistik(context);
   }
-  Future<void> _initializeFirebaseMessaging() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
 
-    await firebaseMessaging.requestPermission();
-
-    // Uygulama ön planda iken bildirim almak için
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Mesaj Alındı: ${message.notification?.title} ___ ${message.notification?.body}");
-      Bildirimgoruntule(context,message.notification?.title, message.notification?.body);
-    });
-    FirebaseMessaging.onBackgroundMessage(backgroundHandler);
-
-  }
-  Future<void> backgroundHandler(RemoteMessage message) async {
-    print("Arka planda mesaj alındı: ${message.notification?.title}");
-    Bildirimgoruntule(context,message.notification?.title, message.notification?.body);
-  }
   Future<void> dilDegistir() async {
     Yazi.loadDil(secilenDil).then((_) {
       setState(() {
