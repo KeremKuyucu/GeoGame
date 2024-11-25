@@ -10,7 +10,6 @@ export 'package:easy_url_launcher/easy_url_launcher.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:theme_mode_builder/theme_mode_builder.dart';
 export 'package:searchfield/searchfield.dart';
-export 'package:firebase_core/firebase_core.dart';
 
 export 'dart:convert';
 export 'dart:io';
@@ -18,7 +17,6 @@ export 'dart:math';
 export 'dart:async';
 export 'dart:isolate';
 
-export 'firebase_options.dart';
 export 'utilities.dart';
 export 'screens/countrys/country.dart';
 export 'screens/countrys/countryprofil.dart';

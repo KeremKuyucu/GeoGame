@@ -19,9 +19,6 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   http: ^1.2.2
   package_info_plus: ^8.0.2
-  firebase_database: ^11.1.6
-  firebase_core: ^3.8.0
-
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

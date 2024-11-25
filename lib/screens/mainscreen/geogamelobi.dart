@@ -194,26 +194,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       },
     );
   }
-  void Bildirimgoruntule(BuildContext context, String? baslik, String? metin) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(baslik ?? 'Başlık Yok'),
-          content: Text(metin ?? 'Mesaj İçeriği Yok'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Kapat'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _selectOption(int index) async {
     setState(() {
       _selectedOption = index;
