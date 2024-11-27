@@ -33,17 +33,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   Future<void> _initializeGame() async {
     await dilDegistir();
     await readFromFile((update) => setState(update));
-    surumkiyasla();
+    await surumkiyasla();
     yeniulkesec();
     istatistik(context);
   }
-
   Future<void> dilDegistir() async {
-    Yazi.loadDil(secilenDil).then((_) {
+    await Yazi.loadDil(secilenDil).then((_) {
       setState(() {
-        options[0] = Yazi.get('game1');
-        options[1] = Yazi.get('game2');
-        options[2] = Yazi.get('game3');
         navBarItems = [
           SalomonBottomBarItem(
             icon: const Icon(Icons.home),
@@ -146,10 +142,11 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   Future<void> istatistik(BuildContext context) async {
     name = await getNameFromFile();
     if (name.isEmpty) {
-      isimgirbox(context);
-    } else {
-      sendLog();
+      await isimgirbox(context);
+      await getNameFromFile();
       sendNewUserNotification(name);
+    } else {
+      postLeadboard();
     }
   }
   Future<void> isimgirbox(BuildContext context) async {

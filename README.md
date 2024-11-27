@@ -1,8 +1,3 @@
-# İlk Projem
-
-Bugün 26.11.24 ilk benim çağımda doğru düzgün projemdi bunu yaparken discordu api olarak kullanmayı öğrendim yüksek ihtimal uzun süre kullanacağım umarım deneyap projemdede kullanacağım.
-Bu okuyan ilerdeki ben ve belki farklı kişiler projenin kodlarında hiçbir sorun yok ama projeye firebase ekleyip bozduğum için derlemesi sorunlu.
-
 # GeoGame
 
 GeoGame, ülkeler hakkında bilginizi geliştirmek için oynayabileceğiniz eğitici bir oyun. Başkentler, bayraklar ve diğer coğrafi bilgilerle kendinizi test edin ve dünya hakkında daha fazla şey öğrenin!

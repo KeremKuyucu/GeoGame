@@ -151,7 +151,7 @@ class _UlkelerlistState extends State<Ulkelerlist> {
                                             errorBuilder: (context, error, stackTrace) {
                                               return Center(
                                                 child: Text(
-                                                  'İnternet Hatası\n Pas tuşuna bas, düzelmezse internetini kontrol et.',
+                                                  'İnternet Hatası',
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color: Colors.red,
@@ -172,7 +172,7 @@ class _UlkelerlistState extends State<Ulkelerlist> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        filteredUlke[index].isim,
+                                        isEnglish ? filteredUlke[index].enisim : filteredUlke[index].isim,
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,

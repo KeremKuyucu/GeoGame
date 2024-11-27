@@ -90,6 +90,8 @@ class _MesafeOyunState extends State<MesafeOyun> {
         if(puan<20)
           puan=20;
         Yanlis();
+        _controller.clear();
+        _currentInput='';
         mesafeyanlis++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -111,6 +113,8 @@ class _MesafeOyunState extends State<MesafeOyun> {
       ),
     );
     setState(() {
+      _currentInput='';
+      message='';
       yeniulkesec();
       Yenitur();
       _controller.clear();

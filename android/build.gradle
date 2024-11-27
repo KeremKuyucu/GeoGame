@@ -1,7 +1,4 @@
-ext.kotlin_version = '1.9.10'
-
-
-buildscript {
+allprojects {
     repositories {
         google()
         mavenCentral()

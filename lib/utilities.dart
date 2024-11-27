@@ -311,7 +311,7 @@ Future<String> getCountry() async {
 Future<String> getNameFromFile() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/dosyalar/isim.json');
+    final file = File('${directory.path}/assets/isim.json');
     if (!await file.exists()) return "";
 
     final content = await file.readAsString();
@@ -325,7 +325,7 @@ Future<String> getNameFromFile() async {
 Future<void> saveNameToFile(String name) async {
   try {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/dosyalar/isim.json');
+    final file = File('${directory.path}/assets/isim.json');
     final data = {'isim': name};
 
     await file.create(recursive: true);
@@ -336,24 +336,7 @@ Future<void> saveNameToFile(String name) async {
 }
 Future<void> sendNewUserNotification(String name) async {
   try {
-    Directory tempDir = await getTemporaryDirectory();
-    File file = File('${tempDir.path}/newuser.txt'); // Dosya yolu burada geçici dizine yönlendirildi
-
-    // Dosya mevcut mu kontrol et
-    bool fileExists = await file.exists();
-    if (!fileExists) {
-      // Dosya yoksa, dosyayı oluştur ve içine 'false' yaz
-      await file.writeAsString('false', mode: FileMode.writeOnly);
-      print('Dosya oluşturuldu ve "false" yazıldı');
-    }
-
-    // Dosya okuma işlemi
-    String contents = await file.readAsString();
-    if (contents == 'true') return; // Dosya zaten 'true' içeriyorsa işlem yapma
-
-    // Yeni kullanıcı bildirimi yapılacak URL
     final targetUrl = '${apiserver}/newuser';
-
     // Mesajı gönder
     final response = await http.post(
       Uri.parse(targetUrl),
@@ -366,7 +349,6 @@ Future<void> sendNewUserNotification(String name) async {
     if (response.statusCode == 200) {
       print('Yeni kullanıcı bildirimi başarıyla gönderildi!');
       // Dosyayı 'true' olarak yaz
-      await file.writeAsString('true', mode: FileMode.writeOnly);
       print('Dosya başarıyla yazıldı');
     } else {
       print('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
@@ -375,14 +357,14 @@ Future<void> sendNewUserNotification(String name) async {
     print('Hata: $e');
   }
 }
-Future<void> sendLog() async {
+Future<void> postLeadboard() async {
   try {
     String name = await getNameFromFile();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
 
-    final fullMessage = '```json\n{'
+    final fullMessage = '{'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
         '"dil": "$secilenDil",\n'
@@ -398,7 +380,7 @@ Future<void> sendLog() async {
         '"mesafepuan": "$mesafepuan",\n'
         '"bayrakpuan": "$bayrakpuan",\n'
         '"baskentpuan": "$baskentpuan"\n'
-        '}```';
+        '}';
 
     // Diğer mesajı gönder
     final targetUrl = '${apiserver}/post_leadboard';
@@ -479,7 +461,7 @@ List<SalomonBottomBarItem> navBarItems = [
 ];
 List<Ulkeler> ulke = [
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/moldova.png",
+      bayrak: "assets/bayraklar/moldova.png",
       trisim: "Moldova",
       enisim: "Moldova",
       isim: "Moldova",
@@ -493,7 +475,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2600
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/amerikabirlesikdevletleri.png",
+      bayrak: "assets/bayraklar/amerikabirlesikdevletleri.png",
       trisim: "Amerika",
       enisim: "Unitedstates",
       isim: "Amerikabirlesikdevletleri",
@@ -507,7 +489,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1289
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/mayotte.png",
+      bayrak: "assets/bayraklar/mayotte.png",
       trisim: "Mayotte",
       enisim: "Mayotte",
       isim: "Mayotte",
@@ -521,7 +503,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 8185
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/nauru.png",
+      bayrak: "assets/bayraklar/nauru.png",
       trisim: "Nauru",
       enisim: "Nauru",
       isim: "Nauru",
@@ -535,7 +517,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 651
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/mozambik.png",
+      bayrak: "assets/bayraklar/mozambik.png",
       trisim: "Mozambik",
       enisim: "Mozambique",
       isim: "Mozambik",
@@ -549,7 +531,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2298
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/brezilya.png",
+      bayrak: "assets/bayraklar/brezilya.png",
       trisim: "Brezilya",
       enisim: "Brazil",
       isim: "Brezilya",
@@ -563,7 +545,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2883
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/yesilburun.png",
+      bayrak: "assets/bayraklar/yesilburun.png",
       trisim: "Yeilburun",
       enisim: "Capeverde",
       isim: "Yesilburun",
@@ -577,7 +559,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 909
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ekvatorginesi.png",
+      bayrak: "assets/bayraklar/ekvatorginesi.png",
       trisim: "Ekvatorginesi",
       enisim: "Equatorialguinea",
       isim: "Ekvatorginesi",
@@ -591,7 +573,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1923
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/arnavutluk.png",
+      bayrak: "assets/bayraklar/arnavutluk.png",
       trisim: "Arnavutluk",
       enisim: "Albania",
       isim: "Arnavutluk",
@@ -605,7 +587,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3044
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/abdvirjinadalari.png",
+      bayrak: "assets/bayraklar/abdvirjinadalari.png",
       trisim: "Abdvirjinadalar",
       enisim: "Unitedstatesvirginislands",
       isim: "Abdvirjinadalari",
@@ -619,7 +601,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 9362
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/niue.png",
+      bayrak: "assets/bayraklar/niue.png",
       trisim: "Niue",
       enisim: "Niue",
       isim: "Niue",
@@ -633,7 +615,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1457
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/palau.png",
+      bayrak: "assets/bayraklar/palau.png",
       trisim: "Palau",
       enisim: "Palau",
       isim: "Palau",
@@ -647,7 +629,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 738
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/nijerya.png",
+      bayrak: "assets/bayraklar/nijerya.png",
       trisim: "Nijerya",
       enisim: "Nigeria",
       isim: "Nijerya",
@@ -661,7 +643,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 157
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/virjinadalari.png",
+      bayrak: "assets/bayraklar/virjinadalari.png",
       trisim: "Virjinadalar",
       enisim: "Britishvirginislands",
       isim: "Virjinadalari",
@@ -675,7 +657,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 4437
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/gambiya.png",
+      bayrak: "assets/bayraklar/gambiya.png",
       trisim: "Gambiya",
       enisim: "Gambia",
       isim: "Gambiya",
@@ -689,7 +671,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 248
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/somali.png",
+      bayrak: "assets/bayraklar/somali.png",
       trisim: "Somali",
       enisim: "Somalia",
       isim: "Somali",
@@ -703,7 +685,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 693
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/yemen.png",
+      bayrak: "assets/bayraklar/yemen.png",
       trisim: "Yemen",
       enisim: "Yemen",
       isim: "Yemen",
@@ -717,7 +699,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 153
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/malezya.png",
+      bayrak: "assets/bayraklar/malezya.png",
       trisim: "Malezya",
       enisim: "Malaysia",
       isim: "Malezya",
@@ -731,7 +713,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1139
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/dominika.png",
+      bayrak: "assets/bayraklar/dominika.png",
       trisim: "Dominika",
       enisim: "Dominica",
       isim: "Dominika",
@@ -745,7 +727,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1715
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/birlesikkrallik.png",
+      bayrak: "assets/bayraklar/birlesikkrallik.png",
       trisim: "Birleikkrallk",
       enisim: "Unitedkingdom",
       isim: "Birlesikkrallik",
@@ -759,7 +741,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 980
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/madagaskar.png",
+      bayrak: "assets/bayraklar/madagaskar.png",
       trisim: "Madagaskar",
       enisim: "Madagascar",
       isim: "Madagaskar",
@@ -773,7 +755,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 266
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sahrademokratikarapcumhuriyeti.png",
+      bayrak: "assets/bayraklar/sahrademokratikarapcumhuriyeti.png",
       trisim: "Sahrademokratikarapcumhuriyeti",
       enisim: "Westernsahara",
       isim: "Sahrademokratikarapcumhuriyeti",
@@ -787,7 +769,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1083
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kibris.png",
+      bayrak: "assets/bayraklar/kibris.png",
       trisim: "Kbrs",
       enisim: "Cyprus",
       isim: "Kibris",
@@ -801,7 +783,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2172
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/antiguavebarbuda.png",
+      bayrak: "assets/bayraklar/antiguavebarbuda.png",
       trisim: "Antiguavebarbuda",
       enisim: "Antiguaandbarbuda",
       isim: "Antiguavebarbuda",
@@ -815,7 +797,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2325
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/irlanda.png",
+      bayrak: "assets/bayraklar/irlanda.png",
       trisim: "Rlanda",
       enisim: "Ireland",
       isim: "Irlanda",
@@ -829,7 +811,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 219
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/paraguay.png",
+      bayrak: "assets/bayraklar/paraguay.png",
       trisim: "Paraguay",
       enisim: "Paraguay",
       isim: "Paraguay",
@@ -843,7 +825,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1190
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/srilanka.png",
+      bayrak: "assets/bayraklar/srilanka.png",
       trisim: "Srilanka",
       enisim: "Srilanka",
       isim: "Srilanka",
@@ -857,7 +839,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3493
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guneyafrika.png",
+      bayrak: "assets/bayraklar/guneyafrika.png",
       trisim: "Gneyafrika",
       enisim: "Southafrica",
       isim: "Guneyafrika",
@@ -871,7 +853,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 985
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kuveyt.png",
+      bayrak: "assets/bayraklar/kuveyt.png",
       trisim: "Kuveyt",
       enisim: "Kuwait",
       isim: "Kuveyt",
@@ -885,7 +867,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 527
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cezayir.png",
+      bayrak: "assets/bayraklar/cezayir.png",
       trisim: "Cezayir",
       enisim: "Algeria",
       isim: "Cezayir",
@@ -899,7 +881,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 989
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/hirvatistan.png",
+      bayrak: "assets/bayraklar/hirvatistan.png",
       trisim: "Hrvatistan",
       enisim: "Croatia",
       isim: "Hirvatistan",
@@ -913,7 +895,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1810
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/martinik.png",
+      bayrak: "assets/bayraklar/martinik.png",
       trisim: "Martinik",
       enisim: "Martinique",
       isim: "Martinik",
@@ -927,7 +909,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 957
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sierraleone.png",
+      bayrak: "assets/bayraklar/sierraleone.png",
       trisim: "Sierraleone",
       enisim: "Sierraleone",
       isim: "Sierraleone",
@@ -941,7 +923,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 153
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kuzeymarianaadalari.png",
+      bayrak: "assets/bayraklar/kuzeymarianaadalari.png",
       trisim: "Kuzeymarianaadalar",
       enisim: "Northernmarianaislands",
       isim: "Kuzeymarianaadalari",
@@ -955,7 +937,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 9029
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ruanda.png",
+      bayrak: "assets/bayraklar/ruanda.png",
       trisim: "Ruanda",
       enisim: "Rwanda",
       isim: "Ruanda",
@@ -969,7 +951,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1180
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/suriye.png",
+      bayrak: "assets/bayraklar/suriye.png",
       trisim: "Suriye",
       enisim: "Syria",
       isim: "Suriye",
@@ -983,7 +965,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 819
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saintvincentvegrenadinler.png",
+      bayrak: "assets/bayraklar/saintvincentvegrenadinler.png",
       trisim: "Saintvincentvegrenadinler",
       enisim: "Saintvincentandthegrenadines",
       isim: "Saintvincentvegrenadinler",
@@ -997,7 +979,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1087
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kosova.png",
+      bayrak: "assets/bayraklar/kosova.png",
       trisim: "Kosova",
       enisim: "Kosovo",
       isim: "Kosova",
@@ -1011,7 +993,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1730
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saintlucia.png",
+      bayrak: "assets/bayraklar/saintlucia.png",
       trisim: "Saintlucia",
       enisim: "Saintlucia",
       isim: "Saintlucia",
@@ -1025,7 +1007,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1552
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/honduras.png",
+      bayrak: "assets/bayraklar/honduras.png",
       trisim: "Honduras",
       enisim: "Honduras",
       isim: "Honduras",
@@ -1039,7 +1021,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 595
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/urdun.png",
+      bayrak: "assets/bayraklar/urdun.png",
       trisim: "Rdn",
       enisim: "Jordan",
       isim: "Urdun",
@@ -1053,7 +1035,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 658
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tuvalu.png",
+      bayrak: "assets/bayraklar/tuvalu.png",
       trisim: "Tuvalu",
       enisim: "Tuvalu",
       isim: "Tuvalu",
@@ -1067,7 +1049,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1820
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/nepal.png",
+      bayrak: "assets/bayraklar/nepal.png",
       trisim: "Nepal",
       enisim: "Nepal",
       isim: "Nepal",
@@ -1081,7 +1063,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3611
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/liberya.png",
+      bayrak: "assets/bayraklar/liberya.png",
       trisim: "Liberya",
       enisim: "Liberia",
       isim: "Liberya",
@@ -1095,7 +1077,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 606
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/avusturya.png",
+      bayrak: "assets/bayraklar/avusturya.png",
       trisim: "Avusturya",
       enisim: "Austria",
       isim: "Avusturya",
@@ -1109,7 +1091,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 118
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guernsey.png",
+      bayrak: "assets/bayraklar/guernsey.png",
       trisim: "Guernsey",
       enisim: "Guernsey",
       isim: "Guernsey",
@@ -1123,7 +1105,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 570
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ortaafrikacumhuriyeti.png",
+      bayrak: "assets/bayraklar/ortaafrikacumhuriyeti.png",
       trisim: "Ortaafrikacumhuriyeti",
       enisim: "Centralafricanrepublic",
       isim: "Ortaafrikacumhuriyeti",
@@ -1137,7 +1119,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 622
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/moritanya.png",
+      bayrak: "assets/bayraklar/moritanya.png",
       trisim: "Moritanya",
       enisim: "Mauritania",
       isim: "Moritanya",
@@ -1151,7 +1133,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1002
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cibuti.png",
+      bayrak: "assets/bayraklar/cibuti.png",
       trisim: "Cibuti",
       enisim: "Djibouti",
       isim: "Cibuti",
@@ -1165,7 +1147,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1474
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fiji.png",
+      bayrak: "assets/bayraklar/fiji.png",
       trisim: "Fiji",
       enisim: "Fiji",
       isim: "Fiji",
@@ -1179,7 +1161,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3250
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/norvec.png",
+      bayrak: "assets/bayraklar/norvec.png",
       trisim: "Norve",
       enisim: "Norway",
       isim: "Norvec",
@@ -1193,7 +1175,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 323
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/letonya.png",
+      bayrak: "assets/bayraklar/letonya.png",
       trisim: "Letonya",
       enisim: "Latvia",
       isim: "Letonya",
@@ -1207,7 +1189,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 112
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/falklandmalvinaadalari.png",
+      bayrak: "assets/bayraklar/falklandmalvinaadalari.png",
       trisim: "Falklandmalvinaadalar",
       enisim: "Falklandislands",
       isim: "Falklandmalvinaadalari",
@@ -1221,7 +1203,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 5318
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kazakistan.png",
+      bayrak: "assets/bayraklar/kazakistan.png",
       trisim: "Kazakistan",
       enisim: "Kazakhstan",
       isim: "Kazakistan",
@@ -1235,7 +1217,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2960
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/aland.png",
+      bayrak: "assets/bayraklar/aland.png",
       trisim: "Aland",
       enisim: "Alandislands",
       isim: "Aland",
@@ -1249,7 +1231,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 311
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/turkmenistan.png",
+      bayrak: "assets/bayraklar/turkmenistan.png",
       trisim: "Trkmenistan",
       enisim: "Turkmenistan",
       isim: "Turkmenistan",
@@ -1263,7 +1245,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 7750
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cocoskeelingadalari.png",
+      bayrak: "assets/bayraklar/cocoskeelingadalari.png",
       trisim: "Cocoskeelingadalar",
       enisim: "Cocoskeelingislands",
       isim: "Cocoskeelingadalari",
@@ -1277,7 +1259,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1989
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bulgaristan.png",
+      bayrak: "assets/bayraklar/bulgaristan.png",
       trisim: "Bulgaristan",
       enisim: "Bulgaria",
       isim: "Bulgaristan",
@@ -1291,7 +1273,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 151
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tokelau.png",
+      bayrak: "assets/bayraklar/tokelau.png",
       trisim: "Tokelau",
       enisim: "Tokelau",
       isim: "Tokelau",
@@ -1305,7 +1287,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1418
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/yenikaledonya.png",
+      bayrak: "assets/bayraklar/yenikaledonya.png",
       trisim: "Yenikaledonya",
       enisim: "Newcaledonia",
       isim: "Yenikaledonya",
@@ -1319,7 +1301,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1715
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/barbados.png",
+      bayrak: "assets/bayraklar/barbados.png",
       trisim: "Barbados",
       enisim: "Barbados",
       isim: "Barbados",
@@ -1333,7 +1315,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 998
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saotomeandprincipe.png",
+      bayrak: "assets/bayraklar/saotomeandprincipe.png",
       trisim: "Saotomeandprincipe",
       enisim: "Saotomeandprincipe",
       isim: "Saotomeandprincipe",
@@ -1347,7 +1329,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1077
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/antarktika.png",
+      bayrak: "assets/bayraklar/antarktika.png",
       trisim: "Antarktika",
       enisim: "Antarctica",
       isim: "Antarktika",
@@ -1361,7 +1343,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1354
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/brunei.png",
+      bayrak: "assets/bayraklar/brunei.png",
       trisim: "Brunei",
       enisim: "Brunei",
       isim: "Brunei",
@@ -1375,7 +1357,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3402
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/butan.png",
+      bayrak: "assets/bayraklar/butan.png",
       trisim: "Butan",
       enisim: "Bhutan",
       isim: "Butan",
@@ -1389,7 +1371,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 8230
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kamerun.png",
+      bayrak: "assets/bayraklar/kamerun.png",
       trisim: "Kamerun",
       enisim: "Cameroon",
       isim: "Kamerun",
@@ -1403,7 +1385,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 637
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/arjantin.png",
+      bayrak: "assets/bayraklar/arjantin.png",
       trisim: "Arjantin",
       enisim: "Argentina",
       isim: "Arjantin",
@@ -1417,7 +1399,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1578
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/azerbaycan.png",
+      bayrak: "assets/bayraklar/azerbaycan.png",
       trisim: "Azerbaycan",
       enisim: "Azerbaijan",
       isim: "Azerbaycan",
@@ -1431,7 +1413,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 706
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/meksika.png",
+      bayrak: "assets/bayraklar/meksika.png",
       trisim: "Meksika",
       enisim: "Mexico",
       isim: "Meksika",
@@ -1445,7 +1427,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3655
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fas.png",
+      bayrak: "assets/bayraklar/fas.png",
       trisim: "Fas",
       enisim: "Morocco",
       isim: "Fas",
@@ -1459,7 +1441,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 928
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guatemala.png",
+      bayrak: "assets/bayraklar/guatemala.png",
       trisim: "Guatemala",
       enisim: "Guatemala",
       isim: "Guatemala",
@@ -1473,7 +1455,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2518
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kenya.png",
+      bayrak: "assets/bayraklar/kenya.png",
       trisim: "Kenya",
       enisim: "Kenya",
       isim: "Kenya",
@@ -1487,7 +1469,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1966
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/malta.png",
+      bayrak: "assets/bayraklar/malta.png",
       trisim: "Malta",
       enisim: "Malta",
       isim: "Malta",
@@ -1501,7 +1483,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1073
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cekya.png",
+      bayrak: "assets/bayraklar/cekya.png",
       trisim: "Ekya",
       enisim: "Czechia",
       isim: "Cekya",
@@ -1515,7 +1497,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 940
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cebelitarik.png",
+      bayrak: "assets/bayraklar/cebelitarik.png",
       trisim: "Cebelitark",
       enisim: "Gibraltar",
       isim: "Cebelitarik",
@@ -1529,7 +1511,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2033
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/aruba.png",
+      bayrak: "assets/bayraklar/aruba.png",
       trisim: "Aruba",
       enisim: "Aruba",
       isim: "Aruba",
@@ -1543,7 +1525,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 735
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saintbarthelemy.png",
+      bayrak: "assets/bayraklar/saintbarthelemy.png",
       trisim: "Saintbarthelemy",
       enisim: "Saintbarthelemy",
       isim: "Saintbarthelemy",
@@ -1557,7 +1539,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 11667
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/monako.png",
+      bayrak: "assets/bayraklar/monako.png",
       trisim: "Monako",
       enisim: "Monaco",
       isim: "Monako",
@@ -1571,7 +1553,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 124
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/birlesikarapemirlikleri.png",
+      bayrak: "assets/bayraklar/birlesikarapemirlikleri.png",
       trisim: "Birleikarapemirlikleri",
       enisim: "Unitedarabemirates",
       isim: "Birlesikarapemirlikleri",
@@ -1585,7 +1567,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 233
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guneysudan.png",
+      bayrak: "assets/bayraklar/guneysudan.png",
       trisim: "Gneysudan",
       enisim: "Southsudan",
       isim: "Guneysudan",
@@ -1599,7 +1581,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1000
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/portoriko.png",
+      bayrak: "assets/bayraklar/portoriko.png",
       trisim: "Portoriko",
       enisim: "Puertorico",
       isim: "Portoriko",
@@ -1613,7 +1595,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1474
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/elsalvador.png",
+      bayrak: "assets/bayraklar/elsalvador.png",
       trisim: "Elsalvador",
       enisim: "Elsalvador",
       isim: "Elsalvador",
@@ -1627,7 +1609,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2363
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fransa.png",
+      bayrak: "assets/bayraklar/fransa.png",
       trisim: "Fransa",
       enisim: "France",
       isim: "Fransa",
@@ -1641,7 +1623,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/nijer.png",
+      bayrak: "assets/bayraklar/nijer.png",
       trisim: "Nijer",
       enisim: "Niger",
       isim: "Nijer",
@@ -1655,7 +1637,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 645
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fildisisahili.png",
+      bayrak: "assets/bayraklar/fildisisahili.png",
       trisim: "Fildiisahili",
       enisim: "Ivorycoast",
       isim: "Fildisisahili",
@@ -1669,7 +1651,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 252
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guneygeorgiaveguneysandwichadalari.png",
+      bayrak: "assets/bayraklar/guneygeorgiaveguneysandwichadalari.png",
       trisim: "Gneygeorgiavegneysandwichadalar",
       enisim: "Southgeorgia",
       isim: "Guneygeorgiaveguneysandwichadalari",
@@ -1683,7 +1665,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 6026
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/botsvana.png",
+      bayrak: "assets/bayraklar/botsvana.png",
       trisim: "Botsvana",
       enisim: "Botswana",
       isim: "Botsvana",
@@ -1697,7 +1679,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 199
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/britanyahintokyanusutopraklari.png",
+      bayrak: "assets/bayraklar/britanyahintokyanusutopraklari.png",
       trisim: "Britanyahintokyanusutopraklar",
       enisim: "Britishindianoceanterritory",
       isim: "Britanyahintokyanusutopraklari",
@@ -1711,7 +1693,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 7213
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ozbekistan.png",
+      bayrak: "assets/bayraklar/ozbekistan.png",
       trisim: "Zbekistan",
       enisim: "Uzbekistan",
       isim: "Ozbekistan",
@@ -1725,7 +1707,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 760
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tunus.png",
+      bayrak: "assets/bayraklar/tunus.png",
       trisim: "Tunus",
       enisim: "Tunisia",
       isim: "Tunus",
@@ -1739,7 +1721,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1128
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/hongkong.png",
+      bayrak: "assets/bayraklar/hongkong.png",
       trisim: "Hongkong",
       enisim: "Hongkong",
       isim: "Hongkong",
@@ -1753,7 +1735,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2045
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kuzeymakedonya.png",
+      bayrak: "assets/bayraklar/kuzeymakedonya.png",
       trisim: "Kuzeymakedonya",
       enisim: "Northmacedonia",
       isim: "Kuzeymakedonya",
@@ -1767,7 +1749,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1613
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/surinam.png",
+      bayrak: "assets/bayraklar/surinam.png",
       trisim: "Surinam",
       enisim: "Suriname",
       isim: "Surinam",
@@ -1781,7 +1763,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 686
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/belcika.png",
+      bayrak: "assets/bayraklar/belcika.png",
       trisim: "Belika",
       enisim: "Belgium",
       isim: "Belcika",
@@ -1795,7 +1777,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 292
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/amerikansamoasi.png",
+      bayrak: "assets/bayraklar/amerikansamoasi.png",
       trisim: "Amerikansamoas",
       enisim: "Americansamoa",
       isim: "Amerikansamoasi",
@@ -1809,7 +1791,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3763
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/solomonadalari.png",
+      bayrak: "assets/bayraklar/solomonadalari.png",
       trisim: "Solomonadalar",
       enisim: "Solomonislands",
       isim: "Solomonadalari",
@@ -1823,7 +1805,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1446
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ukrayna.png",
+      bayrak: "assets/bayraklar/ukrayna.png",
       trisim: "Ukrayna",
       enisim: "Ukraine",
       isim: "Ukrayna",
@@ -1837,7 +1819,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 146
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/finlandiya.png",
+      bayrak: "assets/bayraklar/finlandiya.png",
       trisim: "Finlandiya",
       enisim: "Finland",
       isim: "Finlandiya",
@@ -1851,7 +1833,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 240
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/burkinafaso.png",
+      bayrak: "assets/bayraklar/burkinafaso.png",
       trisim: "Burkinafaso",
       enisim: "Burkinafaso",
       isim: "Burkinafaso",
@@ -1865,7 +1847,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 702
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bosnahersek.png",
+      bayrak: "assets/bayraklar/bosnahersek.png",
       trisim: "Bosnahersek",
       enisim: "Bosniaandherzegovina",
       isim: "Bosnahersek",
@@ -1879,7 +1861,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1197
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/iran.png",
+      bayrak: "assets/bayraklar/iran.png",
       trisim: "Ran",
       enisim: "Iran",
       isim: "Iran",
@@ -1893,7 +1875,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2156
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kuba.png",
+      bayrak: "assets/bayraklar/kuba.png",
       trisim: "Kba",
       enisim: "Cuba",
       isim: "Kuba",
@@ -1907,7 +1889,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1059
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/eritre.png",
+      bayrak: "assets/bayraklar/eritre.png",
       trisim: "Eritre",
       enisim: "Eritrea",
       isim: "Eritre",
@@ -1921,7 +1903,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2447
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/slovakya.png",
+      bayrak: "assets/bayraklar/slovakya.png",
       trisim: "Slovakya",
       enisim: "Slovakia",
       isim: "Slovakya",
@@ -1935,7 +1917,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1366
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/litvanya.png",
+      bayrak: "assets/bayraklar/litvanya.png",
       trisim: "Litvanya",
       enisim: "Lithuania",
       isim: "Litvanya",
@@ -1949,7 +1931,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 151
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saintmartin.png",
+      bayrak: "assets/bayraklar/saintmartin.png",
       trisim: "Saintmartin",
       enisim: "Saintmartin",
       isim: "Saintmartin",
@@ -1963,7 +1945,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/pitcairnadalari.png",
+      bayrak: "assets/bayraklar/pitcairnadalari.png",
       trisim: "Pitcairnadalar",
       enisim: "Pitcairnislands",
       isim: "Pitcairnadalari",
@@ -1977,7 +1959,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 4822
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ginebissau.png",
+      bayrak: "assets/bayraklar/ginebissau.png",
       trisim: "Ginebissau",
       enisim: "Guineabissau",
       isim: "Ginebissau",
@@ -1991,7 +1973,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 519
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/montserrat.png",
+      bayrak: "assets/bayraklar/montserrat.png",
       trisim: "Montserrat",
       enisim: "Montserrat",
       isim: "Montserrat",
@@ -2005,7 +1987,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2440
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/turkiye.png",
+      bayrak: "assets/bayraklar/turkiye.png",
       trisim: "Trkiye",
       enisim: "Turkey",
       isim: "Turkiye",
@@ -2019,7 +2001,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 947
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/filipinler.png",
+      bayrak: "assets/bayraklar/filipinler.png",
       trisim: "Filipinler",
       enisim: "Philippines",
       isim: "Filipinler",
@@ -2033,7 +2015,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1665
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/vanuatu.png",
+      bayrak: "assets/bayraklar/vanuatu.png",
       trisim: "Vanuatu",
       enisim: "Vanuatu",
       isim: "Vanuatu",
@@ -2047,7 +2029,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1682
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bolivya.png",
+      bayrak: "assets/bayraklar/bolivya.png",
       trisim: "Bolivya",
       enisim: "Bolivia",
       isim: "Bolivya",
@@ -2061,7 +2043,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3978
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saintkittsvenevis.png",
+      bayrak: "assets/bayraklar/saintkittsvenevis.png",
       trisim: "Saintkittsvenevis",
       enisim: "Saintkittsandnevis",
       isim: "Saintkittsvenevis",
@@ -2075,7 +2057,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2098
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/romanya.png",
+      bayrak: "assets/bayraklar/romanya.png",
       trisim: "Romanya",
       enisim: "Romania",
       isim: "Romanya",
@@ -2089,7 +2071,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kambocya.png",
+      bayrak: "assets/bayraklar/kambocya.png",
       trisim: "Kamboya",
       enisim: "Cambodia",
       isim: "Kambocya",
@@ -2103,7 +2085,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2613
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/zimbabve.png",
+      bayrak: "assets/bayraklar/zimbabve.png",
       trisim: "Zimbabve",
       enisim: "Zimbabwe",
       isim: "Zimbabve",
@@ -2117,7 +2099,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1548
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/jersey.png",
+      bayrak: "assets/bayraklar/jersey.png",
       trisim: "Jersey",
       enisim: "Jersey",
       isim: "Jersey",
@@ -2131,7 +2113,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2978
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kirgizistan.png",
+      bayrak: "assets/bayraklar/kirgizistan.png",
       trisim: "Krgzistan",
       enisim: "Kyrgyzstan",
       isim: "Kirgizistan",
@@ -2145,7 +2127,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3399
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/karayiphollandasi.png",
+      bayrak: "assets/bayraklar/karayiphollandasi.png",
       trisim: "Karayiphollandas",
       enisim: "Caribbeannetherlands",
       isim: "Karayiphollandasi",
@@ -2159,7 +2141,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2386
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guyana.png",
+      bayrak: "assets/bayraklar/guyana.png",
       trisim: "Guyana",
       enisim: "Guyana",
       isim: "Guyana",
@@ -2173,7 +2155,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1438
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/amerikabirlesikdevletlerikucukdisadalari.png",
+      bayrak: "assets/bayraklar/amerikabirlesikdevletlerikucukdisadalari.png",
       trisim: "Amerikabirleikdevletlerikkdadalar",
       enisim: "Unitedstatesminoroutlyingislands",
       isim: "Amerikabirlesikdevletlerikucukdisadalari",
@@ -2187,7 +2169,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1289
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ermenistan.png",
+      bayrak: "assets/bayraklar/ermenistan.png",
       trisim: "Ermenistan",
       enisim: "Armenia",
       isim: "Ermenistan",
@@ -2201,7 +2183,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 198
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/lubnan.png",
+      bayrak: "assets/bayraklar/lubnan.png",
       trisim: "Lbnan",
       enisim: "Lebanon",
       isim: "Lubnan",
@@ -2215,7 +2197,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1239
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/karadag.png",
+      bayrak: "assets/bayraklar/karadag.png",
       trisim: "Karada",
       enisim: "Montenegro",
       isim: "Karadag",
@@ -2229,7 +2211,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3568
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/gronland.png",
+      bayrak: "assets/bayraklar/gronland.png",
       trisim: "Grnland",
       enisim: "Greenland",
       isim: "Gronland",
@@ -2243,7 +2225,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1104
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/papuayenigine.png",
+      bayrak: "assets/bayraklar/papuayenigine.png",
       trisim: "Papuayenigine",
       enisim: "Papuanewguinea",
       isim: "Papuayenigine",
@@ -2257,7 +2239,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2772
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/zambiya.png",
+      bayrak: "assets/bayraklar/zambiya.png",
       trisim: "Zambiya",
       enisim: "Zambia",
       isim: "Zambiya",
@@ -2271,7 +2253,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1062
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/trinidadvetobago.png",
+      bayrak: "assets/bayraklar/trinidadvetobago.png",
       trisim: "Trinidadvetobago",
       enisim: "Trinidadandtobago",
       isim: "Trinidadvetobago",
@@ -2285,7 +2267,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1236
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fransizguneyveantarktikatopraklari.png",
+      bayrak: "assets/bayraklar/fransizguneyveantarktikatopraklari.png",
       trisim: "Franszgneyveantarktikatopraklar",
       enisim: "Frenchsouthernandantarcticlands",
       isim: "Fransizguneyveantarktikatopraklari",
@@ -2299,7 +2281,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1257
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/peru.png",
+      bayrak: "assets/bayraklar/peru.png",
       trisim: "Peru",
       enisim: "Peru",
       isim: "Peru",
@@ -2313,7 +2295,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 172
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/isvec.png",
+      bayrak: "assets/bayraklar/isvec.png",
       trisim: "Sve",
       enisim: "Sweden",
       isim: "Isvec",
@@ -2327,7 +2309,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 142
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sudan.png",
+      bayrak: "assets/bayraklar/sudan.png",
       trisim: "Sudan",
       enisim: "Sudan",
       isim: "Sudan",
@@ -2341,7 +2323,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 744
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/saintpierrevemiquelon.png",
+      bayrak: "assets/bayraklar/saintpierrevemiquelon.png",
       trisim: "Saintpierrevemiquelon",
       enisim: "Saintpierreandmiquelon",
       isim: "Saintpierrevemiquelon",
@@ -2355,7 +2337,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 14300
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/umman.png",
+      bayrak: "assets/bayraklar/umman.png",
       trisim: "Umman",
       enisim: "Oman",
       isim: "Umman",
@@ -2369,7 +2351,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 789
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/hindistan.png",
+      bayrak: "assets/bayraklar/hindistan.png",
       trisim: "Hindistan",
       enisim: "India",
       isim: "Hindistan",
@@ -2383,7 +2365,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1254
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tayvan.png",
+      bayrak: "assets/bayraklar/tayvan.png",
       trisim: "Tayvan",
       enisim: "Taiwan",
       isim: "Tayvan",
@@ -2397,7 +2379,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1352
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/mogolistan.png",
+      bayrak: "assets/bayraklar/mogolistan.png",
       trisim: "Moolistan",
       enisim: "Mongolia",
       isim: "Mogolistan",
@@ -2411,7 +2393,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 796
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/senegal.png",
+      bayrak: "assets/bayraklar/senegal.png",
       trisim: "Senegal",
       enisim: "Senegal",
       isim: "Senegal",
@@ -2425,7 +2407,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 681
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tanzanya.png",
+      bayrak: "assets/bayraklar/tanzanya.png",
       trisim: "Tanzanya",
       enisim: "Tanzania",
       isim: "Tanzanya",
@@ -2439,7 +2421,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1191
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kanada.png",
+      bayrak: "assets/bayraklar/kanada.png",
       trisim: "Kanada",
       enisim: "Canada",
       isim: "Kanada",
@@ -2453,7 +2435,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1317
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kostarika.png",
+      bayrak: "assets/bayraklar/kostarika.png",
       trisim: "Kostarika",
       enisim: "Costarica",
       isim: "Kostarika",
@@ -2467,7 +2449,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1665
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cin.png",
+      bayrak: "assets/bayraklar/cin.png",
       trisim: "In",
       enisim: "China",
       isim: "Cin",
@@ -2481,7 +2463,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 955
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kolombiya.png",
+      bayrak: "assets/bayraklar/kolombiya.png",
       trisim: "Kolombiya",
       enisim: "Colombia",
       isim: "Kolombiya",
@@ -2495,7 +2477,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 231
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/myanmar.png",
+      bayrak: "assets/bayraklar/myanmar.png",
       trisim: "Myanmar",
       enisim: "Myanmar",
       isim: "Myanmar",
@@ -2509,7 +2491,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1315
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/rusya.png",
+      bayrak: "assets/bayraklar/rusya.png",
       trisim: "Rusya",
       enisim: "Russia",
       isim: "Rusya",
@@ -2523,7 +2505,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 153
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kuzeykore.png",
+      bayrak: "assets/bayraklar/kuzeykore.png",
       trisim: "Kuzeykore",
       enisim: "Northkorea",
       isim: "Kuzeykore",
@@ -2537,7 +2519,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1133
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/caymanadalari.png",
+      bayrak: "assets/bayraklar/caymanadalari.png",
       trisim: "Caymanadalar",
       enisim: "Caymanislands",
       isim: "Caymanadalari",
@@ -2551,7 +2533,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 4625
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bouvetadasi.png",
+      bayrak: "assets/bayraklar/bouvetadasi.png",
       trisim: "Bouvetadas",
       enisim: "Bouvetisland",
       isim: "Bouvetadasi",
@@ -2565,7 +2547,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 323
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/belarus.png",
+      bayrak: "assets/bayraklar/belarus.png",
       trisim: "Belarus",
       enisim: "Belarus",
       isim: "Belarus",
@@ -2579,7 +2561,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1717
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/portekiz.png",
+      bayrak: "assets/bayraklar/portekiz.png",
       trisim: "Portekiz",
       enisim: "Portugal",
       isim: "Portekiz",
@@ -2593,7 +2575,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 4980
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/esvatini.png",
+      bayrak: "assets/bayraklar/esvatini.png",
       trisim: "Esvatini",
       enisim: "Eswatini",
       isim: "Esvatini",
@@ -2607,7 +2589,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2803
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/polonya.png",
+      bayrak: "assets/bayraklar/polonya.png",
       trisim: "Polonya",
       enisim: "Poland",
       isim: "Polonya",
@@ -2621,7 +2603,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 119
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/isvicre.png",
+      bayrak: "assets/bayraklar/isvicre.png",
       trisim: "Svire",
       enisim: "Switzerland",
       isim: "Isvicre",
@@ -2635,7 +2617,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 154
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kongocumhuriyeti.png",
+      bayrak: "assets/bayraklar/kongocumhuriyeti.png",
       trisim: "Kongocumhuriyeti",
       enisim: "Republicofthecongo",
       isim: "Kongocumhuriyeti",
@@ -2649,7 +2631,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 980
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/venezuela.png",
+      bayrak: "assets/bayraklar/venezuela.png",
       trisim: "Venezuela",
       enisim: "Venezuela",
       isim: "Venezuela",
@@ -2663,7 +2645,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 906
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/panama.png",
+      bayrak: "assets/bayraklar/panama.png",
       trisim: "Panama",
       enisim: "Panama",
       isim: "Panama",
@@ -2677,7 +2659,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1123
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/hollanda.png",
+      bayrak: "assets/bayraklar/hollanda.png",
       trisim: "Hollanda",
       enisim: "Netherlands",
       isim: "Hollanda",
@@ -2691,7 +2673,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 153
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bagimsizsamoadevleti.png",
+      bayrak: "assets/bayraklar/bagimsizsamoadevleti.png",
       trisim: "Bamszsamoadevleti",
       enisim: "Samoa",
       isim: "Bagimsizsamoadevleti",
@@ -2705,7 +2687,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 699
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/danimarka.png",
+      bayrak: "assets/bayraklar/danimarka.png",
       trisim: "Danimarka",
       enisim: "Denmark",
       isim: "Danimarka",
@@ -2719,7 +2701,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 292
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/luksemburg.png",
+      bayrak: "assets/bayraklar/luksemburg.png",
       trisim: "Lksemburg",
       enisim: "Luxembourg",
       isim: "Luksemburg",
@@ -2733,7 +2715,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 151
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/faroeadalari.png",
+      bayrak: "assets/bayraklar/faroeadalari.png",
       trisim: "Faroeadalar",
       enisim: "Faroeislands",
       isim: "Faroeadalari",
@@ -2747,7 +2729,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 321
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/slovenya.png",
+      bayrak: "assets/bayraklar/slovenya.png",
       trisim: "Slovenya",
       enisim: "Slovenia",
       isim: "Slovenya",
@@ -2761,7 +2743,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 930
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/togo.png",
+      bayrak: "assets/bayraklar/togo.png",
       trisim: "Togo",
       enisim: "Togo",
       isim: "Togo",
@@ -2775,7 +2757,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 751
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tayland.png",
+      bayrak: "assets/bayraklar/tayland.png",
       trisim: "Tayland",
       enisim: "Thailand",
       isim: "Tayland",
@@ -2789,7 +2771,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 172
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/wallisvefutunaadalaribolgesi.png",
+      bayrak: "assets/bayraklar/wallisvefutunaadalaribolgesi.png",
       trisim: "Wallisvefutunaadalarblgesi",
       enisim: "Wallisandfutuna",
       isim: "Wallisvefutunaadalaribolgesi",
@@ -2803,7 +2785,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 669
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bahamalar.png",
+      bayrak: "assets/bayraklar/bahamalar.png",
       trisim: "Bahamalar",
       enisim: "Bahamas",
       isim: "Bahamalar",
@@ -2817,7 +2799,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 735
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tonga.png",
+      bayrak: "assets/bayraklar/tonga.png",
       trisim: "Tonga",
       enisim: "Tonga",
       isim: "Tonga",
@@ -2831,7 +2813,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 163
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/yunanistan.png",
+      bayrak: "assets/bayraklar/yunanistan.png",
       trisim: "Yunanistan",
       enisim: "Greece",
       isim: "Yunanistan",
@@ -2845,7 +2827,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 306
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sanmarino.png",
+      bayrak: "assets/bayraklar/sanmarino.png",
       trisim: "Sanmarino",
       enisim: "Sanmarino",
       isim: "Sanmarino",
@@ -2859,7 +2841,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 7872
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/reunion.png",
+      bayrak: "assets/bayraklar/reunion.png",
       trisim: "Reunion",
       enisim: "Reunion",
       isim: "Reunion",
@@ -2873,7 +2855,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2106
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/vatikan.png",
+      bayrak: "assets/bayraklar/vatikan.png",
       trisim: "Vatikan",
       enisim: "Vaticancity",
       isim: "Vatikan",
@@ -2887,7 +2869,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 7956
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/burundi.png",
+      bayrak: "assets/bayraklar/burundi.png",
       trisim: "Burundi",
       enisim: "Burundi",
       isim: "Burundi",
@@ -2901,7 +2883,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1841
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bahreyn.png",
+      bayrak: "assets/bayraklar/bahreyn.png",
       trisim: "Bahreyn",
       enisim: "Bahrain",
       isim: "Bahreyn",
@@ -2915,7 +2897,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 827
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/marshalladalari.png",
+      bayrak: "assets/bayraklar/marshalladalari.png",
       trisim: "Marshalladalar",
       enisim: "Marshallislands",
       isim: "Marshalladalari",
@@ -2929,7 +2911,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2699
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/turksvecaicosadalari.png",
+      bayrak: "assets/bayraklar/turksvecaicosadalari.png",
       trisim: "Turksvecaicosadalar",
       enisim: "Turksandcaicosislands",
       isim: "Turksvecaicosadalari",
@@ -2943,7 +2925,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2293
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/manadasi.png",
+      bayrak: "assets/bayraklar/manadasi.png",
       trisim: "Manadas",
       enisim: "Isleofman",
       isim: "Manadasi",
@@ -2957,7 +2939,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2201
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/haiti.png",
+      bayrak: "assets/bayraklar/haiti.png",
       trisim: "Haiti",
       enisim: "Haiti",
       isim: "Haiti",
@@ -2971,7 +2953,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1972
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/afganistan.png",
+      bayrak: "assets/bayraklar/afganistan.png",
       trisim: "Afganistan",
       enisim: "Afghanistan",
       isim: "Afganistan",
@@ -2985,7 +2967,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 8285
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/israil.png",
+      bayrak: "assets/bayraklar/israil.png",
       trisim: "Srail",
       enisim: "Israel",
       isim: "Israil",
@@ -2999,7 +2981,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 893
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/libya.png",
+      bayrak: "assets/bayraklar/libya.png",
       trisim: "Libya",
       enisim: "Libya",
       isim: "Libya",
@@ -3013,7 +2995,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 579
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/uruguay.png",
+      bayrak: "assets/bayraklar/uruguay.png",
       trisim: "Uruguay",
       enisim: "Uruguay",
       isim: "Uruguay",
@@ -3027,7 +3009,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2392
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/norfolkadasi.png",
+      bayrak: "assets/bayraklar/norfolkadasi.png",
       trisim: "Norfolkadas",
       enisim: "Norfolkisland",
       isim: "Norfolkadasi",
@@ -3041,7 +3023,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2349
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/nikaragua.png",
+      bayrak: "assets/bayraklar/nikaragua.png",
       trisim: "Nikaragua",
       enisim: "Nicaragua",
       isim: "Nikaragua",
@@ -3055,7 +3037,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1481
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cookadalari.png",
+      bayrak: "assets/bayraklar/cookadalari.png",
       trisim: "Cookadalar",
       enisim: "Cookislands",
       isim: "Cookadalari",
@@ -3069,7 +3051,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2699
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/laos.png",
+      bayrak: "assets/bayraklar/laos.png",
       trisim: "Laos",
       enisim: "Laos",
       isim: "Laos",
@@ -3083,7 +3065,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 666
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/christmasadasi.png",
+      bayrak: "assets/bayraklar/christmasadasi.png",
       trisim: "Christmasadas",
       enisim: "Christmasisland",
       isim: "Christmasadasi",
@@ -3097,7 +3079,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2256
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sainthelena.png",
+      bayrak: "assets/bayraklar/sainthelena.png",
       trisim: "Sainthelena",
       enisim: "Sainthelenaascensionandtristandacunha",
       isim: "Sainthelena",
@@ -3111,7 +3093,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2484
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/anguilla.png",
+      bayrak: "assets/bayraklar/anguilla.png",
       trisim: "Anguilla",
       enisim: "Anguilla",
       isim: "Anguilla",
@@ -3125,7 +3107,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1929
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/mikronezya.png",
+      bayrak: "assets/bayraklar/mikronezya.png",
       trisim: "Mikronezya",
       enisim: "Micronesia",
       isim: "Mikronezya",
@@ -3139,7 +3121,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 676
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/almanya.png",
+      bayrak: "assets/bayraklar/almanya.png",
       trisim: "Almanya",
       enisim: "Germany",
       isim: "Almanya",
@@ -3153,7 +3135,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 151
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guam.png",
+      bayrak: "assets/bayraklar/guam.png",
       trisim: "Guam",
       enisim: "Guam",
       isim: "Guam",
@@ -3167,7 +3149,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2205
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/kiribati.png",
+      bayrak: "assets/bayraklar/kiribati.png",
       trisim: "Kiribati",
       enisim: "Kiribati",
       isim: "Kiribati",
@@ -3181,7 +3163,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3872
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sintmaarten.png",
+      bayrak: "assets/bayraklar/sintmaarten.png",
       trisim: "Sintmaarten",
       enisim: "Sintmaarten",
       isim: "Sintmaarten",
@@ -3195,7 +3177,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3972
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ispanya.png",
+      bayrak: "assets/bayraklar/ispanya.png",
       trisim: "Spanya",
       enisim: "Spain",
       isim: "Ispanya",
@@ -3209,7 +3191,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3623
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/jamaika.png",
+      bayrak: "assets/bayraklar/jamaika.png",
       trisim: "Jamaika",
       enisim: "Jamaica",
       isim: "Jamaika",
@@ -3223,7 +3205,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 972
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/filistin.png",
+      bayrak: "assets/bayraklar/filistin.png",
       trisim: "Filistin",
       enisim: "Palestine",
       isim: "Filistin",
@@ -3237,7 +3219,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 689
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fransizguyanasi.png",
+      bayrak: "assets/bayraklar/fransizguyanasi.png",
       trisim: "Franszguyanas",
       enisim: "Frenchguiana",
       isim: "Fransizguyanasi",
@@ -3251,7 +3233,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1316
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/andorra.png",
+      bayrak: "assets/bayraklar/andorra.png",
       trisim: "Andorra",
       enisim: "Andorra",
       isim: "Andorra",
@@ -3265,7 +3247,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3895
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sili.png",
+      bayrak: "assets/bayraklar/sili.png",
       trisim: "Ili",
       enisim: "Chile",
       isim: "Sili",
@@ -3279,7 +3261,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 578
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/lesotho.png",
+      bayrak: "assets/bayraklar/lesotho.png",
       trisim: "Lesotho",
       enisim: "Lesotho",
       isim: "Lesotho",
@@ -3293,7 +3275,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1065
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/avustralya.png",
+      bayrak: "assets/bayraklar/avustralya.png",
       trisim: "Avustralya",
       enisim: "Australia",
       isim: "Avustralya",
@@ -3307,7 +3289,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1618
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/grenada.png",
+      bayrak: "assets/bayraklar/grenada.png",
       trisim: "Grenada",
       enisim: "Grenada",
       isim: "Grenada",
@@ -3321,7 +3303,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1950
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/gana.png",
+      bayrak: "assets/bayraklar/gana.png",
       trisim: "Gana",
       enisim: "Ghana",
       isim: "Gana",
@@ -3335,7 +3317,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 639
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/seyseller.png",
+      bayrak: "assets/bayraklar/seyseller.png",
       trisim: "Seyeller",
       enisim: "Seychelles",
       isim: "Seyseller",
@@ -3349,7 +3331,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1411
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/angola.png",
+      bayrak: "assets/bayraklar/angola.png",
       trisim: "Angola",
       enisim: "Angola",
       isim: "Angola",
@@ -3363,7 +3345,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1581
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/bermuda.png",
+      bayrak: "assets/bayraklar/bermuda.png",
       trisim: "Bermuda",
       enisim: "Bermuda",
       isim: "Bermuda",
@@ -3377,7 +3359,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3942
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/pakistan.png",
+      bayrak: "assets/bayraklar/pakistan.png",
       trisim: "Pakistan",
       enisim: "Pakistan",
       isim: "Pakistan",
@@ -3391,7 +3373,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1281
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/mali.png",
+      bayrak: "assets/bayraklar/mali.png",
       trisim: "Mali",
       enisim: "Mali",
       isim: "Mali",
@@ -3405,7 +3387,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/suudiarabistan.png",
+      bayrak: "assets/bayraklar/suudiarabistan.png",
       trisim: "Suudiarabistan",
       enisim: "Saudiarabia",
       isim: "Suudiarabistan",
@@ -3419,7 +3401,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 3003
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/curacao.png",
+      bayrak: "assets/bayraklar/curacao.png",
       trisim: "Curaao",
       enisim: "Curaao",
       isim: "Curacao",
@@ -3433,7 +3415,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 643
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guneykore.png",
+      bayrak: "assets/bayraklar/guneykore.png",
       trisim: "Gneykore",
       enisim: "Southkorea",
       isim: "Guneykore",
@@ -3447,7 +3429,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2667
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/etiyopya.png",
+      bayrak: "assets/bayraklar/etiyopya.png",
       trisim: "Etiyopya",
       enisim: "Ethiopia",
       isim: "Etiyopya",
@@ -3461,7 +3443,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1887
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/guadeloupe.png",
+      bayrak: "assets/bayraklar/guadeloupe.png",
       trisim: "Guadeloupe",
       enisim: "Guadeloupe",
       isim: "Guadeloupe",
@@ -3475,7 +3457,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 5294
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/banglades.png",
+      bayrak: "assets/bayraklar/banglades.png",
       trisim: "Banglade",
       enisim: "Bangladesh",
       isim: "Banglades",
@@ -3489,7 +3471,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 807
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/yenizelanda.png",
+      bayrak: "assets/bayraklar/yenizelanda.png",
       trisim: "Yenizelanda",
       enisim: "Newzealand",
       isim: "Yenizelanda",
@@ -3503,7 +3485,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1564
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/komorlar.png",
+      bayrak: "assets/bayraklar/komorlar.png",
       trisim: "Komorlar",
       enisim: "Comoros",
       isim: "Komorlar",
@@ -3517,7 +3499,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1587
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/belize.png",
+      bayrak: "assets/bayraklar/belize.png",
       trisim: "Belize",
       enisim: "Belize",
       isim: "Belize",
@@ -3531,7 +3513,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 6797
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/uganda.png",
+      bayrak: "assets/bayraklar/uganda.png",
       trisim: "Uganda",
       enisim: "Uganda",
       isim: "Uganda",
@@ -3545,7 +3527,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1457
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/singapur.png",
+      bayrak: "assets/bayraklar/singapur.png",
       trisim: "Singapur",
       enisim: "Singapore",
       isim: "Singapur",
@@ -3559,7 +3541,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 974
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/lihtenstayn.png",
+      bayrak: "assets/bayraklar/lihtenstayn.png",
       trisim: "Lihtentayn",
       enisim: "Liechtenstein",
       isim: "Lihtenstayn",
@@ -3573,7 +3555,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1336
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/macaristan.png",
+      bayrak: "assets/bayraklar/macaristan.png",
       trisim: "Macaristan",
       enisim: "Hungary",
       isim: "Macaristan",
@@ -3587,7 +3569,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 199
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/izlanda.png",
+      bayrak: "assets/bayraklar/izlanda.png",
       trisim: "Zlanda",
       enisim: "Iceland",
       isim: "Izlanda",
@@ -3601,7 +3583,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 330
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/tacikistan.png",
+      bayrak: "assets/bayraklar/tacikistan.png",
       trisim: "Tacikistan",
       enisim: "Tajikistan",
       isim: "Tacikistan",
@@ -3615,7 +3597,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 874
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/namibya.png",
+      bayrak: "assets/bayraklar/namibya.png",
       trisim: "Namibya",
       enisim: "Namibia",
       isim: "Namibya",
@@ -3629,7 +3611,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1896
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/dogutimor.png",
+      bayrak: "assets/bayraklar/dogutimor.png",
       trisim: "Doutimor",
       enisim: "Timorleste",
       isim: "Dogutimor",
@@ -3643,7 +3625,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1305
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/misir.png",
+      bayrak: "assets/bayraklar/misir.png",
       trisim: "Msr",
       enisim: "Egypt",
       isim: "Misir",
@@ -3657,7 +3639,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1198
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/sirbistan.png",
+      bayrak: "assets/bayraklar/sirbistan.png",
       trisim: "Srbistan",
       enisim: "Serbia",
       isim: "Sirbistan",
@@ -3671,7 +3653,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 6204
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/mauritius.png",
+      bayrak: "assets/bayraklar/mauritius.png",
       trisim: "Mauritius",
       enisim: "Mauritius",
       isim: "Mauritius",
@@ -3685,7 +3667,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 245
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/makao.png",
+      bayrak: "assets/bayraklar/makao.png",
       trisim: "Makao",
       enisim: "Macau",
       isim: "Makao",
@@ -3699,7 +3681,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2255
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/fransizpolinezyasi.png",
+      bayrak: "assets/bayraklar/fransizpolinezyasi.png",
       trisim: "Franszpolinezyas",
       enisim: "Frenchpolynesia",
       isim: "Fransizpolinezyasi",
@@ -3713,7 +3695,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 2561
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/maldivler.png",
+      bayrak: "assets/bayraklar/maldivler.png",
       trisim: "Maldivler",
       enisim: "Maldives",
       isim: "Maldivler",
@@ -3727,7 +3709,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 704
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/endonezya.png",
+      bayrak: "assets/bayraklar/endonezya.png",
       trisim: "Endonezya",
       enisim: "Indonesia",
       isim: "Endonezya",
@@ -3741,7 +3723,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 146
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/demokratikkongocumhuriyeti.png",
+      bayrak: "assets/bayraklar/demokratikkongocumhuriyeti.png",
       trisim: "Demokratikkongocumhuriyeti",
       enisim: "Drcongo",
       isim: "Demokratikkongocumhuriyeti",
@@ -3755,7 +3737,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1486
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/estonya.png",
+      bayrak: "assets/bayraklar/estonya.png",
       trisim: "Estonya",
       enisim: "Estonia",
       isim: "Estonya",
@@ -3769,7 +3751,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 153
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/vietnam.png",
+      bayrak: "assets/bayraklar/vietnam.png",
       trisim: "Vietnam",
       enisim: "Vietnam",
       isim: "Vietnam",
@@ -3783,7 +3765,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 913
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/italya.png",
+      bayrak: "assets/bayraklar/italya.png",
       trisim: "Talya",
       enisim: "Italy",
       isim: "Italya",
@@ -3797,7 +3779,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/gine.png",
+      bayrak: "assets/bayraklar/gine.png",
       trisim: "Gine",
       enisim: "Guinea",
       isim: "Gine",
@@ -3811,7 +3793,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/cad.png",
+      bayrak: "assets/bayraklar/cad.png",
       trisim: "Ad",
       enisim: "Chad",
       isim: "Cad",
@@ -3825,7 +3807,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 253
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/ekvador.png",
+      bayrak: "assets/bayraklar/ekvador.png",
       trisim: "Ekvador",
       enisim: "Ecuador",
       isim: "Ekvador",
@@ -3839,7 +3821,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 5052
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/gurcistan.png",
+      bayrak: "assets/bayraklar/gurcistan.png",
       trisim: "Grcistan",
       enisim: "Georgia",
       isim: "Gurcistan",
@@ -3853,7 +3835,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1046
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/malavi.png",
+      bayrak: "assets/bayraklar/malavi.png",
       trisim: "Malavi",
       enisim: "Malawi",
       isim: "Malavi",
@@ -3867,7 +3849,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1467
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/irak.png",
+      bayrak: "assets/bayraklar/irak.png",
       trisim: "Irak",
       enisim: "Iraq",
       isim: "Irak",
@@ -3881,7 +3863,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 789
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/svalbardvejanmayen.png",
+      bayrak: "assets/bayraklar/svalbardvejanmayen.png",
       trisim: "Svalbardvejanmayen",
       enisim: "Svalbardandjanmayen",
       isim: "Svalbardvejanmayen",
@@ -3895,7 +3877,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 323
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/benin.png",
+      bayrak: "assets/bayraklar/benin.png",
       trisim: "Benin",
       enisim: "Benin",
       isim: "Benin",
@@ -3909,7 +3891,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 176
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/japonya.png",
+      bayrak: "assets/bayraklar/japonya.png",
       trisim: "Japonya",
       enisim: "Japan",
       isim: "Japonya",
@@ -3923,7 +3905,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 932
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/dominikcumhuriyeti.png",
+      bayrak: "assets/bayraklar/dominikcumhuriyeti.png",
       trisim: "Dominikcumhuriyeti",
       enisim: "Dominicanrepublic",
       isim: "Dominikcumhuriyeti",
@@ -3937,7 +3919,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 1658
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/katar.png",
+      bayrak: "assets/bayraklar/katar.png",
       trisim: "Katar",
       enisim: "Qatar",
       isim: "Katar",
@@ -3951,7 +3933,7 @@ List<Ulkeler> ulke = [
       dosyaboyut: 336
   ),
   Ulkeler(
-      bayrak: "dosyalar/bayraklar/gabon.png",
+      bayrak: "assets/bayraklar/gabon.png",
       trisim: "Gabon",
       enisim: "Gabon",
       isim: "Gabon",

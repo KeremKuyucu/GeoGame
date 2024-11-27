@@ -87,6 +87,8 @@ class _BaskentOyunState extends State<BaskentOyun> {
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
+        _controller.clear();
+        _currentInput='';
         baskentyanlis++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

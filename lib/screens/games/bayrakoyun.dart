@@ -86,6 +86,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
+        _controller.clear();
+        _currentInput='';
         bayrakyanlis++;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

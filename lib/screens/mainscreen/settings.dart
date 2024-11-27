@@ -95,12 +95,13 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(Yazi.get('ayarlarlist')),
         centerTitle: true,
         leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
+          builder: (context) =>
+              IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
         ),
       ),
       drawer: DrawerWidget(),
@@ -151,7 +152,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
               ),
-              _buildSectionTitle(Yazi.get('ayarlarlist12')),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  Yazi.get('ayarlarlist12'),
+                  style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                ),
+              ),
               buildSwitch(Yazi.get('ayarlarlist8'), yazmamodu, (value) {
                 setState(() {
                   yazmamodu = value;
@@ -215,14 +222,23 @@ class _SettingsPageState extends State<SettingsPage> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('If there is a translation error,'),
-                      Text('please report the error.'),
-                      Text('The translations are machine translations.'),
+                      Text('If there is a translation error,',
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      Text('please report the error.',
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      Text('The translations are machine translations.',
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ],
               ),
-              _buildSectionTitle(Yazi.get('ayarlarlist13')),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  Yazi.get('ayarlarlist13'),
+                  style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+                ),
+              ),
               buildSwitch(Yazi.get('ayarlarlist1'), amerikakitasi, (value) {
                 setState(() {
                   amerikakitasi = value;
@@ -289,34 +305,49 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
+}
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Text(
-        title,
-        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget buildSwitch(String title, bool currentValue,
-      ValueChanged<bool> onChanged) {
+Widget buildSwitch(String title, bool currentValue,
+    ValueChanged<bool> onChanged) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: TextStyle(fontSize: 16.0)),
+        Switch(
+          value: currentValue,
+          onChanged: onChanged,
+          activeColor: Colors.green,
+          inactiveTrackColor: Colors.grey,
+          inactiveThumbColor: Colors.red,
+        ),
+      ],
+    ),
+  );
+}
+  Widget buildSwitchRow(List<String> titles, List<bool> values, List<ValueChanged<bool>> onChangedList) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: TextStyle(fontSize: 16.0)),
-          Switch(
-            value: currentValue,
-            onChanged: onChanged,
-            activeColor: Colors.green,
-            inactiveTrackColor: Colors.grey,
-            inactiveThumbColor: Colors.red,
-          ),
-        ],
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Switch'ler arasında eşit boşluk bırakır
+        children: List.generate(titles.length, (index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0), // Aralarına yatay boşluk ekler
+            child: Row(
+              children: [
+                Text(titles[index], style: TextStyle(fontSize: 16.0)),
+                Switch(
+                  value: values[index],
+                  onChanged: onChangedList[index],
+                  activeColor: Colors.green,
+                  inactiveTrackColor: Colors.grey,
+                  inactiveThumbColor: Colors.red,
+                ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
-}
