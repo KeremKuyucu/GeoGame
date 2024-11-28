@@ -34,7 +34,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     await dilDegistir();
     await readFromFile((update) => setState(update));
     await surumkiyasla();
-    yeniulkesec();
     istatistik(context);
   }
   Future<void> dilDegistir() async {
@@ -140,56 +139,14 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     }
   }
   Future<void> istatistik(BuildContext context) async {
-    name = await getNameFromFile();
     if (name.isEmpty) {
-      await isimgirbox(context);
-      await getNameFromFile();
-      sendNewUserNotification(name);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SettingsPage()),
+      );
     } else {
       postLeadboard();
     }
-  }
-  Future<void> isimgirbox(BuildContext context) async {
-    final TextEditingController nameController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(Yazi.get('isimsorma1')),
-          content: TextField(
-            controller: nameController,
-            decoration: InputDecoration(hintText: Yazi.get('isimsorma2')),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(Yazi.get('isimsorma3')),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text(Yazi.get('isimsorma4')),
-              onPressed: () {
-                String name = nameController.text;
-                Navigator.of(context).pop();
-                if (name.isNotEmpty) {
-                  saveNameToFile(name);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${Yazi.get('isimsorma5')} $name'),
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(Yazi.get('isimsorma6'))),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
   void _selectOption(int index) async {
     setState(() {
@@ -213,33 +170,43 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         context,
         MaterialPageRoute(builder: (context) => MesafeOyun()),
       );
+    } else if (getSelectableCountryCount() < 1) {
+      Yenitur();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SettingsPage()),
+      );
     }
   }
   void _selectIndex(int index) async {
     setState(() {
       selectedIndex = index;
     });
-    if (selectedIndex == 0 && getSelectableCountryCount() > 0) {
-      //zaten aynı sayfa
-    } else if (selectedIndex == 1 && getSelectableCountryCount() > 0) {
+    if (selectedIndex == 0) {
+      Yenitur();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => GeoGameLobi()),
+      );
+    } else if (selectedIndex == 1) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2 || getSelectableCountryCount() == 0) {
+    } else if (selectedIndex == 2) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Ulkelerlist()),
       );
-    } else if (selectedIndex == 3 || getSelectableCountryCount() == 0) {
+    } else if (selectedIndex == 3) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4 && getSelectableCountryCount() > 0) {
+    } else if (selectedIndex == 4 ) {
       Yenitur();
       Navigator.pushReplacement(
         context,

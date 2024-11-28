@@ -140,10 +140,9 @@ class DrawerWidget extends StatelessWidget {
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
 final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
-String name = "", secilenDil='Türkçe';
-String apiserver = "";
+String name = "", secilenDil='Türkçe', apiserver = "";
 List<dynamic> users = [];
-final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer(), arkafon = AudioPlayer();
+final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
   try {
     if (player.playing) {
@@ -167,8 +166,6 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
 Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/dogru.mp3');}
 Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yanlis.mp3');}
 Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yenitur.mp3');}
-Future<void> Arkafon() async {  await playAudioFromAssetOrUrl( arkafon, 'assets/sesler/arkafon.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/arkafon.mp3'); arkafon.setLoopMode(LoopMode.one);}
-Future<void> Arkafondurdur() async { await arkafon.stop(); }
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
   int butonRandomNumber = random.nextInt(4);
@@ -235,6 +232,7 @@ Future<void> readFromFile(Function updateState) async {
       bmuyeligi = jsonData['bmuyeligi'] == true;
       yazmamodu = jsonData['yazmamodu'] == true;
       darktema = jsonData['darktema'] == true;
+      name = jsonData['name'];
       secilenDil = jsonData['secilenDil'];
       toplampuan = jsonData['toplampuan']?? 0;
       mesafedogru = jsonData['mesafedogru'] ?? 0;
@@ -267,6 +265,7 @@ Future<void> writeToFile() async {
     'bmuyeligi': bmuyeligi,
     'yazmamodu': yazmamodu,
     'darktema': darktema,
+    'name': name,
     'secilenDil': secilenDil,
     'toplampuan': toplampuan,
     'mesafedogru': mesafedogru,
@@ -308,33 +307,7 @@ Future<String> getCountry() async {
     throw Exception('Hata oluştu: $e');
   }
 }
-Future<String> getNameFromFile() async {
-  try {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/assets/name.json');
-    if (!await file.exists()) return "";
-
-    final content = await file.readAsString();
-    final data = json.decode(content);
-    return data['isim'];
-  } catch (e) {
-    print('Error reading name: $e');
-    return "";
-  }
-}
-Future<void> saveNameToFile(String name) async {
-  try {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/assets/name.json');
-    final data = {'isim': name};
-
-    await file.create(recursive: true);
-    await file.writeAsString(json.encode(data));
-  } catch (e) {
-    print('Error saving name: $e');
-  }
-}
-Future<void> sendNewUserNotification(String name) async {
+Future<void> sendNewUserNotification(String oyuncuName) async {
   try {
     final targetUrl = '${apiserver}/newuser';
     // Mesajı gönder
@@ -342,14 +315,33 @@ Future<void> sendNewUserNotification(String name) async {
       Uri.parse(targetUrl),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'message': 'Yeni kullanıcı kaydedildi!\nİsmi: $name',
+        'message': 'Yeni kullanıcı kaydedildi!\nİsmi: $oyuncuName',
       }),
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
       print('Yeni kullanıcı bildirimi başarıyla gönderildi!');
-      // Dosyayı 'true' olarak yaz
-      print('Dosya başarıyla yazıldı');
+    } else {
+      print('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Hata: $e');
+  }
+}
+Future<void> nameChangeNotification(String eskiname,String yeniname) async {
+  try {
+    final targetUrl = '${apiserver}/changename';
+    // Mesajı gönder
+    final response = await http.post(
+      Uri.parse(targetUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'message': 'Bir kullanıcı ismini değiştirdi:\n Eski ismi: $eskiname \n Yeni ismi: $yeniname',
+      }),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      print('Yeni kullanıcı bildirimi başarıyla gönderildi!');
     } else {
       print('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
     }
@@ -359,7 +351,6 @@ Future<void> sendNewUserNotification(String name) async {
 }
 Future<void> postLeadboard() async {
   try {
-    String name = await getNameFromFile();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');

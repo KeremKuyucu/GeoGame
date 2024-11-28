@@ -32,27 +32,31 @@ class _UlkelerlistState extends State<Ulkelerlist> {
     setState(() {
       selectedIndex = index;
     });
-    if (selectedIndex == 0 && getSelectableCountryCount() > 0) {
+    if (selectedIndex == 0) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
-    } else if (selectedIndex == 1 && getSelectableCountryCount() > 0) {
+    } else if (selectedIndex == 1) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2 || getSelectableCountryCount() == 0) {
-      //aynı sayfa
-    } else if (selectedIndex == 3 || getSelectableCountryCount() == 0) {
+    } else if (selectedIndex == 2) {
+      Yenitur();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Ulkelerlist()),
+      );
+    } else if (selectedIndex == 3) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4 && getSelectableCountryCount() > 0) {
+    } else if (selectedIndex == 4) {
       Yenitur();
       Navigator.pushReplacement(
         context,

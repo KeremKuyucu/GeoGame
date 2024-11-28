@@ -6,15 +6,16 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _controller = TextEditingController(text: name);
     readFromFile((update) => setState(update));
-    if (false == (amerikakitasi || asyakitasi || afrikakitasi || avrupakitasi ||
-        okyanusyakitasi || antartikakitasi)) {
+    if (getSelectableCountryCount() < 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showMyDialog();
+        _kitaUyari();
       });
     }
   }
@@ -34,20 +35,25 @@ class _SettingsPageState extends State<SettingsPage> {
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2 || getSelectableCountryCount() == 0) {
+    } else if (selectedIndex == 2 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Ulkelerlist()),
       );
-    } else if (selectedIndex == 3 || getSelectableCountryCount() == 0) {
+    } else if (selectedIndex == 3 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4 && getSelectableCountryCount() > 0) {
-      // aynı sayfa bişey yapma
+    } else if (selectedIndex == 4 || getSelectableCountryCount() < 1) {
+      selectedIndex == 4;
+      Yenitur();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SettingsPage()),
+      );
     }
   }
   void restartApp() {
@@ -58,26 +64,25 @@ class _SettingsPageState extends State<SettingsPage> {
       MaterialPageRoute(builder: (context) => GeoGameLobi()),
     );
   }
-  Future<void> _showMyDialog() async {
+  Future<void> _kitaUyari() async {
     Yazi.loadDil(secilenDil);
-    print(Yazi.get('kitauyari'));
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Yazi.get('kitauyari')),
+          title: Text(Yazi.get('kitayari')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Yazi.get('kitauyari1')),
-                Text(Yazi.get('kitauyari2')),
+                Text(Yazi.get('kitayari1')),
+                Text(Yazi.get('kitayari2')),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('kitauyari3')),
+              child: Text(Yazi.get('kitayari3')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -114,67 +119,84 @@ class _SettingsPageState extends State<SettingsPage> {
                 margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 elevation: 10.0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0), // Daha yuvarlak köşeler
+                  borderRadius: BorderRadius.circular(20.0),
                 ),
-                shadowColor: Colors.black.withOpacity(0.2), // Daha yumuşak gölge
-                color: Colors.grey.shade900, // Koyu arka plan rengi
+                shadowColor: Colors.black.withOpacity(0.2),
+                color: Colors.grey.shade900,
                 child: Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.0), // Container köşelerini yuvarlamak
+                    borderRadius: BorderRadius.circular(20.0),
                     gradient: LinearGradient(
-                      colors: [Colors.grey.shade800, Colors.black], // Hafif geçişli renkler
+                      colors: [Colors.grey.shade800, Colors.black],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                   ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            Yazi.get('ayarlarlist10'),
-                            style: TextStyle(
-                              fontSize: 18.0, // Daha büyük font
-                              fontWeight: FontWeight.bold, // Kalın yazı tipi
-                              color: Colors.white,
-                            ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        Yazi.get('isimsorma1'),
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Divider(
+                        color: Colors.white.withOpacity(0.5),
+                      ),
+                      SizedBox(height: 8.0),
+                      // TextField ile kullanıcıya değer girişi yaptırıyoruz
+                      TextField(
+                        controller: _controller,
+                        style: TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: Yazi.get('isimsorma6'),
+                          hintStyle: TextStyle(color: Colors.white70),
+                          filled: true,
+                          fillColor: Colors.grey.shade800,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
                           ),
-                          SizedBox(height: 8.0), // Metin ile alt kısmı arasına boşluk ekleyin
-                          Divider(
-                            color: Colors.white.withOpacity(0.5), // Şeffaf beyaz bir çizgi
-                          ),
-                          // Eğer alt öğeler ekleyecekseniz, buraya ekleyebilirsiniz
-                        ],
-                      );
-                    },
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                          });
+                        },
+                      ),
+                      SizedBox(height: 16.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            nameChangeNotification(name, _controller.text);
+                            if (name.isEmpty)
+                              sendNewUserNotification(_controller.text);
+                            writeToFile();
+                            name = _controller.text;
+                          });
+                          dogru.play();
+                        },
+                        child: Text(Yazi.get('isimsorma4')),
+                      ),
+                    ],
                   ),
                 ),
-              ),
+              ), // isim sorma
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Text(
                   Yazi.get('ayarlarlist12'),
                   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
                 ),
-              ),
+              ), // baslık
               buildSwitch(Yazi.get('ayarlarlist8'), yazmamodu, (value) {
                 setState(() {
                   yazmamodu = value;
                   writeToFile();
-                });
-              }),
-              buildSwitch(
-                  Yazi.get('ayarlarlist9'), backgroundMusicPlaying, (value) {
-                setState(() {
-                  if (backgroundMusicPlaying) {
-                    Arkafondurdur();
-                    backgroundMusicPlaying = !backgroundMusicPlaying;
-                  } else {
-                    Arkafon();
-                    backgroundMusicPlaying = !backgroundMusicPlaying;
-                  }
                 });
               }),
               buildSwitch(Yazi.get('ayarlarlist14')+(darktema ? 'Dark': 'Light'), darktema, (value) {
@@ -215,7 +237,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                 ],
-              ),
+              ), // dil değiştirme
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -231,14 +253,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   ),
                 ],
-              ),
+              ), //makine çeviri uyarı
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Text(
                   Yazi.get('ayarlarlist13'),
                   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
                 ),
-              ),
+              ),// baslık
               buildSwitch(Yazi.get('ayarlarlist1'), amerikakitasi, (value) {
                 setState(() {
                   amerikakitasi = value;
@@ -297,7 +319,8 @@ class _SettingsPageState extends State<SettingsPage> {
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) {
           setState(() {
-            selectedIndex = index;
+            if (getSelectableCountryCount() > 0)
+              selectedIndex = index;
           });
           _selectIndex(selectedIndex);
         },
@@ -326,28 +349,3 @@ Widget buildSwitch(String title, bool currentValue,
     ),
   );
 }
-  Widget buildSwitchRow(List<String> titles, List<bool> values, List<ValueChanged<bool>> onChangedList) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Switch'ler arasında eşit boşluk bırakır
-        children: List.generate(titles.length, (index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0), // Aralarına yatay boşluk ekler
-            child: Row(
-              children: [
-                Text(titles[index], style: TextStyle(fontSize: 16.0)),
-                Switch(
-                  value: values[index],
-                  onChanged: onChangedList[index],
-                  activeColor: Colors.green,
-                  inactiveTrackColor: Colors.grey,
-                  inactiveThumbColor: Colors.red,
-                ),
-              ],
-            ),
-          );
-        }),
-      ),
-    );
-  }
