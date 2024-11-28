@@ -311,7 +311,7 @@ Future<String> getCountry() async {
 Future<String> getNameFromFile() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/assets/isim.json');
+    final file = File('${directory.path}/assets/name.json');
     if (!await file.exists()) return "";
 
     final content = await file.readAsString();
@@ -325,7 +325,7 @@ Future<String> getNameFromFile() async {
 Future<void> saveNameToFile(String name) async {
   try {
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/assets/isim.json');
+    final file = File('${directory.path}/assets/name.json');
     final data = {'isim': name};
 
     await file.create(recursive: true);

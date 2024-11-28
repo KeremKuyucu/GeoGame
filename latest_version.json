@@ -1,5 +1,6 @@
 {
   "latest_version": "1.2.2",
   "apk_url": "https://github.com/keremlolgg/GeoGame/releases/latest",
-  "apiserver": "https://statuesque-marred-clave.glitch.me"
+  "apiserver": "https://statuesque-marred-clave.glitch.me",
+  "apiserverbackup": "https://geogame.can.re"
 }

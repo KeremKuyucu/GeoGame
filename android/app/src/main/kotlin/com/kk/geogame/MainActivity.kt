@@ -1,4 +1,4 @@
-package com.example.geogamedeneme
+package com.kk.geogame
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,11 +1,11 @@
 {
-    "name": "geogamedeneme",
-    "short_name": "geogamedeneme",
+    "name": "geogame",
+    "short_name": "geogame",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "geogame uygulaması",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
