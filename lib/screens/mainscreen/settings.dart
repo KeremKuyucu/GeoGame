@@ -178,7 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             writeToFile();
                             name = _controller.text;
                           });
-                          dogru.play();
+                          Dogru();
                         },
                         child: Text(Yazi.get('isimsorma4')),
                       ),

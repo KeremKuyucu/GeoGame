@@ -115,13 +115,6 @@ class DrawerWidget extends StatelessWidget {
               await EasyLauncher.url(url: Yazi.get('discordurl'));
             },
           ),
-          ListTile(
-            leading: Icon(Icons.music_note, color: Colors.red),
-            title: Text(Yazi.get('sarki')),
-            onTap: () async {
-              await EasyLauncher.url(url: Yazi.get('sarkiurl'));
-            },
-          ),
           Divider(),
           ListTile(
             title: Text(
@@ -351,6 +344,7 @@ Future<void> nameChangeNotification(String eskiname,String yeniname) async {
 }
 Future<void> postLeadboard() async {
   try {
+    print ("buradan geçti");
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');

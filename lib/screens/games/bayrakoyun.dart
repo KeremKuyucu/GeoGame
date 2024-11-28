@@ -30,7 +30,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     yeniulkesec();
-    bayrakoyunkurallari();
+    await bayrakoyunkurallari();
   }
 
   Future<void> bayrakoyunkurallari() async {

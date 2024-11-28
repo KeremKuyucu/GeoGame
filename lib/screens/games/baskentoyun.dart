@@ -30,7 +30,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
 
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
-    await yeniulkesec();
+    yeniulkesec();
     await baskentoyunkurallari(context);
   }
 

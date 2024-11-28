@@ -24,7 +24,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
-    await yeniulkesec();
+    yeniulkesec();
     await mesafeoyunkurallari();
   }
   Future<void> mesafeoyunkurallari() async {
