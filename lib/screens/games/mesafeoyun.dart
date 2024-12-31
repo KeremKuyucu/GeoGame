@@ -33,7 +33,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
       barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Yazi.get('mesafekural')),
+          title: Text(Yazi.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -45,7 +45,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('bayrakkural4')),
+              child: Text(Yazi.get('tamam')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -63,9 +63,9 @@ class _MesafeOyunState extends State<MesafeOyun> {
           break;
         }
       }
-      message += Yazi.get('mesafetahmin') + gecici.isim + "    ";
-      message += Yazi.get('mesafetahmin1') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
-      message += Yazi.get('mesafetahmin2') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
+      message += Yazi.get('tahmin') + gecici.isim + "    ";
+      message += Yazi.get('mesafe') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
+      message += Yazi.get('yon') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         _controller.clear();
         _currentInput='';
@@ -84,11 +84,11 @@ class _MesafeOyunState extends State<MesafeOyun> {
           mesafepuan+=puan;
           writeToFile();
         });
-        puan=50;
+        puan=200;
       } else {
         puan-=10;
-        if(puan<20)
-          puan=20;
+        if(puan<50)
+          puan=50;
         Yanlis();
         _controller.clear();
         _currentInput='';
@@ -146,7 +146,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('mesafe')),
+        title: Text(Yazi.get('mesafebaslik')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -185,7 +185,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                 children: [
                   ElevatedButton(
                     onPressed: _checkAnswer,
-                    child: Text(Yazi.get('tahmin1')),
+                    child: Text(Yazi.get('tahmingir')),
                   ),
                   ElevatedButton(
                     onPressed: _pasButtonPressed,
@@ -197,7 +197,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                         message = '';
                       });
                     },
-                    child: Text(Yazi.get('tahmin2')),
+                    child: Text(Yazi.get('tahmintemizle')),
                   ),
                 ],
               ),

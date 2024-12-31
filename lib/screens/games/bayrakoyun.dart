@@ -39,7 +39,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
       barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Yazi.get('bayrakkural')),
+          title: Text(Yazi.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -51,7 +51,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('bayrakkural4')),
+              child: Text(Yazi.get('tamam')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -120,7 +120,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('bayrak')),
+        title: Text(Yazi.get('bayrakbaslik')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -167,7 +167,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
                                 child: Text(
-                                  'İnternet Hatası\n Pas tuşuna pas düzelmiyorsa internetini kontrol et.',
+                                  'İnternet Error',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.red,

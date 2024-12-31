@@ -31,8 +31,8 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ThemeModeBuilderConfig.setLight();
   }
   Future<void> _initializeGame() async {
-    await dilDegistir();
     await readFromFile((update) => setState(update));
+    await dilDegistir();
     await surumkiyasla();
     istatistik(context);
   }
@@ -53,7 +53,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           SalomonBottomBarItem(
             icon: const Icon(FontAwesomeIcons.info),
             selectedColor: Colors.teal,
-            title: const Text('Ulkeler'),
+            title: Text(Yazi.get('navigasyonbar3')),
           ),
           SalomonBottomBarItem(
             icon: const Icon(Icons.person),
@@ -62,7 +62,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
           ),
           SalomonBottomBarItem(
             icon: const Icon(Icons.settings),
-            title: Text(Yazi.get('navigasyonbar3')),
+            title: Text(Yazi.get('navigasyonbar5')),
             selectedColor: Colors.orange,
           ),
         ];
@@ -152,19 +152,25 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     setState(() {
       _selectedOption = index;
     });
-    if (_selectedOption == 0 && getSelectableCountryCount() > 0) {
+    if (_selectedOption == 0) {
       Yenitur();
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => BaskentOyun()),
+        MaterialPageRoute(builder: (context) => Denizekosistem()),
       );
     } else if (_selectedOption == 1 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => BayrakOyun()),
+        MaterialPageRoute(builder: (context) => BaskentOyun()),
       );
     } else if (_selectedOption == 2 && getSelectableCountryCount() > 0) {
+      Yenitur();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => BayrakOyun()),
+      );
+    } else if (_selectedOption == 3 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.push(
         context,
@@ -237,8 +243,30 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
-          itemCount: 3,
+          itemCount: 4,
           itemBuilder: (context, index) {
+            // Listelerle yapılandırma
+            final titles = [
+              Yazi.get('deniztitle'),
+              Yazi.get('baskenttitle'),
+              Yazi.get('bayraktitle'),
+              Yazi.get('mesafetitle')
+            ];
+
+            final descriptions = [
+              Yazi.get('denizdescription'),
+              Yazi.get('baskentdescription'),
+              Yazi.get('bayrakdescription'),
+              Yazi.get('mesafedescription')
+            ];
+
+            final images = [
+              'assets/logo2.png',
+              'assets/baskent.jpg',
+              'assets/bayrak.jpg',
+              'assets/mesafe.jpg'
+            ];
+
             return Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0),
@@ -256,9 +284,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child: Image.asset(
-                          index == 0
-                              ? 'assets/baskent.jpg'
-                              : (index == 1 ? 'assets/bayrak.jpg' : 'assets/mesafe.jpg'),
+                          images[index],
                           width: 100,
                           height: 100,
                           fit: BoxFit.cover,
@@ -270,9 +296,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              index == 0
-                                  ? Yazi.get('baskenttitle')
-                                  : (index == 1 ? Yazi.get('bayraktitle') : Yazi.get('mesafetitle')),
+                              titles[index],
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -280,14 +304,12 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              index == 0
-                                  ? Yazi.get('baskentdescription')
-                                  : (index == 1 ? Yazi.get('bayrakdescription') : Yazi.get('mesafedescription')),
+                              descriptions[index],
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[700],
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),

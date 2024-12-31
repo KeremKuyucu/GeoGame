@@ -82,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('kitayari3')),
+              child: Text(Yazi.get('tamam')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('ayarlarlist')),
+        title: Text(Yazi.get('ayarlar')),
         centerTitle: true,
         leading: Builder(
           builder: (context) =>
@@ -173,7 +173,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         onPressed: () {
                           setState(() {
                             nameChangeNotification(name, _controller.text);
-                            if (name.isEmpty)
+                            if (name.isEmpty && _controller.text.isNotEmpty)
                               sendNewUserNotification(_controller.text);
                             writeToFile();
                             name = _controller.text;
@@ -189,17 +189,17 @@ class _SettingsPageState extends State<SettingsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Text(
-                  Yazi.get('ayarlarlist12'),
+                  Yazi.get('digerayarlar'),
                   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
                 ),
               ), // baslık
-              buildSwitch(Yazi.get('ayarlarlist8'), yazmamodu, (value) {
+              buildSwitch(Yazi.get('siklimod'), yazmamodu, (value) {
                 setState(() {
                   yazmamodu = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist14')+(darktema ? 'Dark': 'Light'), darktema, (value) {
+              buildSwitch(Yazi.get('tema')+(darktema ? 'Dark': 'Light'), darktema, (value) {
                 setState(() {
                   darktema = value;
                   if(darktema)
@@ -212,7 +212,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(Yazi.get('ayarlarlist11'), style: TextStyle(fontSize: 16.0)),
+                  Text(Yazi.get('dil'), style: TextStyle(fontSize: 16.0)),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -244,66 +244,72 @@ class _SettingsPageState extends State<SettingsPage> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('If there is a translation error,',
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-                      Text('please report the error.',
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-                      Text('The translations are machine translations.',
-                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      Text(
+                        secilenDil != "Türkçe" ? 'If there is a translation error,': '',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        secilenDil != "Türkçe" ? 'please report the error.': '',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        secilenDil != "Türkçe" ? 'The translations are machine translations.': '',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                 ],
-              ), //makine çeviri uyarı
+              ), // makine çeviri uyarısı
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Text(
-                  Yazi.get('ayarlarlist13'),
+                  Yazi.get('kitasecenek'),
                   style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
                 ),
               ),// baslık
-              buildSwitch(Yazi.get('ayarlarlist1'), amerikakitasi, (value) {
+              buildSwitch(Yazi.get('amerika'), amerikakitasi, (value) {
                 setState(() {
                   amerikakitasi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist2'), asyakitasi, (value) {
+              buildSwitch(Yazi.get('asya'), asyakitasi, (value) {
                 setState(() {
                   asyakitasi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist3'), afrikakitasi, (value) {
+              buildSwitch(Yazi.get('afrika'), afrikakitasi, (value) {
                 setState(() {
                   afrikakitasi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist4'), avrupakitasi, (value) {
+              buildSwitch(Yazi.get('avrupa'), avrupakitasi, (value) {
                 setState(() {
                   avrupakitasi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist5'), okyanusyakitasi, (value) {
+              buildSwitch(Yazi.get('okyanusya'), okyanusyakitasi, (value) {
                 setState(() {
                   okyanusyakitasi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist6'), antartikakitasi, (value) {
+              buildSwitch(Yazi.get('antartika'), antartikakitasi, (value) {
                 setState(() {
                   antartikakitasi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist7'), bmuyeligi, (value) {
+              buildSwitch(Yazi.get('bmuyelik'), bmuyeligi, (value) {
                 setState(() {
                   bmuyeligi = value;
                   writeToFile();
                 });
               }),
-              buildSwitch(Yazi.get('ayarlarlist15'), sadecebm, (value) {
+              buildSwitch(Yazi.get('sadecebm'), sadecebm, (value) {
                 setState(() {
                   sadecebm = value;
                   writeToFile();

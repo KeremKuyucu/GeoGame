@@ -16,6 +16,7 @@ class Yazi {
   static Map<String, dynamic>? _localizedStrings;
   static String _currentLanguage = 'Türkçe';
 
+  // Dil dosyasını yükler
   static Future<void> loadDil(String dilKodu) async {
     if (_currentLanguage == dilKodu && _localizedStrings != null) {
       return;
@@ -23,8 +24,10 @@ class Yazi {
     try {
       String jsonString = await rootBundle.loadString('assets/dil.json');
       Map<String, dynamic> jsonMap = json.decode(jsonString);
-      if (jsonMap.containsKey(dilKodu)) {
-        _localizedStrings = jsonMap[dilKodu];
+
+      // 'Veriler' altında istenilen dilin kontrolü yapılır
+      if (jsonMap['Veriler'] != null) {
+        _localizedStrings = jsonMap['Veriler'];
       } else {
         _localizedStrings = {};
       }
@@ -34,9 +37,13 @@ class Yazi {
       _localizedStrings = {};
     }
   }
+
+  // Anahtar ile dildeki metni alır
   static String get(String key)  {
-    loadDil(_currentLanguage);
-    return _localizedStrings?[key] ?? '';
+    if (_localizedStrings != null && _localizedStrings!.containsKey(key)) {
+      return _localizedStrings?[key]?[_currentLanguage] ?? '';
+    }
+    return '';
   }
 }
 class DrawerWidget extends StatelessWidget {
@@ -84,35 +91,46 @@ class DrawerWidget extends StatelessWidget {
             title: Text(Yazi.get('instagram')),
             onTap: () async {
               await EasyLauncher.url(
-                  url: Yazi.get('instagramurl'), mode: Mode.platformDefault);
+                  url: 'https://www.instagram.com/kerem_.kk', mode: Mode.platformDefault);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.person, color: Color(0xFF5865F2)),
+            title: Text(Yazi.get('yapimcimetin')),
+            onTap: () async {
+              await EasyLauncher.url(
+                  url: 'https://keremkk.can.re', mode: Mode.platformDefault);
             },
           ),
           ListTile(
             leading: Icon(Icons.public, color: Colors.red),
             title: Text(Yazi.get('website')),
             onTap: () async {
-              await EasyLauncher.url(url: Yazi.get('websiteurl'));
+              await EasyLauncher.url(url: 'https://geogame.can.re');
             },
           ),
           ListTile(
             leading: FaIcon(Icons.report),
             title: Text(Yazi.get('hatabildir')),
             onTap: () async {
-              await EasyLauncher.url(url: Yazi.get('hatabildirurl'));
+              await EasyLauncher.email(
+                  email: "report@keremkk.can.re",
+                  subject: "",
+                  body: "Merhaba, ");
             },
           ),
           ListTile(
             leading: FaIcon(FontAwesomeIcons.github),
             title: Text(Yazi.get('github')),
             onTap: () async {
-              await EasyLauncher.url(url: Yazi.get('githuburl'));
+              await EasyLauncher.url(url: 'https://github.com/keremlolgg/GeoGame');
             },
           ),
           ListTile(
             leading: Icon(Icons.discord, color: Color(0xFF5865F2)),
             title: Text(Yazi.get('discord')),
             onTap: () async {
-              await EasyLauncher.url(url: Yazi.get('discordurl'));
+              await EasyLauncher.url(url: 'https://discord.com/users/483678328646270996');
             },
           ),
           Divider(),
@@ -131,7 +149,7 @@ class DrawerWidget extends StatelessWidget {
 }
 
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
-final List<String> diller = ['Türkçe','English','Español','Deutsch','Русский','中文','Kurdî','Français','Português','العربية'];
+final List<String> diller = ['Türkçe','English'];
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
 String name = "", secilenDil='Türkçe', apiserver = "";
 List<dynamic> users = [];
@@ -344,7 +362,6 @@ Future<void> nameChangeNotification(String eskiname,String yeniname) async {
 }
 Future<void> postLeadboard() async {
   try {
-    print ("buradan geçti");
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');

@@ -40,7 +40,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
       barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Yazi.get('baskentkural')),
+          title: Text(Yazi.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -52,7 +52,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('baskentkural4')),
+              child: Text(Yazi.get('tamam')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -121,7 +121,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('baskent')),
+        title: Text(Yazi.get('baskentbaslik')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -151,7 +151,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  Yazi.get('baskent1') + kalici.baskent,
+                  Yazi.get('baskenticerik') + kalici.baskent,
                   style: TextStyle(fontSize: 24),
                   textAlign: TextAlign.center,
                 ),

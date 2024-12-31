@@ -128,8 +128,6 @@ class _LeadboardState extends State<Leadboard> {
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
-                print('Kullanıcı ${users[index]['name']} tıklandı');
-                print('Kullanıcı ${users[index]['mesafepuan']} tıklandı');
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Userprofile(userindex: index,)),

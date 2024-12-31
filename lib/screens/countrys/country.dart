@@ -68,7 +68,7 @@ class _UlkelerlistState extends State<Ulkelerlist> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Ulkeler'),
+          title: Text(Yazi.get('navigasyonbar3')),
           centerTitle: true,
           leading: Builder(
             builder: (context) => IconButton(
@@ -78,17 +78,6 @@ class _UlkelerlistState extends State<Ulkelerlist> {
               },
             ),
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => GeoGameLobi()),
-                );
-              },
-            ),
-          ],
         ),
       drawer: DrawerWidget(),
         body: Padding(
@@ -101,7 +90,7 @@ class _UlkelerlistState extends State<Ulkelerlist> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Ülke arayın...',
+                    hintText: Yazi.get('ulkeara'),
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.0),

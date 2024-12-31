@@ -82,7 +82,7 @@ class _UlkelerProfilesState extends State<UlkelerProfiles> {
 
               // Ülke Başkenti
               Text(
-                'Başkenti: ${kalici.baskent}', // Ülkenin başkent bilgisi
+                '${Yazi.get('baskent')} ${kalici.baskent}', // Ülkenin başkent bilgisi
                 style: TextStyle(
                   fontSize: 20.0,
                   color: Colors.purpleAccent,
@@ -93,7 +93,7 @@ class _UlkelerProfilesState extends State<UlkelerProfiles> {
 
               // Ülkenin Kıtası
               Text(
-                'Kıta: ${kalici.kita}',
+                '${Yazi.get('kita')} ${kalici.kita}',
                 style: TextStyle(
                   fontSize: 20.0,
                   color: Colors.tealAccent,
@@ -104,7 +104,7 @@ class _UlkelerProfilesState extends State<UlkelerProfiles> {
 
               // BM Üyesi Olma Durumu
               Text(
-                'BM Üyesi: ${kalici.bm ? 'Evet' : 'Hayır'}',
+                '${Yazi.get('bmuyesi')} ${kalici.bm ? Yazi.get('evet') : Yazi.get('hayir')}',
                 style: TextStyle(
                   fontSize: 20.0,
                   color: Colors.white,
@@ -115,14 +115,14 @@ class _UlkelerProfilesState extends State<UlkelerProfiles> {
 
               // Enlem ve Boylam Bilgisi
               Text(
-                'Ondalıklı Kordinat:',
+                Yazi.get('kordinat'),
                 style: TextStyle(
                   fontSize: 18.0,
                   color: Colors.white70,
                 ),
               ),
               Text(
-                'Enlem: ${kalici.enlem}, Boylam: ${kalici.boylam}',
+                '${Yazi.get('enlem')} ${kalici.enlem}, ${Yazi.get('boylam')} ${kalici.boylam}',
                 style: TextStyle(
                   fontSize: 18.0,
                   color: Colors.white70,
@@ -148,7 +148,7 @@ class _UlkelerProfilesState extends State<UlkelerProfiles> {
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
                                 child: Text(
-                                  'İnternet Hatası\n Pas tuşuna pas düzelmiyorsa internetini kontrol et.',
+                                  'İnternet Error',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.red,
