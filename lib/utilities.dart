@@ -403,6 +403,43 @@ Future<void> postLeadboard() async {
     print('Hata: $e');
   }
 }
+Future<void> postMessage(String message) async {
+  try {
+    final targetUrl = '${apiserver}/ekosistem';
+    final response = await http.post(
+      Uri.parse(targetUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'message': '```'+message+'```',
+      }),
+    ).timeout(Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      print('Log başarıyla gönderildi!');
+    } else {
+      print('Log gönderilemedi: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Hata: $e');
+  }
+}
+Future<void> postMessage2(String message) async {
+  try {
+    // Dosya yolunu al
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/log.txt');
+
+    // Mesajı dosyaya yaz
+    await file.writeAsString(
+      '$message\n',
+      mode: FileMode.append, // Dosya zaten varsa üzerine ekler
+    );
+
+    print('Log başarıyla dosyaya yazıldı: ${file.path}');
+  } catch (e) {
+    print('Dosyaya yazılırken hata oluştu: $e');
+  }
+}
 // Listeler
 Ulkeler gecici = Ulkeler(
   bayrak: '',

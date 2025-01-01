@@ -380,8 +380,8 @@
       "English": "Marine Ecosystem"
     },
     "denizdescription": {
-      "Türkçe": "aciklama eklencek",
-      "English": "Description will be added."
+      "Türkçe": "Bu simülasyon, deniz ekosistemindeki plankton yoğunluğunun değişimini gösteren bir model sunmaktadır. Kullanıcılar, farklı parametreleri ayarlayarak plankton yoğunluğunun zaman içindeki etkilerini gözlemleyebilir ve deniz ekosistemindeki değişimlerin nasıl bir etki yarattığını anlayabilirler.",
+      "English": "This simulation provides a model demonstrating the changes in plankton density within the marine ecosystem. Users can adjust different parameters to observe the effects of plankton density over time and understand how changes in the marine ecosystem impact it."
     }
   }
 }
