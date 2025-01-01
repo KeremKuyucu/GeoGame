@@ -15,7 +15,7 @@ Projeyi deneyimlemek için aşağıdaki linkten oyuna erişebilirsiniz:
 
 # Desteklenen Diller
 
-Türkçe, English, Español, Deutsch, Русский, 中文, Kurdî, Français, Português, العربية
+Türkçe, English,
 
 # Özellikler
 
