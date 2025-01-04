@@ -63,7 +63,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
           break;
         }
       }
-      message += Yazi.get('tahmin') + gecici.isim + "    ";
+      message += Yazi.get('tahminmetin') + gecici.isim + "    ";
       message += Yazi.get('mesafe') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
       message += Yazi.get('yon') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {

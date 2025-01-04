@@ -8,34 +8,93 @@ class Denizekosistem extends StatefulWidget {
 }
 
 class _DenizState extends State<Denizekosistem> {
-  double temperature = 0; // Başlangıç sıcaklığı
-  double planktonDensity = 60.0; // Plankton yoğunluğu (% olarak)
-  double atmosphericCO2 = 400.0; // Başlangıç CO2 seviyesi (ppm olarak)
-  double nitrate = 30.0, iron = 15.0, ph = 7.5, co2 = 400.0, salinity = 35.0;
   List<LatLng> _points = [];
 
-  // Parametrelerin plankton yoğunluğuna etkisi (%)
+  void initState() {
+    super.initState();
+    _initializeGame();
+  }
+  Future<void> _initializeGame() async {
+    await readFromFile((update) => setState(update));
+    denizoyunkurallari();
+  }
+  Future<void> denizoyunkurallari() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(Yazi.get('kurallar')),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(Yazi.get('denizkural1')),
+                Text(Yazi.get('denizkural2')),
+                Text(Yazi.get('denizkural3')),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(Yazi.get('tamam')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final Map<String, double> effects = {
-    'nitrate': 0.3, // %30
-    'iron': 0.15, // %15
-    'ph': -0.5, // %50 azalma etkisi
-    'co2': -0.4, // %40 azalma etkisi
-    'salinity': 0.0, // Nötr etki
+    'nitrate': 0.35, // %35
+    'iron': 0.2,     // %20
+    'ph': -0.5,      // %50 azalma etkisi
+    'co2': -0.45,    // %45 azalma etkisi
+    'salinity': -0.15, // %15 azalma etkisi
+    'temperature': 0.15, // %15
   };
+
+  double planktonDensity = 60.0;
+  double atmosphericCO2 = 400.0;
+  double nitrate = 30.0, iron = 15.0, ph = 7.5, co2 = 400.0, salinity = 35.0, temperature = 15.0;
 
   void updatePlanktonDensity() {
     setState(() {
       double effectSum = 1.0;
       effectSum += effects['nitrate']! * (nitrate / 100);
       effectSum += effects['iron']! * (iron / 100);
-      effectSum += effects['ph']! * (7.5 - ph).abs() / 7.5;
-      effectSum += effects['co2']! * (400.0 - co2).abs() / 400.0;
-      effectSum += effects['salinity']! * (35.0 - salinity).abs() / 35.0;
+      effectSum += effects['ph']! * ((7.5 - ph) / 7.5);
+      effectSum += effects['co2']! * ((400.0 - co2) / 400.0);
+      effectSum += effects['salinity']! * ((35.0 - salinity) / 35.0);
+      effectSum += effects['temperature']! * ((15.0 - temperature) / 15.0);
       planktonDensity = (60.0 * effectSum).clamp(0, 100);
-      atmosphericCO2 =
-          (400.0 * (1 - planktonDensity / 100 * 0.4)).clamp(0, 400);
+      atmosphericCO2 = (400.0 * (1 - planktonDensity / 100 * 0.4)).clamp(0, 400);
+      planktonDensity = (planktonDensity > 50) ? (planktonDensity * 0.95) : planktonDensity;
     });
   }
+
+  Color getDensityColor(double density) {
+    if (density >= 90) {
+      return Color(0xFF004D40); // Çok sağlıklı - Koyu yeşil
+    } else if (density >= 75) {
+      return Color(0xFF00796B); // Sağlıklı - Orta yeşil
+    } else if (density >= 60) {
+      return Color(0xFF009688); // Orta seviye - Turkuaz
+    } else if (density >= 45) {
+      return Color(0xFF4CAF50); // Hafif azalma - Açık yeşil
+    } else if (density >= 30) {
+      return Color(0xFF8BC34A); // Düşük - Sarımsı yeşil
+    } else if (density >= 15) {
+      return Color(0xFFFFEB3B); // Tehlikeli - Sarı
+    } else if (density >= 5) {
+      return Color(0xFFFF9800); // Kritik - Turuncu
+    } else {
+      return Color(0xFFF44336); // Çok düşük - Kırmızı
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,8 +266,8 @@ class _DenizState extends State<Denizekosistem> {
                       LatLng(41.31234035040979,31.128004985863257)
 
                     ],
-                    color: Colors.blue.withOpacity(0.5),
-                    borderColor: Colors.blue,
+                    color: getDensityColor(planktonDensity),
+                    borderColor: getDensityColor(planktonDensity),
                     borderStrokeWidth: 2,
                   ),
                 ],
@@ -300,8 +359,8 @@ class _DenizState extends State<Denizekosistem> {
                       LatLng(40.70933017654362,29.257281910377788),
                       LatLng(40.74055264993188,29.303973804909038)
                     ],
-                    color: Colors.blue.withOpacity(0.5),
-                    borderColor: Colors.blue,
+                    color: getDensityColor(planktonDensity),
+                    borderColor: getDensityColor(planktonDensity),
                     borderStrokeWidth: 2,
                   ),
                 ],
@@ -403,8 +462,8 @@ class _DenizState extends State<Denizekosistem> {
                       LatLng(38.07109925869601,53.5821775058648),
                       LatLng(37.40210484104114,53.6700681308648)
                     ],
-                    color: Colors.blue.withOpacity(0.5),
-                    borderColor: Colors.blue,
+                    color: getDensityColor(planktonDensity),
+                    borderColor: getDensityColor(planktonDensity),
                     borderStrokeWidth: 2,
                   ),
                 ],
@@ -692,8 +751,8 @@ class _DenizState extends State<Denizekosistem> {
                       LatLng(31.391526641997213,33.72253336298364),
                       LatLng(31.48432051439198,34.01773663344967)
                     ],
-                    color: Colors.blue.withOpacity(0.5),
-                    borderColor: Colors.blue,
+                    color: getDensityColor(planktonDensity),
+                    borderColor: getDensityColor(planktonDensity),
                     borderStrokeWidth: 2,
                   ),
                 ],
@@ -843,8 +902,8 @@ class _DenizState extends State<Denizekosistem> {
                       LatLng(35.96487124593337,23.350262536423497),
                       LatLng(35.74225649714511,23.438153161423497)
                     ],
-                    color: Colors.blue.withOpacity(0.5),
-                    borderColor: Colors.blue,
+                    color: getDensityColor(planktonDensity),
+                    borderColor: getDensityColor(planktonDensity),
                     borderStrokeWidth: 2,
                   ),
                 ],

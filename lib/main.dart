@@ -58,6 +58,8 @@ flutter build apk
 xcopy /Y /I "build\app\outputs\apk\release\app-release.apk" "C:\Users\KeremK\Desktop\app-release.apk"
 f
 flutter build windows
-xcopy /E /I "build\windows\x64\runner\Release" "C:\Users\KeremK\Desktop\Release"
+xcopy /E /I "build\windows\x64\runner\Release" "C:\Users\KeremK\Desktop\GeoGame"
+flutter build web
+xcopy /E /I "build\web" "C:\Users\KeremK\Desktop\web"
 
  */

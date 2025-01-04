@@ -128,14 +128,14 @@
       "English": "Welcome to the Distance Country Quiz.\nYour goal is to guess a randomly selected country from 250 countries.\nDistances may vary by +-100 km.\nThe center positions of countries are used as references."
     },
     "mesafekural3": {
-      "Türkçe": "Puan Sistemi: Her turda puaniniz 200 den baslar her yanlis tahminde 10 puan azalir.\n15 Tahminden sonra kazanilan puan 50'e sabitlenir tur bitince tekrar 100'den baslar.",
-      "English": "Scoring System: Each round starts with 200 points. With each wrong guess, 10 points are deducted.\nAfter 15 guesses, the score is fixed at 50 and the round restarts from 100."
+      "Türkçe": "Puan Sistemi: Her turda puaniniz 200 den baslar her yanlis tahminde 10 puan azalir.\n15 Tahminden sonra kazanilan puan 50'e sabitlenir tur bitince tekrar 200'den baslar.",
+      "English": "Scoring System: Each round starts with 200 points. With each wrong guess, 10 points are deducted.\nAfter 15 guesses, the score is fixed at 50 and the round restarts from 200."
     },
     "mesafebaslik": {
       "Türkçe": "Mesafe Oyun",
       "English": "Distance Game"
     },
-    "tahmin": {
+    "tahminmetin": {
       "Türkçe": "Tahmin: ",
       "English": "Guess: "
     },
@@ -154,6 +154,22 @@
     "tahmintemizle": {
       "Türkçe": "Tahminleri Temizle",
       "English": "Clear Guesses"
+    },
+    "denizkural1": {
+      "Türkçe": "Deniz Ekosistemi Simülasyonu",
+      "English": "Marine Ecosystem Simulation"
+    },
+    "denizkural2": {
+      "Türkçe": "Deniz ekosistemindeki çevresel faktörlerin fitoplankton üzerindeki etkilerini analiz edin.\nAmacınız, bu faktörlerin etkilerini değerlendirerek ekolojik dengeyi korumaktır.",
+      "English": "Analyze the impact of environmental factors on phytoplankton in the marine ecosystem.\nYour goal is to evaluate these effects and maintain ecological balance."
+    },
+    "denizkural3": {
+      "Türkçe": "Simülasyon Kuralları: Faktörler, fitoplankton yoğunluğunu artırabilir veya azaltabilir.\nNitrat ve demir pozitif etkiye sahiptir. pH ve CO2 negatif etki gösterir. Tuzluluk nötrdür.",
+      "English": "Simulation Rules: Factors can increase or decrease phytoplankton concentration.\nNitrate and iron have positive effects. pH and CO2 show negative effects. Salinity is neutral."
+    },
+    "denizbaslik": {
+      "Türkçe": "Deniz Ekosistemi",
+      "English": "Marine Ecosystem"
     },
     "ulkeara": {
       "Türkçe": "Ülke arayın...",
@@ -380,8 +396,8 @@
       "English": "Marine Ecosystem"
     },
     "denizdescription": {
-      "Türkçe": "Bu simülasyon, deniz ekosistemindeki plankton yoğunluğunun değişimini gösteren bir model sunmaktadır. Kullanıcılar, farklı parametreleri ayarlayarak plankton yoğunluğunun zaman içindeki etkilerini gözlemleyebilir ve deniz ekosistemindeki değişimlerin nasıl bir etki yarattığını anlayabilirler.",
-      "English": "This simulation provides a model demonstrating the changes in plankton density within the marine ecosystem. Users can adjust different parameters to observe the effects of plankton density over time and understand how changes in the marine ecosystem impact it."
+      "Türkçe": "Dünya üzerindeki plankton yoğunluğunu inceleyin.",
+      "English": "Examine the density of plankton on Earth."
     }
   }
 }
