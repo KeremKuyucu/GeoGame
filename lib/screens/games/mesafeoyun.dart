@@ -80,6 +80,15 @@ class _MesafeOyunState extends State<MesafeOyun> {
             duration: Duration(seconds: 2),
           ),
         );
+        postUlkeLog(
+            '{\n"Name": "$name",\n'
+                '"Mesaj": "Cevap Doğru",\n'
+                '"dogrucevap": "${kalici.isim}",\n'
+                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"Yeşil": "${butonAnahtarlar[0]}",\n'
+                '"Sarı": "${butonAnahtarlar[1]}",\n'
+                '"Mavi": "${butonAnahtarlar[2]}",\n'
+                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
         setState(() {
           mesafepuan+=puan;
           writeToFile();
@@ -93,6 +102,15 @@ class _MesafeOyunState extends State<MesafeOyun> {
         _controller.clear();
         _currentInput='';
         mesafeyanlis++;
+        postUlkeLog(
+            '{\n"Name": "$name",\n'
+                '"Mesaj": "Cevap Yanlış",\n'
+                '"dogrucevap": "${kalici.isim}",\n'
+                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"Yeşil": "${butonAnahtarlar[0]}",\n'
+                '"Sarı": "${butonAnahtarlar[1]}",\n'
+                '"Mavi": "${butonAnahtarlar[2]}",\n'
+                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap')+puan.toString()),
@@ -112,6 +130,15 @@ class _MesafeOyunState extends State<MesafeOyun> {
         duration: Duration(seconds: 2),
       ),
     );
+    postUlkeLog(
+        '{\n"Name": "$name",\n'
+            '"Mesaj": "Pas Geçildi",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+            '"Yeşil": "${butonAnahtarlar[0]}",\n'
+            '"Sarı": "${butonAnahtarlar[1]}",\n'
+            '"Mavi": "${butonAnahtarlar[2]}",\n'
+            '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       _currentInput='';
       message='';
@@ -183,21 +210,51 @@ class _MesafeOyunState extends State<MesafeOyun> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Butonlar arasında eşit boşluk bırakır
                 children: [
-                  ElevatedButton(
-                    onPressed: _checkAnswer,
-                    child: Text(Yazi.get('tahmingir')),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 4.0),
+                      child: ElevatedButton(
+                        onPressed: _pasButtonPressed,
+                        child: Text(
+                          Yazi.get('pas'),
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrangeAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed: _pasButtonPressed,
-                    child: Text(Yazi.get('pas')),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        message = '';
-                      });
-                    },
-                    child: Text(Yazi.get('tahmintemizle')),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 4.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            message = '';
+                          });
+                        },
+                        child: Text(
+                          Yazi.get('tahmintemizle'),
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pink,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

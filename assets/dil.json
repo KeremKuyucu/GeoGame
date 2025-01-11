@@ -147,29 +147,9 @@
       "Türkçe": "Yön: ",
       "English": "Direction: "
     },
-    "tahmingir": {
-      "Türkçe": "Tahmin Gir",
-      "English": "Enter Guess"
-    },
     "tahmintemizle": {
       "Türkçe": "Tahminleri Temizle",
       "English": "Clear Guesses"
-    },
-    "denizkural1": {
-      "Türkçe": "Deniz Ekosistemi Simülasyonu",
-      "English": "Marine Ecosystem Simulation"
-    },
-    "denizkural2": {
-      "Türkçe": "Deniz ekosistemindeki çevresel faktörlerin fitoplankton üzerindeki etkilerini analiz edin.\nAmacınız, bu faktörlerin etkilerini değerlendirerek ekolojik dengeyi korumaktır.",
-      "English": "Analyze the impact of environmental factors on phytoplankton in the marine ecosystem.\nYour goal is to evaluate these effects and maintain ecological balance."
-    },
-    "denizkural3": {
-      "Türkçe": "Simülasyon Kuralları: Faktörler, fitoplankton yoğunluğunu artırabilir veya azaltabilir.\nNitrat ve demir pozitif etkiye sahiptir. pH ve CO2 negatif etki gösterir. Tuzluluk nötrdür.",
-      "English": "Simulation Rules: Factors can increase or decrease phytoplankton concentration.\nNitrate and iron have positive effects. pH and CO2 show negative effects. Salinity is neutral."
-    },
-    "denizbaslik": {
-      "Türkçe": "Deniz Ekosistemi",
-      "English": "Marine Ecosystem"
     },
     "ulkeara": {
       "Türkçe": "Ülke arayın...",
@@ -390,14 +370,6 @@
     "mesafedescription": {
       "Türkçe": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
       "English": "Guess countries based on distance and direction."
-    },
-    "deniztitle": {
-      "Türkçe": "Deniz Ekosistemi",
-      "English": "Marine Ecosystem"
-    },
-    "denizdescription": {
-      "Türkçe": "Dünya üzerindeki plankton yoğunluğunu inceleyin.",
-      "English": "Examine the density of plankton on Earth."
     }
   }
 }

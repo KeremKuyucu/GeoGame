@@ -23,7 +23,6 @@ export 'screens/countrys/countryprofil.dart';
 export 'screens/games/baskentoyun.dart';
 export 'screens/games/bayrakoyun.dart';
 export 'screens/games/mesafeoyun.dart';
-export 'screens/games/denizekosistem.dart';
 export 'screens/leadboards-and-profile/profiles.dart';
 export 'screens/leadboards-and-profile/leadboard.dart';
 export 'screens/leadboards-and-profile/userprofile.dart';

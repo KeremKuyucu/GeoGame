@@ -77,6 +77,15 @@ class _BayrakOyunState extends State<BayrakOyun> {
             duration: Duration(seconds: 2),
           ),
         );
+        postUlkeLog(
+            '{\n"Name": "$name",\n'
+                '"Mesaj": "Cevap Doğru",\n'
+                '"dogrucevap": "${kalici.isim}",\n'
+                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"Yeşil": "${butonAnahtarlar[0]}",\n'
+                '"Sarı": "${butonAnahtarlar[1]}",\n'
+                '"Mavi": "${butonAnahtarlar[2]}",\n'
+                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
         setState(() {
           bayrakpuan += puan;
           writeToFile();
@@ -89,6 +98,15 @@ class _BayrakOyunState extends State<BayrakOyun> {
         _controller.clear();
         _currentInput='';
         bayrakyanlis++;
+        postUlkeLog(
+            '{\n"Name": "$name",\n'
+                '"Mesaj": "Cevap Yanlış",\n'
+                '"dogrucevap": "${kalici.isim}",\n'
+                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"Yeşil": "${butonAnahtarlar[0]}",\n'
+                '"Sarı": "${butonAnahtarlar[1]}",\n'
+                '"Mavi": "${butonAnahtarlar[2]}",\n'
+                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap') + puan.toString()),
@@ -109,6 +127,15 @@ class _BayrakOyunState extends State<BayrakOyun> {
         duration: Duration(seconds: 2),
       ),
     );
+    postUlkeLog(
+        '{\n"Name": "$name",\n'
+            '"Mesaj": "Pas Geçildi",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+            '"Yeşil": "${butonAnahtarlar[0]}",\n'
+            '"Sarı": "${butonAnahtarlar[1]}",\n'
+            '"Mavi": "${butonAnahtarlar[2]}",\n'
+            '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       yeniulkesec();
       Yenitur();
@@ -186,13 +213,26 @@ class _BayrakOyunState extends State<BayrakOyun> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ElevatedButton(
-                    onPressed: _checkAnswer,
-                    child: Text(Yazi.get('tahmin')),
-                  ),
-                  ElevatedButton(
-                    onPressed: _pasButtonPressed,
-                    child: Text(Yazi.get('pas')),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 4.0),
+                      child: ElevatedButton(
+                        onPressed: _pasButtonPressed,
+                        child: Text(
+                          Yazi.get('pas'),
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrangeAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -304,32 +344,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
                             .toList(),
                         controller: _controller,
                         onSuggestionTap: (value) {
-                          void _checkAnswer() {
-                            setState(() {
-                              if (kalici
-                                  .ks(kelimeDuzelt(_controller.text.trim()))) {
-                                _controller.clear();
-                                yeniulkesec();
-                                Dogru();
-                                setState(() {
-                                  toplampuan += puan;
-                                  writeToFile();
-                                });
-                              } else {
-                                puan -= 10;
-                                if (puan < 20) puan = 20;
-                                Yanlis();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(Yazi.get('yanlis')),
-                                    backgroundColor: Colors.red,
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              }
-                            });
-                          }
-
                           setState(() {
                             _controller.text = value.searchKey;
                             _currentInput = value.searchKey;

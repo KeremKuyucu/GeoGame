@@ -366,7 +366,7 @@ Future<void> postLeadboard() async {
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
 
-    final fullMessage = '{'
+    final fullMessage = '{\n'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
         '"dil": "$secilenDil",\n'
@@ -403,41 +403,24 @@ Future<void> postLeadboard() async {
     print('Hata: $e');
   }
 }
-Future<void> postMessage(String message) async {
+Future<void> postUlkeLog(String message) async {
   try {
-    final targetUrl = '${apiserver}/ekosistem';
+    final targetUrl = '${apiserver}/ulkelog';
     final response = await http.post(
       Uri.parse(targetUrl),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'message': '```'+message+'```',
+        'message': message,
       }),
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Log başarıyla gönderildi!');
+      print('Ulke Log başarıyla gönderildi!');
     } else {
-      print('Log gönderilemedi: ${response.statusCode}');
+      print('Ulke Log gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
     print('Hata: $e');
-  }
-}
-Future<void> postMessage2(String message) async {
-  try {
-    // Dosya yolunu al
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/log.txt');
-
-    // Mesajı dosyaya yaz
-    await file.writeAsString(
-      '$message\n',
-      mode: FileMode.append, // Dosya zaten varsa üzerine ekler
-    );
-
-    print('Log başarıyla dosyaya yazıldı: ${file.path}');
-  } catch (e) {
-    print('Dosyaya yazılırken hata oluştu: $e');
   }
 }
 // Listeler

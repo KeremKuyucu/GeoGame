@@ -78,6 +78,15 @@ class _BaskentOyunState extends State<BaskentOyun> {
             duration: Duration(seconds: 2),
           ),
         );
+        postUlkeLog(
+            '{\n"Name": "$name",\n'
+                '"Mesaj": "Cevap Doğru",\n'
+                '"dogrucevap": "${kalici.isim}",\n'
+                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"Yeşil": "${butonAnahtarlar[0]}",\n'
+                '"Sarı": "${butonAnahtarlar[1]}",\n'
+                '"Mavi": "${butonAnahtarlar[2]}",\n'
+                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
         setState(() {
           baskentpuan += puan;
           writeToFile();
@@ -90,6 +99,15 @@ class _BaskentOyunState extends State<BaskentOyun> {
         _controller.clear();
         _currentInput='';
         baskentyanlis++;
+        postUlkeLog(
+            '{\n"Name": "$name",\n'
+                '"Mesaj": "Cevap Yanlış",\n'
+                '"dogrucevap": "${kalici.isim}",\n'
+                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"Yeşil": "${butonAnahtarlar[0]}",\n'
+                '"Sarı": "${butonAnahtarlar[1]}",\n'
+                '"Mavi": "${butonAnahtarlar[2]}",\n'
+                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap') + puan.toString()),
@@ -110,6 +128,15 @@ class _BaskentOyunState extends State<BaskentOyun> {
         duration: Duration(seconds: 2),
       ),
     );
+    postUlkeLog(
+        '{\n"Name": "$name",\n'
+            '"Mesaj": "Pas Geçildi",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+            '"Yeşil": "${butonAnahtarlar[0]}",\n'
+            '"Sarı": "${butonAnahtarlar[1]}",\n'
+            '"Mavi": "${butonAnahtarlar[2]}",\n'
+            '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       yeniulkesec();
       Yenitur();
@@ -159,13 +186,26 @@ class _BaskentOyunState extends State<BaskentOyun> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    ElevatedButton(
-                      onPressed: _checkAnswer,
-                      child: Text(Yazi.get('tahmin')),
-                    ),
-                    ElevatedButton(
-                      onPressed: _pasButtonPressed,
-                      child: Text(Yazi.get('pas')),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 4.0),
+                        child: ElevatedButton(
+                          onPressed: _pasButtonPressed,
+                          child: Text(
+                            Yazi.get('pas'),
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepOrangeAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

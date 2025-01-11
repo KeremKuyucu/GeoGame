@@ -152,25 +152,19 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     setState(() {
       _selectedOption = index;
     });
-    if (_selectedOption == 0) {
-      Yenitur();
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Denizekosistem()),
-      );
-    } else if (_selectedOption == 1 && getSelectableCountryCount() > 0) {
+    if (_selectedOption == 0 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BaskentOyun()),
       );
-    } else if (_selectedOption == 2 && getSelectableCountryCount() > 0) {
+    } else if (_selectedOption == 1 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BayrakOyun()),
       );
-    } else if (_selectedOption == 3 && getSelectableCountryCount() > 0) {
+    } else if (_selectedOption == 2 && getSelectableCountryCount() > 0) {
       Yenitur();
       Navigator.push(
         context,
@@ -243,25 +237,22 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
-          itemCount: 4,
+          itemCount: 3,
           itemBuilder: (context, index) {
             // Listelerle yapılandırma
             final titles = [
-              Yazi.get('deniztitle'),
               Yazi.get('baskenttitle'),
               Yazi.get('bayraktitle'),
               Yazi.get('mesafetitle')
             ];
 
             final descriptions = [
-              Yazi.get('denizdescription'),
               Yazi.get('baskentdescription'),
               Yazi.get('bayrakdescription'),
               Yazi.get('mesafedescription')
             ];
 
             final images = [
-              'assets/logo2.png',
               'assets/baskent.jpg',
               'assets/bayrak.jpg',
               'assets/mesafe.jpg'
