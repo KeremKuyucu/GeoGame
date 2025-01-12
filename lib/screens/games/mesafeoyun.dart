@@ -67,6 +67,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
       message += Yazi.get('mesafe') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
       message += Yazi.get('yon') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
+        String ulke = kelimeDuzelt(_controller.text.trim());
         _controller.clear();
         _currentInput='';
         message='';
@@ -84,7 +85,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
             '{\n"Name": "$name",\n'
                 '"Mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"verilencevap: "$ulke",\n'
                 '"Yeşil": "${butonAnahtarlar[0]}",\n'
                 '"Sarı": "${butonAnahtarlar[1]}",\n'
                 '"Mavi": "${butonAnahtarlar[2]}",\n'
@@ -95,6 +96,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         });
         puan=200;
       } else {
+        String ulke = kelimeDuzelt(_controller.text.trim());
         puan-=10;
         if(puan<50)
           puan=50;
@@ -106,7 +108,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
             '{\n"Name": "$name",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"verilencevap: "$ulke",\n'
                 '"Yeşil": "${butonAnahtarlar[0]}",\n'
                 '"Sarı": "${butonAnahtarlar[1]}",\n'
                 '"Mavi": "${butonAnahtarlar[2]}",\n'
@@ -134,7 +136,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         '{\n"Name": "$name",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+            '"verilencevap: "",\n'
             '"Yeşil": "${butonAnahtarlar[0]}",\n'
             '"Sarı": "${butonAnahtarlar[1]}",\n'
             '"Mavi": "${butonAnahtarlar[2]}",\n'

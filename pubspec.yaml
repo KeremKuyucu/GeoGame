@@ -1,7 +1,7 @@
 name: GeoGame
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.2.7
+version: 1.2.8
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -30,7 +30,9 @@ dev_dependencies:
     sdk: flutter
 
 flutter_icons:
-  android: true
+  android: {
+    "generate": true
+  }
   web: {
     "generate": true
   }

@@ -66,6 +66,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
   void _checkAnswer() {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
+        String ulke = kelimeDuzelt(_controller.text.trim());
         _controller.clear();
         _currentInput = '';
         yeniulkesec();
@@ -82,7 +83,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
             '{\n"Name": "$name",\n'
                 '"Mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"verilencevap: "$ulke",\n'
                 '"Yeşil": "${butonAnahtarlar[0]}",\n'
                 '"Sarı": "${butonAnahtarlar[1]}",\n'
                 '"Mavi": "${butonAnahtarlar[2]}",\n'
@@ -93,6 +94,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
         });
         puan = 50;
       } else {
+        String ulke = kelimeDuzelt(_controller.text.trim());
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
@@ -103,7 +105,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
             '{\n"Name": "$name",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+                '"verilencevap: "$ulke",\n'
                 '"Yeşil": "${butonAnahtarlar[0]}",\n'
                 '"Sarı": "${butonAnahtarlar[1]}",\n'
                 '"Mavi": "${butonAnahtarlar[2]}",\n'
@@ -132,7 +134,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
         '{\n"Name": "$name",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap: "${kelimeDuzelt(_controller.text.trim())}",\n'
+            '"verilencevap: "",\n'
             '"Yeşil": "${butonAnahtarlar[0]}",\n'
             '"Sarı": "${butonAnahtarlar[1]}",\n'
             '"Mavi": "${butonAnahtarlar[2]}",\n'
