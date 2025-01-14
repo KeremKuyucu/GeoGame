@@ -10,6 +10,10 @@ export 'package:easy_url_launcher/easy_url_launcher.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:theme_mode_builder/theme_mode_builder.dart';
 export 'package:searchfield/searchfield.dart';
+export 'package:firebase_core/firebase_core.dart';
+export 'package:firebase_auth/firebase_auth.dart';
+export 'package:firebase_analytics/firebase_analytics.dart';
+export 'package:community_material_icon/community_material_icon.dart';
 
 export 'dart:convert';
 export 'dart:io';
@@ -28,3 +32,4 @@ export 'screens/leadboards-and-profile/leadboard.dart';
 export 'screens/leadboards-and-profile/userprofile.dart';
 export 'screens/mainscreen/settings.dart';
 export 'screens/mainscreen/geogamelobi.dart';
+export 'firebase_options.dart';

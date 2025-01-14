@@ -31,6 +31,9 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ThemeModeBuilderConfig.setLight();
   }
   Future<void> _initializeGame() async {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     await readFromFile((update) => setState(update));
     await dilDegistir();
     await surumkiyasla();

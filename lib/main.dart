@@ -2,7 +2,6 @@ import 'package:GeoGame/util.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
   disableCertificateVerification();
   runApp(Geogame());
 }

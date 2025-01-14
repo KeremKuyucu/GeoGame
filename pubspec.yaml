@@ -23,6 +23,12 @@ dependencies:
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
   flutter_animate: ^4.5.2
+  firebase_core: ^3.10.0
+  firebase_auth: ^5.4.0
+  firebase_ui_auth: ^1.16.0
+  community_material_icon: ^5.9.55
+  firebase_analytics: ^11.4.0
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
