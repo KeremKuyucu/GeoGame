@@ -33,14 +33,14 @@ Mobil ve Windows uyumlu
 Aşağıda oyuna ait ekran görüntülerini bulabilirsiniz:
 
 <p align="center">
-  <img src="Resimler/baskentoyun.jpg" alt="Oyun Ekranı 1" width="200"/>
-  <img src="Resimler/bayrakoyun.jpg" alt="Oyun Ekranı 2" width="200"/>
-  <img src="Resimler/mesafeoyun.jpg" alt="Oyun Ekranı 3" width="200"/>
-  <img src="Resimler/mainlobi.jpg" alt="Oyun Ekranı 4" width="200"/>
-  <img src="Resimler/leadboard.jpg" alt="Oyun Ekranı 5" width="200"/>
-  <img src="Resimler/ulkeler.jpg" alt="Oyun Ekranı 6" width="200"/>
-  <img src="Resimler/profiles.jpg" alt="Oyun Ekranı 7" width="200"/>
-  <img src="Resimler/settings.jpg" alt="Oyun Ekranı 8" width="200"/>
+  <img src="Resimler/baskentoyun.png" alt="Oyun Ekranı 1" width="200"/>
+  <img src="Resimler/bayrakoyun.png" alt="Oyun Ekranı 2" width="200"/>
+  <img src="Resimler/mesafeoyun.png" alt="Oyun Ekranı 3" width="200"/>
+  <img src="Resimler/mainlobi.png" alt="Oyun Ekranı 4" width="200"/>
+  <img src="Resimler/leadboard.png" alt="Oyun Ekranı 5" width="200"/>
+  <img src="Resimler/ulkeler.png" alt="Oyun Ekranı 6" width="200"/>
+  <img src="Resimler/profiles.png" alt="Oyun Ekranı 7" width="200"/>
+  <img src="Resimler/settings.png" alt="Oyun Ekranı 8" width="200"/>
 
 
 # Kullanılan Teknolojiler
