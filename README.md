@@ -2,12 +2,13 @@
 
 GeoGame is an educational game designed to enhance your knowledge about countries. Test yourself on capitals, flags, and other geographical facts while learning more about the world!
 
-## API
+## Website
 
-GeoGame leverages Discord APIs for its leaderboard functionality.
-For server-side code, [Click Here](https://github.com/keremlolgg/geogame-api).
+Access the GeoGame website to experience the game:
 
-## Demo
+[GeoGame Website](https://keremkk.glitch.me/geogame)
+
+## Download
 
 Experience the game by accessing it via the following link:
 
