@@ -1,7 +1,7 @@
 # **GeoGame** 
 
 <p align="center">
-  <a href="tr.md">🇹🇷 Türkçe</a>
+  <a href="TR.md">🇹🇷 Türkçe</a>
 </p>
 
 <p align="center">
