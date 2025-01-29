@@ -33,7 +33,7 @@ class Yazi {
       }
       _currentLanguage = dilKodu;
     } catch (e) {
-      print('Dosya bulunamadı veya JSON okuma hatası: $e');
+      debugPrint('Dosya bulunamadı veya JSON okuma hatası: $e');
       _localizedStrings = {};
     }
   }
@@ -151,8 +151,17 @@ class DrawerWidget extends StatelessWidget {
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
 final List<String> diller = ['Türkçe','English'];
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
-String name = "", secilenDil='Türkçe', apiserver = "";
+String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='Türkçe', apiserver = "https://keremkk.glitch.me";
 List<dynamic> users = [];
+final List<Color> buttonColors = [
+  Colors.green,
+  Colors.yellow,
+  Colors.blue,
+  Colors.red
+];
+final List<bool> butontiklama = [
+  true,true,true,true,true
+];
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer();
 Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
   try {
@@ -162,7 +171,7 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
     await player.setAsset(assetPath);
     await player.play();
   } catch (e) {
-    print('Error playing asset: $e');
+    debugPrint('Error playing asset: $e');
     try {
       if (player.playing) {
         await player.stop();
@@ -170,7 +179,7 @@ Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, Strin
       await player.setUrl(url);
       await player.play();
     } catch (urlError) {
-      print('Error playing audio from URL: $urlError');
+      debugPrint('Error playing audio from URL: $urlError');
     }
   }
 }
@@ -179,6 +188,10 @@ Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesl
 Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yenitur.mp3');}
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
+  butontiklama[0]=true;
+  butontiklama[1]=true;
+  butontiklama[2]=true;
+  butontiklama[3]=true;
   int butonRandomNumber = random.nextInt(4);
   Set<int> selectedIndices = {};
 
@@ -226,7 +239,7 @@ int getSelectableCountryCount() {
 }
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}kurallar.json';
+  final filePath = '${directory.path}/kurallar.json';
   final file = File(filePath);
 
   if (await file.exists()) {
@@ -236,16 +249,20 @@ Future<void> readFromFile(Function updateState) async {
     updateState(() {
       amerikakitasi = jsonData['amerikakitasi'] == true;
       asyakitasi = jsonData['asyakitasi'] == true;
-      afrikakitasi = jsonData['afrikkatasi'] == true;
+      afrikakitasi = jsonData['afrikakitasi'] == true;
       avrupakitasi = jsonData['avrupakitasi'] == true;
       okyanusyakitasi = jsonData['okyanusyakitasi'] == true;
       antartikakitasi = jsonData['antartikakitasi'] == true;
       bmuyeligi = jsonData['bmuyeligi'] == true;
       yazmamodu = jsonData['yazmamodu'] == true;
       darktema = jsonData['darktema'] == true;
-      name = jsonData['name'];
-      secilenDil = jsonData['secilenDil'];
-      toplampuan = jsonData['toplampuan']?? 0;
+
+      name = jsonData['name'] ?? '';
+      uid = jsonData['uid'] ?? '';
+      profilurl = jsonData['profilurl'] ?? 'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
+      secilenDil = jsonData['secilenDil'] ?? 'Türkçe';
+
+      toplampuan = jsonData['toplampuan'] ?? 0;
       mesafedogru = jsonData['mesafedogru'] ?? 0;
       mesafeyanlis = jsonData['mesafeyanlis'] ?? 0;
       bayrakdogru = jsonData['bayrakdogru'] ?? 0;
@@ -255,21 +272,22 @@ Future<void> readFromFile(Function updateState) async {
       mesafepuan = jsonData['mesafepuan'] ?? 0;
       bayrakpuan = jsonData['bayrakpuan'] ?? 0;
       baskentpuan = jsonData['baskentpuan'] ?? 0;
+      print ("dosyadan okundu");
     });
   } else {
-    print('Dosya bulunamadı: kurallar.json');
+    debugPrint('Dosya bulunamadı: kurallar.json');
     writeToFile();
   }
 }
 Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}kurallar.json';
+  final filePath = '${directory.path}/kurallar.json';
   final file = File(filePath);
   toplampuan=bayrakpuan+baskentpuan+mesafepuan;
   final data = {
     'amerikakitasi': amerikakitasi,
     'asyakitasi': asyakitasi,
-    'afrikkatasi': afrikakitasi,
+    'afrikakitasi': afrikakitasi,
     'avrupakitasi': avrupakitasi,
     'okyanusyakitasi': okyanusyakitasi,
     'antartikakitasi': antartikakitasi,
@@ -277,6 +295,8 @@ Future<void> writeToFile() async {
     'yazmamodu': yazmamodu,
     'darktema': darktema,
     'name': name,
+    'uid': uid,
+    'profilurl': profilurl,
     'secilenDil': secilenDil,
     'toplampuan': toplampuan,
     'mesafedogru': mesafedogru,
@@ -292,6 +312,7 @@ Future<void> writeToFile() async {
 
   final jsonData = jsonEncode(data);
   await file.writeAsString(jsonData);
+  print("dosyaya yazıldı");
 }
 String kelimeDuzelt(String kelime) {
   String sonuc = '';
@@ -331,12 +352,12 @@ Future<void> sendNewUserNotification(String oyuncuName) async {
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Yeni kullanıcı bildirimi başarıyla gönderildi!');
+      debugPrint('Yeni kullanıcı bildirimi başarıyla gönderildi!');
     } else {
-      print('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
+      debugPrint('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
-    print('Hata: $e');
+    debugPrint('Hata: $e');
   }
 }
 Future<void> nameChangeNotification(String eskiname,String yeniname) async {
@@ -352,12 +373,12 @@ Future<void> nameChangeNotification(String eskiname,String yeniname) async {
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Yeni kullanıcı bildirimi başarıyla gönderildi!');
+      debugPrint('Yeni kullanıcı bildirimi başarıyla gönderildi!');
     } else {
-      print('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
+      debugPrint('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
-    print('Hata: $e');
+   debugPrint('Hata: $e');
   }
 }
 Future<void> postLeadboard() async {
@@ -369,6 +390,8 @@ Future<void> postLeadboard() async {
     final fullMessage = '{\n'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
+        '"uid": "$uid",\n'
+        '"profilurl": "$profilurl",\n'
         '"dil": "$secilenDil",\n'
         '"surum": "$localVersion",\n'
         '"ulke": "$country",\n'
@@ -395,12 +418,12 @@ Future<void> postLeadboard() async {
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Log başarıyla gönderildi!');
+      debugPrint('Log başarıyla gönderildi!');
     } else {
-      print('Log gönderilemedi: ${response.statusCode}');
+     debugPrint('Log gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
-    print('Hata: $e');
+    debugPrint('Hata: $e');
   }
 }
 Future<void> postUlkeLog(String message) async {
@@ -415,12 +438,12 @@ Future<void> postUlkeLog(String message) async {
     ).timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
-      print('Ulke Log başarıyla gönderildi!');
+      debugPrint('Ulke Log başarıyla gönderildi!');
     } else {
-      print('Ulke Log gönderilemedi: ${response.statusCode}');
+      debugPrint('Ulke Log gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
-    print('Hata: $e');
+    debugPrint('Hata: $e');
   }
 }
 // Listeler

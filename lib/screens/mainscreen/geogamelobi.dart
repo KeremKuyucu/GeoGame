@@ -1,5 +1,6 @@
 import 'package:GeoGame/util.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
 void disableCertificateVerification() {
   HttpOverrides.global = MyHttpOverrides();
@@ -21,9 +22,13 @@ class GeoGameLobi extends StatefulWidget {
 class _GeoGameLobiState extends State<GeoGameLobi> {
   int _selectedOption = 0;
   List<String> options = List.filled(3, '');
+  final _auth = firebase_auth.FirebaseAuth.instance;
+  firebase_auth.User? _user;
+
   @override
   void initState() {
     super.initState();
+    _checkCurrentUser();
     _initializeGame();
     if (darktema)
       ThemeModeBuilderConfig.setDark();
@@ -31,13 +36,76 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ThemeModeBuilderConfig.setLight();
   }
   Future<void> _initializeGame() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
     await readFromFile((update) => setState(update));
     await dilDegistir();
     await surumkiyasla();
-    istatistik(context);
+    if (name.isEmpty) {
+      selectedIndex=4;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SettingsPage()),
+      );
+    } else {
+      postLeadboard();
+    }
+  }
+  Future<void> puanguncelle() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${apiserver}/get_leadboard'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        setState(() {
+          users = data['users'].map((user) {
+            return {
+              'name': user['name'] ?? '',
+              'uid': user['uid'] ?? '',
+              'profilurl': user['profilurl'] ?? 'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
+              'puan': int.parse(user['puan'] ?? "0"),
+              'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
+              'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
+              'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
+              'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
+              'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
+              'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
+              'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
+              'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
+              'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
+            };
+          }).toList();
+
+          for (var user in users) {
+            if (user['uid'] == _user?.uid) {
+              debugPrint ('uidler eşleşti');
+              if(toplampuan< user['puan']){
+                debugPrint('puan daha düşük güncellendi');
+                toplampuan = user['puan'];
+                mesafepuan = user['mesafepuan'];
+                baskentpuan = user['baskentpuan'];
+                bayrakpuan = user['bayrakpuan'];
+                mesafedogru = user['mesafedogru'];
+                baskentdogru = user['baskentdogru'];
+                bayrakdogru = user['bayrakdogru'];
+                mesafeyanlis = user['mesafeyanlis'];
+                baskentyanlis = user['baskentyanlis'];
+                bayrakyanlis = user['bayrakyanlis'];
+                writeToFile();
+              }
+              break;
+            }
+          }
+        });
+
+        print("Veri başarıyla güncellendi.");
+      } else {
+        throw Exception('Veri yüklenemedi.');
+      }
+    } catch (e) {
+      print('Hata: $e');
+    }
   }
   Future<void> dilDegistir() async {
     await Yazi.loadDil(secilenDil).then((_) {
@@ -141,15 +209,12 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       showUpdateDialog(context);
     }
   }
-  Future<void> istatistik(BuildContext context) async {
-    if (name.isEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SettingsPage()),
-      );
-    } else {
-      postLeadboard();
-    }
+  Future<void> _checkCurrentUser() async {
+    User? user = _auth.currentUser;
+    setState(() {
+      _user = user;
+    });
+    debugPrint('user=$_user');
   }
   void _selectOption(int index) async {
     setState(() {

@@ -6,23 +6,22 @@ class MesafeOyun extends StatefulWidget {
 }
 
 class _MesafeOyunState extends State<MesafeOyun> {
-  final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
-  String message='';
+  String message='',_currentInput = '';
   late TextEditingController _controller;
-  String _currentInput = '';
   int puan=100;
+
   @override
   void initState() {
     super.initState();
     _initializeGame();
+  }
+  Future<void> _initializeGame() async {
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-  }
-  Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     yeniulkesec();
     await mesafeoyunkurallari();
@@ -82,14 +81,15 @@ class _MesafeOyunState extends State<MesafeOyun> {
           ),
         );
         postUlkeLog(
-            '{\n"Name": "$name",\n'
-                '"Mesaj": "Cevap Doğru",\n'
+            '{\n"name": "$name",\n'
+                '"oyunmodu": "mesafe",\n'
+                '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "$ulke",\n'
-                '"Yeşil": "${butonAnahtarlar[0]}",\n'
-                '"Sarı": "${butonAnahtarlar[1]}",\n'
-                '"Mavi": "${butonAnahtarlar[2]}",\n'
-                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
+                '"verilencevap": "$ulke",\n'
+                '"yesil": "${butonAnahtarlar[0]}",\n'
+                '"sari": "${butonAnahtarlar[1]}",\n'
+                '"mavi": "${butonAnahtarlar[2]}",\n'
+                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         setState(() {
           mesafepuan+=puan;
           writeToFile();
@@ -104,15 +104,17 @@ class _MesafeOyunState extends State<MesafeOyun> {
         _controller.clear();
         _currentInput='';
         mesafeyanlis++;
+        writeToFile();
         postUlkeLog(
-            '{\n"Name": "$name",\n'
+            '{\n"name": "$name",\n'
+                '"oyunmodu": "mesafe",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "$ulke",\n'
-                '"Yeşil": "${butonAnahtarlar[0]}",\n'
-                '"Sarı": "${butonAnahtarlar[1]}",\n'
-                '"Mavi": "${butonAnahtarlar[2]}",\n'
-                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
+                '"verilencevap": "$ulke",\n'
+                '"yesil": "${butonAnahtarlar[0]}",\n'
+                '"sari": "${butonAnahtarlar[1]}",\n'
+                '"mavi": "${butonAnahtarlar[2]}",\n'
+                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap')+puan.toString()),
@@ -132,15 +134,17 @@ class _MesafeOyunState extends State<MesafeOyun> {
         duration: Duration(seconds: 2),
       ),
     );
+    String ulke = kelimeDuzelt(_controller.text.trim());
     postUlkeLog(
-        '{\n"Name": "$name",\n'
+        '{\n"name": "$name",\n'
+            '"oyunmodu": "mesafe",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap: "",\n'
-            '"Yeşil": "${butonAnahtarlar[0]}",\n'
-            '"Sarı": "${butonAnahtarlar[1]}",\n'
-            '"Mavi": "${butonAnahtarlar[2]}",\n'
-            '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
+            '"verilencevap": "$ulke",\n'
+            '"yesil": "${butonAnahtarlar[0]}",\n'
+            '"sari": "${butonAnahtarlar[1]}",\n'
+            '"mavi": "${butonAnahtarlar[2]}",\n'
+            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       _currentInput='';
       message='';

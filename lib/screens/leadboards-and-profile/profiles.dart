@@ -17,6 +17,7 @@ class _ProfilesState extends State<Profiles> {
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
   }
+
   void _selectIndex(int index) async {
     setState(() {
       selectedIndex = index;
@@ -93,15 +94,26 @@ class _ProfilesState extends State<Profiles> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profil başlığı
-                  Text(
-                    ('$name'),
-                    style: TextStyle(
-                      fontSize: 26.0, // Daha büyük başlık
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.2, // Harf aralığı ekleyerek şıklık katma
-                    ),
+                  // Profil başlığı ve profil resmi
+                  Row(
+                    children: [
+                      // Profil Resmi
+                      CircleAvatar(
+                        radius: 25.0, // Profil resmi boyutu
+                        backgroundImage: NetworkImage(profilurl)
+                      ),
+                      SizedBox(width: 10.0),
+                      // Kullanıcı adı
+                      Text(
+                        ('$name'),
+                        style: TextStyle(
+                          fontSize: 26.0, // Daha büyük başlık
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.2, // Harf aralığı ekleyerek şıklık katma
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 12.0),
                   Divider(

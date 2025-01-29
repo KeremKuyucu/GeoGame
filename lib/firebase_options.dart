@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -51,7 +42,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAv1RDMydkKFNBNsknhTByb9dP2SV8ZzXQ',
-    appId: '1:422602946138:android:fa1691bb3d191e5818ca63',
+    appId: '1:422602946138:android:ea31a43fdbf51a3818ca63',
     messagingSenderId: '422602946138',
     projectId: 'geogamekk',
     databaseURL: 'https://geogamekk-default-rtdb.europe-west1.firebasedatabase.app',
@@ -60,12 +51,48 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyAhMZ1WyPKmOv1CD8ZF6tpd2tHXAkvrm6Y',
-    appId: '1:422602946138:web:e2a457d277b914b418ca63',
+    appId: '1:422602946138:web:5a50870baba5afa718ca63',
     messagingSenderId: '422602946138',
     projectId: 'geogamekk',
     authDomain: 'geogamekk.firebaseapp.com',
     databaseURL: 'https://geogamekk-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'geogamekk.firebasestorage.app',
-    measurementId: 'G-K3S4B0J03W',
+    measurementId: 'G-XHF4FYY8K7',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAhMZ1WyPKmOv1CD8ZF6tpd2tHXAkvrm6Y',
+    appId: '1:422602946138:web:591cfe5753d95d0818ca63',
+    messagingSenderId: '422602946138',
+    projectId: 'geogamekk',
+    authDomain: 'geogamekk.firebaseapp.com',
+    databaseURL: 'https://geogamekk-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'geogamekk.firebasestorage.app',
+    measurementId: 'G-8TJH0F54N3',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAMcojqpEBfrS6i0TqzGbmR8nHTFOL7_fo',
+    appId: '1:422602946138:ios:4a7bb7a7a148f1c918ca63',
+    messagingSenderId: '422602946138',
+    projectId: 'geogamekk',
+    databaseURL: 'https://geogamekk-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'geogamekk.firebasestorage.app',
+    androidClientId: '422602946138-kt9ml0a8k2r53m4o0qr5fqhn0ctmdv65.apps.googleusercontent.com',
+    iosClientId: '422602946138-vqbk94ousvi1htcji4rk2d0n5gbtu23i.apps.googleusercontent.com',
+    iosBundleId: 'com.kk.geogame',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAMcojqpEBfrS6i0TqzGbmR8nHTFOL7_fo',
+    appId: '1:422602946138:ios:4a7bb7a7a148f1c918ca63',
+    messagingSenderId: '422602946138',
+    projectId: 'geogamekk',
+    databaseURL: 'https://geogamekk-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'geogamekk.firebasestorage.app',
+    androidClientId: '422602946138-kt9ml0a8k2r53m4o0qr5fqhn0ctmdv65.apps.googleusercontent.com',
+    iosClientId: '422602946138-vqbk94ousvi1htcji4rk2d0n5gbtu23i.apps.googleusercontent.com',
+    iosBundleId: 'com.kk.geogame',
+  );
+
 }

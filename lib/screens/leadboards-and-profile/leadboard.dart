@@ -5,13 +5,13 @@ class Leadboard extends StatefulWidget {
   @override
   _LeadboardState createState() => _LeadboardState();
 }
-
 class _LeadboardState extends State<Leadboard> {
   @override
   void initState() {
     super.initState();
     _initializeGame();
   }
+
   Future<void> _initializeGame() async {
     fetchData();
     await readFromFile((update) => setState(update));
@@ -65,6 +65,9 @@ class _LeadboardState extends State<Leadboard> {
           users = data['users'].map((user) {
             return {
               'name': user['name'] ?? '',
+              'uid': user['uid'] ?? '',
+              'profilurl': user['profilurl'] ??
+                  'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
               'puan': int.parse(user['puan'] ?? "0"),
               'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
               'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
@@ -124,67 +127,75 @@ class _LeadboardState extends State<Leadboard> {
         child: users.isEmpty
             ? Center(child: CircularProgressIndicator())
             : ListView.builder(
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Userprofile(userindex: index,)),
-                );
-              },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                elevation: 5,
-                margin: EdgeInsets.symmetric(vertical: 10),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        child: Text(
-                          '${index + 1}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        radius: 30,
-                        backgroundColor: _getBackgroundColor(index),
+                itemCount: users.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Userprofile(
+                                  userindex: index,
+                                )),
+                      );
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      elevation: 5,
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
                           children: [
-                            Text(
-                              users[index]['name'] ?? 'Unknown Name',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                            CircleAvatar(
+                              child: Text(
+                                '${index + 1}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                              radius: 15,
+                              backgroundColor: _getBackgroundColor(index),
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Score: ${users[index]['puan'] ?? '0'}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[700],
+                            CircleAvatar(
+                                backgroundImage: NetworkImage(users[index]
+                                        ['profilurl'] ??
+                                    'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363'),
+                                radius: 30),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    users[index]['name'] ?? 'Unknown Name',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Score: ${users[index]['puan'] ?? '0'}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      )
-                    ],
-                  ),
-                ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: selectedIndex,

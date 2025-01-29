@@ -1,11 +1,20 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    id 'com.google.gms.google-services'
+}
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth:23.1.0'
+    implementation 'com.google.android.gms:play-services-auth:21.3.0'
+    implementation 'com.google.firebase:firebase-auth:23.1.0'
+    implementation 'com.google.firebase:firebase-messaging:24.1.0'
+    implementation 'com.google.android.gms:play-services-measurement-api:22.1.2'
 }
 
 android {
@@ -23,21 +32,33 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.kk.geogame"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
+        compileSdkVersion 34
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-
-    buildTypes {
+    signingConfigs {
+        debug {
+            storeFile file("C:\\Users\\KeremK\\. Projeler\\StudioProjects\\geogame\\ksk.jks")  // Gerçek dosya yolu
+            storePassword "kerem2008"  // Keystore şifresi
+            keyAlias "ksk"  // Keystore'da belirlediğiniz alias
+            keyPassword "kerem2008"  // Alias'a ait şifre
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            storeFile file("C:\\Users\\KeremK\\. Projeler\\StudioProjects\\geogame\\ksk.jks")  // Gerçek dosya yolu
+            storePassword "kerem2008"  // Keystore şifresi
+            keyAlias "ksk"  // Keystore'da belirlediğiniz alias
+            keyPassword "kerem2008"  // Alias'a ait şifre
+        }
+    }
+    buildTypes {
+        debug {
             signingConfig = signingConfigs.debug
+        }
+        release {
+            signingConfig = signingConfigs.release
         }
     }
 }
@@ -45,9 +66,3 @@ android {
 flutter {
     source = "../.."
 }
-
-dependencies {
-    implementation 'com.google.firebase:firebase-core:16.0.1'
-}
-
-apply plugin: 'com.google.gms.google-services'

@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:422602946138:android:fa1691bb3d191e5818ca63",
+        "mobilesdk_app_id": "1:422602946138:android:ea31a43fdbf51a3818ca63",
         "android_client_info": {
-          "package_name": "kk.geogame.app"
+          "package_name": "com.kk.geogame"
         }
       },
       "oauth_client": [

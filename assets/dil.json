@@ -76,8 +76,8 @@
       "English": "Okay"
     },
     "sikgizle": {
-      "Türkçe": "Şıkları Ayarlardan Kapatabilirsiniz.",
-      "English": "You can disable options in settings."
+      "Türkçe": "İsterseniz ayarlardan şıkları\n 'Yazarak Bilme Modu' ile değiştirebilirsiniz.",
+      "English": "If you want, you can change the options\nfrom the settings to 'Typing Mode'."
     },
     "kurallar": {
       "Türkçe": "Kurallar",

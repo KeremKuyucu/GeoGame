@@ -1,6 +1,6 @@
-// Dosyanın başında yalnızca export komutları olmalı
 export 'package:flutter/material.dart';
-export 'package:flutter/services.dart' show rootBundle;
+export 'package:flutter/foundation.dart';
+export 'package:flutter/services.dart';
 export 'package:path_provider/path_provider.dart';
 export 'package:just_audio/just_audio.dart';
 export 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -14,6 +14,8 @@ export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:firebase_analytics/firebase_analytics.dart';
 export 'package:community_material_icon/community_material_icon.dart';
+export 'package:google_sign_in/google_sign_in.dart';
+export 'package:google_mobile_ads/google_mobile_ads.dart';
 
 export 'dart:convert';
 export 'dart:io';

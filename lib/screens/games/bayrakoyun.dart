@@ -6,12 +6,7 @@ class BayrakOyun extends StatefulWidget {
 }
 
 class _BayrakOyunState extends State<BayrakOyun> {
-  final List<Color> buttonColors = [
-    Colors.green,
-    Colors.yellow,
-    Colors.blue,
-    Colors.red
-  ];
+
   late TextEditingController _controller;
   String _currentInput = '';
   int puan = 50;
@@ -19,20 +14,20 @@ class _BayrakOyunState extends State<BayrakOyun> {
   void initState() {
     super.initState();
     _initializeGame();
+
+  }
+
+  Future<void> _initializeGame() async {
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-  }
-
-  Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     yeniulkesec();
     await bayrakoyunkurallari();
   }
-
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
       context: context,
@@ -61,8 +56,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
       },
     );
   }
-
-  void _checkAnswer() {
+  void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         String ulke = kelimeDuzelt(_controller.text.trim());
@@ -79,14 +73,15 @@ class _BayrakOyunState extends State<BayrakOyun> {
           ),
         );
         postUlkeLog(
-            '{\n"Name": "$name",\n'
-                '"Mesaj": "Cevap Doğru",\n'
+            '{\n"name": "$name",\n'
+                '"oyunmodu": "bayrak",\n'
+                '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "$ulke",\n'
-                '"Yeşil": "${butonAnahtarlar[0]}",\n'
-                '"Sarı": "${butonAnahtarlar[1]}",\n'
-                '"Mavi": "${butonAnahtarlar[2]}",\n'
-                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
+                '"verilencevap": "$ulke",\n'
+                '"yesil": "${butonAnahtarlar[0]}",\n'
+                '"sari": "${butonAnahtarlar[1]}",\n'
+                '"mavi": "${butonAnahtarlar[2]}",\n'
+                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         setState(() {
           bayrakpuan += puan;
           writeToFile();
@@ -97,18 +92,21 @@ class _BayrakOyunState extends State<BayrakOyun> {
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
+        butontiklama[i]=false;
         _controller.clear();
         _currentInput='';
         bayrakyanlis++;
+        writeToFile();
         postUlkeLog(
-            '{\n"Name": "$name",\n'
+            '{\n"name": "$name",\n'
+                '"oyunmodu": "bayrak",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap: "$ulke",\n'
-                '"Yeşil": "${butonAnahtarlar[0]}",\n'
-                '"Sarı": "${butonAnahtarlar[1]}",\n'
-                '"Mavi": "${butonAnahtarlar[2]}",\n'
-                '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
+                '"verilencevap": "$ulke",\n'
+                '"yesil": "${butonAnahtarlar[0]}",\n'
+                '"sari": "${butonAnahtarlar[1]}",\n'
+                '"mavi": "${butonAnahtarlar[2]}",\n'
+                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(Yazi.get('yanliscevap') + puan.toString()),
@@ -119,7 +117,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
       }
     });
   }
-
   void _pasButtonPressed() {
     puan = 50;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -129,15 +126,17 @@ class _BayrakOyunState extends State<BayrakOyun> {
         duration: Duration(seconds: 2),
       ),
     );
+    String ulke = kelimeDuzelt(_controller.text.trim());
     postUlkeLog(
-        '{\n"Name": "$name",\n'
+        '{\n"name": "$name",\n'
+            '"oyunmodu": "bayrak",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap: "",\n'
-            '"Yeşil": "${butonAnahtarlar[0]}",\n'
-            '"Sarı": "${butonAnahtarlar[1]}",\n'
-            '"Mavi": "${butonAnahtarlar[2]}",\n'
-            '"Kırmızı": "${butonAnahtarlar[3]}"\n}');
+            '"verilencevap": "$ulke",\n'
+            '"yesil": "${butonAnahtarlar[0]}",\n'
+            '"sari": "${butonAnahtarlar[1]}",\n'
+            '"mavi": "${butonAnahtarlar[2]}",\n'
+            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       yeniulkesec();
       Yenitur();
@@ -210,7 +209,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                     ),
                   ],
                 ),
-              ),
+              ), // bayrak
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -251,10 +250,10 @@ class _BayrakOyunState extends State<BayrakOyun> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
-                                onPressed: () {
+                                onPressed: butontiklama[i] ? () {
                                   _controller.text = butonAnahtarlar[i];
-                                  _checkAnswer();
-                                },
+                                  _checkAnswer(i);
+                                } : null,
                                 child: Text(
                                   butonAnahtarlar[i],
                                   style: TextStyle(
@@ -282,10 +281,10 @@ class _BayrakOyunState extends State<BayrakOyun> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 4.0),
                               child: ElevatedButton(
-                                onPressed: () {
+                                onPressed: butontiklama[i] ? () {
                                   _controller.text = butonAnahtarlar[i];
-                                  _checkAnswer();
-                                },
+                                  _checkAnswer(i);
+                                } : null,
                                 child: Text(
                                   butonAnahtarlar[i],
                                   style: TextStyle(
@@ -313,7 +312,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
                   ],
                 ),
               SizedBox(height: 20),
-              Padding(
+              if (!yazmamodu)
+                Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.8,
@@ -349,7 +349,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                           setState(() {
                             _controller.text = value.searchKey;
                             _currentInput = value.searchKey;
-                            _checkAnswer();
+                            _checkAnswer(5);
                           });
                         },
                       ),
