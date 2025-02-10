@@ -1,4 +1,4 @@
-# **GeoGame** 
+# **GeoGame**  
 
 <p align="center">
   <a href="TR.md">🇹🇷 Türkçe</a>
@@ -21,6 +21,8 @@ Access the GeoGame website to experience the game:
 Download and experience the game from the latest release:  
 
 ➡️ [**GeoGame - Latest Release**](https://github.com/keremlolgg/GeoGame/releases/latest)  
+
+![GitHub all releases](https://img.shields.io/github/downloads/keremlolgg/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
 
 ## **Supported Languages**  
 
@@ -63,6 +65,4 @@ A server-side application **processes scores**, **updates the leaderboard table*
 
 ## **License**  
 
-This project is licensed under the **GPL License**. For more details, refer to the [**LICENSE**](LICENSE) file.  
-
----
+This project is licensed under the **GPL License**. For more details, refer to the [**LICENSE**](LICENSE) file.
