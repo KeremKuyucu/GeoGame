@@ -8,6 +8,13 @@
   <img src="assets/logo.png" alt="GeoGame Logo" width="200"/>
 </p>  
 
+![GitHub all releases](https://img.shields.io/github/downloads/keremlolgg/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
+![GitHub stars](https://img.shields.io/github/stars/keremlolgg/GeoGame?style=for-the-badge)  
+![GitHub forks](https://img.shields.io/github/forks/keremlolgg/GeoGame?style=for-the-badge)  
+![License](https://img.shields.io/github/license/keremlolgg/GeoGame?style=for-the-badge)  
+![Last Commit](https://img.shields.io/github/last-commit/keremlolgg/GeoGame?style=for-the-badge)  
+![Made with Flutter](https://img.shields.io/badge/Made%20with-Flutter-blue?style=for-the-badge&logo=flutter)  
+
 GeoGame is an educational game designed to enhance your knowledge about countries. Test yourself on capitals, flags, and other geographical facts while learning more about the world!  
 
 ## **Website**  
@@ -21,8 +28,6 @@ Access the GeoGame website to experience the game:
 Download and experience the game from the latest release:  
 
 ➡️ [**GeoGame - Latest Release**](https://github.com/keremlolgg/GeoGame/releases/latest)  
-
-![GitHub all releases](https://img.shields.io/github/downloads/keremlolgg/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
 
 ## **Supported Languages**  
 
