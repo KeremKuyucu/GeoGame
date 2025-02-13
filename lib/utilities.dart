@@ -49,27 +49,141 @@ class Yazi {
 class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _sebepController = TextEditingController();
+    final TextEditingController _messageController = TextEditingController();
+
+    Future<void> sendMessage(String sebep, String message) async {
+      final url = Uri.parse('$apiserver/feedback');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'sebep': sebep,
+          'message': message,
+          'isim': name,
+          'uid': uid,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Mesaj başarıyla gönderildi.');
+      } else {
+        print('Mesaj gönderilemedi.');
+      }
+    }
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: BoxDecoration(),
-            child: Text(
-              'GeoGame',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    offset: Offset(2.0, 2.0),
-                    blurRadius: 3.0,
-                    color: Colors.black.withOpacity(0.5),
-                  ),
-                ],
-              ),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
             ),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: AssetImage('assets/logo.png'),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'GeoGame',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(2.0, 2.0),
+                        blurRadius: 3.0,
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: Icon(Icons.report, color: Colors.blueAccent),
+            title: Text('Hata Bildir', style: TextStyle(fontWeight: FontWeight.bold)),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Hata Bildir',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          _buildTextField(_sebepController, 'Sebep'),
+                          SizedBox(height: 10),
+                          _buildTextField(_messageController, 'Mesaj'),
+                          SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  sendMessage(
+                                    _sebepController.text,
+                                    _messageController.text,
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  child: Text('Gönder'),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  child: Text('İptal'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
           ListTile(
             title: Text(
@@ -79,60 +193,18 @@ class DrawerWidget extends StatelessWidget {
             dense: true,
           ),
           Divider(),
-          ListTile(
-            leading: Icon(Icons.share, color: Color(0xFF5865F2)),
-            title: Text(Yazi.get('uygpaylas')),
-            onTap: () async {
-              await Share.share(Yazi.get('davetpromt'));
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.instagram),
-            title: Text(Yazi.get('instagram')),
-            onTap: () async {
-              await EasyLauncher.url(
-                  url: 'https://www.instagram.com/kerem_.kk', mode: Mode.platformDefault);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.person, color: Color(0xFF5865F2)),
-            title: Text(Yazi.get('yapimcimetin')),
-            onTap: () async {
-              await EasyLauncher.url(
-                  url: 'https://keremkk.can.re', mode: Mode.platformDefault);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.public, color: Colors.red),
-            title: Text(Yazi.get('website')),
-            onTap: () async {
-              await EasyLauncher.url(url: 'https://geogame.can.re');
-            },
-          ),
-          ListTile(
-            leading: FaIcon(Icons.report),
-            title: Text(Yazi.get('hatabildir')),
-            onTap: () async {
-              await EasyLauncher.email(
-                  email: "report@keremkk.can.re",
-                  subject: "",
-                  body: "Merhaba, ");
-            },
-          ),
-          ListTile(
-            leading: FaIcon(FontAwesomeIcons.github),
-            title: Text(Yazi.get('github')),
-            onTap: () async {
-              await EasyLauncher.url(url: 'https://github.com/keremlolgg/GeoGame');
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.discord, color: Color(0xFF5865F2)),
-            title: Text(Yazi.get('discord')),
-            onTap: () async {
-              await EasyLauncher.url(url: 'https://discord.com/users/483678328646270996');
-            },
-          ),
+          _buildListTile(Icons.share, Color(0xFF5865F2), Yazi.get('uygpaylas'), () async {
+            await Share.share(Yazi.get('davetpromt'));
+          }),
+          _buildListTile(Icons.person, Color(0xFF5865F2), Yazi.get('yapimcimetin'), () async {
+            await EasyLauncher.url(url: 'https://keremkk.can.re', mode: Mode.platformDefault);
+          }),
+          _buildListTile(Icons.public, Colors.red, Yazi.get('website'), () async {
+            await EasyLauncher.url(url: 'https://geogame.can.re');
+          }),
+          _buildListTile(FontAwesomeIcons.github, Colors.black, Yazi.get('github'), () async {
+            await EasyLauncher.url(url: 'https://github.com/keremlolgg/GeoGame');
+          }),
           Divider(),
           ListTile(
             title: Text(
@@ -146,12 +218,100 @@ class DrawerWidget extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildTextField(TextEditingController controller, String hint) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hint,
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListTile(IconData icon, Color iconColor, String title, Function() onTap) {
+    return ListTile(
+      leading: Icon(icon, color: iconColor),
+      title: Text(title),
+      onTap: onTap,
+    );
+  }
 }
+class CustomNotification extends StatelessWidget {
+  final String countryName;
+
+  CustomNotification({required this.countryName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.blue, // Bildirimin rengini değiştirebilirsiniz
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Doğru Ülke!',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Ülke: $countryName',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4.0, horizontal: 4.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Pas butonuna basıldığında yapılacak işlemi buraya ekleyebilirsiniz
+                          Navigator.of(context).pop();  // Bildirimi kapat
+                        },
+                        child: Text(
+                          'Pas',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepOrangeAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
 final List<String> diller = ['Türkçe','English'];
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
-String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='Türkçe', apiserver = "https://keremkk.glitch.me";
+String name = "",profilurl= "https://keremkk.glitch.me/site/media/1337832093727723531",uid = '', secilenDil='English', apiserver = "https://keremkk.glitch.me/geogame";
 List<dynamic> users = [];
 final List<Color> buttonColors = [
   Colors.green,
@@ -337,48 +497,6 @@ Future<String> getCountry() async {
     }
   } catch (e) {
     throw Exception('Hata oluştu: $e');
-  }
-}
-Future<void> sendNewUserNotification(String oyuncuName) async {
-  try {
-    final targetUrl = '${apiserver}/newuser';
-    // Mesajı gönder
-    final response = await http.post(
-      Uri.parse(targetUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'message': 'Yeni kullanıcı kaydedildi!\nİsmi: $oyuncuName',
-      }),
-    ).timeout(Duration(seconds: 30));
-
-    if (response.statusCode == 200) {
-      debugPrint('Yeni kullanıcı bildirimi başarıyla gönderildi!');
-    } else {
-      debugPrint('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
-    }
-  } catch (e) {
-    debugPrint('Hata: $e');
-  }
-}
-Future<void> nameChangeNotification(String eskiname,String yeniname) async {
-  try {
-    final targetUrl = '${apiserver}/changename';
-    // Mesajı gönder
-    final response = await http.post(
-      Uri.parse(targetUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'message': 'Bir kullanıcı ismini değiştirdi:\n Eski ismi: $eskiname \n Yeni ismi: $yeniname',
-      }),
-    ).timeout(Duration(seconds: 30));
-
-    if (response.statusCode == 200) {
-      debugPrint('Yeni kullanıcı bildirimi başarıyla gönderildi!');
-    } else {
-      debugPrint('Yeni kullanıcı bildirimi gönderilemedi: ${response.statusCode}');
-    }
-  } catch (e) {
-   debugPrint('Hata: $e');
   }
 }
 Future<void> postLeadboard() async {

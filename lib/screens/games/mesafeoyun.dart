@@ -73,23 +73,12 @@ class _MesafeOyunState extends State<MesafeOyun> {
         yeniulkesec();
         Dogru();
         mesafedogru++;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(Yazi.get('dogrucevap')),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
         postUlkeLog(
             '{\n"name": "$name",\n'
                 '"oyunmodu": "mesafe",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n'
-                '"yesil": "${butonAnahtarlar[0]}",\n'
-                '"sari": "${butonAnahtarlar[1]}",\n'
-                '"mavi": "${butonAnahtarlar[2]}",\n'
-                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+                '"verilencevap": "$ulke",\n');
         setState(() {
           mesafepuan+=puan;
           writeToFile();
@@ -110,29 +99,18 @@ class _MesafeOyunState extends State<MesafeOyun> {
                 '"oyunmodu": "mesafe",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n'
-                '"yesil": "${butonAnahtarlar[0]}",\n'
-                '"sari": "${butonAnahtarlar[1]}",\n'
-                '"mavi": "${butonAnahtarlar[2]}",\n'
-                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(Yazi.get('yanliscevap')+puan.toString()),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
+                '"verilencevap": "$ulke",\n');
       }
     });
   }
   void _pasButtonPressed() {
     puan=100;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(Yazi.get('gecilenulke')+kalici.isim),
-        backgroundColor: Colors.yellow,
-        duration: Duration(seconds: 2),
-      ),
+    String ulkeisim = kalici.isim;
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CustomNotification(countryName: '$ulkeisim');
+      },
     );
     String ulke = kelimeDuzelt(_controller.text.trim());
     postUlkeLog(
@@ -140,11 +118,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
             '"oyunmodu": "mesafe",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+            '"verilencevap": "$ulke",\n');
     setState(() {
       _currentInput='';
       message='';

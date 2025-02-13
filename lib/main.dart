@@ -2,7 +2,6 @@ import 'package:GeoGame/util.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -28,7 +27,7 @@ class GeoGame extends State<Geogame> {
     return ThemeModeBuilder(
       builder: (BuildContext context, ThemeMode themeMode) {
         return MaterialApp(
-          debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: false,
           title: "GeoGame",
           themeMode: themeMode,
           theme: ThemeData(

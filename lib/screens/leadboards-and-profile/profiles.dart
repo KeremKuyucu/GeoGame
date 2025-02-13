@@ -99,7 +99,7 @@ class _ProfilesState extends State<Profiles> {
                     children: [
                       // Profil Resmi
                       CircleAvatar(
-                        radius: 25.0, // Profil resmi boyutu
+                        radius: 25.0,
                         backgroundImage: NetworkImage(profilurl)
                       ),
                       SizedBox(width: 10.0),

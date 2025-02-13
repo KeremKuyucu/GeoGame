@@ -1,12 +1,12 @@
 import 'package:GeoGame/util.dart';
 
-class BayrakOyun extends StatefulWidget {
+class BayrakOyunCoop extends StatefulWidget {
   @override
-  _BayrakOyunState createState() => _BayrakOyunState();
+  _BayrakOyunCoopState createState() => _BayrakOyunCoopState();
 }
 
-class _BayrakOyunState extends State<BayrakOyun> {
-
+class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
+  bool isPortraitUp = true;
   late TextEditingController _controller;
   String _currentInput = '';
   int puan = 50;
@@ -16,7 +16,21 @@ class _BayrakOyunState extends State<BayrakOyun> {
     _initializeGame();
 
   }
+  void ekrancevir() {
+    // Yön değiştirmek için UI'dan sonra yapılacak işlemleri belirleyelim.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isPortraitUp) {
+        // Eğer mevcut yön portre üst ise, portre alt yap
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown]);
+      } else {
+        // Eğer mevcut yön portre alt ise, portre üst yap
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      }
 
+      // Yönü tersine çevir
+      isPortraitUp = !isPortraitUp;
+    });
+  }
   Future<void> _initializeGame() async {
     _controller = TextEditingController();
     _controller.addListener(() {
@@ -64,10 +78,11 @@ class _BayrakOyunState extends State<BayrakOyun> {
         _currentInput = '';
         yeniulkesec();
         Dogru();
+        ekrancevir();
         bayrakdogru++;
         postUlkeLog(
             '{\n"name": "$name",\n'
-                '"oyunmodu": "bayrak",\n'
+                '"oyunmodu": "bayrak coop",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
                 '"verilencevap": "$ulke",\n'
@@ -101,32 +116,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
                 '"mavi": "${butonAnahtarlar[2]}",\n'
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
-    });
-  }
-  void _pasButtonPressed() {
-    puan = 50;
-    String ulkeisim = kalici.isim;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CustomNotification(countryName: '$ulkeisim');
-      },
-    );
-    String ulke = kelimeDuzelt(_controller.text.trim());
-    postUlkeLog(
-        '{\n"name": "$name",\n'
-            '"oyunmodu": "bayrak",\n'
-            '"Mesaj": "Pas Geçildi",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
-    setState(() {
-      yeniulkesec();
-      Yenitur();
-      _controller.clear();
     });
   }
 
@@ -205,7 +194,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 4.0, horizontal: 4.0),
                       child: ElevatedButton(
-                        onPressed: _pasButtonPressed,
+                        onPressed: null,
                         child: Text(
                           Yazi.get('pas'),
                           style: TextStyle(
@@ -248,7 +237,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      buttonColors[i], // Buton rengini ayarla
+                                  buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
@@ -279,7 +268,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      buttonColors[i], // Buton rengini ayarla
+                                  buttonColors[i], // Buton rengini ayarla
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
@@ -300,49 +289,49 @@ class _BayrakOyunState extends State<BayrakOyun> {
               SizedBox(height: 20),
               if (!yazmamodu)
                 Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: Column(
-                    children: [
-                      SearchField<Ulkeler>(
-                        suggestions: ulke
-                            .where((e) => (isEnglish ? e.enisim : e.isim)
-                                .toLowerCase()
-                                .contains(_currentInput.toLowerCase()))
-                            .map(
-                              (e) => SearchFieldListItem<Ulkeler>(
-                                (isEnglish ? e.enisim : e.isim),
-                                item: e,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          (isEnglish ? e.enisim : e.isim),
-                                          style: TextStyle(fontSize: 16),
-                                        ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Column(
+                      children: [
+                        SearchField<Ulkeler>(
+                          suggestions: ulke
+                              .where((e) => (isEnglish ? e.enisim : e.isim)
+                              .toLowerCase()
+                              .contains(_currentInput.toLowerCase()))
+                              .map(
+                                (e) => SearchFieldListItem<Ulkeler>(
+                              (isEnglish ? e.enisim : e.isim),
+                              item: e,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        (isEnglish ? e.enisim : e.isim),
+                                        style: TextStyle(fontSize: 16),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            )
-                            .toList(),
-                        controller: _controller,
-                        onSuggestionTap: (value) {
-                          setState(() {
-                            _controller.text = value.searchKey;
-                            _currentInput = value.searchKey;
-                            _checkAnswer(5);
-                          });
-                        },
-                      ),
-                    ],
+                            ),
+                          )
+                              .toList(),
+                          controller: _controller,
+                          onSuggestionTap: (value) {
+                            setState(() {
+                              _controller.text = value.searchKey;
+                              _currentInput = value.searchKey;
+                              _checkAnswer(5);
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

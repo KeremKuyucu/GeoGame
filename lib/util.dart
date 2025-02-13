@@ -10,12 +10,10 @@ export 'package:easy_url_launcher/easy_url_launcher.dart';
 export 'package:share_plus/share_plus.dart';
 export 'package:theme_mode_builder/theme_mode_builder.dart';
 export 'package:searchfield/searchfield.dart';
+
 export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_auth/firebase_auth.dart';
-export 'package:firebase_analytics/firebase_analytics.dart';
-export 'package:community_material_icon/community_material_icon.dart';
 export 'package:google_sign_in/google_sign_in.dart';
-export 'package:google_mobile_ads/google_mobile_ads.dart';
 
 export 'dart:convert';
 export 'dart:io';

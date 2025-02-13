@@ -1,11 +1,12 @@
 import 'package:GeoGame/util.dart';
 
-class BaskentOyun extends StatefulWidget {
+class BaskentOyunCoop extends StatefulWidget {
   @override
-  _BaskentOyunState createState() => _BaskentOyunState();
+  _BaskentOyunCoopState createState() => _BaskentOyunCoopState();
 }
 
-class _BaskentOyunState extends State<BaskentOyun> {
+class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
+  bool isPortraitUp = true;
   late TextEditingController _controller;
   String _currentInput = '';
   int puan = 50;
@@ -62,13 +63,11 @@ class _BaskentOyunState extends State<BaskentOyun> {
         _currentInput = '';
         yeniulkesec();
         Dogru();
+        ekrancevir();
         baskentdogru++;
-        baskentpuan += puan;
-        writeToFile();
-        puan = 50;
         postUlkeLog(
             '{\n"name": "$name",\n'
-                '"oyunmodu": "baskent",\n'
+                '"oyunmodu": "baskent coop",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
                 '"verilencevap": "$ulke",\n'
@@ -76,6 +75,11 @@ class _BaskentOyunState extends State<BaskentOyun> {
                 '"sari": "${butonAnahtarlar[1]}",\n'
                 '"mavi": "${butonAnahtarlar[2]}",\n'
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+        setState(() {
+          baskentpuan += puan;
+          writeToFile();
+        });
+        puan = 50;
       } else {
         String ulke = kelimeDuzelt(_controller.text.trim());
         puan -= 10;
@@ -99,30 +103,19 @@ class _BaskentOyunState extends State<BaskentOyun> {
       }
     });
   }
-  void _pasButtonPressed() {
-    puan = 50;
-    String ulkeisim = kalici.isim;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CustomNotification(countryName: '$ulkeisim');
-      },
-    );
-    String ulke = kelimeDuzelt(_controller.text.trim());
-    postUlkeLog(
-        '{\n"name": "$name",\n'
-            '"oyunmodu": "baskent",\n'
-            '"mesaj": "Pas Geçildi",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"}');
-    setState(() {
-      yeniulkesec();
-      Yenitur();
-      _controller.clear();
+  void ekrancevir() {
+    // Yön değiştirmek için UI'dan sonra yapılacak işlemleri belirleyelim.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isPortraitUp) {
+        // Eğer mevcut yön portre üst ise, portre alt yap
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown]);
+      } else {
+        // Eğer mevcut yön portre alt ise, portre üst yap
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      }
+
+      // Yönü tersine çevir
+      isPortraitUp = !isPortraitUp;
     });
   }
 
@@ -173,7 +166,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 4.0, horizontal: 4.0),
                         child: ElevatedButton(
-                          onPressed: _pasButtonPressed,
+                          onPressed: null,
                           child: Text(
                             Yazi.get('pas'),
                             style: TextStyle(
@@ -216,7 +209,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        buttonColors[i], // Buton rengini ayarla
+                                    buttonColors[i], // Buton rengini ayarla
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                     ),
@@ -247,7 +240,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                        buttonColors[i], // Buton rengini ayarla
+                                    buttonColors[i], // Buton rengini ayarla
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                     ),
@@ -268,54 +261,54 @@ class _BaskentOyunState extends State<BaskentOyun> {
                 SizedBox(height: 20),
                 if(!yazmamodu)
                   Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    child: Column(
-                      children: [
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim)
-                                  .toLowerCase()
-                                  .contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                                  (isEnglish ? e.enisim : e.isim),
-                                  item: e,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage(e.url),
-                                          radius: 20,
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: Column(
+                        children: [
+                          SearchField<Ulkeler>(
+                            suggestions: ulke
+                                .where((e) => (isEnglish ? e.enisim : e.isim)
+                                .toLowerCase()
+                                .contains(_currentInput.toLowerCase()))
+                                .map(
+                                  (e) => SearchFieldListItem<Ulkeler>(
+                                (isEnglish ? e.enisim : e.isim),
+                                item: e,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(e.url),
+                                        radius: 20,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          (isEnglish ? e.enisim : e.isim),
+                                          style: TextStyle(fontSize: 16),
                                         ),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            (isEnglish ? e.enisim : e.isim),
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
-                              _checkAnswer(5);
-                            });
-                          },
-                        ),
-                      ],
+                              ),
+                            )
+                                .toList(),
+                            controller: _controller,
+                            onSuggestionTap: (value) {
+                              setState(() {
+                                _controller.text = value.searchKey;
+                                _currentInput = value.searchKey;
+                                _checkAnswer(5);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),

@@ -64,14 +64,25 @@ class _UserProfileState extends State<Userprofile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profil başlığı
-                  Text(
-                    ('${users[widget.userindex]['name']}'),
-                    style: TextStyle(
-                      fontSize: 26.0, // Daha büyük başlık
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.2, // Harf aralığı ekleyerek şıklık katma
-                    ),
+                  Row(
+                    children: [
+                      // Profil Resmi
+                      CircleAvatar(
+                          radius: 25.0,
+                          backgroundImage: NetworkImage('${users[widget.userindex]['profilurl']}')
+                      ),
+                      SizedBox(width: 10.0),
+                      // Kullanıcı adı
+                      Text(
+                        ('${users[widget.userindex]['name']}'),
+                        style: TextStyle(
+                          fontSize: 26.0, // Daha büyük başlık
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.2, // Harf aralığı ekleyerek şıklık katma
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 12.0),
                   Divider(

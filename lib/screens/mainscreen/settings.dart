@@ -77,47 +77,45 @@ class _SettingsPageState extends State<SettingsPage> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        setState(() {
-          users = data['users'].map((user) {
-            return {
-              'name': user['name'] ?? '',
-              'uid': user['uid'] ?? '',
-              'profilurl': user['profilurl'] ??
-                  'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
-              'puan': int.parse(user['puan'] ?? "0"),
-              'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
-              'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
-              'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
-              'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
-              'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
-              'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
-              'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
-              'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
-              'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
-            };
-          }).toList();
+        users = data['users'].map((user) {
+          return {
+            'name': user['name'] ?? '',
+            'uid': user['uid'] ?? '',
+            'profilurl': user['profilurl'] ??
+                'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
+            'puan': int.parse(user['puan'] ?? "0"),
+            'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
+            'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
+            'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
+            'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
+            'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
+            'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
+            'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
+            'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
+            'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
+          };
+        }).toList();
 
-          for (var user in users) {
-            if (user['uid'] == _user?.uid) {
-              debugPrint('uidler eşleşti');
-              if (toplampuan < user['puan']) {
-                debugPrint('puan daha düşük güncellendi');
-                toplampuan = user['puan'];
-                mesafepuan = user['mesafepuan'];
-                baskentpuan = user['baskentpuan'];
-                bayrakpuan = user['bayrakpuan'];
-                mesafedogru = user['mesafedogru'];
-                baskentdogru = user['baskentdogru'];
-                bayrakdogru = user['bayrakdogru'];
-                mesafeyanlis = user['mesafeyanlis'];
-                baskentyanlis = user['baskentyanlis'];
-                bayrakyanlis = user['bayrakyanlis'];
-                writeToFile();
-              }
-              break;
+        for (var user in users) {
+          if (user['uid'] ==  _user?.uid) {
+            debugPrint('uidler eşleşti');
+            if (toplampuan < user['puan']) {
+              debugPrint('puan daha düşük güncellendi');
+              toplampuan = user['puan'];
+              mesafepuan = user['mesafepuan'];
+              baskentpuan = user['baskentpuan'];
+              bayrakpuan = user['bayrakpuan'];
+              mesafedogru = user['mesafedogru'];
+              baskentdogru = user['baskentdogru'];
+              bayrakdogru = user['bayrakdogru'];
+              mesafeyanlis = user['mesafeyanlis'];
+              baskentyanlis = user['baskentyanlis'];
+              bayrakyanlis = user['bayrakyanlis'];
+              writeToFile();
             }
+            break;
           }
-        });
+        }
 
         print("Veri başarıyla güncellendi.");
       } else {
@@ -155,6 +153,7 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
   }
+
   Future<firebase_auth.User?> googleSignIn() async {
     try {
       await GoogleSignIn().signOut();
@@ -187,10 +186,10 @@ class _SettingsPageState extends State<SettingsPage> {
       String isim;
       String email = "";
       if (user != null) {
-        isim = user.displayName ?? "Kullanıcı Adı";
+        isim = user.providerData.isNotEmpty ? user.providerData[0].displayName ?? "Misafir" : "Misafir";
         uid = user.uid;
         email = user.email ?? "";
-        name = user.displayName!;
+        name = user.providerData.isNotEmpty ? user.providerData[0].displayName ?? "Misafir" : "Misafir";
         profilurl = user.photoURL!;
         writeToFile();
       } else {
@@ -355,16 +354,16 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Card(
                 margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                elevation: 10.0,
+                elevation: 15.0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(25.0),
                 ),
-                shadowColor: Colors.black.withOpacity(0.2),
+                shadowColor: Colors.black.withOpacity(0.4),
                 color: Colors.grey.shade900,
                 child: Container(
                   padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.0),
+                    borderRadius: BorderRadius.circular(25.0),
                     gradient: LinearGradient(
                       colors: [Colors.grey.shade800, Colors.black],
                       begin: Alignment.topLeft,
@@ -381,8 +380,20 @@ class _SettingsPageState extends State<SettingsPage> {
                             onPressed: googleSignIn,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue, // Buton rengi
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+                              elevation: 5,
                             ),
-                            child: Text("Google ile Giriş Yap"),
+                            child: Text(
+                              "Google ile Giriş Yap",
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(height: 10),
@@ -391,8 +402,20 @@ class _SettingsPageState extends State<SettingsPage> {
                             onPressed: signInAnonymously,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green, // Buton rengi
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+                              elevation: 5,
                             ),
-                            child: Text("Misafir Devam Et"),
+                            child: Text(
+                              "Misafir Devam Et",
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -401,9 +424,25 @@ class _SettingsPageState extends State<SettingsPage> {
                       if (_user != null) ...[
                         // Profil Resmi
                         Center(
-                          child: CircleAvatar(
-                            radius: 60.0,
-                            backgroundImage: NetworkImage(profilurl),
+                          child: AnimatedContainer(
+                            duration: Duration(seconds: 1),
+                            curve: Curves.easeInOut,
+                            height: 120.0,
+                            width: 120.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(profilurl),
+                                fit: BoxFit.cover,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.6),
+                                  blurRadius: 10.0,
+                                  spreadRadius: 2.0,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(height: 10),
@@ -412,9 +451,11 @@ class _SettingsPageState extends State<SettingsPage> {
                           child: Text(
                             name,
                             style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ),
                         SizedBox(height: 20),
@@ -424,8 +465,20 @@ class _SettingsPageState extends State<SettingsPage> {
                             onPressed: signOut,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red, // Çıkış butonunun rengi
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+                              elevation: 5,
                             ),
-                            child: Text("Çıkış Yap"),
+                            child: Text(
+                              "Çıkış Yap",
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ],
