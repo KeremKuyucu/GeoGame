@@ -18,15 +18,15 @@ class _BayrakOyunState extends State<BayrakOyun> {
   }
 
   Future<void> _initializeGame() async {
+    await readFromFile((update) => setState(update));
+    await bayrakoyunkurallari();
+    yeniulkesec();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-    await readFromFile((update) => setState(update));
-    yeniulkesec();
-    await bayrakoyunkurallari();
   }
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(

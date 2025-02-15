@@ -17,15 +17,15 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
+    await readFromFile((update) => setState(update));
+    await baskentoyunkurallari(context);
+    yeniulkesec();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-    await readFromFile((update) => setState(update));
-    yeniulkesec();
-    await baskentoyunkurallari(context);
   }
   Future<void> baskentoyunkurallari(BuildContext context) async {
     return showDialog<void>(

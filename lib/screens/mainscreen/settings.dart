@@ -1,5 +1,4 @@
 import 'package:GeoGame/util.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:http/http.dart' as http;
 
 class SettingsPage extends StatefulWidget {
@@ -8,21 +7,68 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final _auth = firebase_auth.FirebaseAuth.instance;
-  firebase_auth.User? _user;
+  Timer? _clipboardTimer;
 
   @override
   void initState() {
     super.initState();
     readFromFile((update) => setState(update));
-    _checkCurrentUser();
     if (getSelectableCountryCount() < 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _kitaUyari();
       });
     }
+    _startClipboardTimer();
   }
+  void dispose() {
+    _clipboardTimer?.cancel();
+    super.dispose();
+  }
+  void _startClipboardTimer() {
+    _clipboardTimer = Timer.periodic(Duration(seconds: 2), _checkClipboard);
+  }
+  void _stopClipboardTimer() {
+    _clipboardTimer?.cancel();
+    _clipboardTimer = null;
+  }
+  void _checkClipboard(Timer timer) async {
+    // Eğer 'name' boşsa, timer'ı durduruyoruz
+    if (uid.isNotEmpty) {
+      _stopClipboardTimer();
+      return;
+    }
 
+    // Clipboard'tan veriyi alıyoruz
+    ClipboardData? clipboardData = await Clipboard.getData('text/plain');
+    String? text = clipboardData?.text;
+    if (text != null && text.isNotEmpty) {
+      try {
+        var jsonData = jsonDecode(text);
+        if (jsonData is Map && jsonData.containsKey('user') && jsonData['user'] is Map) {
+          var user = jsonData['user'];
+          setState(() {
+            uid = user['uid'];
+            name = user['displayName'];
+            profilurl = user['profilePicture'];
+            writeToFile();
+            puanguncelle();
+            Clipboard.setData(ClipboardData(text: ''));
+          });
+
+          debugPrint('Geçerli JSON verisi: $jsonData');
+          debugPrint('UID: $uid');
+          debugPrint('Display Name: $name');
+          debugPrint('Profile Picture: $profilurl');
+
+          _stopClipboardTimer();
+        } else {
+          debugPrint('Geçerli JSON verisi değil.');
+        }
+      } catch (e) {
+        debugPrint('Geçerli bir JSON verisi değil: $e');
+      }
+    }
+  }
   void _selectIndex(int index) async {
     setState(() {
       selectedIndex = index;
@@ -97,7 +143,7 @@ class _SettingsPageState extends State<SettingsPage> {
         }).toList();
 
         for (var user in users) {
-          if (user['uid'] ==  _user?.uid) {
+          if (user['uid'] ==  uid) {
             debugPrint('uidler eşleşti');
             if (toplampuan < user['puan']) {
               debugPrint('puan daha düşük güncellendi');
@@ -153,115 +199,12 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
   }
-
-  Future<firebase_auth.User?> googleSignIn() async {
-    try {
-      await GoogleSignIn().signOut();
-
-      // Google hesabı ile oturum açma ekranını göster
-      final googleUser = await GoogleSignIn().signIn();
-
-      if (googleUser == null) {
-        // Kullanıcı oturum açmayı iptal etti
-        debugPrint("Kullanıcı oturum açmayı iptal etti.");
-        return null;
-      }
-
-      final googleAuth = await googleUser.authentication;
-      final credential = firebase_auth.GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-      User? user = userCredential.user;
-
-      // setState ile kullanıcıyı güncelle
-      setState(() {
-        _user = user;
-        puanguncelle();
-      });
-
-      String isim;
-      String email = "";
-      if (user != null) {
-        isim = user.providerData.isNotEmpty ? user.providerData[0].displayName ?? "Misafir" : "Misafir";
-        uid = user.uid;
-        email = user.email ?? "";
-        name = user.providerData.isNotEmpty ? user.providerData[0].displayName ?? "Misafir" : "Misafir";
-        profilurl = user.photoURL!;
-        writeToFile();
-      } else {
-        isim = "Error";
-      }
-
-      // API'ye kullanıcı bilgilerini gönder
-      try {
-        final targetUrl = '${apiserver}/geogamesignlog';
-        final response = await http
-            .post(
-              Uri.parse(targetUrl),
-              headers: {'Content-Type': 'application/json'},
-              body: json.encode({
-                'sebep': 'Giriş',
-                'email': email,
-                'name': isim,
-              }),
-            )
-            .timeout(Duration(seconds: 30));
-
-        if (response.statusCode == 200) {
-          debugPrint('Mesaj başarıyla gönderildi!');
-        } else {
-          debugPrint('Mesaj gönderilemedi: ${response.statusCode}');
-        }
-      } catch (e) {
-        debugPrint('Hata: $e');
-      }
-
-      return user;
-    } catch (error) {
-      debugPrint("Google Sign-In Hatası: $error");
-      return null;
-    }
-  }
   Future<void> signOut() async {
-    final user = _auth.currentUser;
-    String isim ="";
-    String email = "";
-    if (user != null) {
-      isim = user.displayName ?? "Misafir";
-      email = user.email ?? "Misafir@";
-      name = '';
-      uid = '';
-      profilurl =
-          'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
-      toplampuan = 0;
-      mesafepuan = 0;
-      baskentpuan = 0;
-      bayrakpuan = 0;
-      mesafedogru = 0;
-      baskentdogru = 0;
-      bayrakdogru = 0;
-      mesafeyanlis = 0;
-      baskentyanlis = 0;
-      bayrakyanlis = 0;
-      writeToFile();
-    } else {
-      isim = "Error";
-    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          user == null
-              ? 'Zaten giriş yapmadınız.'
-              : '"${user.displayName?.isEmpty ?? true ? "Misafir" : user.displayName!}" adlı hesaptan çıkış yaptınız.',
-        ),
+        content: Text('"$name" adlı hesaptan çıkış yaptınız.'),
       ),
     );
-    _auth.signOut();
-    setState(() => this._user = null);
     try {
       final targetUrl = '${apiserver}/geogamesignlog';
       final response = await http
@@ -270,8 +213,8 @@ class _SettingsPageState extends State<SettingsPage> {
             headers: {'Content-Type': 'application/json'},
             body: json.encode({
               'sebep': "Çıkış",
-              'email': email,
-              'name': isim,
+              'uid': uid,
+              'name': name,
             }),
           )
           .timeout(Duration(seconds: 30));
@@ -284,51 +227,23 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (e) {
       debugPrint('Hata: $e');
     }
-  }
-  Future<firebase_auth.User?> signInAnonymously() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
-
-      setState(() {
-        _user = userCredential.user;
-        name = "Misafir";
-        writeToFile();
-      });
-        try {
-          final targetUrl = '${apiserver}/geogamesignlog';
-          final response = await http
-              .post(
-            Uri.parse(targetUrl),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode({
-              'sebep': 'Misafir Giriş',
-              'email': "Misafir@",
-              'name': "Misafir",
-            }),
-          )
-              .timeout(Duration(seconds: 30));
-
-          if (response.statusCode == 200) {
-            debugPrint('Mesaj başarıyla gönderildi!');
-          } else {
-            debugPrint('Mesaj gönderilemedi: ${response.statusCode}');
-          }
-        } catch (e) {
-          debugPrint('Hata: $e');
-        }
-      return userCredential.user;
-    } catch (e) {
-      print("Anonim giriş hatası: $e");
-      return null;
-    }
-
-  }
-  Future<void> _checkCurrentUser() async {
-    User? user = _auth.currentUser;
     setState(() {
-      _user = user;
+      name = '';
+      uid = '';
+      profilurl = 'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
+      toplampuan = 0;
+      mesafepuan = 0;
+      baskentpuan = 0;
+      bayrakpuan = 0;
+      mesafedogru = 0;
+      baskentdogru = 0;
+      bayrakdogru = 0;
+      mesafeyanlis = 0;
+      baskentyanlis = 0;
+      bayrakyanlis = 0;
+      writeToFile();
     });
-    debugPrint('user=$_user');
+    _startClipboardTimer();
   }
 
   @override
@@ -353,82 +268,65 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             children: [
               Card(
-                margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                elevation: 15.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                shadowColor: Colors.black.withOpacity(0.4),
-                color: Colors.grey.shade900,
-                child: Container(
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25.0),
-                    gradient: LinearGradient(
-                      colors: [Colors.grey.shade800, Colors.black],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                  margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  elevation: 12.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Kullanıcı giriş yapmamışsa
-                      if (_user == null) ...[
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: googleSignIn,
+                  shadowColor: Colors.black.withOpacity(0.3),
+                  color: Colors.grey.shade900,
+                  child: Container(
+                    padding: const EdgeInsets.all(25.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
+                      gradient: LinearGradient(
+                        colors: [Colors.grey.shade800, Colors.black87],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (uid.isEmpty) ...[
+                          ElevatedButton(
+                            onPressed: () {
+                              EasyLauncher.url(url: 'https://keremkk.glitch.me/auth');
+                            },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue, // Buton rengi
+                              backgroundColor: Colors.blueAccent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(15.0),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+                              padding: EdgeInsets.symmetric(horizontal: 35.0, vertical: 14.0),
                               elevation: 5,
                             ),
                             child: Text(
-                              "Google ile Giriş Yap",
+                              Yazi.get('giris'),
                               style: TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        Center(
-                          child: ElevatedButton(
-                            onPressed: signInAnonymously,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green, // Buton rengi
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              "Misafir Devam Et",
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                          SizedBox(height: 10),
+                          Text(
+                            Yazi.get('oturummesaj'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 1.1,
                             ),
                           ),
-                        ),
-                      ],
-
-                      // Kullanıcı giriş yapmışsa
-                      if (_user != null) ...[
-                        // Profil Resmi
-                        Center(
-                          child: AnimatedContainer(
-                            duration: Duration(seconds: 1),
+                        ] else ...[
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 600),
                             curve: Curves.easeInOut,
-                            height: 120.0,
-                            width: 120.0,
+                            height: 110.0,
+                            width: 110.0,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
@@ -437,18 +335,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: Colors.black.withOpacity(0.5),
                                   blurRadius: 10.0,
-                                  spreadRadius: 2.0,
+                                  spreadRadius: 1.5,
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        // Kullanıcı Adı
-                        Center(
-                          child: Text(
+                          SizedBox(height: 12),
+                          Text(
                             name,
                             style: TextStyle(
                               fontSize: 22,
@@ -457,35 +352,32 @@ class _SettingsPageState extends State<SettingsPage> {
                               letterSpacing: 1.2,
                             ),
                           ),
-                        ),
-                        SizedBox(height: 20),
-                        // Çıkış Butonu
-                        Center(
-                          child: ElevatedButton(
+                          SizedBox(height: 15),
+                          ElevatedButton(
                             onPressed: signOut,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red, // Çıkış butonunun rengi
+                              backgroundColor: Colors.redAccent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.0),
+                                borderRadius: BorderRadius.circular(15.0),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
+                              padding: EdgeInsets.symmetric(horizontal: 35.0, vertical: 14.0),
                               elevation: 5,
                             ),
                             child: Text(
-                              "Çıkış Yap",
+                              Yazi.get('cikis'),
                               style: TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-              ),
+              ), // oturum açma
+              SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Text(

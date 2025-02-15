@@ -11,10 +11,6 @@ export 'package:share_plus/share_plus.dart';
 export 'package:theme_mode_builder/theme_mode_builder.dart';
 export 'package:searchfield/searchfield.dart';
 
-export 'package:firebase_core/firebase_core.dart';
-export 'package:firebase_auth/firebase_auth.dart';
-export 'package:google_sign_in/google_sign_in.dart';
-
 export 'dart:convert';
 export 'dart:io';
 export 'dart:math';
@@ -27,9 +23,10 @@ export 'screens/countrys/countryprofil.dart';
 export 'screens/games/baskentoyun.dart';
 export 'screens/games/bayrakoyun.dart';
 export 'screens/games/mesafeoyun.dart';
+export 'package:GeoGame/screens/games/baskentoyuncoop.dart';
+export 'package:GeoGame/screens/games/bayrakoyuncoop.dart';
 export 'screens/leadboards-and-profile/profiles.dart';
 export 'screens/leadboards-and-profile/leadboard.dart';
 export 'screens/leadboards-and-profile/userprofile.dart';
 export 'screens/mainscreen/settings.dart';
 export 'screens/mainscreen/geogamelobi.dart';
-export 'firebase_options.dart';

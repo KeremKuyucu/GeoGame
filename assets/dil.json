@@ -12,8 +12,8 @@
       "English": "Share the App"
     },
     "davetpromt": {
-      "Türkçe": "GeoGame Adlı Oyunu Oynamak İçin Davet Edildiniz. https://geogame.can.re",
-      "English": "You have been invited to play the GeoGame. https://geogame.can.re"
+      "Türkçe": "GeoGame'e Katılmak İçin Seni Davet Ediyoruz! Eğlenceli bir yolculuğa başlamak için hemen tıkla: https://geogame.can.re",
+      "English": "You're Invited to Join GeoGame! Start your exciting journey now by clicking here: https://geogame.can.re"
     },
     "website": {
       "Türkçe": "GeoGame Website",
@@ -26,6 +26,14 @@
     "hatabildir": {
       "Türkçe": "Hata Bildir",
       "English": "Report a Bug"
+    },
+    "hatabaslik": {
+      "Türkçe": "Lütfen Hata Başlığını Girin",
+      "English": "Please Enter the Bug Title"
+    },
+    "hatametin": {
+      "Türkçe": "Hata hakkında detaylı bilgi verin",
+      "English": "Provide detailed information about the bug"
     },
     "yapimcimetin": {
       "Türkçe": "Benim Websitem",
@@ -378,6 +386,18 @@
     "bayrakcoopdescription": {
       "Türkçe": "Bayraktan ülkeyi tanıyın, her cevapta ekran döner, pas kullanılmamaktadır.",
       "English": "Guess the country from its flag. The screen will rotate with every answer, and no pass option is available."
+    },
+    "giris": {
+      "Türkçe": "Giriş Yap",
+      "English": "Log In"
+    },
+    "cikis": {
+      "Türkçe": "Çıkış Yap",
+      "English": "Log Out"
+    },
+    "oturummesaj": {
+      "Türkçe": "Google hesabı ile giriş yaparak puanlarınızı kaydedebilirsiniz.",
+      "English": "You can save your scores by logging in with your Google account."
     }
   }
 }

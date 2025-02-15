@@ -16,15 +16,15 @@ class _MesafeOyunState extends State<MesafeOyun> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
+    await readFromFile((update) => setState(update));
+    yeniulkesec();
+    await mesafeoyunkurallari();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-    await readFromFile((update) => setState(update));
-    yeniulkesec();
-    await mesafeoyunkurallari();
   }
   Future<void> mesafeoyunkurallari() async {
     return showDialog<void>(
@@ -62,7 +62,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
           break;
         }
       }
-      message += Yazi.get('tahminmetin') + gecici.isim + "    ";
+      message += Yazi.get('tahminmetin') + (isEnglish ? gecici.enisim : gecici.isim) + "    ";
       message += Yazi.get('mesafe') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
       message += Yazi.get('yon') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {

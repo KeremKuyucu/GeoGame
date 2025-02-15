@@ -32,15 +32,15 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
     });
   }
   Future<void> _initializeGame() async {
+    await readFromFile((update) => setState(update));
+    yeniulkesec();
+    await bayrakoyunkurallari();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
-    await readFromFile((update) => setState(update));
-    yeniulkesec();
-    await bayrakoyunkurallari();
   }
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(

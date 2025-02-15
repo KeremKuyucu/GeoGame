@@ -1,5 +1,3 @@
-import 'package:GeoGame/screens/games/baskentoyuncoop.dart';
-import 'package:GeoGame/screens/games/bayrakoyuncoop.dart';
 import 'package:GeoGame/util.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,9 +33,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ThemeModeBuilderConfig.setLight();
   }
   Future<void> _initializeGame() async {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
     await readFromFile((update) => setState(update));
     await dilDegistir();
     await surumkiyasla();
@@ -50,6 +45,9 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     } else {
       postLeadboard();
     }
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
   }
   Future<void> dilDegistir() async {
     await Yazi.loadDil(secilenDil).then((_) {
@@ -146,7 +144,8 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         },
       );
     }
-
+    print(remoteVersion);
+    print(localVersion);
     if (remoteVersion != null &&
         apkUrl != null &&
         remoteVersion != localVersion) {
