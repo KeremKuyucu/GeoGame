@@ -7,8 +7,7 @@ class BayrakOyunCoop extends StatefulWidget {
 
 class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
   bool isPortraitUp = true;
-  late TextEditingController _controller;
-  String _currentInput = '';
+  late TextEditingController _controller = TextEditingController();
   int puan = 50;
   @override
   void initState() {
@@ -16,12 +15,6 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    _controller = TextEditingController();
-    _controller.addListener(() {
-      setState(() {
-        _currentInput = _controller.text.trim();
-      });
-    });
     await readFromFile((update) => setState(update));
     yeniulkesec();
     await bayrakoyunkurallari();
@@ -58,12 +51,14 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
     setState(() {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         String ulke = kelimeDuzelt(_controller.text.trim());
-        _controller.clear();
-        _currentInput = '';
-        yeniulkesec();
-        Dogru();
         ekrancevir();
+        Dogru();
+        _controller.clear();
+        _controller.text="";
+        yeniulkesec();
         bayrakdogru++;
+        bayrakpuan += puan;
+        writeToFile();
         postUlkeLog(
             '{\n"name": "$name",\n'
                 '"uid": "$uid",\n'
@@ -75,21 +70,17 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
                 '"sari": "${butonAnahtarlar[1]}",\n'
                 '"mavi": "${butonAnahtarlar[2]}",\n'
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
-        setState(() {
-          bayrakpuan += puan;
-          writeToFile();
-        });
         puan = 50;
       } else {
         String ulke = kelimeDuzelt(_controller.text.trim());
         puan -= 10;
         if (puan < 20) puan = 20;
-        Yanlis();
-        butontiklama[i]=false;
-        _controller.clear();
-        _currentInput='';
-        bayrakyanlis++;
-        writeToFile();
+          Yanlis();
+          butontiklama[i]=false;
+          _controller.clear();
+          _controller.text="";
+          bayrakyanlis++;
+          writeToFile();
         postUlkeLog(
             '{\n"name": "$name",\n'
                 '"uid": "$uid",\n'
@@ -213,7 +204,6 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
               if (yazmamodu)
                 Column(
                   children: [
@@ -287,50 +277,32 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
                     )
                   ],
                 ),
-              SizedBox(height: 20),
               if (!yazmamodu)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    child: Column(
-                      children: [
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim)
-                              .toLowerCase()
-                              .contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                              (isEnglish ? e.enisim : e.isim),
-                              item: e,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        (isEnglish ? e.enisim : e.isim),
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
-                              _checkAnswer(5);
-                            });
-                          },
+                  child: SearchField<Ulkeler>(
+                    suggestions: ulke
+                        .map(
+                          (e) => SearchFieldListItem<Ulkeler>(
+                            isEnglish ? e.enisim : e.isim,
+                        item: e,
+                        child: Row(
+                          children: [
+                            Text(isEnglish ? e.enisim : e.isim),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    )
+                        .toList(),
+                    controller: _controller,
+                    onSuggestionTap: (value) {
+                      if (value.item != null) {
+                        setState(() {
+                          _controller.text = value.searchKey;
+                          _checkAnswer(4);
+                        });
+                      }
+                    },
                   ),
                 ),
             ],

@@ -6,8 +6,7 @@ class BaskentOyun extends StatefulWidget {
 }
 
 class _BaskentOyunState extends State<BaskentOyun> {
-  late TextEditingController _controller;
-  String _currentInput = '';
+  late TextEditingController _controller = TextEditingController();
   int puan = 50;
 
   @override
@@ -16,15 +15,9 @@ class _BaskentOyunState extends State<BaskentOyun> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    _controller = TextEditingController();
-    _controller.addListener(() {
-      setState(() {
-        _currentInput = _controller.text.trim();
-      });
-    });
     await readFromFile((update) => setState(update));
     yeniulkesec();
-    await baskentoyunkurallari();
+    baskentoyunkurallari();
   }
   Future<void> baskentoyunkurallari() async {
     return showDialog<void>(
@@ -59,7 +52,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         String ulke = kelimeDuzelt(_controller.text.trim());
         _controller.clear();
-        _currentInput = '';
         yeniulkesec();
         Dogru();
         baskentdogru++;
@@ -83,7 +75,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
         if (puan < 20) puan = 20;
         Yanlis();
         _controller.clear();
-        _currentInput='';
         baskentyanlis++;
         writeToFile();
         butontiklama[i]=false;
@@ -268,57 +259,36 @@ class _BaskentOyunState extends State<BaskentOyun> {
                       )
                     ],
                   ),
-                SizedBox(height: 20),
                 if(!yazmamodu)
                   Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    child: Column(
-                      children: [
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim)
-                                  .toLowerCase()
-                                  .contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                                  (isEnglish ? e.enisim : e.isim),
-                                  item: e,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundImage: NetworkImage(e.url),
-                                          radius: 20,
-                                        ),
-                                        SizedBox(width: 10),
-                                        Expanded(
-                                          child: Text(
-                                            (isEnglish ? e.enisim : e.isim),
-                                            style: TextStyle(fontSize: 16),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
-                              _checkAnswer(5);
-                            });
-                          },
+                    padding: const EdgeInsets.all(8.0),
+                    child: SearchField<Ulkeler>(
+                      suggestions: ulke
+                          .map(
+                            (e) => SearchFieldListItem<Ulkeler>(
+                              isEnglish ? e.enisim : e.isim,
+                          item: e,
+                          child: Row(
+                            children: [
+                              CircleAvatar(backgroundImage: NetworkImage(e.url)),
+                              const SizedBox(width: 10),
+                              Text(isEnglish ? e.enisim : e.isim),
+                            ],
+                          ),
                         ),
-                      ],
+                      )
+                          .toList(),
+                      controller: _controller,
+                      onSuggestionTap: (value) {
+                        if (value.item != null) {
+                          setState(() {
+                            _controller.text = value.searchKey;
+                            _checkAnswer(4);
+                          });
+                        }
+                      },
                     ),
                   ),
-                ),
               ],
             ),
           ),

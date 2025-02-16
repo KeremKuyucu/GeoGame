@@ -40,7 +40,7 @@ class Yazi {
   static String get(String key) {
     if (_localizedStrings == null) {
       dilDegistir();
-      return '⚠️ Dil dosyası yüklenmemiş';
+      return '⚠️ Dil dosyası yükleniyor...';
     }
 
     if (_localizedStrings!.containsKey(key)) {
@@ -234,7 +234,7 @@ class DrawerWidget extends StatelessWidget {
             await EasyLauncher.url(url: 'https://keremkk.can.re', mode: Mode.platformDefault);
           }),
           _buildListTile(Icons.public, Colors.red, Yazi.get('website'), () async {
-            await EasyLauncher.url(url: 'https://geogame.can.re');
+            await EasyLauncher.url(url: 'https://keremkk.glitch.me/geogame');
           }),
           _buildListTile(FontAwesomeIcons.github, Colors.black, Yazi.get('github'), () async {
             await EasyLauncher.url(url: 'https://github.com/keremlolgg/GeoGame');
@@ -295,12 +295,12 @@ class CustomNotification extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Doğru Ülke!',
+                Yazi.get('pascevap'),
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
               SizedBox(height: 10),
               Text(
-                'Ülke: $countryName',
+                '$countryName',
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               SizedBox(height: 10),
@@ -317,7 +317,7 @@ class CustomNotification extends StatelessWidget {
                           Navigator.of(context).pop();  // Bildirimi kapat
                         },
                         child: Text(
-                          'Pas',
+                          Yazi.get('tamam'),
                           style: TextStyle(
                             color: Colors.black,
                           ),

@@ -6,8 +6,8 @@ class MesafeOyun extends StatefulWidget {
 }
 
 class _MesafeOyunState extends State<MesafeOyun> {
-  String message='',_currentInput = '';
-  late TextEditingController _controller;
+  String message='';
+  late TextEditingController _controller = TextEditingController();
   int puan=100;
 
   @override
@@ -17,12 +17,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
 
   Future<void> _initializeGame() async {
-    _controller = TextEditingController();
-    _controller.addListener(() {
-      setState(() {
-        _currentInput = _controller.text.trim();
-      });
-    });
     await readFromFile((update) => setState(update));
     yeniulkesec();
     await mesafeoyunkurallari();
@@ -69,11 +63,12 @@ class _MesafeOyunState extends State<MesafeOyun> {
       if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
         String ulke = kelimeDuzelt(_controller.text.trim());
         _controller.clear();
-        _currentInput='';
         message='';
         yeniulkesec();
         Dogru();
         mesafedogru++;
+        mesafepuan+=puan;
+        writeToFile();
         postUlkeLog(
             '{\n"name": "$name",\n'
                 '"uid": "$uid",\n'
@@ -81,19 +76,14 @@ class _MesafeOyunState extends State<MesafeOyun> {
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
                 '"verilencevap": "$ulke",\n');
-        setState(() {
-          mesafepuan+=puan;
-          writeToFile();
-        });
-        puan=200;
+        puan=300;
       } else {
         String ulke = kelimeDuzelt(_controller.text.trim());
         puan-=10;
-        if(puan<50)
-          puan=50;
+        if(puan<100)
+          puan=100;
         Yanlis();
         _controller.clear();
-        _currentInput='';
         mesafeyanlis++;
         writeToFile();
         postUlkeLog(
@@ -107,7 +97,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
     });
   }
   void _pasButtonPressed() {
-    puan=100;
+    puan=300;
     String ulkeisim = kalici.isim;
     showDialog(
       context: context,
@@ -124,7 +114,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
             '"dogrucevap": "${kalici.isim}",\n'
             '"verilencevap": "$ulke",\n');
     setState(() {
-      _currentInput='';
       message='';
       yeniulkesec();
       Yenitur();
@@ -245,53 +234,33 @@ class _MesafeOyunState extends State<MesafeOyun> {
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: Column(
-                    children: [
-                        SearchField<Ulkeler>(
-                          suggestions: ulke
-                              .where((e) => (isEnglish ? e.enisim : e.isim).toLowerCase().contains(_currentInput.toLowerCase()))
-                              .map(
-                                (e) => SearchFieldListItem<Ulkeler>(
-                                  (isEnglish ? e.enisim : e.isim),
-                              item: e,
-
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(e.url),
-                                      radius: 20,
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        (isEnglish ? e.enisim : e.isim),
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                              .toList(),
-                          controller: _controller,
-                          onSuggestionTap: (value) {
-                            setState(() {
-                              _controller.text = value.searchKey;
-                              _currentInput = value.searchKey;
-                              _checkAnswer();
-                            });
-                          },
-                        ),
-                    ],
-                  ),
+                child: SearchField<Ulkeler>(
+                  suggestions: ulke
+                      .map(
+                        (e) => SearchFieldListItem<Ulkeler>(
+                          isEnglish ? e.enisim : e.isim,
+                      item: e,
+                      child: Row(
+                        children: [
+                          CircleAvatar(backgroundImage: NetworkImage(e.url)),
+                          const SizedBox(width: 10),
+                          Text(isEnglish ? e.enisim : e.isim),
+                        ],
+                      ),
+                    ),
+                  )
+                      .toList(),
+                  controller: _controller,
+                  onSuggestionTap: (value) {
+                    if (value.item != null) {
+                      setState(() {
+                        _controller.text = value.searchKey;
+                        _checkAnswer();
+                      });
+                    }
+                  },
                 ),
               ),
-              SizedBox(height: 20),
             ],
           ),
         ),
