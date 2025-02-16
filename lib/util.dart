@@ -18,13 +18,11 @@ export 'dart:async';
 export 'dart:isolate';
 
 export 'utilities.dart';
-export 'screens/countrys/country.dart';
-export 'screens/countrys/countryprofil.dart';
 export 'screens/games/baskentoyun.dart';
 export 'screens/games/bayrakoyun.dart';
 export 'screens/games/mesafeoyun.dart';
-export 'package:GeoGame/screens/games/baskentoyuncoop.dart';
-export 'package:GeoGame/screens/games/bayrakoyuncoop.dart';
+export 'screens/games/baskentoyuncoop.dart';
+export 'screens/games/bayrakoyuncoop.dart';
 export 'screens/leadboards-and-profile/profiles.dart';
 export 'screens/leadboards-and-profile/leadboard.dart';
 export 'screens/leadboards-and-profile/userprofile.dart';

@@ -52,7 +52,32 @@ class Yazi {
   }
 
   static Future<void> dilDegistir() async {
-    await loadDil(secilenDil);
+    //await loadDil(secilenDil);
+    await Yazi.loadDil(secilenDil).then((_) {
+        navBarItems = [
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.home),
+            title: Text(Yazi.get('navigasyonbar1')),
+            selectedColor: Colors.purple,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.leaderboard),
+            title: Text(Yazi.get('navigasyonbar2')),
+            selectedColor: Colors.pink,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.person),
+            title: Text(Yazi.get('navigasyonbar3')),
+            selectedColor: Colors.teal,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.settings),
+            title: Text(Yazi.get('navigasyonbar4')),
+            selectedColor: Colors.orange,
+          ),
+        ];
+      });
+    isEnglish = (secilenDil != 'Türkçe');
   }
 }
 class DrawerWidget extends StatelessWidget {
@@ -356,6 +381,7 @@ Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesl
 Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yenitur.mp3');}
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
+  print("yeni ülke seçildi");
   butontiklama[0]=true;
   butontiklama[1]=true;
   butontiklama[2]=true;
@@ -609,11 +635,6 @@ List<SalomonBottomBarItem> navBarItems = [
     title: const Text(''),
   ),
   SalomonBottomBarItem(
-    icon: const Icon(FontAwesomeIcons.info),
-    selectedColor: Colors.teal,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
     icon: const Icon(Icons.person),
     selectedColor: Colors.teal,
     title: const Text(''),
@@ -628,7 +649,7 @@ List<SalomonBottomBarItem> navBarItems = [
 List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/md.png",
-    bayrak: "dosyalar/bayraklar/moldova.png",
+    bayrak: "assets/bayraklar/moldova.png",
     enisim: "Moldova",
     isim: "Moldova",
     baskent: "Chisinau",
@@ -639,7 +660,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/us.png",
-    bayrak: "dosyalar/bayraklar/amerikabirlesikdevletleri.png",
+    bayrak: "assets/bayraklar/amerikabirlesikdevletleri.png",
     enisim: "Unitedstates",
     isim: "Amerikabirlesikdevletleri",
     baskent: "Washingtondc",
@@ -650,7 +671,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/yt.png",
-    bayrak: "dosyalar/bayraklar/mayotte.png",
+    bayrak: "assets/bayraklar/mayotte.png",
     enisim: "Mayotte",
     isim: "Mayotte",
     baskent: "Mamoudzou",
@@ -661,7 +682,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/nr.png",
-    bayrak: "dosyalar/bayraklar/nauru.png",
+    bayrak: "assets/bayraklar/nauru.png",
     enisim: "Nauru",
     isim: "Nauru",
     baskent: "Yaren",
@@ -672,7 +693,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mz.png",
-    bayrak: "dosyalar/bayraklar/mozambik.png",
+    bayrak: "assets/bayraklar/mozambik.png",
     enisim: "Mozambique",
     isim: "Mozambik",
     baskent: "Maputo",
@@ -683,7 +704,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/br.png",
-    bayrak: "dosyalar/bayraklar/brezilya.png",
+    bayrak: "assets/bayraklar/brezilya.png",
     enisim: "Brazil",
     isim: "Brezilya",
     baskent: "Brasÿlia",
@@ -694,7 +715,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cv.png",
-    bayrak: "dosyalar/bayraklar/yesilburun.png",
+    bayrak: "assets/bayraklar/yesilburun.png",
     enisim: "Capeverde",
     isim: "Yesilburun",
     baskent: "Praia",
@@ -705,7 +726,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gq.png",
-    bayrak: "dosyalar/bayraklar/ekvatorginesi.png",
+    bayrak: "assets/bayraklar/ekvatorginesi.png",
     enisim: "Equatorialguinea",
     isim: "Ekvatorginesi",
     baskent: "Malabo",
@@ -716,7 +737,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/al.png",
-    bayrak: "dosyalar/bayraklar/arnavutluk.png",
+    bayrak: "assets/bayraklar/arnavutluk.png",
     enisim: "Albania",
     isim: "Arnavutluk",
     baskent: "Tirana",
@@ -727,7 +748,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/vi.png",
-    bayrak: "dosyalar/bayraklar/abdvirjinadalari.png",
+    bayrak: "assets/bayraklar/abdvirjinadalari.png",
     enisim: "Unitedstatesvirginislands",
     isim: "Abdvirjinadalari",
     baskent: "Charlotteamalie",
@@ -738,7 +759,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/nu.png",
-    bayrak: "dosyalar/bayraklar/niue.png",
+    bayrak: "assets/bayraklar/niue.png",
     enisim: "Niue",
     isim: "Niue",
     baskent: "Alofi",
@@ -749,7 +770,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pw.png",
-    bayrak: "dosyalar/bayraklar/palau.png",
+    bayrak: "assets/bayraklar/palau.png",
     enisim: "Palau",
     isim: "Palau",
     baskent: "Ngerulmud",
@@ -760,7 +781,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ng.png",
-    bayrak: "dosyalar/bayraklar/nijerya.png",
+    bayrak: "assets/bayraklar/nijerya.png",
     enisim: "Nigeria",
     isim: "Nijerya",
     baskent: "Abuja",
@@ -771,7 +792,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/vg.png",
-    bayrak: "dosyalar/bayraklar/virjinadalari.png",
+    bayrak: "assets/bayraklar/virjinadalari.png",
     enisim: "Britishvirginislands",
     isim: "Virjinadalari",
     baskent: "Roadtown",
@@ -782,7 +803,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gm.png",
-    bayrak: "dosyalar/bayraklar/gambiya.png",
+    bayrak: "assets/bayraklar/gambiya.png",
     enisim: "Gambia",
     isim: "Gambiya",
     baskent: "Banjul",
@@ -793,7 +814,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/so.png",
-    bayrak: "dosyalar/bayraklar/somali.png",
+    bayrak: "assets/bayraklar/somali.png",
     enisim: "Somalia",
     isim: "Somali",
     baskent: "Mogadishu",
@@ -804,7 +825,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ye.png",
-    bayrak: "dosyalar/bayraklar/yemen.png",
+    bayrak: "assets/bayraklar/yemen.png",
     enisim: "Yemen",
     isim: "Yemen",
     baskent: "Sanaa",
@@ -815,7 +836,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/my.png",
-    bayrak: "dosyalar/bayraklar/malezya.png",
+    bayrak: "assets/bayraklar/malezya.png",
     enisim: "Malaysia",
     isim: "Malezya",
     baskent: "Kualalumpur",
@@ -826,7 +847,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/dm.png",
-    bayrak: "dosyalar/bayraklar/dominika.png",
+    bayrak: "assets/bayraklar/dominika.png",
     enisim: "Dominica",
     isim: "Dominika",
     baskent: "Roseau",
@@ -837,7 +858,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gb.png",
-    bayrak: "dosyalar/bayraklar/birlesikkrallik.png",
+    bayrak: "assets/bayraklar/birlesikkrallik.png",
     enisim: "Unitedkingdom",
     isim: "Birlesikkrallik",
     baskent: "London",
@@ -848,7 +869,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mg.png",
-    bayrak: "dosyalar/bayraklar/madagaskar.png",
+    bayrak: "assets/bayraklar/madagaskar.png",
     enisim: "Madagascar",
     isim: "Madagaskar",
     baskent: "Antananarivo",
@@ -859,7 +880,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/eh.png",
-    bayrak: "dosyalar/bayraklar/sahrademokratikarapcumhuriyeti.png",
+    bayrak: "assets/bayraklar/sahrademokratikarapcumhuriyeti.png",
     enisim: "Westernsahara",
     isim: "Sahrademokratikarapcumhuriyeti",
     baskent: "Elaaiun",
@@ -870,7 +891,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cy.png",
-    bayrak: "dosyalar/bayraklar/kibris.png",
+    bayrak: "assets/bayraklar/kibris.png",
     enisim: "Cyprus",
     isim: "Kibris",
     baskent: "Nicosia",
@@ -881,7 +902,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ag.png",
-    bayrak: "dosyalar/bayraklar/antiguavebarbuda.png",
+    bayrak: "assets/bayraklar/antiguavebarbuda.png",
     enisim: "Antiguaandbarbuda",
     isim: "Antiguavebarbuda",
     baskent: "Saintjohns",
@@ -892,7 +913,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ie.png",
-    bayrak: "dosyalar/bayraklar/irlanda.png",
+    bayrak: "assets/bayraklar/irlanda.png",
     enisim: "Ireland",
     isim: "Irlanda",
     baskent: "Dublin",
@@ -903,7 +924,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/py.png",
-    bayrak: "dosyalar/bayraklar/paraguay.png",
+    bayrak: "assets/bayraklar/paraguay.png",
     enisim: "Paraguay",
     isim: "Paraguay",
     baskent: "Asunci¾n",
@@ -914,7 +935,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lk.png",
-    bayrak: "dosyalar/bayraklar/srilanka.png",
+    bayrak: "assets/bayraklar/srilanka.png",
     enisim: "Srilanka",
     isim: "Srilanka",
     baskent: "Srijayawardenepurakotte",
@@ -925,7 +946,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/za.png",
-    bayrak: "dosyalar/bayraklar/guneyafrika.png",
+    bayrak: "assets/bayraklar/guneyafrika.png",
     enisim: "Southafrica",
     isim: "Guneyafrika",
     baskent: "Pretoriabloemfonteincapetown",
@@ -936,7 +957,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kw.png",
-    bayrak: "dosyalar/bayraklar/kuveyt.png",
+    bayrak: "assets/bayraklar/kuveyt.png",
     enisim: "Kuwait",
     isim: "Kuveyt",
     baskent: "Kuwaitcity",
@@ -947,7 +968,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/dz.png",
-    bayrak: "dosyalar/bayraklar/cezayir.png",
+    bayrak: "assets/bayraklar/cezayir.png",
     enisim: "Algeria",
     isim: "Cezayir",
     baskent: "Algiers",
@@ -958,7 +979,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/hr.png",
-    bayrak: "dosyalar/bayraklar/hirvatistan.png",
+    bayrak: "assets/bayraklar/hirvatistan.png",
     enisim: "Croatia",
     isim: "Hirvatistan",
     baskent: "Zagreb",
@@ -969,7 +990,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mq.png",
-    bayrak: "dosyalar/bayraklar/martinik.png",
+    bayrak: "assets/bayraklar/martinik.png",
     enisim: "Martinique",
     isim: "Martinik",
     baskent: "Fortdefrance",
@@ -980,7 +1001,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sl.png",
-    bayrak: "dosyalar/bayraklar/sierraleone.png",
+    bayrak: "assets/bayraklar/sierraleone.png",
     enisim: "Sierraleone",
     isim: "Sierraleone",
     baskent: "Freetown",
@@ -991,7 +1012,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mp.png",
-    bayrak: "dosyalar/bayraklar/kuzeymarianaadalari.png",
+    bayrak: "assets/bayraklar/kuzeymarianaadalari.png",
     enisim: "Northernmarianaislands",
     isim: "Kuzeymarianaadalari",
     baskent: "Saipan",
@@ -1002,7 +1023,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/rw.png",
-    bayrak: "dosyalar/bayraklar/ruanda.png",
+    bayrak: "assets/bayraklar/ruanda.png",
     enisim: "Rwanda",
     isim: "Ruanda",
     baskent: "Kigali",
@@ -1013,7 +1034,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/suriye?v=1739643150915",
-    bayrak: "dosyalar/bayraklar/suriye.png",
+    bayrak: "assets/bayraklar/suriye.png",
     enisim: "Syria",
     isim: "Suriye",
     baskent: "Damascus",
@@ -1024,7 +1045,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/vc.png",
-    bayrak: "dosyalar/bayraklar/saintvincentvegrenadinler.png",
+    bayrak: "assets/bayraklar/saintvincentvegrenadinler.png",
     enisim: "Saintvincentandthegrenadines",
     isim: "Saintvincentvegrenadinler",
     baskent: "Kingstown",
@@ -1035,7 +1056,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/xk.png",
-    bayrak: "dosyalar/bayraklar/kosova.png",
+    bayrak: "assets/bayraklar/kosova.png",
     enisim: "Kosovo",
     isim: "Kosova",
     baskent: "Pristina",
@@ -1046,7 +1067,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lc.png",
-    bayrak: "dosyalar/bayraklar/saintlucia.png",
+    bayrak: "assets/bayraklar/saintlucia.png",
     enisim: "Saintlucia",
     isim: "Saintlucia",
     baskent: "Castries",
@@ -1057,7 +1078,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/hn.png",
-    bayrak: "dosyalar/bayraklar/honduras.png",
+    bayrak: "assets/bayraklar/honduras.png",
     enisim: "Honduras",
     isim: "Honduras",
     baskent: "Tegucigalpa",
@@ -1068,7 +1089,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/jo.png",
-    bayrak: "dosyalar/bayraklar/urdun.png",
+    bayrak: "assets/bayraklar/urdun.png",
     enisim: "Jordan",
     isim: "Urdun",
     baskent: "Amman",
@@ -1079,7 +1100,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tv.png",
-    bayrak: "dosyalar/bayraklar/tuvalu.png",
+    bayrak: "assets/bayraklar/tuvalu.png",
     enisim: "Tuvalu",
     isim: "Tuvalu",
     baskent: "Funafuti",
@@ -1090,7 +1111,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/np.png",
-    bayrak: "dosyalar/bayraklar/nepal.png",
+    bayrak: "assets/bayraklar/nepal.png",
     enisim: "Nepal",
     isim: "Nepal",
     baskent: "Kathmandu",
@@ -1101,7 +1122,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lr.png",
-    bayrak: "dosyalar/bayraklar/liberya.png",
+    bayrak: "assets/bayraklar/liberya.png",
     enisim: "Liberia",
     isim: "Liberya",
     baskent: "Monrovia",
@@ -1112,7 +1133,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/hm.png",
-    bayrak: "dosyalar/bayraklar/heardadasivemcdonaldadalari.png",
+    bayrak: "assets/bayraklar/heardadasivemcdonaldadalari.png",
     enisim: "Heardislandandmcdonaldislands",
     isim: "Heardadasivemcdonaldadalari",
     baskent: "",
@@ -1123,7 +1144,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/at.png",
-    bayrak: "dosyalar/bayraklar/avusturya.png",
+    bayrak: "assets/bayraklar/avusturya.png",
     enisim: "Austria",
     isim: "Avusturya",
     baskent: "Vienna",
@@ -1134,7 +1155,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gg.png",
-    bayrak: "dosyalar/bayraklar/guernsey.png",
+    bayrak: "assets/bayraklar/guernsey.png",
     enisim: "Guernsey",
     isim: "Guernsey",
     baskent: "Stpeterport",
@@ -1145,7 +1166,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cf.png",
-    bayrak: "dosyalar/bayraklar/ortaafrikacumhuriyeti.png",
+    bayrak: "assets/bayraklar/ortaafrikacumhuriyeti.png",
     enisim: "Centralafricanrepublic",
     isim: "Ortaafrikacumhuriyeti",
     baskent: "Bangui",
@@ -1156,7 +1177,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mr.png",
-    bayrak: "dosyalar/bayraklar/moritanya.png",
+    bayrak: "assets/bayraklar/moritanya.png",
     enisim: "Mauritania",
     isim: "Moritanya",
     baskent: "Nouakchott",
@@ -1167,7 +1188,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/dj.png",
-    bayrak: "dosyalar/bayraklar/cibuti.png",
+    bayrak: "assets/bayraklar/cibuti.png",
     enisim: "Djibouti",
     isim: "Cibuti",
     baskent: "Djibouti",
@@ -1178,7 +1199,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/fj.png",
-    bayrak: "dosyalar/bayraklar/fiji.png",
+    bayrak: "assets/bayraklar/fiji.png",
     enisim: "Fiji",
     isim: "Fiji",
     baskent: "Suva",
@@ -1189,7 +1210,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/no.png",
-    bayrak: "dosyalar/bayraklar/norvec.png",
+    bayrak: "assets/bayraklar/norvec.png",
     enisim: "Norway",
     isim: "Norvec",
     baskent: "Oslo",
@@ -1200,7 +1221,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lv.png",
-    bayrak: "dosyalar/bayraklar/letonya.png",
+    bayrak: "assets/bayraklar/letonya.png",
     enisim: "Latvia",
     isim: "Letonya",
     baskent: "Riga",
@@ -1211,7 +1232,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/fk.png",
-    bayrak: "dosyalar/bayraklar/falklandmalvinaadalari.png",
+    bayrak: "assets/bayraklar/falklandmalvinaadalari.png",
     enisim: "Falklandislands",
     isim: "Falklandmalvinaadalari",
     baskent: "Stanley",
@@ -1222,7 +1243,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kz.png",
-    bayrak: "dosyalar/bayraklar/kazakistan.png",
+    bayrak: "assets/bayraklar/kazakistan.png",
     enisim: "Kazakhstan",
     isim: "Kazakistan",
     baskent: "Nursultan",
@@ -1233,7 +1254,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ax.png",
-    bayrak: "dosyalar/bayraklar/aland.png",
+    bayrak: "assets/bayraklar/aland.png",
     enisim: "Alandislands",
     isim: "Aland",
     baskent: "Mariehamn",
@@ -1244,7 +1265,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tm.png",
-    bayrak: "dosyalar/bayraklar/turkmenistan.png",
+    bayrak: "assets/bayraklar/turkmenistan.png",
     enisim: "Turkmenistan",
     isim: "Turkmenistan",
     baskent: "Ashgabat",
@@ -1255,7 +1276,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cc.png",
-    bayrak: "dosyalar/bayraklar/cocoskeelingadalari.png",
+    bayrak: "assets/bayraklar/cocoskeelingadalari.png",
     enisim: "Cocoskeelingislands",
     isim: "Cocoskeelingadalari",
     baskent: "Westisland",
@@ -1266,7 +1287,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bg.png",
-    bayrak: "dosyalar/bayraklar/bulgaristan.png",
+    bayrak: "assets/bayraklar/bulgaristan.png",
     enisim: "Bulgaria",
     isim: "Bulgaristan",
     baskent: "Sofia",
@@ -1277,7 +1298,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tk.png",
-    bayrak: "dosyalar/bayraklar/tokelau.png",
+    bayrak: "assets/bayraklar/tokelau.png",
     enisim: "Tokelau",
     isim: "Tokelau",
     baskent: "Fakaofo",
@@ -1288,7 +1309,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/nc.png",
-    bayrak: "dosyalar/bayraklar/yenikaledonya.png",
+    bayrak: "assets/bayraklar/yenikaledonya.png",
     enisim: "Newcaledonia",
     isim: "Yenikaledonya",
     baskent: "NoumÚa",
@@ -1299,7 +1320,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bb.png",
-    bayrak: "dosyalar/bayraklar/barbados.png",
+    bayrak: "assets/bayraklar/barbados.png",
     enisim: "Barbados",
     isim: "Barbados",
     baskent: "Bridgetown",
@@ -1310,7 +1331,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/st.png",
-    bayrak: "dosyalar/bayraklar/saotomeandprincipe.png",
+    bayrak: "assets/bayraklar/saotomeandprincipe.png",
     enisim: "Saotomeandprincipe",
     isim: "Saotomeandprincipe",
     baskent: "Saotome",
@@ -1321,7 +1342,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/aq.png",
-    bayrak: "dosyalar/bayraklar/antarktika.png",
+    bayrak: "assets/bayraklar/antarktika.png",
     enisim: "Antarctica",
     isim: "Antarktika",
     baskent: "",
@@ -1332,7 +1353,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bn.png",
-    bayrak: "dosyalar/bayraklar/brunei.png",
+    bayrak: "assets/bayraklar/brunei.png",
     enisim: "Brunei",
     isim: "Brunei",
     baskent: "Bandarseribegawan",
@@ -1343,7 +1364,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bt.png",
-    bayrak: "dosyalar/bayraklar/butan.png",
+    bayrak: "assets/bayraklar/butan.png",
     enisim: "Bhutan",
     isim: "Butan",
     baskent: "Thimphu",
@@ -1354,7 +1375,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cm.png",
-    bayrak: "dosyalar/bayraklar/kamerun.png",
+    bayrak: "assets/bayraklar/kamerun.png",
     enisim: "Cameroon",
     isim: "Kamerun",
     baskent: "YaoundÚ",
@@ -1365,7 +1386,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ar.png",
-    bayrak: "dosyalar/bayraklar/arjantin.png",
+    bayrak: "assets/bayraklar/arjantin.png",
     enisim: "Argentina",
     isim: "Arjantin",
     baskent: "Buenosaires",
@@ -1376,7 +1397,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/az.png",
-    bayrak: "dosyalar/bayraklar/azerbaycan.png",
+    bayrak: "assets/bayraklar/azerbaycan.png",
     enisim: "Azerbaijan",
     isim: "Azerbaycan",
     baskent: "Baku",
@@ -1387,7 +1408,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mx.png",
-    bayrak: "dosyalar/bayraklar/meksika.png",
+    bayrak: "assets/bayraklar/meksika.png",
     enisim: "Mexico",
     isim: "Meksika",
     baskent: "Mexicocity",
@@ -1398,7 +1419,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ma.png",
-    bayrak: "dosyalar/bayraklar/fas.png",
+    bayrak: "assets/bayraklar/fas.png",
     enisim: "Morocco",
     isim: "Fas",
     baskent: "Rabat",
@@ -1409,7 +1430,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gt.png",
-    bayrak: "dosyalar/bayraklar/guatemala.png",
+    bayrak: "assets/bayraklar/guatemala.png",
     enisim: "Guatemala",
     isim: "Guatemala",
     baskent: "Guatemalacity",
@@ -1420,7 +1441,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ke.png",
-    bayrak: "dosyalar/bayraklar/kenya.png",
+    bayrak: "assets/bayraklar/kenya.png",
     enisim: "Kenya",
     isim: "Kenya",
     baskent: "Nairobi",
@@ -1431,7 +1452,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mt.png",
-    bayrak: "dosyalar/bayraklar/malta.png",
+    bayrak: "assets/bayraklar/malta.png",
     enisim: "Malta",
     isim: "Malta",
     baskent: "Valletta",
@@ -1442,7 +1463,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cz.png",
-    bayrak: "dosyalar/bayraklar/cekya.png",
+    bayrak: "assets/bayraklar/cekya.png",
     enisim: "Czechia",
     isim: "Cekya",
     baskent: "Prague",
@@ -1453,7 +1474,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gi.png",
-    bayrak: "dosyalar/bayraklar/cebelitarik.png",
+    bayrak: "assets/bayraklar/cebelitarik.png",
     enisim: "Gibraltar",
     isim: "Cebelitarik",
     baskent: "Gibraltar",
@@ -1464,7 +1485,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/aw.png",
-    bayrak: "dosyalar/bayraklar/aruba.png",
+    bayrak: "assets/bayraklar/aruba.png",
     enisim: "Aruba",
     isim: "Aruba",
     baskent: "Oranjestad",
@@ -1475,7 +1496,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bl.png",
-    bayrak: "dosyalar/bayraklar/saintbarthelemy.png",
+    bayrak: "assets/bayraklar/saintbarthelemy.png",
     enisim: "Saintbarthelemy",
     isim: "Saintbarthelemy",
     baskent: "Gustavia",
@@ -1486,7 +1507,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mc.png",
-    bayrak: "dosyalar/bayraklar/monako.png",
+    bayrak: "assets/bayraklar/monako.png",
     enisim: "Monaco",
     isim: "Monako",
     baskent: "Monaco",
@@ -1497,7 +1518,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ae.png",
-    bayrak: "dosyalar/bayraklar/birlesikarapemirlikleri.png",
+    bayrak: "assets/bayraklar/birlesikarapemirlikleri.png",
     enisim: "Unitedarabemirates",
     isim: "Birlesikarapemirlikleri",
     baskent: "Abudhabi",
@@ -1508,7 +1529,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ss.png",
-    bayrak: "dosyalar/bayraklar/guneysudan.png",
+    bayrak: "assets/bayraklar/guneysudan.png",
     enisim: "Southsudan",
     isim: "Guneysudan",
     baskent: "Juba",
@@ -1519,7 +1540,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pr.png",
-    bayrak: "dosyalar/bayraklar/portoriko.png",
+    bayrak: "assets/bayraklar/portoriko.png",
     enisim: "Puertorico",
     isim: "Portoriko",
     baskent: "Sanjuan",
@@ -1530,7 +1551,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sv.png",
-    bayrak: "dosyalar/bayraklar/elsalvador.png",
+    bayrak: "assets/bayraklar/elsalvador.png",
     enisim: "Elsalvador",
     isim: "Elsalvador",
     baskent: "Sansalvador",
@@ -1541,7 +1562,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/fr.png",
-    bayrak: "dosyalar/bayraklar/fransa.png",
+    bayrak: "assets/bayraklar/fransa.png",
     enisim: "France",
     isim: "Fransa",
     baskent: "Paris",
@@ -1552,7 +1573,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ne.png",
-    bayrak: "dosyalar/bayraklar/nijer.png",
+    bayrak: "assets/bayraklar/nijer.png",
     enisim: "Niger",
     isim: "Nijer",
     baskent: "Niamey",
@@ -1563,7 +1584,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ci.png",
-    bayrak: "dosyalar/bayraklar/fildisisahili.png",
+    bayrak: "assets/bayraklar/fildisisahili.png",
     enisim: "Ivorycoast",
     isim: "Fildisisahili",
     baskent: "Yamoussoukro",
@@ -1574,7 +1595,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gs.png",
-    bayrak: "dosyalar/bayraklar/guneygeorgiaveguneysandwichadalari.png",
+    bayrak: "assets/bayraklar/guneygeorgiaveguneysandwichadalari.png",
     enisim: "Southgeorgia",
     isim: "Guneygeorgiaveguneysandwichadalari",
     baskent: "Kingedwardpoint",
@@ -1585,7 +1606,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bw.png",
-    bayrak: "dosyalar/bayraklar/botsvana.png",
+    bayrak: "assets/bayraklar/botsvana.png",
     enisim: "Botswana",
     isim: "Botsvana",
     baskent: "Gaborone",
@@ -1596,7 +1617,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/io.png",
-    bayrak: "dosyalar/bayraklar/britanyahintokyanusutopraklari.png",
+    bayrak: "assets/bayraklar/britanyahintokyanusutopraklari.png",
     enisim: "Britishindianoceanterritory",
     isim: "Britanyahintokyanusutopraklari",
     baskent: "Diegogarcia",
@@ -1607,7 +1628,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/uz.png",
-    bayrak: "dosyalar/bayraklar/ozbekistan.png",
+    bayrak: "assets/bayraklar/ozbekistan.png",
     enisim: "Uzbekistan",
     isim: "Ozbekistan",
     baskent: "Tashkent",
@@ -1618,7 +1639,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tn.png",
-    bayrak: "dosyalar/bayraklar/tunus.png",
+    bayrak: "assets/bayraklar/tunus.png",
     enisim: "Tunisia",
     isim: "Tunus",
     baskent: "Tunis",
@@ -1629,7 +1650,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/hk.png",
-    bayrak: "dosyalar/bayraklar/hongkong.png",
+    bayrak: "assets/bayraklar/hongkong.png",
     enisim: "Hongkong",
     isim: "Hongkong",
     baskent: "Cityofvictoria",
@@ -1640,7 +1661,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mk.png",
-    bayrak: "dosyalar/bayraklar/kuzeymakedonya.png",
+    bayrak: "assets/bayraklar/kuzeymakedonya.png",
     enisim: "Northmacedonia",
     isim: "Kuzeymakedonya",
     baskent: "Skopje",
@@ -1651,7 +1672,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sr.png",
-    bayrak: "dosyalar/bayraklar/surinam.png",
+    bayrak: "assets/bayraklar/surinam.png",
     enisim: "Suriname",
     isim: "Surinam",
     baskent: "Paramaribo",
@@ -1662,7 +1683,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/be.png",
-    bayrak: "dosyalar/bayraklar/belcika.png",
+    bayrak: "assets/bayraklar/belcika.png",
     enisim: "Belgium",
     isim: "Belcika",
     baskent: "Brussels",
@@ -1673,7 +1694,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/as.png",
-    bayrak: "dosyalar/bayraklar/amerikansamoasi.png",
+    bayrak: "assets/bayraklar/amerikansamoasi.png",
     enisim: "Americansamoa",
     isim: "Amerikansamoasi",
     baskent: "Pagopago",
@@ -1684,7 +1705,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sb.png",
-    bayrak: "dosyalar/bayraklar/solomonadalari.png",
+    bayrak: "assets/bayraklar/solomonadalari.png",
     enisim: "Solomonislands",
     isim: "Solomonadalari",
     baskent: "Honiara",
@@ -1695,7 +1716,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ua.png",
-    bayrak: "dosyalar/bayraklar/ukrayna.png",
+    bayrak: "assets/bayraklar/ukrayna.png",
     enisim: "Ukraine",
     isim: "Ukrayna",
     baskent: "Kyiv",
@@ -1706,7 +1727,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/fi.png",
-    bayrak: "dosyalar/bayraklar/finlandiya.png",
+    bayrak: "assets/bayraklar/finlandiya.png",
     enisim: "Finland",
     isim: "Finlandiya",
     baskent: "Helsinki",
@@ -1717,7 +1738,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bf.png",
-    bayrak: "dosyalar/bayraklar/burkinafaso.png",
+    bayrak: "assets/bayraklar/burkinafaso.png",
     enisim: "Burkinafaso",
     isim: "Burkinafaso",
     baskent: "Ouagadougou",
@@ -1728,7 +1749,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ba.png",
-    bayrak: "dosyalar/bayraklar/bosnahersek.png",
+    bayrak: "assets/bayraklar/bosnahersek.png",
     enisim: "Bosniaandherzegovina",
     isim: "Bosnahersek",
     baskent: "Sarajevo",
@@ -1739,7 +1760,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ir.png",
-    bayrak: "dosyalar/bayraklar/iran.png",
+    bayrak: "assets/bayraklar/iran.png",
     enisim: "Iran",
     isim: "Iran",
     baskent: "Tehran",
@@ -1750,7 +1771,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cu.png",
-    bayrak: "dosyalar/bayraklar/kuba.png",
+    bayrak: "assets/bayraklar/kuba.png",
     enisim: "Cuba",
     isim: "Kuba",
     baskent: "Havana",
@@ -1761,7 +1782,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/er.png",
-    bayrak: "dosyalar/bayraklar/eritre.png",
+    bayrak: "assets/bayraklar/eritre.png",
     enisim: "Eritrea",
     isim: "Eritre",
     baskent: "Asmara",
@@ -1772,7 +1793,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sk.png",
-    bayrak: "dosyalar/bayraklar/slovakya.png",
+    bayrak: "assets/bayraklar/slovakya.png",
     enisim: "Slovakia",
     isim: "Slovakya",
     baskent: "Bratislava",
@@ -1783,7 +1804,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lt.png",
-    bayrak: "dosyalar/bayraklar/litvanya.png",
+    bayrak: "assets/bayraklar/litvanya.png",
     enisim: "Lithuania",
     isim: "Litvanya",
     baskent: "Vilnius",
@@ -1794,7 +1815,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mf.png",
-    bayrak: "dosyalar/bayraklar/saintmartin.png",
+    bayrak: "assets/bayraklar/saintmartin.png",
     enisim: "Saintmartin",
     isim: "Saintmartin",
     baskent: "Marigot",
@@ -1805,7 +1826,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pn.png",
-    bayrak: "dosyalar/bayraklar/pitcairnadalari.png",
+    bayrak: "assets/bayraklar/pitcairnadalari.png",
     enisim: "Pitcairnislands",
     isim: "Pitcairnadalari",
     baskent: "Adamstown",
@@ -1816,7 +1837,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gw.png",
-    bayrak: "dosyalar/bayraklar/ginebissau.png",
+    bayrak: "assets/bayraklar/ginebissau.png",
     enisim: "Guineabissau",
     isim: "Ginebissau",
     baskent: "Bissau",
@@ -1827,7 +1848,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ms.png",
-    bayrak: "dosyalar/bayraklar/montserrat.png",
+    bayrak: "assets/bayraklar/montserrat.png",
     enisim: "Montserrat",
     isim: "Montserrat",
     baskent: "Plymouth",
@@ -1838,7 +1859,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tr.png",
-    bayrak: "dosyalar/bayraklar/turkiye.png",
+    bayrak: "assets/bayraklar/turkiye.png",
     enisim: "Turkey",
     isim: "Turkiye",
     baskent: "Ankara",
@@ -1849,7 +1870,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ph.png",
-    bayrak: "dosyalar/bayraklar/filipinler.png",
+    bayrak: "assets/bayraklar/filipinler.png",
     enisim: "Philippines",
     isim: "Filipinler",
     baskent: "Manila",
@@ -1860,7 +1881,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/vu.png",
-    bayrak: "dosyalar/bayraklar/vanuatu.png",
+    bayrak: "assets/bayraklar/vanuatu.png",
     enisim: "Vanuatu",
     isim: "Vanuatu",
     baskent: "Portvila",
@@ -1871,7 +1892,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bo.png",
-    bayrak: "dosyalar/bayraklar/bolivya.png",
+    bayrak: "assets/bayraklar/bolivya.png",
     enisim: "Bolivia",
     isim: "Bolivya",
     baskent: "Sucre",
@@ -1882,7 +1903,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kn.png",
-    bayrak: "dosyalar/bayraklar/saintkittsvenevis.png",
+    bayrak: "assets/bayraklar/saintkittsvenevis.png",
     enisim: "Saintkittsandnevis",
     isim: "Saintkittsvenevis",
     baskent: "Basseterre",
@@ -1893,7 +1914,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ro.png",
-    bayrak: "dosyalar/bayraklar/romanya.png",
+    bayrak: "assets/bayraklar/romanya.png",
     enisim: "Romania",
     isim: "Romanya",
     baskent: "Bucharest",
@@ -1904,7 +1925,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kh.png",
-    bayrak: "dosyalar/bayraklar/kambocya.png",
+    bayrak: "assets/bayraklar/kambocya.png",
     enisim: "Cambodia",
     isim: "Kambocya",
     baskent: "Phnompenh",
@@ -1915,7 +1936,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/zw.png",
-    bayrak: "dosyalar/bayraklar/zimbabve.png",
+    bayrak: "assets/bayraklar/zimbabve.png",
     enisim: "Zimbabwe",
     isim: "Zimbabve",
     baskent: "Harare",
@@ -1926,7 +1947,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/je.png",
-    bayrak: "dosyalar/bayraklar/jersey.png",
+    bayrak: "assets/bayraklar/jersey.png",
     enisim: "Jersey",
     isim: "Jersey",
     baskent: "Sainthelier",
@@ -1937,7 +1958,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kg.png",
-    bayrak: "dosyalar/bayraklar/kirgizistan.png",
+    bayrak: "assets/bayraklar/kirgizistan.png",
     enisim: "Kyrgyzstan",
     isim: "Kirgizistan",
     baskent: "Bishkek",
@@ -1948,7 +1969,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bq.png",
-    bayrak: "dosyalar/bayraklar/karayiphollandasi.png",
+    bayrak: "assets/bayraklar/karayiphollandasi.png",
     enisim: "Caribbeannetherlands",
     isim: "Karayiphollandasi",
     baskent: "Kralendijk",
@@ -1959,7 +1980,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gy.png",
-    bayrak: "dosyalar/bayraklar/guyana.png",
+    bayrak: "assets/bayraklar/guyana.png",
     enisim: "Guyana",
     isim: "Guyana",
     baskent: "Georgetown",
@@ -1970,7 +1991,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/um.png",
-    bayrak: "dosyalar/bayraklar/amerikabirlesikdevletlerikucukdisadalari.png",
+    bayrak: "assets/bayraklar/amerikabirlesikdevletlerikucukdisadalari.png",
     enisim: "Unitedstatesminoroutlyingislands",
     isim: "Amerikabirlesikdevletlerikucukdisadalari",
     baskent: "Washingtondc",
@@ -1981,7 +2002,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/am.png",
-    bayrak: "dosyalar/bayraklar/ermenistan.png",
+    bayrak: "assets/bayraklar/ermenistan.png",
     enisim: "Armenia",
     isim: "Ermenistan",
     baskent: "Yerevan",
@@ -1992,7 +2013,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lb.png",
-    bayrak: "dosyalar/bayraklar/lubnan.png",
+    bayrak: "assets/bayraklar/lubnan.png",
     enisim: "Lebanon",
     isim: "Lubnan",
     baskent: "Beirut",
@@ -2003,7 +2024,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/me.png",
-    bayrak: "dosyalar/bayraklar/karadag.png",
+    bayrak: "assets/bayraklar/karadag.png",
     enisim: "Montenegro",
     isim: "Karadag",
     baskent: "Podgorica",
@@ -2014,7 +2035,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gl.png",
-    bayrak: "dosyalar/bayraklar/gronland.png",
+    bayrak: "assets/bayraklar/gronland.png",
     enisim: "Greenland",
     isim: "Gronland",
     baskent: "Nuuk",
@@ -2025,7 +2046,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pg.png",
-    bayrak: "dosyalar/bayraklar/papuayenigine.png",
+    bayrak: "assets/bayraklar/papuayenigine.png",
     enisim: "Papuanewguinea",
     isim: "Papuayenigine",
     baskent: "Portmoresby",
@@ -2036,7 +2057,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/zm.png",
-    bayrak: "dosyalar/bayraklar/zambiya.png",
+    bayrak: "assets/bayraklar/zambiya.png",
     enisim: "Zambia",
     isim: "Zambiya",
     baskent: "Lusaka",
@@ -2047,7 +2068,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tt.png",
-    bayrak: "dosyalar/bayraklar/trinidadvetobago.png",
+    bayrak: "assets/bayraklar/trinidadvetobago.png",
     enisim: "Trinidadandtobago",
     isim: "Trinidadvetobago",
     baskent: "Portofspain",
@@ -2058,7 +2079,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tf.png",
-    bayrak: "dosyalar/bayraklar/fransizguneyveantarktikatopraklari.png",
+    bayrak: "assets/bayraklar/fransizguneyveantarktikatopraklari.png",
     enisim: "Frenchsouthernandantarcticlands",
     isim: "Fransizguneyveantarktikatopraklari",
     baskent: "Portauxfranais",
@@ -2069,7 +2090,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pe.png",
-    bayrak: "dosyalar/bayraklar/peru.png",
+    bayrak: "assets/bayraklar/peru.png",
     enisim: "Peru",
     isim: "Peru",
     baskent: "Lima",
@@ -2080,7 +2101,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/se.png",
-    bayrak: "dosyalar/bayraklar/isvec.png",
+    bayrak: "assets/bayraklar/isvec.png",
     enisim: "Sweden",
     isim: "Isvec",
     baskent: "Stockholm",
@@ -2091,7 +2112,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sd.png",
-    bayrak: "dosyalar/bayraklar/sudan.png",
+    bayrak: "assets/bayraklar/sudan.png",
     enisim: "Sudan",
     isim: "Sudan",
     baskent: "Khartoum",
@@ -2102,7 +2123,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pm.png",
-    bayrak: "dosyalar/bayraklar/saintpierrevemiquelon.png",
+    bayrak: "assets/bayraklar/saintpierrevemiquelon.png",
     enisim: "Saintpierreandmiquelon",
     isim: "Saintpierrevemiquelon",
     baskent: "Saintpierre",
@@ -2113,7 +2134,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/om.png",
-    bayrak: "dosyalar/bayraklar/umman.png",
+    bayrak: "assets/bayraklar/umman.png",
     enisim: "Oman",
     isim: "Umman",
     baskent: "Muscat",
@@ -2124,7 +2145,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/in.png",
-    bayrak: "dosyalar/bayraklar/hindistan.png",
+    bayrak: "assets/bayraklar/hindistan.png",
     enisim: "India",
     isim: "Hindistan",
     baskent: "Newdelhi",
@@ -2135,7 +2156,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tw.png",
-    bayrak: "dosyalar/bayraklar/tayvan.png",
+    bayrak: "assets/bayraklar/tayvan.png",
     enisim: "Taiwan",
     isim: "Tayvan",
     baskent: "Taipei",
@@ -2146,7 +2167,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mn.png",
-    bayrak: "dosyalar/bayraklar/mogolistan.png",
+    bayrak: "assets/bayraklar/mogolistan.png",
     enisim: "Mongolia",
     isim: "Mogolistan",
     baskent: "Ulanbator",
@@ -2157,7 +2178,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sn.png",
-    bayrak: "dosyalar/bayraklar/senegal.png",
+    bayrak: "assets/bayraklar/senegal.png",
     enisim: "Senegal",
     isim: "Senegal",
     baskent: "Dakar",
@@ -2168,7 +2189,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tz.png",
-    bayrak: "dosyalar/bayraklar/tanzanya.png",
+    bayrak: "assets/bayraklar/tanzanya.png",
     enisim: "Tanzania",
     isim: "Tanzanya",
     baskent: "Dodoma",
@@ -2179,7 +2200,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ca.png",
-    bayrak: "dosyalar/bayraklar/kanada.png",
+    bayrak: "assets/bayraklar/kanada.png",
     enisim: "Canada",
     isim: "Kanada",
     baskent: "Ottawa",
@@ -2190,7 +2211,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cr.png",
-    bayrak: "dosyalar/bayraklar/kostarika.png",
+    bayrak: "assets/bayraklar/kostarika.png",
     enisim: "Costarica",
     isim: "Kostarika",
     baskent: "SanjosÚ",
@@ -2201,7 +2222,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cn.png",
-    bayrak: "dosyalar/bayraklar/cin.png",
+    bayrak: "assets/bayraklar/cin.png",
     enisim: "China",
     isim: "Cin",
     baskent: "Beijing",
@@ -2212,7 +2233,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/co.png",
-    bayrak: "dosyalar/bayraklar/kolombiya.png",
+    bayrak: "assets/bayraklar/kolombiya.png",
     enisim: "Colombia",
     isim: "Kolombiya",
     baskent: "Bogotß",
@@ -2223,7 +2244,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mm.png",
-    bayrak: "dosyalar/bayraklar/myanmar.png",
+    bayrak: "assets/bayraklar/myanmar.png",
     enisim: "Myanmar",
     isim: "Myanmar",
     baskent: "Naypyidaw",
@@ -2234,7 +2255,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ru.png",
-    bayrak: "dosyalar/bayraklar/rusya.png",
+    bayrak: "assets/bayraklar/rusya.png",
     enisim: "Russia",
     isim: "Rusya",
     baskent: "Moscow",
@@ -2245,7 +2266,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kp.png",
-    bayrak: "dosyalar/bayraklar/kuzeykore.png",
+    bayrak: "assets/bayraklar/kuzeykore.png",
     enisim: "Northkorea",
     isim: "Kuzeykore",
     baskent: "Pyongyang",
@@ -2256,7 +2277,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ky.png",
-    bayrak: "dosyalar/bayraklar/caymanadalari.png",
+    bayrak: "assets/bayraklar/caymanadalari.png",
     enisim: "Caymanislands",
     isim: "Caymanadalari",
     baskent: "Georgetown",
@@ -2267,7 +2288,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bv.png",
-    bayrak: "dosyalar/bayraklar/bouvetadasi.png",
+    bayrak: "assets/bayraklar/bouvetadasi.png",
     enisim: "Bouvetisland",
     isim: "Bouvetadasi",
     baskent: "",
@@ -2278,7 +2299,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/by.png",
-    bayrak: "dosyalar/bayraklar/belarus.png",
+    bayrak: "assets/bayraklar/belarus.png",
     enisim: "Belarus",
     isim: "Belarus",
     baskent: "Minsk",
@@ -2289,7 +2310,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pt.png",
-    bayrak: "dosyalar/bayraklar/portekiz.png",
+    bayrak: "assets/bayraklar/portekiz.png",
     enisim: "Portugal",
     isim: "Portekiz",
     baskent: "Lisbon",
@@ -2300,7 +2321,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sz.png",
-    bayrak: "dosyalar/bayraklar/esvatini.png",
+    bayrak: "assets/bayraklar/esvatini.png",
     enisim: "Eswatini",
     isim: "Esvatini",
     baskent: "Mbabane",
@@ -2311,7 +2332,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pl.png",
-    bayrak: "dosyalar/bayraklar/polonya.png",
+    bayrak: "assets/bayraklar/polonya.png",
     enisim: "Poland",
     isim: "Polonya",
     baskent: "Warsaw",
@@ -2322,7 +2343,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ch.png",
-    bayrak: "dosyalar/bayraklar/isvicre.png",
+    bayrak: "assets/bayraklar/isvicre.png",
     enisim: "Switzerland",
     isim: "Isvicre",
     baskent: "Bern",
@@ -2333,7 +2354,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cg.png",
-    bayrak: "dosyalar/bayraklar/kongocumhuriyeti.png",
+    bayrak: "assets/bayraklar/kongocumhuriyeti.png",
     enisim: "Republicofthecongo",
     isim: "Kongocumhuriyeti",
     baskent: "Brazzaville",
@@ -2344,7 +2365,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ve.png",
-    bayrak: "dosyalar/bayraklar/venezuela.png",
+    bayrak: "assets/bayraklar/venezuela.png",
     enisim: "Venezuela",
     isim: "Venezuela",
     baskent: "Caracas",
@@ -2355,7 +2376,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pa.png",
-    bayrak: "dosyalar/bayraklar/panama.png",
+    bayrak: "assets/bayraklar/panama.png",
     enisim: "Panama",
     isim: "Panama",
     baskent: "Panamacity",
@@ -2366,7 +2387,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/nl.png",
-    bayrak: "dosyalar/bayraklar/hollanda.png",
+    bayrak: "assets/bayraklar/hollanda.png",
     enisim: "Netherlands",
     isim: "Hollanda",
     baskent: "Amsterdam",
@@ -2377,7 +2398,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ws.png",
-    bayrak: "dosyalar/bayraklar/bagimsizsamoadevleti.png",
+    bayrak: "assets/bayraklar/bagimsizsamoadevleti.png",
     enisim: "Samoa",
     isim: "Bagimsizsamoadevleti",
     baskent: "Apia",
@@ -2388,7 +2409,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/dk.png",
-    bayrak: "dosyalar/bayraklar/danimarka.png",
+    bayrak: "assets/bayraklar/danimarka.png",
     enisim: "Denmark",
     isim: "Danimarka",
     baskent: "Copenhagen",
@@ -2399,7 +2420,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/lu.png",
-    bayrak: "dosyalar/bayraklar/luksemburg.png",
+    bayrak: "assets/bayraklar/luksemburg.png",
     enisim: "Luxembourg",
     isim: "Luksemburg",
     baskent: "Luxembourg",
@@ -2410,7 +2431,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/fo.png",
-    bayrak: "dosyalar/bayraklar/faroeadalari.png",
+    bayrak: "assets/bayraklar/faroeadalari.png",
     enisim: "Faroeislands",
     isim: "Faroeadalari",
     baskent: "T¾rshavn",
@@ -2421,7 +2442,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/si.png",
-    bayrak: "dosyalar/bayraklar/slovenya.png",
+    bayrak: "assets/bayraklar/slovenya.png",
     enisim: "Slovenia",
     isim: "Slovenya",
     baskent: "Ljubljana",
@@ -2432,7 +2453,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tg.png",
-    bayrak: "dosyalar/bayraklar/togo.png",
+    bayrak: "assets/bayraklar/togo.png",
     enisim: "Togo",
     isim: "Togo",
     baskent: "LomÚ",
@@ -2443,7 +2464,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/th.png",
-    bayrak: "dosyalar/bayraklar/tayland.png",
+    bayrak: "assets/bayraklar/tayland.png",
     enisim: "Thailand",
     isim: "Tayland",
     baskent: "Bangkok",
@@ -2454,7 +2475,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/wf.png",
-    bayrak: "dosyalar/bayraklar/wallisvefutunaadalaribolgesi.png",
+    bayrak: "assets/bayraklar/wallisvefutunaadalaribolgesi.png",
     enisim: "Wallisandfutuna",
     isim: "Wallisvefutunaadalaribolgesi",
     baskent: "Matautu",
@@ -2465,7 +2486,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bs.png",
-    bayrak: "dosyalar/bayraklar/bahamalar.png",
+    bayrak: "assets/bayraklar/bahamalar.png",
     enisim: "Bahamas",
     isim: "Bahamalar",
     baskent: "Nassau",
@@ -2476,7 +2497,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/to.png",
-    bayrak: "dosyalar/bayraklar/tonga.png",
+    bayrak: "assets/bayraklar/tonga.png",
     enisim: "Tonga",
     isim: "Tonga",
     baskent: "Nukualofa",
@@ -2487,7 +2508,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gr.png",
-    bayrak: "dosyalar/bayraklar/yunanistan.png",
+    bayrak: "assets/bayraklar/yunanistan.png",
     enisim: "Greece",
     isim: "Yunanistan",
     baskent: "Athens",
@@ -2498,7 +2519,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sm.png",
-    bayrak: "dosyalar/bayraklar/sanmarino.png",
+    bayrak: "assets/bayraklar/sanmarino.png",
     enisim: "Sanmarino",
     isim: "Sanmarino",
     baskent: "Cityofsanmarino",
@@ -2509,7 +2530,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/re.png",
-    bayrak: "dosyalar/bayraklar/reunion.png",
+    bayrak: "assets/bayraklar/reunion.png",
     enisim: "Reunion",
     isim: "Reunion",
     baskent: "Saintdenis",
@@ -2520,7 +2541,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/va.png",
-    bayrak: "dosyalar/bayraklar/vatikan.png",
+    bayrak: "assets/bayraklar/vatikan.png",
     enisim: "Vaticancity",
     isim: "Vatikan",
     baskent: "Vaticancity",
@@ -2531,7 +2552,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bi.png",
-    bayrak: "dosyalar/bayraklar/burundi.png",
+    bayrak: "assets/bayraklar/burundi.png",
     enisim: "Burundi",
     isim: "Burundi",
     baskent: "Gitega",
@@ -2542,7 +2563,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bh.png",
-    bayrak: "dosyalar/bayraklar/bahreyn.png",
+    bayrak: "assets/bayraklar/bahreyn.png",
     enisim: "Bahrain",
     isim: "Bahreyn",
     baskent: "Manama",
@@ -2553,7 +2574,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mh.png",
-    bayrak: "dosyalar/bayraklar/marshalladalari.png",
+    bayrak: "assets/bayraklar/marshalladalari.png",
     enisim: "Marshallislands",
     isim: "Marshalladalari",
     baskent: "Majuro",
@@ -2564,7 +2585,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tc.png",
-    bayrak: "dosyalar/bayraklar/turksvecaicosadalari.png",
+    bayrak: "assets/bayraklar/turksvecaicosadalari.png",
     enisim: "Turksandcaicosislands",
     isim: "Turksvecaicosadalari",
     baskent: "Cockburntown",
@@ -2575,7 +2596,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/im.png",
-    bayrak: "dosyalar/bayraklar/manadasi.png",
+    bayrak: "assets/bayraklar/manadasi.png",
     enisim: "Isleofman",
     isim: "Manadasi",
     baskent: "Douglas",
@@ -2586,7 +2607,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ht.png",
-    bayrak: "dosyalar/bayraklar/haiti.png",
+    bayrak: "assets/bayraklar/haiti.png",
     enisim: "Haiti",
     isim: "Haiti",
     baskent: "Portauprince",
@@ -2597,7 +2618,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/320px-Flag_of_the_Taliban.svg.png",
-    bayrak: "dosyalar/bayraklar/afganistan.png",
+    bayrak: "assets/bayraklar/afganistan.png",
     enisim: "Afghanistan",
     isim: "Afganistan",
     baskent: "Kabul",
@@ -2608,7 +2629,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/il.png",
-    bayrak: "dosyalar/bayraklar/israil.png",
+    bayrak: "assets/bayraklar/israil.png",
     enisim: "Israel",
     isim: "Israil",
     baskent: "Jerusalem",
@@ -2619,7 +2640,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ly.png",
-    bayrak: "dosyalar/bayraklar/libya.png",
+    bayrak: "assets/bayraklar/libya.png",
     enisim: "Libya",
     isim: "Libya",
     baskent: "Tripoli",
@@ -2630,7 +2651,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/uy.png",
-    bayrak: "dosyalar/bayraklar/uruguay.png",
+    bayrak: "assets/bayraklar/uruguay.png",
     enisim: "Uruguay",
     isim: "Uruguay",
     baskent: "Montevideo",
@@ -2641,7 +2662,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/nf.png",
-    bayrak: "dosyalar/bayraklar/norfolkadasi.png",
+    bayrak: "assets/bayraklar/norfolkadasi.png",
     enisim: "Norfolkisland",
     isim: "Norfolkadasi",
     baskent: "Kingston",
@@ -2652,7 +2673,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ni.png",
-    bayrak: "dosyalar/bayraklar/nikaragua.png",
+    bayrak: "assets/bayraklar/nikaragua.png",
     enisim: "Nicaragua",
     isim: "Nikaragua",
     baskent: "Managua",
@@ -2663,7 +2684,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ck.png",
-    bayrak: "dosyalar/bayraklar/cookadalari.png",
+    bayrak: "assets/bayraklar/cookadalari.png",
     enisim: "Cookislands",
     isim: "Cookadalari",
     baskent: "Avarua",
@@ -2674,7 +2695,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/la.png",
-    bayrak: "dosyalar/bayraklar/laos.png",
+    bayrak: "assets/bayraklar/laos.png",
     enisim: "Laos",
     isim: "Laos",
     baskent: "Vientiane",
@@ -2685,7 +2706,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cx.png",
-    bayrak: "dosyalar/bayraklar/christmasadasi.png",
+    bayrak: "assets/bayraklar/christmasadasi.png",
     enisim: "Christmasisland",
     isim: "Christmasadasi",
     baskent: "Flyingfishcove",
@@ -2696,7 +2717,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sh.png",
-    bayrak: "dosyalar/bayraklar/sainthelena.png",
+    bayrak: "assets/bayraklar/sainthelena.png",
     enisim: "Sainthelenaascensionandtristandacunha",
     isim: "Sainthelena",
     baskent: "Jamestown",
@@ -2707,7 +2728,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ai.png",
-    bayrak: "dosyalar/bayraklar/anguilla.png",
+    bayrak: "assets/bayraklar/anguilla.png",
     enisim: "Anguilla",
     isim: "Anguilla",
     baskent: "Thevalley",
@@ -2718,7 +2739,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/fm.png",
-    bayrak: "dosyalar/bayraklar/mikronezya.png",
+    bayrak: "assets/bayraklar/mikronezya.png",
     enisim: "Micronesia",
     isim: "Mikronezya",
     baskent: "Palikir",
@@ -2729,7 +2750,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/de.png",
-    bayrak: "dosyalar/bayraklar/almanya.png",
+    bayrak: "assets/bayraklar/almanya.png",
     enisim: "Germany",
     isim: "Almanya",
     baskent: "Berlin",
@@ -2740,7 +2761,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gu.png",
-    bayrak: "dosyalar/bayraklar/guam.png",
+    bayrak: "assets/bayraklar/guam.png",
     enisim: "Guam",
     isim: "Guam",
     baskent: "HagÕt±a",
@@ -2751,7 +2772,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ki.png",
-    bayrak: "dosyalar/bayraklar/kiribati.png",
+    bayrak: "assets/bayraklar/kiribati.png",
     enisim: "Kiribati",
     isim: "Kiribati",
     baskent: "Southtarawa",
@@ -2762,7 +2783,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sx.png",
-    bayrak: "dosyalar/bayraklar/sintmaarten.png",
+    bayrak: "assets/bayraklar/sintmaarten.png",
     enisim: "Sintmaarten",
     isim: "Sintmaarten",
     baskent: "Philipsburg",
@@ -2773,7 +2794,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/es.png",
-    bayrak: "dosyalar/bayraklar/ispanya.png",
+    bayrak: "assets/bayraklar/ispanya.png",
     enisim: "Spain",
     isim: "Ispanya",
     baskent: "Madrid",
@@ -2784,7 +2805,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/jm.png",
-    bayrak: "dosyalar/bayraklar/jamaika.png",
+    bayrak: "assets/bayraklar/jamaika.png",
     enisim: "Jamaica",
     isim: "Jamaika",
     baskent: "Kingston",
@@ -2795,7 +2816,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ps.png",
-    bayrak: "dosyalar/bayraklar/filistin.png",
+    bayrak: "assets/bayraklar/filistin.png",
     enisim: "Palestine",
     isim: "Filistin",
     baskent: "Ramallahjerusalem",
@@ -2806,7 +2827,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gf.png",
-    bayrak: "dosyalar/bayraklar/fransizguyanasi.png",
+    bayrak: "assets/bayraklar/fransizguyanasi.png",
     enisim: "Frenchguiana",
     isim: "Fransizguyanasi",
     baskent: "Cayenne",
@@ -2817,7 +2838,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ad.png",
-    bayrak: "dosyalar/bayraklar/andorra.png",
+    bayrak: "assets/bayraklar/andorra.png",
     enisim: "Andorra",
     isim: "Andorra",
     baskent: "Andorralavella",
@@ -2828,7 +2849,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cl.png",
-    bayrak: "dosyalar/bayraklar/sili.png",
+    bayrak: "assets/bayraklar/sili.png",
     enisim: "Chile",
     isim: "Sili",
     baskent: "Santiago",
@@ -2839,7 +2860,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ls.png",
-    bayrak: "dosyalar/bayraklar/lesotho.png",
+    bayrak: "assets/bayraklar/lesotho.png",
     enisim: "Lesotho",
     isim: "Lesotho",
     baskent: "Maseru",
@@ -2850,7 +2871,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/au.png",
-    bayrak: "dosyalar/bayraklar/avustralya.png",
+    bayrak: "assets/bayraklar/avustralya.png",
     enisim: "Australia",
     isim: "Avustralya",
     baskent: "Canberra",
@@ -2861,7 +2882,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gd.png",
-    bayrak: "dosyalar/bayraklar/grenada.png",
+    bayrak: "assets/bayraklar/grenada.png",
     enisim: "Grenada",
     isim: "Grenada",
     baskent: "Stgeorges",
@@ -2872,7 +2893,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gh.png",
-    bayrak: "dosyalar/bayraklar/gana.png",
+    bayrak: "assets/bayraklar/gana.png",
     enisim: "Ghana",
     isim: "Gana",
     baskent: "Accra",
@@ -2883,7 +2904,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sc.png",
-    bayrak: "dosyalar/bayraklar/seyseller.png",
+    bayrak: "assets/bayraklar/seyseller.png",
     enisim: "Seychelles",
     isim: "Seyseller",
     baskent: "Victoria",
@@ -2894,7 +2915,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ao.png",
-    bayrak: "dosyalar/bayraklar/angola.png",
+    bayrak: "assets/bayraklar/angola.png",
     enisim: "Angola",
     isim: "Angola",
     baskent: "Luanda",
@@ -2905,7 +2926,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bm.png",
-    bayrak: "dosyalar/bayraklar/bermuda.png",
+    bayrak: "assets/bayraklar/bermuda.png",
     enisim: "Bermuda",
     isim: "Bermuda",
     baskent: "Hamilton",
@@ -2916,7 +2937,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pk.png",
-    bayrak: "dosyalar/bayraklar/pakistan.png",
+    bayrak: "assets/bayraklar/pakistan.png",
     enisim: "Pakistan",
     isim: "Pakistan",
     baskent: "Islamabad",
@@ -2927,7 +2948,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ml.png",
-    bayrak: "dosyalar/bayraklar/mali.png",
+    bayrak: "assets/bayraklar/mali.png",
     enisim: "Mali",
     isim: "Mali",
     baskent: "Bamako",
@@ -2938,7 +2959,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sa.png",
-    bayrak: "dosyalar/bayraklar/suudiarabistan.png",
+    bayrak: "assets/bayraklar/suudiarabistan.png",
     enisim: "Saudiarabia",
     isim: "Suudiarabistan",
     baskent: "Riyadh",
@@ -2949,7 +2970,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cw.png",
-    bayrak: "dosyalar/bayraklar/curacao.png",
+    bayrak: "assets/bayraklar/curacao.png",
     enisim: "Curaao",
     isim: "Curacao",
     baskent: "Willemstad",
@@ -2960,7 +2981,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/kr.png",
-    bayrak: "dosyalar/bayraklar/guneykore.png",
+    bayrak: "assets/bayraklar/guneykore.png",
     enisim: "Southkorea",
     isim: "Guneykore",
     baskent: "Seoul",
@@ -2971,7 +2992,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/et.png",
-    bayrak: "dosyalar/bayraklar/etiyopya.png",
+    bayrak: "assets/bayraklar/etiyopya.png",
     enisim: "Ethiopia",
     isim: "Etiyopya",
     baskent: "Addisababa",
@@ -2982,7 +3003,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gp.png",
-    bayrak: "dosyalar/bayraklar/guadeloupe.png",
+    bayrak: "assets/bayraklar/guadeloupe.png",
     enisim: "Guadeloupe",
     isim: "Guadeloupe",
     baskent: "Basseterre",
@@ -2993,7 +3014,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bd.png",
-    bayrak: "dosyalar/bayraklar/banglades.png",
+    bayrak: "assets/bayraklar/banglades.png",
     enisim: "Bangladesh",
     isim: "Banglades",
     baskent: "Dhaka",
@@ -3004,7 +3025,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/nz.png",
-    bayrak: "dosyalar/bayraklar/yenizelanda.png",
+    bayrak: "assets/bayraklar/yenizelanda.png",
     enisim: "Newzealand",
     isim: "Yenizelanda",
     baskent: "Wellington",
@@ -3015,7 +3036,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/km.png",
-    bayrak: "dosyalar/bayraklar/komorlar.png",
+    bayrak: "assets/bayraklar/komorlar.png",
     enisim: "Comoros",
     isim: "Komorlar",
     baskent: "Moroni",
@@ -3026,7 +3047,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bz.png",
-    bayrak: "dosyalar/bayraklar/belize.png",
+    bayrak: "assets/bayraklar/belize.png",
     enisim: "Belize",
     isim: "Belize",
     baskent: "Belmopan",
@@ -3037,7 +3058,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ug.png",
-    bayrak: "dosyalar/bayraklar/uganda.png",
+    bayrak: "assets/bayraklar/uganda.png",
     enisim: "Uganda",
     isim: "Uganda",
     baskent: "Kampala",
@@ -3048,7 +3069,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sg.png",
-    bayrak: "dosyalar/bayraklar/singapur.png",
+    bayrak: "assets/bayraklar/singapur.png",
     enisim: "Singapore",
     isim: "Singapur",
     baskent: "Singapore",
@@ -3059,7 +3080,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/li.png",
-    bayrak: "dosyalar/bayraklar/lihtenstayn.png",
+    bayrak: "assets/bayraklar/lihtenstayn.png",
     enisim: "Liechtenstein",
     isim: "Lihtenstayn",
     baskent: "Vaduz",
@@ -3070,7 +3091,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/hu.png",
-    bayrak: "dosyalar/bayraklar/macaristan.png",
+    bayrak: "assets/bayraklar/macaristan.png",
     enisim: "Hungary",
     isim: "Macaristan",
     baskent: "Budapest",
@@ -3081,7 +3102,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/is.png",
-    bayrak: "dosyalar/bayraklar/izlanda.png",
+    bayrak: "assets/bayraklar/izlanda.png",
     enisim: "Iceland",
     isim: "Izlanda",
     baskent: "Reykjavik",
@@ -3092,7 +3113,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tj.png",
-    bayrak: "dosyalar/bayraklar/tacikistan.png",
+    bayrak: "assets/bayraklar/tacikistan.png",
     enisim: "Tajikistan",
     isim: "Tacikistan",
     baskent: "Dushanbe",
@@ -3103,7 +3124,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/na.png",
-    bayrak: "dosyalar/bayraklar/namibya.png",
+    bayrak: "assets/bayraklar/namibya.png",
     enisim: "Namibia",
     isim: "Namibya",
     baskent: "Windhoek",
@@ -3114,7 +3135,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/tl.png",
-    bayrak: "dosyalar/bayraklar/dogutimor.png",
+    bayrak: "assets/bayraklar/dogutimor.png",
     enisim: "Timorleste",
     isim: "Dogutimor",
     baskent: "Dili",
@@ -3125,7 +3146,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/eg.png",
-    bayrak: "dosyalar/bayraklar/misir.png",
+    bayrak: "assets/bayraklar/misir.png",
     enisim: "Egypt",
     isim: "Misir",
     baskent: "Cairo",
@@ -3136,7 +3157,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/rs.png",
-    bayrak: "dosyalar/bayraklar/sirbistan.png",
+    bayrak: "assets/bayraklar/sirbistan.png",
     enisim: "Serbia",
     isim: "Sirbistan",
     baskent: "Belgrade",
@@ -3147,7 +3168,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mu.png",
-    bayrak: "dosyalar/bayraklar/mauritius.png",
+    bayrak: "assets/bayraklar/mauritius.png",
     enisim: "Mauritius",
     isim: "Mauritius",
     baskent: "Portlouis",
@@ -3158,7 +3179,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mo.png",
-    bayrak: "dosyalar/bayraklar/makao.png",
+    bayrak: "assets/bayraklar/makao.png",
     enisim: "Macau",
     isim: "Makao",
     baskent: "",
@@ -3169,7 +3190,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/pf.png",
-    bayrak: "dosyalar/bayraklar/fransizpolinezyasi.png",
+    bayrak: "assets/bayraklar/fransizpolinezyasi.png",
     enisim: "Frenchpolynesia",
     isim: "Fransizpolinezyasi",
     baskent: "Papeete",
@@ -3180,7 +3201,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mv.png",
-    bayrak: "dosyalar/bayraklar/maldivler.png",
+    bayrak: "assets/bayraklar/maldivler.png",
     enisim: "Maldives",
     isim: "Maldivler",
     baskent: "MalÚ",
@@ -3191,7 +3212,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/id.png",
-    bayrak: "dosyalar/bayraklar/endonezya.png",
+    bayrak: "assets/bayraklar/endonezya.png",
     enisim: "Indonesia",
     isim: "Endonezya",
     baskent: "Jakarta",
@@ -3202,7 +3223,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/cd.png",
-    bayrak: "dosyalar/bayraklar/demokratikkongocumhuriyeti.png",
+    bayrak: "assets/bayraklar/demokratikkongocumhuriyeti.png",
     enisim: "Drcongo",
     isim: "Demokratikkongocumhuriyeti",
     baskent: "Kinshasa",
@@ -3213,7 +3234,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ee.png",
-    bayrak: "dosyalar/bayraklar/estonya.png",
+    bayrak: "assets/bayraklar/estonya.png",
     enisim: "Estonia",
     isim: "Estonya",
     baskent: "Tallinn",
@@ -3224,7 +3245,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/vn.png",
-    bayrak: "dosyalar/bayraklar/vietnam.png",
+    bayrak: "assets/bayraklar/vietnam.png",
     enisim: "Vietnam",
     isim: "Vietnam",
     baskent: "Hanoi",
@@ -3235,7 +3256,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/it.png",
-    bayrak: "dosyalar/bayraklar/italya.png",
+    bayrak: "assets/bayraklar/italya.png",
     enisim: "Italy",
     isim: "Italya",
     baskent: "Rome",
@@ -3246,7 +3267,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/gn.png",
-    bayrak: "dosyalar/bayraklar/gine.png",
+    bayrak: "assets/bayraklar/gine.png",
     enisim: "Guinea",
     isim: "Gine",
     baskent: "Conakry",
@@ -3257,7 +3278,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/td.png",
-    bayrak: "dosyalar/bayraklar/cad.png",
+    bayrak: "assets/bayraklar/cad.png",
     enisim: "Chad",
     isim: "Cad",
     baskent: "Ndjamena",
@@ -3268,7 +3289,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ec.png",
-    bayrak: "dosyalar/bayraklar/ekvador.png",
+    bayrak: "assets/bayraklar/ekvador.png",
     enisim: "Ecuador",
     isim: "Ekvador",
     baskent: "Quito",
@@ -3279,7 +3300,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ge.png",
-    bayrak: "dosyalar/bayraklar/gurcistan.png",
+    bayrak: "assets/bayraklar/gurcistan.png",
     enisim: "Georgia",
     isim: "Gurcistan",
     baskent: "Tbilisi",
@@ -3290,7 +3311,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/mw.png",
-    bayrak: "dosyalar/bayraklar/malavi.png",
+    bayrak: "assets/bayraklar/malavi.png",
     enisim: "Malawi",
     isim: "Malavi",
     baskent: "Lilongwe",
@@ -3301,7 +3322,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/iq.png",
-    bayrak: "dosyalar/bayraklar/irak.png",
+    bayrak: "assets/bayraklar/irak.png",
     enisim: "Iraq",
     isim: "Irak",
     baskent: "Baghdad",
@@ -3312,7 +3333,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/sj.png",
-    bayrak: "dosyalar/bayraklar/svalbardvejanmayen.png",
+    bayrak: "assets/bayraklar/svalbardvejanmayen.png",
     enisim: "Svalbardandjanmayen",
     isim: "Svalbardvejanmayen",
     baskent: "Longyearbyen",
@@ -3323,7 +3344,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/bj.png",
-    bayrak: "dosyalar/bayraklar/benin.png",
+    bayrak: "assets/bayraklar/benin.png",
     enisim: "Benin",
     isim: "Benin",
     baskent: "Portonovo",
@@ -3334,7 +3355,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/jp.png",
-    bayrak: "dosyalar/bayraklar/japonya.png",
+    bayrak: "assets/bayraklar/japonya.png",
     enisim: "Japan",
     isim: "Japonya",
     baskent: "Tokyo",
@@ -3345,7 +3366,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/do.png",
-    bayrak: "dosyalar/bayraklar/dominikcumhuriyeti.png",
+    bayrak: "assets/bayraklar/dominikcumhuriyeti.png",
     enisim: "Dominicanrepublic",
     isim: "Dominikcumhuriyeti",
     baskent: "Santodomingo",
@@ -3356,7 +3377,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/qa.png",
-    bayrak: "dosyalar/bayraklar/katar.png",
+    bayrak: "assets/bayraklar/katar.png",
     enisim: "Qatar",
     isim: "Katar",
     baskent: "Doha",
@@ -3367,7 +3388,7 @@ List<Ulkeler> ulke = [
   ),
   Ulkeler(
     url: "https://flagcdn.com/w320/ga.png",
-    bayrak: "dosyalar/bayraklar/gabon.png",
+    bayrak: "assets/bayraklar/gabon.png",
     enisim: "Gabon",
     isim: "Gabon",
     baskent: "Libreville",

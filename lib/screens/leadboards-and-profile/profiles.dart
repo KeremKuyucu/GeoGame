@@ -38,15 +38,9 @@ class _ProfilesState extends State<Profiles> {
       Yenitur();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Ulkelerlist()),
-      );
-    } else if (selectedIndex == 3) {
-      Yenitur();
-      Navigator.pushReplacement(
-        context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4) {
+    } else if (selectedIndex == 3 ) {
       Yenitur();
       Navigator.pushReplacement(
         context,

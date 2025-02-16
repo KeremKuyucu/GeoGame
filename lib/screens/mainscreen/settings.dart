@@ -18,7 +18,6 @@ class _SettingsPageState extends State<SettingsPage> {
         _kitaUyari();
       });
     }
-    _startClipboardTimer();
   }
   void dispose() {
     _clipboardTimer?.cancel();
@@ -32,13 +31,11 @@ class _SettingsPageState extends State<SettingsPage> {
     _clipboardTimer = null;
   }
   void _checkClipboard(Timer timer) async {
-    // Eğer 'name' boşsa, timer'ı durduruyoruz
     if (uid.isNotEmpty) {
       _stopClipboardTimer();
       return;
     }
 
-    // Clipboard'tan veriyi alıyoruz
     ClipboardData? clipboardData = await Clipboard.getData('text/plain');
     String? text = clipboardData?.text;
     if (text != null && text.isNotEmpty) {
@@ -73,32 +70,25 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       selectedIndex = index;
     });
-    if (selectedIndex == 0 && getSelectableCountryCount() > 0) {
+    if (selectedIndex == 0) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
-    } else if (selectedIndex == 1 && getSelectableCountryCount() > 0) {
+    } else if (selectedIndex == 1) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2 && getSelectableCountryCount() > 0) {
-      Yenitur();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Ulkelerlist()),
-      );
-    } else if (selectedIndex == 3 && getSelectableCountryCount() > 0) {
+    } else if (selectedIndex == 2) {
       Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4 || getSelectableCountryCount() < 1) {
-      selectedIndex == 4;
+    } else if (selectedIndex == 3 ) {
       Yenitur();
       Navigator.pushReplacement(
         context,
@@ -291,6 +281,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         if (uid.isEmpty) ...[
                           ElevatedButton(
                             onPressed: () {
+                              _startClipboardTimer();
                               EasyLauncher.url(url: 'https://keremkk.glitch.me/auth');
                             },
                             style: ElevatedButton.styleFrom(
@@ -531,8 +522,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-Widget buildSwitch(
-    String title, bool currentValue, ValueChanged<bool> onChanged) {
+Widget buildSwitch( String title, bool currentValue, ValueChanged<bool> onChanged) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(

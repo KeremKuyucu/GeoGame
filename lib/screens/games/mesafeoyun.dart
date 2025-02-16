@@ -15,16 +15,17 @@ class _MesafeOyunState extends State<MesafeOyun> {
     super.initState();
     _initializeGame();
   }
+
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
-    yeniulkesec();
-    await mesafeoyunkurallari();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
+    await readFromFile((update) => setState(update));
+    yeniulkesec();
+    await mesafeoyunkurallari();
   }
   Future<void> mesafeoyunkurallari() async {
     return showDialog<void>(
@@ -75,6 +76,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         mesafedogru++;
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "mesafe",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -96,6 +98,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
         writeToFile();
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "mesafe",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -115,6 +118,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
     String ulke = kelimeDuzelt(_controller.text.trim());
     postUlkeLog(
         '{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
             '"oyunmodu": "mesafe",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'

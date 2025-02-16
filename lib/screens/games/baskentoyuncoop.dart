@@ -17,17 +17,17 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
-    await baskentoyunkurallari(context);
-    yeniulkesec();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
+    await readFromFile((update) => setState(update));
+    yeniulkesec();
+    await baskentoyunkurallari();
   }
-  Future<void> baskentoyunkurallari(BuildContext context) async {
+  Future<void> baskentoyunkurallari() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
@@ -67,6 +67,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         baskentdogru++;
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "baskent coop",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -92,6 +93,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         butontiklama[i]=false;
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "baskent",\n'
                 '"mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'

@@ -1,18 +1,6 @@
 import 'package:GeoGame/util.dart';
 import 'package:http/http.dart' as http;
 
-void disableCertificateVerification() {
-  HttpOverrides.global = MyHttpOverrides();
-}
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context);
-    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;  // Sertifika doğrulamasını geç
-    return client;
-  }
-}
-
 class GeoGameLobi extends StatefulWidget {
   @override
   _GeoGameLobiState createState() => _GeoGameLobiState();
@@ -20,8 +8,6 @@ class GeoGameLobi extends StatefulWidget {
 
 class _GeoGameLobiState extends State<GeoGameLobi> {
   int _selectedOption = 0;
-  List<String> options = List.filled(3, '');
-
 
   @override
   void initState() {
@@ -34,7 +20,10 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   }
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
-    await dilDegistir();
+    setState(() {
+      Yazi.dilDegistir();
+    });
+    yeniulkesec();
     await surumkiyasla();
     if (name.isEmpty) {
       selectedIndex=4;
@@ -49,46 +38,11 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       DeviceOrientation.portraitUp,
     ]);
   }
-  Future<void> dilDegistir() async {
-    await Yazi.loadDil(secilenDil).then((_) {
-      setState(() {
-        navBarItems = [
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.home),
-            title: Text(Yazi.get('navigasyonbar1')),
-            selectedColor: Colors.purple,
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.leaderboard),
-            title: Text(Yazi.get('navigasyonbar2')),
-            selectedColor: Colors.pink,
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(FontAwesomeIcons.info),
-            selectedColor: Colors.teal,
-            title: Text(Yazi.get('navigasyonbar3')),
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.person),
-            title: Text(Yazi.get('navigasyonbar4')),
-            selectedColor: Colors.teal,
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.settings),
-            title: Text(Yazi.get('navigasyonbar5')),
-            selectedColor: Colors.orange,
-          ),
-        ];
-      });
-    });
-    isEnglish = (secilenDil != 'Türkçe');
-  }
   Future<void> surumkiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String? remoteVersion;
     String? apkUrl;
-
     Future<void> _fetchData() async {
       try {
         final response = await http.get(Uri.parse(
@@ -113,8 +67,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         print('Error: $e');
       }
     }
-
-    await _fetchData();
     void showUpdateDialog(BuildContext context) {
       showDialog(
         context: context,
@@ -144,15 +96,16 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         },
       );
     }
-    print(remoteVersion);
-    print(localVersion);
+
+    //print(remoteVersion);
+    //print(localVersion);
+    await _fetchData();
     if (remoteVersion != null &&
         apkUrl != null &&
         remoteVersion != localVersion) {
       showUpdateDialog(context);
     }
   }
-
   void _selectOption(int index) async {
     setState(() {
       _selectedOption = index;
@@ -215,15 +168,9 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       Yenitur();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Ulkelerlist()),
-      );
-    } else if (selectedIndex == 3) {
-      Yenitur();
-      Navigator.pushReplacement(
-        context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4 ) {
+    } else if (selectedIndex == 3 ) {
       Yenitur();
       Navigator.pushReplacement(
         context,

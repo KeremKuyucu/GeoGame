@@ -14,33 +14,17 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
   void initState() {
     super.initState();
     _initializeGame();
-
-  }
-  void ekrancevir() {
-    // Yön değiştirmek için UI'dan sonra yapılacak işlemleri belirleyelim.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (isPortraitUp) {
-        // Eğer mevcut yön portre üst ise, portre alt yap
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown]);
-      } else {
-        // Eğer mevcut yön portre alt ise, portre üst yap
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-      }
-
-      // Yönü tersine çevir
-      isPortraitUp = !isPortraitUp;
-    });
   }
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
-    yeniulkesec();
-    await bayrakoyunkurallari();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
+    await readFromFile((update) => setState(update));
+    yeniulkesec();
+    await bayrakoyunkurallari();
   }
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
@@ -82,6 +66,7 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
         bayrakdogru++;
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "bayrak coop",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -107,6 +92,7 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
         writeToFile();
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "bayrak",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -116,6 +102,21 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
                 '"mavi": "${butonAnahtarlar[2]}",\n'
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
+    });
+  }
+  void ekrancevir() {
+    // Yön değiştirmek için UI'dan sonra yapılacak işlemleri belirleyelim.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isPortraitUp) {
+        // Eğer mevcut yön portre üst ise, portre alt yap
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown]);
+      } else {
+        // Eğer mevcut yön portre alt ise, portre üst yap
+        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      }
+
+      // Yönü tersine çevir
+      isPortraitUp = !isPortraitUp;
     });
   }
 

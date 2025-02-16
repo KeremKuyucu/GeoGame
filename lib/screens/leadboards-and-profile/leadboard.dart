@@ -36,15 +36,9 @@ class _LeadboardState extends State<Leadboard> {
       Yenitur();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Ulkelerlist()),
-      );
-    } else if (selectedIndex == 3) {
-      Yenitur();
-      Navigator.pushReplacement(
-        context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 4) {
+    } else if (selectedIndex == 3 ) {
       Yenitur();
       Navigator.pushReplacement(
         context,

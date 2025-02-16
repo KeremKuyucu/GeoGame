@@ -14,19 +14,18 @@ class _BayrakOyunState extends State<BayrakOyun> {
   void initState() {
     super.initState();
     _initializeGame();
-
   }
 
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
-    await bayrakoyunkurallari();
-    yeniulkesec();
     _controller = TextEditingController();
     _controller.addListener(() {
       setState(() {
         _currentInput = _controller.text.trim();
       });
     });
+    await readFromFile((update) => setState(update));
+    yeniulkesec();
+    await bayrakoyunkurallari();
   }
   Future<void> bayrakoyunkurallari() async {
     return showDialog<void>(
@@ -67,6 +66,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         bayrakdogru++;
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "bayrak",\n'
                 '"mesaj": "Cevap Doğru",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -92,6 +92,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
         writeToFile();
         postUlkeLog(
             '{\n"name": "$name",\n'
+                '"uid": "$uid",\n'
                 '"oyunmodu": "bayrak",\n'
                 '"Mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
@@ -115,6 +116,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
     String ulke = kelimeDuzelt(_controller.text.trim());
     postUlkeLog(
         '{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
             '"oyunmodu": "bayrak",\n'
             '"Mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
