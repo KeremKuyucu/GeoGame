@@ -104,63 +104,6 @@ class _SettingsPageState extends State<SettingsPage> {
       MaterialPageRoute(builder: (context) => GeoGameLobi()),
     );
   }
-  Future<void> puanguncelle() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${apiserver}/get_leadboard'),
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        users = data['users'].map((user) {
-          return {
-            'name': user['name'] ?? '',
-            'uid': user['uid'] ?? '',
-            'profilurl': user['profilurl'] ??
-                'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
-            'puan': int.parse(user['puan'] ?? "0"),
-            'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
-            'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
-            'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
-            'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
-            'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
-            'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
-            'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
-            'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
-            'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
-          };
-        }).toList();
-
-        for (var user in users) {
-          if (user['uid'] ==  uid) {
-            debugPrint('uidler eşleşti');
-            if (toplampuan < user['puan']) {
-              debugPrint('puan daha düşük güncellendi');
-              toplampuan = user['puan'];
-              mesafepuan = user['mesafepuan'];
-              baskentpuan = user['baskentpuan'];
-              bayrakpuan = user['bayrakpuan'];
-              mesafedogru = user['mesafedogru'];
-              baskentdogru = user['baskentdogru'];
-              bayrakdogru = user['bayrakdogru'];
-              mesafeyanlis = user['mesafeyanlis'];
-              baskentyanlis = user['baskentyanlis'];
-              bayrakyanlis = user['bayrakyanlis'];
-              writeToFile();
-            }
-            break;
-          }
-        }
-
-        print("Veri başarıyla güncellendi.");
-      } else {
-        throw Exception('Veri yüklenemedi.');
-      }
-    } catch (e) {
-      print('Hata: $e');
-    }
-  }
   Future<void> _kitaUyari() async {
     Yazi.loadDil(secilenDil);
     return showDialog<void>(

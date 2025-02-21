@@ -49,8 +49,8 @@ class _BaskentOyunState extends State<BaskentOyun> {
   }
   void _checkAnswer(int i) {
     setState(() {
-      if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+      if (kalici.ks(_controller.text.trim())) {
+        String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
         Dogru();
@@ -70,7 +70,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                 '"mavi": "${butonAnahtarlar[2]}",\n'
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       } else {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+        String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
@@ -94,14 +94,13 @@ class _BaskentOyunState extends State<BaskentOyun> {
   }
   void _pasButtonPressed() {
     puan = 50;
-    String ulkeisim = kalici.isim;
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(countryName: '$ulkeisim');
+        return CustomNotification(baslik: Yazi.get('pascevap'),metin: (isEnglish ? kalici.enisim : kalici.isim));
       },
     );
-    String ulke = kelimeDuzelt(_controller.text.trim());
+    String ulke = _controller.text.trim();
     postUlkeLog(
         '{\n"name": "$name",\n'
             '"uid": "$uid",\n'

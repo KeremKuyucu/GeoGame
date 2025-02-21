@@ -50,8 +50,8 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
   }
   void _checkAnswer(int i) {
     setState(() {
-      if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+      if (kalici.ks(_controller.text.trim())) {
+        String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
         Dogru();
@@ -72,7 +72,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
       } else {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+        String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();

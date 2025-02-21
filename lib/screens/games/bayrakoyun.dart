@@ -50,8 +50,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
   }
   void _checkAnswer(int i) {
     setState(() {
-      if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+      if (kalici.ks(_controller.text.trim())) {
+        String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
         Dogru();
@@ -71,7 +71,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
       } else {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+        String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
         Yanlis();
@@ -83,7 +83,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
             '{\n"name": "$name",\n'
                 '"uid": "$uid",\n'
                 '"oyunmodu": "bayrak",\n'
-                '"Mesaj": "Cevap Yanlış",\n'
+                '"mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
                 '"verilencevap": "$ulke",\n'
                 '"yesil": "${butonAnahtarlar[0]}",\n'
@@ -95,19 +95,18 @@ class _BayrakOyunState extends State<BayrakOyun> {
   }
   void _pasButtonPressed() {
     puan = 50;
-    String ulkeisim = kalici.isim;
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(countryName: '$ulkeisim');
+        return CustomNotification(baslik: Yazi.get('pascevap'),metin: (isEnglish ? kalici.enisim : kalici.isim));
       },
     );
-    String ulke = kelimeDuzelt(_controller.text.trim());
+    String ulke = _controller.text.trim();
     postUlkeLog(
         '{\n"name": "$name",\n'
             '"uid": "$uid",\n'
             '"oyunmodu": "bayrak",\n'
-            '"Mesaj": "Pas Geçildi",\n'
+            '"mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
             '"verilencevap": "$ulke",\n'
             '"yesil": "${butonAnahtarlar[0]}",\n'

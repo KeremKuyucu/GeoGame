@@ -276,9 +276,10 @@ class DrawerWidget extends StatelessWidget {
   }
 }
 class CustomNotification extends StatelessWidget {
-  final String countryName;
+  final String baslik;
+  final String metin;
 
-  CustomNotification({required this.countryName});
+  CustomNotification({required this.baslik,required this.metin});
 
   @override
   Widget build(BuildContext context) {
@@ -295,12 +296,12 @@ class CustomNotification extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                Yazi.get('pascevap'),
+                baslik,
                 style: TextStyle(fontSize: 18, color: Colors.white),
               ),
               SizedBox(height: 10),
               Text(
-                '$countryName',
+                metin,
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               SizedBox(height: 10),
@@ -313,7 +314,6 @@ class CustomNotification extends StatelessWidget {
                           vertical: 4.0, horizontal: 4.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          // Pas butonuna basıldığında yapılacak işlemi buraya ekleyebilirsiniz
                           Navigator.of(context).pop();  // Bildirimi kapat
                         },
                         child: Text(
@@ -340,6 +340,7 @@ class CustomNotification extends StatelessWidget {
     );
   }
 }
+// return CustomNotification(baslik: 'baslik',metin: 'metin');
 
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
 final List<String> diller = ['Türkçe','English'];
@@ -431,6 +432,11 @@ int getSelectableCountryCount() {
   //print('Ülke Sayısı: $count');
   return count;
 }
+String createToken() {
+  const String karakterler = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  Random random = Random();
+  return List.generate(10, (index) => karakterler[random.nextInt(karakterler.length)]).join();
+}
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
   final filePath = '${directory.path}/kurallar.json';
@@ -508,14 +514,62 @@ Future<void> writeToFile() async {
   await file.writeAsString(jsonData);
   print("dosyaya yazıldı");
 }
-String kelimeDuzelt(String kelime) {
-  String sonuc = '';
-  for (int i = 0; i < kelime.length; i++) {
-    if (kelime[i].contains(RegExp(r'[a-zA-Z]'))) {
-      sonuc += i == 0 ? kelime[i].toUpperCase() : kelime[i].toLowerCase();
+Future<void> puanguncelle() async {
+  try {
+    final response = await http.get(
+      Uri.parse('${apiserver}/get_leadboard'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      users = data['users'].map((user) {
+        return {
+          'name': user['name'] ?? '',
+          'uid': user['uid'] ?? '',
+          'profilurl': user['profilurl'] ??
+              'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
+          'puan': int.parse(user['puan'] ?? "0"),
+          'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
+          'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
+          'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
+          'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
+          'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
+          'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
+          'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
+          'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
+          'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
+        };
+      }).toList();
+
+      for (var user in users) {
+        if (user['uid'] ==  uid) {
+          debugPrint('uidler eşleşti');
+          if (toplampuan < user['puan']) {
+            debugPrint('puan daha düşük güncellendi');
+            toplampuan = user['puan'];
+            mesafepuan = user['mesafepuan'];
+            baskentpuan = user['baskentpuan'];
+            bayrakpuan = user['bayrakpuan'];
+            mesafedogru = user['mesafedogru'];
+            baskentdogru = user['baskentdogru'];
+            bayrakdogru = user['bayrakdogru'];
+            mesafeyanlis = user['mesafeyanlis'];
+            baskentyanlis = user['baskentyanlis'];
+            bayrakyanlis = user['bayrakyanlis'];
+            writeToFile();
+          }
+          break;
+        }
+      }
+
+      print("Veri başarıyla güncellendi.");
+    } else {
+      throw Exception('Veri yüklenemedi.');
     }
+  } catch (e) {
+    print('Hata: $e');
   }
-  return sonuc;
 }
 Future<String> getCountry() async {
   final url = Uri.parse('https://am.i.mullvad.net/country');

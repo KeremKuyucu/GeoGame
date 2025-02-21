@@ -49,8 +49,8 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
   }
   void _checkAnswer(int i) {
     setState(() {
-      if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+      if (kalici.ks(_controller.text.trim())) {
+        String ulke = _controller.text.trim();
         ekrancevir();
         Dogru();
         _controller.clear();
@@ -72,7 +72,7 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
                 '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
       } else {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+        String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
           Yanlis();
@@ -85,7 +85,7 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
             '{\n"name": "$name",\n'
                 '"uid": "$uid",\n'
                 '"oyunmodu": "bayrak",\n'
-                '"Mesaj": "Cevap Yanlış",\n'
+                '"mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
                 '"verilencevap": "$ulke",\n'
                 '"yesil": "${butonAnahtarlar[0]}",\n'

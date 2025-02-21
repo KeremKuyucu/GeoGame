@@ -52,7 +52,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
   void _checkAnswer() {
     setState(() {
       for (int a=0;a<250;a++){
-        if(ulke[a].ks(kelimeDuzelt(_controller.text.trim()))){
+        if(ulke[a].ks(_controller.text.trim())){
           gecici= ulke[a];
           break;
         }
@@ -60,8 +60,8 @@ class _MesafeOyunState extends State<MesafeOyun> {
       message += Yazi.get('tahminmetin') + (isEnglish ? gecici.enisim : gecici.isim) + "    ";
       message += Yazi.get('mesafe') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
       message += Yazi.get('yon') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
-      if (kalici.ks(kelimeDuzelt(_controller.text.trim()))) {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+      if (kalici.ks(_controller.text.trim())) {
+        String ulke = _controller.text.trim();
         _controller.clear();
         message='';
         yeniulkesec();
@@ -78,7 +78,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                 '"verilencevap": "$ulke",\n');
         puan=300;
       } else {
-        String ulke = kelimeDuzelt(_controller.text.trim());
+        String ulke = _controller.text.trim();
         puan-=10;
         if(puan<100)
           puan=100;
@@ -90,7 +90,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
             '{\n"name": "$name",\n'
                 '"uid": "$uid",\n'
                 '"oyunmodu": "mesafe",\n'
-                '"Mesaj": "Cevap Yanlış",\n'
+                '"mesaj": "Cevap Yanlış",\n'
                 '"dogrucevap": "${kalici.isim}",\n'
                 '"verilencevap": "$ulke",\n');
       }
@@ -98,19 +98,18 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
   void _pasButtonPressed() {
     puan=300;
-    String ulkeisim = kalici.isim;
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(countryName: '$ulkeisim');
+        return CustomNotification(baslik: Yazi.get('pascevap'),metin: (isEnglish ? kalici.enisim : kalici.isim));
       },
     );
-    String ulke = kelimeDuzelt(_controller.text.trim());
+    String ulke = _controller.text.trim();
     postUlkeLog(
         '{\n"name": "$name",\n'
             '"uid": "$uid",\n'
             '"oyunmodu": "mesafe",\n'
-            '"Mesaj": "Pas Geçildi",\n'
+            '"mesaj": "Pas Geçildi",\n'
             '"dogrucevap": "${kalici.isim}",\n'
             '"verilencevap": "$ulke",\n');
     setState(() {

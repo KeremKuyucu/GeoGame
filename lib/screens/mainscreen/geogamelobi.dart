@@ -12,20 +12,21 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   @override
   void initState() {
     super.initState();
-    _initializeGame();
     if (darktema)
       ThemeModeBuilderConfig.setDark();
     else
       ThemeModeBuilderConfig.setLight();
+    _initializeGame();
   }
   Future<void> _initializeGame() async {
+    await puanguncelle();
     await readFromFile((update) => setState(update));
     setState(() {
       Yazi.dilDegistir();
     });
     yeniulkesec();
     await surumkiyasla();
-    if (name.isEmpty) {
+    if (uid.isEmpty) {
       selectedIndex=4;
       Navigator.pushReplacement(
         context,
