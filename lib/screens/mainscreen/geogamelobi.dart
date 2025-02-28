@@ -19,7 +19,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    await puanguncelle();
     await readFromFile((update) => setState(update));
     setState(() {
       Yazi.dilDegistir();
@@ -34,6 +33,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       );
     } else {
       postLeadboard();
+      puanguncelle();
     }
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -112,37 +112,31 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       _selectedOption = index;
     });
     if (_selectedOption == 0 && getSelectableCountryCount() > 0) {
-      Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BaskentOyun()),
       );
     } else if (_selectedOption == 1 && getSelectableCountryCount() > 0) {
-      Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BayrakOyun()),
       );
     } else if (_selectedOption == 2 && getSelectableCountryCount() > 0) {
-      Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MesafeOyun()),
       );
     } else if (_selectedOption == 3 && getSelectableCountryCount() > 0) {
-      Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BaskentOyunCoop()),
       );
     } else if (_selectedOption == 4 && getSelectableCountryCount() > 0) {
-      Yenitur();
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BayrakOyunCoop()),
       );
     }else if (getSelectableCountryCount() < 1) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -154,25 +148,21 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       selectedIndex = index;
     });
     if (selectedIndex == 0) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
     } else if (selectedIndex == 1) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
     } else if (selectedIndex == 2) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
     } else if (selectedIndex == 3 ) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),

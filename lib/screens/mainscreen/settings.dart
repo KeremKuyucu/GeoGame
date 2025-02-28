@@ -56,7 +56,6 @@ class _SettingsPageState extends State<SettingsPage> {
           debugPrint('UID: $uid');
           debugPrint('Display Name: $name');
           debugPrint('Profile Picture: $profilurl');
-
           _stopClipboardTimer();
         } else {
           debugPrint('Geçerli JSON verisi değil.');
@@ -71,25 +70,21 @@ class _SettingsPageState extends State<SettingsPage> {
       selectedIndex = index;
     });
     if (selectedIndex == 0) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
     } else if (selectedIndex == 1) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
     } else if (selectedIndex == 2) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
     } else if (selectedIndex == 3 ) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),

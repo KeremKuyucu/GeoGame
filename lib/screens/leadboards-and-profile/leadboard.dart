@@ -21,25 +21,21 @@ class _LeadboardState extends State<Leadboard> {
       selectedIndex = index;
     });
     if (selectedIndex == 0) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
     } else if (selectedIndex == 1) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
     } else if (selectedIndex == 2) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
     } else if (selectedIndex == 3 ) {
-      Yenitur();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),

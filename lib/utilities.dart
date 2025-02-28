@@ -439,7 +439,7 @@ String createToken() {
 }
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/kurallar.json';
+  final filePath = '${directory.path}/geogame.json';
   final file = File(filePath);
 
   if (await file.exists()) {
@@ -481,7 +481,7 @@ Future<void> readFromFile(Function updateState) async {
 }
 Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/kurallar.json';
+  final filePath = '${directory.path}/geogame.json';
   final file = File(filePath);
   toplampuan=bayrakpuan+baskentpuan+mesafepuan;
   final data = {
@@ -547,6 +547,9 @@ Future<void> puanguncelle() async {
           debugPrint('uidler eşleşti');
           if (toplampuan < user['puan']) {
             debugPrint('puan daha düşük güncellendi');
+            uid = user['uid'];
+            name = user['name'];
+            profilurl = user['profilurl'];
             toplampuan = user['puan'];
             mesafepuan = user['mesafepuan'];
             baskentpuan = user['baskentpuan'];
