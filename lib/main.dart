@@ -2,6 +2,8 @@ import 'package:GeoGame/util.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Locale deviceLocale = PlatformDispatcher.instance.locale;
+  diltercihi = deviceLocale.languageCode;
   runApp(Geogame());
 }
 

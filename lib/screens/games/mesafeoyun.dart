@@ -98,10 +98,11 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
   void _pasButtonPressed() {
     puan=300;
+    String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(baslik: Yazi.get('pascevap'),metin: (isEnglish ? kalici.enisim : kalici.isim));
+        return CustomNotification(baslik: Yazi.get('pascevap'),metin: pasulke);
       },
     );
     String ulke = _controller.text.trim();

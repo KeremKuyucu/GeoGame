@@ -52,6 +52,8 @@ class Yazi {
   }
 
   static Future<void> dilDegistir() async {
+    if (secilenDil.isEmpty)
+      secilenDil = diltercihi == 'tr' ? "Türkçe" : "English";
     //await loadDil(secilenDil);
     await Yazi.loadDil(secilenDil).then((_) {
         navBarItems = [
@@ -180,6 +182,8 @@ class DrawerWidget extends StatelessWidget {
                                     _sebepController.text,
                                     _messageController.text,
                                   );
+                                  _sebepController.clear();
+                                  _messageController.clear();
                                   Navigator.pop(context);
                                 },
                                 style: TextButton.styleFrom(
@@ -340,12 +344,17 @@ class CustomNotification extends StatelessWidget {
     );
   }
 }
-// return CustomNotification(baslik: 'baslik',metin: 'metin');
+//     showDialog(
+//       context: context,
+//       builder: (context) {
+//         return CustomNotification(baslik: baslikmetin,metin: icerikmetin);
+//       },
 
 bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
 final List<String> diller = ['Türkçe','English'];
+String diltercihi = '';
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
-String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='English', apiserver = "https://keremkk.glitch.me/geogame";
+String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='', apiserver = "https://keremkk.glitch.me/geogame";
 List<dynamic> users = [];
 final List<Color> buttonColors = [
   Colors.green,

@@ -140,7 +140,6 @@ class _SettingsPageState extends State<SettingsPage> {
             Uri.parse(targetUrl),
             headers: {'Content-Type': 'application/json'},
             body: json.encode({
-              'sebep': "Çıkış",
               'uid': uid,
               'name': name,
             }),
