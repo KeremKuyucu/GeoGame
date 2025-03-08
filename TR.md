@@ -8,6 +8,8 @@
 
 GeoGame, ülkeler hakkındaki bilginizi artırmaya yönelik eğitici bir oyundur. Başkentler, bayraklar ve diğer coğrafi bilgileri öğrenirken kendinizi test edin ve dünya hakkında daha fazla bilgi edinin!  
 
+<img  align="left" src="https://komarev.com/ghpvc/?username=keremlolgg&repo=geogame&style=for-the-badge&label=VISITORS+COUNT&color=%237B1E7B"/>
+
 ![GitHub all releases](https://img.shields.io/github/downloads/keremlolgg/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
 ![GitHub stars](https://img.shields.io/github/stars/keremlolgg/GeoGame?style=for-the-badge)  
 ![GitHub forks](https://img.shields.io/github/forks/keremlolgg/GeoGame?style=for-the-badge)  
