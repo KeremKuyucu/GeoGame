@@ -1,0 +1,2 @@
+C:/Users/KeremK/. Projeler/StudioProjects/geogame/android/app/.cxx/RelWithDebInfo/392x4y3v/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/KeremK/. Projeler/StudioProjects/geogame/android/app/.cxx/RelWithDebInfo/392x4y3v/x86_64/CMakeFiles/rebuild_cache.dir
