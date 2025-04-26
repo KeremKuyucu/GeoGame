@@ -24,7 +24,7 @@ GeoGame is an educational game designed to enhance your knowledge about countrie
 
 Access the GeoGame website to experience the game:  
 
-➡️ [**GeoGame Website**](https://keremkk.glitch.me/geogame)  
+➡️ [**GeoGame Website**](https://keremkk.vercel.app/geogame)  
 
 ## **Download**  
 
