@@ -238,7 +238,7 @@ class DrawerWidget extends StatelessWidget {
             await EasyLauncher.url(url: 'https://keremkk.can.re', mode: Mode.platformDefault);
           }),
           _buildListTile(Icons.public, Colors.red, Yazi.get('website'), () async {
-            await EasyLauncher.url(url: 'https://keremkk.glitch.me/geogame');
+            await EasyLauncher.url(url: 'https://keremkk.vercel.app/geogame');
           }),
           _buildListTile(FontAwesomeIcons.github, Colors.black, Yazi.get('github'), () async {
             await EasyLauncher.url(url: 'https://github.com/keremlolgg/GeoGame');
@@ -610,7 +610,6 @@ Future<void> postLeadboard() async {
         '"name": "$name",\n'
         '"uid": "$uid",\n'
         '"profilurl": "$profilurl",\n'
-        '"dil": "$secilenDil",\n'
         '"surum": "$localVersion",\n'
         '"ulke": "$country",\n'
         '"toplampuan": "$toplampuan",\n'
