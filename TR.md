@@ -68,6 +68,10 @@ Aşağıda oyuna ait bazı ekran görüntüleri bulunmaktadır:
 GeoGame, **GitHub üzerinden gerçek zamanlı API bağlantılarını** alarak **Discord** üzerinde liderlik tablosunu günceller.  
 Sunucu tarafında çalışan bir uygulama, **skorları işler**, **liderlik tablosunu günceller** ve gerektiğinde **webhook mesajlarını** değiştirerek verileri yeniden kullanılabilir hale getirir.  
 
+## **Server Code**
+
+[Code](https://glitch.com/edit/#!/keremkk?path=routes/geogame.js)
+
 ## **Lisans**  
 
 Bu proje, **GPL Lisansı** altında lisanslanmıştır. Daha fazla bilgi için lütfen [**LICENSE**](LICENSE) dosyasını inceleyiniz.
