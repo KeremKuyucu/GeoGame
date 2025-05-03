@@ -71,6 +71,11 @@ Below are some screenshots from the game:
 GeoGame retrieves **real-time API links from GitHub** to update the **leaderboard on Discord**.  
 A server-side application **processes scores**, **updates the leaderboard table**, and **modifies webhook messages** for data retrieval when necessary.  
 
+## **Server Code**
+
+[Code](https://glitch.com/edit/#!/keremkk?path=routes/geogame.js)
+
+
 ## **License**  
 
 This project is licensed under the **GPL License**. For more details, refer to the [**LICENSE**](LICENSE) file.
