@@ -24,7 +24,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       Yazi.dilDegistir();
     });
     yeniulkesec();
-    await surumkiyasla();
+    surumKiyasla();
     if (uid.isEmpty) {
       selectedIndex=4;
       Navigator.pushReplacement(
@@ -39,74 +39,80 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       DeviceOrientation.portraitUp,
     ]);
   }
-  Future<void> surumkiyasla() async {
+  Future<void> surumKiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String? remoteVersion;
     String? apkUrl;
-    Future<void> _fetchData() async {
-      try {
-        final response = await http.get(Uri.parse(
-            'https://raw.githubusercontent.com/keremlolgg/GeoGame/main/latest_version.json'));
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
+    String? updateNotes;
 
-          // Null kontrolü ve verinin geçerliliği
-          if (data != null && data.containsKey('latest_version') && data.containsKey('apk_url') && data.containsKey('apiserver')) {
-            setState(() {
-              remoteVersion = data['latest_version'] ?? 'N/A';
-              apkUrl = data['apk_url'] ?? 'N/A';
-              apiserver = data['apiserver'] ?? 'N/A';
-            });
-          } else {
-            throw Exception('Missing keys in the JSON data');
-          }
-        } else {
-          throw Exception('Failed to load data');
-        }
-      } catch (e) {
-        print('Error: $e');
-      }
-    }
-    void showUpdateDialog(BuildContext context) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(Yazi.get('surum1')),
-            content: Text(Yazi.get('surum2')),
-            actions: <Widget>[
-              TextButton(
-                child: Text(Yazi.get('surum3')),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: Text(Yazi.get('surum4')),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  EasyLauncher.url(
-                    url: apkUrl!,
-                  );
-                },
-              ),
-            ],
+    try {
+      final response = await http.get(Uri.parse(
+          'https://api.github.com/repos/KeremKuyucu/GeoGame/releases/latest'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        remoteVersion =
+            (data['tag_name'] as String?)?.replaceFirst(RegExp(r'^v'), '');
+        updateNotes = data['body'] ?? 'Yama notları mevcut değil';
+
+        apkUrl = (data['assets'] as List).firstWhere(
+              (asset) =>
+              (asset['browser_download_url'] as String).toLowerCase().endsWith('.apk'),
+          orElse: () => null,
+        )?['browser_download_url'];
+
+        if (remoteVersion != null &&
+            apkUrl != null &&
+            remoteVersion != localVersion) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(Yazi.get('surum1')),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(Yazi.get('surum2')),
+                      SizedBox(height: 10),
+                      Text(
+                        updateNotes ?? '',
+                        style: TextStyle(fontSize: 13, color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text(Yazi.get('surum3')),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text(Yazi.get('surum4')),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      EasyLauncher.url(url: apkUrl!);
+                    },
+                  ),
+                ],
+              );
+            },
           );
-        },
-      );
-    }
-
-    //print(remoteVersion);
-    //print(localVersion);
-    await _fetchData();
-    if (remoteVersion != null &&
-        apkUrl != null &&
-        remoteVersion != localVersion) {
-      showUpdateDialog(context);
+        }
+      } else {
+        throw Exception('GitHub API hatası: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Hata: $e');
     }
   }
+
   void _selectOption(int index) async {
     setState(() {
       _selectedOption = index;
