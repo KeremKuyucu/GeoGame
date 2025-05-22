@@ -219,7 +219,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ElevatedButton(
                             onPressed: () {
                               _startClipboardTimer();
-                              EasyLauncher.url(url: 'https://keremkk.glitch.me/auth');
+                              EasyLauncher.url(url: 'https://geogame-auth.keremkk.com.tr');
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueAccent,

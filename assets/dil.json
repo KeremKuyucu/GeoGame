@@ -4,8 +4,8 @@
   },
   "Veriler": {
     "sikayet": {
-      "Türkçe": "Şikayet veya önerinizi aşağıdaki butona tıklayarak bize iletebilirsiniz.",
-      "English": "You can send your complaints or suggestions by clicking the button below."
+      "Türkçe": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
+      "English": "You can send your complaints or suggestions by clicking the button above."
     },
     "uygpaylas": {
       "Türkçe": "Uygulamayı Paylaş",
@@ -276,16 +276,12 @@
       "English": "New Version Available"
     },
     "surum2": {
-      "Türkçe": "Lütfen internet sitesinden uygulamayı tekrar indirerek güncelleyiniz.",
-      "English": "Please update the app by downloading it again from the website."
-    },
-    "surum3": {
       "Türkçe": "Şimdi Değil",
       "English": "Not Now"
     },
-    "surum4": {
-      "Türkçe": "Siteye Git",
-      "English": "Go to Site"
+    "surum3": {
+      "Türkçe": "Güncelle",
+      "English": "Update"
     },
     "baskenttitle": {
       "Türkçe": "Başkentten Ülke Bilme",

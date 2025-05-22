@@ -235,13 +235,13 @@ class DrawerWidget extends StatelessWidget {
             await Share.share(Yazi.get('davetpromt'));
           }),
           _buildListTile(Icons.person, Color(0xFF5865F2), Yazi.get('yapimcimetin'), () async {
-            await EasyLauncher.url(url: 'https://keremkk.can.re', mode: Mode.platformDefault);
+            await EasyLauncher.url(url: 'https://keremkk.com.tr', mode: Mode.platformDefault);
           }),
           _buildListTile(Icons.public, Colors.red, Yazi.get('website'), () async {
-            await EasyLauncher.url(url: 'https://keremkk.vercel.app/geogame');
+            await EasyLauncher.url(url: 'https://keremkk.com.tr/geogame');
           }),
           _buildListTile(FontAwesomeIcons.github, Colors.black, Yazi.get('github'), () async {
-            await EasyLauncher.url(url: 'https://github.com/keremlolgg/GeoGame');
+            await EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame');
           }),
           Divider(),
           ListTile(

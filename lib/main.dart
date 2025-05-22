@@ -6,10 +6,7 @@ void main() async {
   diltercihi = deviceLocale.languageCode;
   runApp(Geogame());
 }
-
 class Geogame extends StatefulWidget {
-  static var navigatorKey;
-
   @override
   State<Geogame> createState() => GeoGame();
 }

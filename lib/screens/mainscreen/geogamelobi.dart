@@ -43,7 +43,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String? remoteVersion;
-    String? apkUrl;
     String? updateNotes;
 
     try {
@@ -57,14 +56,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
             (data['tag_name'] as String?)?.replaceFirst(RegExp(r'^v'), '');
         updateNotes = data['body'] ?? 'Yama notları mevcut değil';
 
-        apkUrl = (data['assets'] as List).firstWhere(
-              (asset) =>
-              (asset['browser_download_url'] as String).toLowerCase().endsWith('.apk'),
-          orElse: () => null,
-        )?['browser_download_url'];
-
         if (remoteVersion != null &&
-            apkUrl != null &&
             remoteVersion != localVersion) {
           showDialog(
             context: context,
@@ -77,27 +69,24 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(Yazi.get('surum2')),
-                      SizedBox(height: 10),
                       Text(
                         updateNotes ?? '',
-                        style: TextStyle(fontSize: 13, color: Colors.black54),
                       ),
                     ],
                   ),
                 ),
                 actions: <Widget>[
                   TextButton(
-                    child: Text(Yazi.get('surum3')),
+                    child: Text(Yazi.get('surum2')),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                   ),
                   TextButton(
-                    child: Text(Yazi.get('surum4')),
+                    child: Text(Yazi.get('surum3')),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      EasyLauncher.url(url: apkUrl!);
+                      EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame/releases/latest');
                     },
                   ),
                 ],

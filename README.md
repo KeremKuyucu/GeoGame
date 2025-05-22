@@ -8,14 +8,14 @@
   <img src="assets/logo.png" alt="GeoGame Logo" width="200"/>
 </p>  
 
-<img  align="left" src="https://komarev.com/ghpvc/?username=keremlolgg&repo=geogame&style=for-the-badge&label=VISITORS+COUNT&color=%237B1E7B"/>
+<img  align="left" src="https://komarev.com/ghpvc/?username=keremkuyucu&repo=geogame&style=for-the-badge&label=VISITORS+COUNT&color=%237B1E7B"/>
 
-![GitHub all releases](https://img.shields.io/github/downloads/keremlolgg/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
-![GitHub stars](https://img.shields.io/github/stars/keremlolgg/GeoGame?style=for-the-badge)  
-![GitHub forks](https://img.shields.io/github/forks/keremlolgg/GeoGame?style=for-the-badge)  
-![GitHub repo size](https://img.shields.io/github/repo-size/keremlolgg/geogame?style=for-the-badge)
-![License](https://img.shields.io/github/license/keremlolgg/GeoGame?style=for-the-badge)  
-![Last Commit](https://img.shields.io/github/last-commit/keremlolgg/GeoGame?style=for-the-badge)  
+![GitHub all releases](https://img.shields.io/github/downloads/keremkuyucu/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
+![GitHub stars](https://img.shields.io/github/stars/keremkuyucu/GeoGame?style=for-the-badge)  
+![GitHub forks](https://img.shields.io/github/forks/keremkuyucu/GeoGame?style=for-the-badge)  
+![GitHub repo size](https://img.shields.io/github/repo-size/keremkuyucu/geogame?style=for-the-badge)
+![License](https://img.shields.io/github/license/keremkuyucu/GeoGame?style=for-the-badge)  
+![Last Commit](https://img.shields.io/github/last-commit/keremkuyucu/GeoGame?style=for-the-badge)  
 ![Made with Flutter](https://img.shields.io/badge/Made%20with-Flutter-blue?style=for-the-badge&logo=flutter)  
 
 GeoGame is an educational game designed to enhance your knowledge about countries. Test yourself on capitals, flags, and other geographical facts while learning more about the world!  
@@ -24,13 +24,13 @@ GeoGame is an educational game designed to enhance your knowledge about countrie
 
 Access the GeoGame website to experience the game:  
 
-➡️ [**GeoGame Website**](https://keremkk.vercel.app/geogame)  
+➡️ [**GeoGame Website**](https://geogame.keremkk.com.tr)  
 
 ## **Download**  
 
 Download and experience the game from the latest release:  
 
-➡️ [**GeoGame - Latest Release**](https://github.com/keremlolgg/GeoGame/releases/latest)  
+➡️ [**GeoGame - Latest Release**](https://github.com/keremkuyucu/GeoGame/releases/latest)  
 
 ## **Supported Languages**  
 
