@@ -48,20 +48,6 @@ class GeoGame extends State<Geogame> {
 /*
 flutter pub run flutter_launcher_icons:main
 
-
-adb install build\app\outputs\flutter-apk\app-release.apk
-
-flutter build apk
-xcopy /Y /I "build\app\outputs\flutter-apk\app-release.apk" "C:\Users\KeremK\Desktop\GeoGame-Mobile.apk"
-flutter build windows
-xcopy /E /I "build\windows\x64\runner\Release" "C:\Users\KeremK\Desktop\GeoGame"
-flutter build web
-
-
-flutter build apk --release --split-per-abi
-flutter build windows
-xcopy /E /I "build\windows\x64\runner\Release" "C:\Users\KeremK\Desktop\GeoGame"
-
 flutter build apk --release --split-per-abi
 flutter build windows
 

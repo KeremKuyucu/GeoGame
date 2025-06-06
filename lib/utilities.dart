@@ -2,8 +2,15 @@ import 'package:GeoGame/util.dart';
 import 'package:http/http.dart' as http;
 
 class Ulkeler {
-  String bayrak, enisim, isim, baskent, kita, url;
-  bool bm ; double enlem, boylam;
+  final String url;
+  final String bayrak;
+  final String enisim;
+  final String isim;
+  final String baskent;
+  final String kita;
+  final bool bm;
+  final double enlem;
+  final double boylam;
   Ulkeler({
     required this.bayrak, required this.enisim, required this.isim, required this.baskent, required this.kita,
     required this.url, required this.bm, required this.enlem, required this.boylam,
@@ -2923,7 +2930,7 @@ List<Ulkeler> ulke = [
     bayrak: "assets/bayraklar/grenada.png",
     enisim: "Grenada",
     isim: "Grenada",
-    baskent: "Stgeorges",
+    baskent: "St. George's",
     kita: "Americas",
     bm: true,
     enlem: 12.12,
@@ -2998,7 +3005,7 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/sa.png",
     bayrak: "assets/bayraklar/suudiarabistan.png",
-    enisim: "Saudiarabia",
+    enisim: "Saudi Arabia",
     isim: "Suudiarabistan",
     baskent: "Riyadh",
     kita: "Asia",
@@ -3020,8 +3027,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/kr.png",
     bayrak: "assets/bayraklar/guneykore.png",
-    enisim: "Southkorea",
-    isim: "Guneykore",
+    enisim: "South Korea",
+    isim: "Güney Kore",
     baskent: "Seoul",
     kita: "Asia",
     bm: true,
@@ -3033,7 +3040,7 @@ List<Ulkeler> ulke = [
     bayrak: "assets/bayraklar/etiyopya.png",
     enisim: "Ethiopia",
     isim: "Etiyopya",
-    baskent: "Addisababa",
+    baskent: "Addis Ababa",
     kita: "Africa",
     bm: true,
     enlem: 8,
@@ -3064,8 +3071,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/nz.png",
     bayrak: "assets/bayraklar/yenizelanda.png",
-    enisim: "Newzealand",
-    isim: "Yenizelanda",
+    enisim: "New Zealand",
+    isim: "Yeni Zelanda",
     baskent: "Wellington",
     kita: "Oceania",
     bm: true,
@@ -3229,8 +3236,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/pf.png",
     bayrak: "assets/bayraklar/fransizpolinezyasi.png",
-    enisim: "Frenchpolynesia",
-    isim: "Fransizpolinezyasi",
+    enisim: "French Polynesia",
+    isim: "Fransız Polinezyası",
     baskent: "Papeete",
     kita: "Oceania",
     bm: false,
@@ -3242,7 +3249,7 @@ List<Ulkeler> ulke = [
     bayrak: "assets/bayraklar/maldivler.png",
     enisim: "Maldives",
     isim: "Maldivler",
-    baskent: "MalÚ",
+    baskent: "Malé",
     kita: "Asia",
     bm: true,
     enlem: 3.25,
@@ -3372,8 +3379,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/sj.png",
     bayrak: "assets/bayraklar/svalbardvejanmayen.png",
-    enisim: "Svalbardandjanmayen",
-    isim: "Svalbardvejanmayen",
+    enisim: "Svalbard and Jan Mayen",
+    isim: "Svalbard ve Jan Mayen",
     baskent: "Longyearbyen",
     kita: "Europe",
     bm: false,
@@ -3385,7 +3392,7 @@ List<Ulkeler> ulke = [
     bayrak: "assets/bayraklar/benin.png",
     enisim: "Benin",
     isim: "Benin",
-    baskent: "Portonovo",
+    baskent: "Porto-Novo",
     kita: "Africa",
     bm: true,
     enlem: 9.5,
@@ -3407,7 +3414,7 @@ List<Ulkeler> ulke = [
     bayrak: "assets/bayraklar/dominikcumhuriyeti.png",
     enisim: "Dominicanrepublic",
     isim: "Dominikcumhuriyeti",
-    baskent: "Santodomingo",
+    baskent: "Santo Domingo",
     kita: "Americas",
     bm: true,
     enlem: 19,
