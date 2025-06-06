@@ -62,9 +62,7 @@ flutter build apk --release --split-per-abi
 flutter build windows
 xcopy /E /I "build\windows\x64\runner\Release" "C:\Users\KeremK\Desktop\GeoGame"
 
-flutter build apk
-xcopy /Y /I "build\app\outputs\flutter-apk\app-release.apk" "C:\Users\Kerem\Desktop\GeoGame-Mobile.apk"
+flutter build apk --release --split-per-abi
 flutter build windows
-xcopy /E /I "build\windows\x64\runner\Release" "C:\Users\Kerem\Desktop\GeoGame"
 
  */

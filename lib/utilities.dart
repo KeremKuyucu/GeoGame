@@ -354,7 +354,7 @@ bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi 
 final List<String> diller = ['Türkçe','English'];
 String diltercihi = '';
 int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
-String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='', apiserver = "https://keremkk.glitch.me/geogame";
+String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='', apiserver = "https://geogame-api.keremkk.com.tr/api";
 List<dynamic> users = [];
 final List<Color> buttonColors = [
   Colors.green,
@@ -365,30 +365,8 @@ final List<Color> buttonColors = [
 final List<bool> butontiklama = [
   true,true,true,true,true
 ];
-final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer(), yenitur = AudioPlayer();
-Future<void> playAudioFromAssetOrUrl(AudioPlayer player, String assetPath, String url) async {
-  try {
-    if (player.playing) {
-      await player.stop();
-    }
-    await player.setAsset(assetPath);
-    await player.play();
-  } catch (e) {
-    debugPrint('Error playing asset: $e');
-    try {
-      if (player.playing) {
-        await player.stop();
-      }
-      await player.setUrl(url);
-      await player.play();
-    } catch (urlError) {
-      debugPrint('Error playing audio from URL: $urlError');
-    }
-  }
-}
-Future<void> Dogru() async { await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/dogru.mp3');}
-Future<void> Yanlis() async { await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yanlis.mp3');}
-Future<void> Yenitur() async { await playAudioFromAssetOrUrl(yenitur, 'assets/sesler/yenitur.mp3', 'https://github.com/keremlolgg/GeoGame/raw/main/assets/sesler/yenitur.mp3');}
+final random = Random();
+
 // Fonksiyonlar
 Future<void> yeniulkesec() async {
   print("yeni ülke seçildi");
@@ -440,11 +418,6 @@ int getSelectableCountryCount() {
   }
   //print('Ülke Sayısı: $count');
   return count;
-}
-String createToken() {
-  const String karakterler = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  Random random = Random();
-  return List.generate(10, (index) => karakterler[random.nextInt(karakterler.length)]).join();
 }
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -726,8 +699,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/us.png",
     bayrak: "assets/bayraklar/amerikabirlesikdevletleri.png",
-    enisim: "Unitedstates",
-    isim: "Amerikabirlesikdevletleri",
+    enisim: "United states",
+    isim: "Amerika birlesik devletleri",
     baskent: "Washingtondc",
     kita: "Americas",
     bm: true,
@@ -782,7 +755,7 @@ List<Ulkeler> ulke = [
     url: "https://flagcdn.com/w320/cv.png",
     bayrak: "assets/bayraklar/yesilburun.png",
     enisim: "Capeverde",
-    isim: "Yesilburun",
+    isim: "Yesil burun",
     baskent: "Praia",
     kita: "Africa",
     bm: true,
@@ -792,8 +765,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/gq.png",
     bayrak: "assets/bayraklar/ekvatorginesi.png",
-    enisim: "Equatorialguinea",
-    isim: "Ekvatorginesi",
+    enisim: "Equatorial guinea",
+    isim: "Ekvator ginesi",
     baskent: "Malabo",
     kita: "Africa",
     bm: true,
@@ -814,8 +787,8 @@ List<Ulkeler> ulke = [
   Ulkeler(
     url: "https://flagcdn.com/w320/vi.png",
     bayrak: "assets/bayraklar/abdvirjinadalari.png",
-    enisim: "Unitedstatesvirginislands",
-    isim: "Abdvirjinadalari",
+    enisim: "United states virgin islands",
+    isim: "Abd virjin adalari",
     baskent: "Charlotteamalie",
     kita: "Americas",
     bm: false,
@@ -859,7 +832,7 @@ List<Ulkeler> ulke = [
     url: "https://flagcdn.com/w320/vg.png",
     bayrak: "assets/bayraklar/virjinadalari.png",
     enisim: "Britishvirginislands",
-    isim: "Virjinadalari",
+    isim: "Virjin adalari",
     baskent: "Roadtown",
     kita: "Americas",
     bm: false,

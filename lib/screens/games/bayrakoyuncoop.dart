@@ -52,7 +52,6 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
       if (kalici.ks(_controller.text.trim())) {
         String ulke = _controller.text.trim();
         ekrancevir();
-        Dogru();
         _controller.clear();
         _controller.text="";
         yeniulkesec();
@@ -75,7 +74,6 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
         String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
-          Yanlis();
           butontiklama[i]=false;
           _controller.clear();
           _controller.text="";

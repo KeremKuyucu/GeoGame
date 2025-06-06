@@ -54,7 +54,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
         String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
-        Dogru();
         bayrakdogru++;
         bayrakpuan += puan;
         writeToFile();
@@ -74,7 +73,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
         String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
-        Yanlis();
         butontiklama[i]=false;
         _controller.clear();
         bayrakyanlis++;
@@ -116,7 +114,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
             '"kirmizi": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       yeniulkesec();
-      Yenitur();
       _controller.clear();
     });
   }

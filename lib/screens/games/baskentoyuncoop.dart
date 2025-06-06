@@ -54,7 +54,6 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
-        Dogru();
         ekrancevir();
         baskentdogru++;
         baskentpuan += puan;
@@ -75,7 +74,6 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         String ulke = _controller.text.trim();
         puan -= 10;
         if (puan < 20) puan = 20;
-        Yanlis();
         _controller.clear();
         baskentyanlis++;
         writeToFile();

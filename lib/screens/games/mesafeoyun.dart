@@ -65,7 +65,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
         _controller.clear();
         message='';
         yeniulkesec();
-        Dogru();
         mesafedogru++;
         mesafepuan+=puan;
         writeToFile();
@@ -82,7 +81,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
         puan-=10;
         if(puan<100)
           puan=100;
-        Yanlis();
         _controller.clear();
         mesafeyanlis++;
         writeToFile();
@@ -116,7 +114,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
     setState(() {
       message='';
       yeniulkesec();
-      Yenitur();
       _controller.clear();
     });
   }

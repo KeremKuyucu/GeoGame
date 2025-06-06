@@ -1,6 +1,6 @@
 [Setup]
 AppName=GeoGame
-AppVersion=1.3.7
+AppVersion=1.3.8
 DefaultDirName={userappdata}\GeoGame
 DefaultGroupName=GeoGame
 OutputDir=C:\Users\Kerem\Projects
