@@ -1,77 +1,113 @@
-# **GeoGame**  
-
-[**README.md**](README.md)  
+# 🌍 GeoGame
 
 <p align="center">
-  <img src="assets/logo.png" alt="GeoGame Logosu" width="200"/>
-</p>  
+  <a href="README.md">🇬🇧 English</a>
+</p>
 
-GeoGame, ülkeler hakkındaki bilginizi artırmaya yönelik eğitici bir oyundur. Başkentler, bayraklar ve diğer coğrafi bilgileri öğrenirken kendinizi test edin ve dünya hakkında daha fazla bilgi edinin!  
+<p align="center">
+  <img src="assets/logo.png" alt="GeoGame Logo" width="200"/>
+</p>
 
-<img  align="left" src="https://komarev.com/ghpvc/?username=keremlolgg&repo=geogame&style=for-the-badge&label=VISITORS+COUNT&color=%237B1E7B"/>
+<p align="center">
+  <img src="https://img.shields.io/github/downloads/keremkuyucu/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads"/>
+  </p>
 
-![GitHub all releases](https://img.shields.io/github/downloads/keremlolgg/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
-![GitHub stars](https://img.shields.io/github/stars/keremlolgg/GeoGame?style=for-the-badge)  
-![GitHub forks](https://img.shields.io/github/forks/keremlolgg/GeoGame?style=for-the-badge)  
-![License](https://img.shields.io/github/license/keremlolgg/GeoGame?style=for-the-badge)  
-![Last Commit](https://img.shields.io/github/last-commit/keremlolgg/GeoGame?style=for-the-badge)  
-![Made with Flutter](https://img.shields.io/badge/Made%20with-Flutter-blue?style=for-the-badge&logo=flutter)  
+---
 
-## **Web Sitesi**  
+**GeoGame**, coğrafi bilginizi artırmak için tasarlanmış eğitici bir oyundur. Etkileşimli sınavlar ve mini oyunlarla ülkeler hakkında daha fazla şey öğrenin!
 
-GeoGame’i çevrimiçi deneyimlemek için aşağıdaki bağlantıyı ziyaret edebilirsiniz:  
+🎮 Başkentler, bayraklar, mesafe tahmini ve daha fazlası!
+📱 **Mobil** ve **Windows** uyumlu
+🌐 **Türkçe** 🇹🇷 ve **İngilizce** 🇬🇧 dil desteği
 
-➡️ [**GeoGame Web Sitesi**](https://keremkk.glitch.me/geogame)  
+---
 
-## **İndirme**  
+## 🌐 Web Sitesi
 
-Oyunun en son sürümünü indirerek deneyimlemek için aşağıdaki bağlantıyı kullanabilirsiniz:  
+Oyunu oynamak veya güncellemeleri takip etmek için:
+➡️ [**GeoGame Web Sitesi**](https://geogame.keremkk.com.tr)
 
-➡️ [**GeoGame - Son Sürüm**](https://github.com/keremlolgg/GeoGame/releases/latest)  
+---
 
-## **Desteklenen Diller**  
+## 📦 İndir
 
-- **Türkçe**  
-- **İngilizce**  
+Son sürümü indirip GeoGame'i hemen deneyin:
+➡️ [**GeoGame - Son Sürüm**](https://github.com/keremkuyucu/GeoGame/releases/latest)
 
-## **Özellikler**  
+---
 
-✅ Ülkelerin başkentleri, bayrakları ve diğer coğrafi bilgileri hakkında quiz soruları  
-✅ Avrupa, Asya ve Afrika gibi kıtalar hakkında bilgi edinme  
-✅ Kullanıcı dostu arayüz ile akıcı bir deneyim  
-✅ **Mobil** ve **Windows** platformlarıyla uyumlu çalışma  
+## 🧠 Özellikler
 
-## **Ekran Görüntüleri**  
+* ✅ Ülkelerin başkentleri, bayrakları ve mesafeleri hakkında quizler
+* ✅ Kıtaya göre seviyeler: Avrupa, Asya, Afrika ve daha fazlası
+* ✅ Discord üzerinden gerçek zamanlı skor tablosu
+* ✅ Basit ve kullanıcı dostu arayüz (Material Design)
+* ✅ **Mobil** ve **masaüstü (Windows)** desteği
+* ✅ Google ile bulut tabanlı giriş sistemi
 
-Aşağıda oyuna ait bazı ekran görüntüleri bulunmaktadır:  
+---
+
+## 🖼️ Ekran Görüntüleri
 
 <p align="center">
   <img src="Resimler/baskentoyun.png" alt="Başkent Oyunu" width="200"/>
   <img src="Resimler/bayrakoyun.png" alt="Bayrak Oyunu" width="200"/>
   <img src="Resimler/mesafeoyun.png" alt="Mesafe Oyunu" width="200"/>
-  <img src="Resimler/mainlobi.png" alt="Ana Menü" width="200"/>
-  <img src="Resimler/leadboard.png" alt="Liderlik Tablosu" width="200"/>
+  <img src="Resimler/mainlobi.png" alt="Ana Lobi" width="200"/>
+  <img src="Resimler/leadboard.png" alt="Skor Tablosu" width="200"/>
   <img src="Resimler/ulkeler.png" alt="Ülkeler" width="200"/>
   <img src="Resimler/profiles.png" alt="Profil Sayfası" width="200"/>
   <img src="Resimler/settings.png" alt="Ayarlar" width="200"/>
-</p>  
+</p>
 
-## **Kullanılan Teknolojiler**  
+---
 
-- **Flutter** – Mobil ve web uygulama geliştirme framework'ü  
-- **Dart** – Uygulamanın geliştirilmesinde kullanılan programlama dili  
-- **Glitch** – Web uygulamasının barındırıldığı platform  
-- **Discord** – Liderlik tablosu verilerinin depolanması ve yönetilmesi için kullanılmıştır  
+## 🧰 Teknoloji Yığını
 
-## **Arka Plan İşleyişi**  
+| Katman         | Kullanılan Teknolojiler                  |
+| -------------- | ---------------------------------------- |
+| **Ön Yüz**     | Flutter, Dart                            |
+| **Arka Uç**    | Next.js (Vercel üzerinde barındırılıyor) |
+| **Giriş**      | Google ile giriş (Firebase & Web App)    |
+| **Veritabanı** | Discord Webhook (Skorlar için)           |
+| **Web**        | Next.js                                  |
 
-GeoGame, **GitHub üzerinden gerçek zamanlı API bağlantılarını** alarak **Discord** üzerinde liderlik tablosunu günceller.  
-Sunucu tarafında çalışan bir uygulama, **skorları işler**, **liderlik tablosunu günceller** ve gerektiğinde **webhook mesajlarını** değiştirerek verileri yeniden kullanılabilir hale getirir.  
+---
 
-## **Server Code**
+## 🧩 Proje Yapısı
 
-[Code](https://glitch.com/edit/#!/keremkk?path=routes/geogame.js)
+GeoGame birden fazla açık kaynaklı depodan oluşur:
 
-## **Lisans**  
+| Depo                                                                    | Açıklama                                                           |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [**GeoGame**](https://github.com/keremkuyucu/GeoGame)                   | Mobil ve masaüstü için ana Flutter uygulaması                      |
+| [**geogame-api**](https://github.com/keremkuyucu/geogame-api)           | Puan işleme, kullanıcı verisi ve skor güncellemeleri için REST API |
+| [**geogame-auth-web**](https://github.com/keremkuyucu/geogame-auth-web) | Google ile giriş ve yönlendirme işlemleri                          |
+| [**geogame-cdn**](https://github.com/keremkuyucu/geogame-cdn)           | JSON veriler, ülke bilgileri ve varlıklar için CDN                 |
+| [**geogame-website**](https://github.com/keremkuyucu/geogame-website)   | Resmi web sitesi ve tanıtım sayfası                                |
+| [**GeoGameCPP**](https://github.com/keremkuyucu/GeoGameCPP)             | GeoGame’in orijinal C++ ile yazılmış ilk versiyonu                 |
 
-Bu proje, **GPL Lisansı** altında lisanslanmıştır. Daha fazla bilgi için lütfen [**LICENSE**](LICENSE) dosyasını inceleyiniz.
+---
+
+## 🖥️ Arka Uç İşlevleri
+
+* 📡 Discord Webhook ile **gerçek zamanlı skor güncellemeleri**
+* 🔁 Ülke bilgileri ve sorular için **GitHub JSON kaynakları**
+* 🧠 Puan doğrulama ve kullanıcı yönetimi için **sunucu tarafı mantığı**
+* 🔐 Firebase ve Web Gateway ile **OAuth tabanlı giriş sistemi**
+
+---
+
+## 📜 Lisans
+
+Bu proje **GNU Genel Kamu Lisansı v3.0** ile lisanslanmıştır.
+Ayrıntılar için [**LICENSE**](LICENSE) dosyasını inceleyebilirsiniz.
+
+---
+
+## 🙋‍♂️ Geliştirici
+
+Sevgiyle geliştirilmiştir ❤️ [Kerem Kuyucu](https://github.com/keremkuyucu) tarafından
+
+> Öğrenci ve Geliştirici
+> 📍 Bilecik, Türkiye

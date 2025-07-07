@@ -1,4 +1,4 @@
-# **GeoGame**  
+# 🌍 GeoGame
 
 <p align="center">
   <a href="TR.md">🇹🇷 Türkçe</a>
@@ -6,47 +6,48 @@
 
 <p align="center">
   <img src="assets/logo.png" alt="GeoGame Logo" width="200"/>
-</p>  
+</p>
 
-<img  align="left" src="https://komarev.com/ghpvc/?username=keremkuyucu&repo=geogame&style=for-the-badge&label=VISITORS+COUNT&color=%237B1E7B"/>
+<p align="center">
+  <img src="https://img.shields.io/github/downloads/keremkuyucu/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads"/>
+  </p>
 
-![GitHub all releases](https://img.shields.io/github/downloads/keremkuyucu/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Total%20Downloads)  
-![GitHub stars](https://img.shields.io/github/stars/keremkuyucu/GeoGame?style=for-the-badge)  
-![GitHub forks](https://img.shields.io/github/forks/keremkuyucu/GeoGame?style=for-the-badge)  
-![GitHub repo size](https://img.shields.io/github/repo-size/keremkuyucu/geogame?style=for-the-badge)
-![License](https://img.shields.io/github/license/keremkuyucu/GeoGame?style=for-the-badge)  
-![Last Commit](https://img.shields.io/github/last-commit/keremkuyucu/GeoGame?style=for-the-badge)  
-![Made with Flutter](https://img.shields.io/badge/Made%20with-Flutter-blue?style=for-the-badge&logo=flutter)  
+---
 
-GeoGame is an educational game designed to enhance your knowledge about countries. Test yourself on capitals, flags, and other geographical facts while learning more about the world!  
+**GeoGame** is an educational game designed to enhance your geographical knowledge through interactive quizzes and challenges.
 
-## **Website**  
+🎮 **Play with capital cities, flags, distance estimation, and more!**  
+📱 Available on **Mobile** and **Windows**  
+🌐 Supports **Turkish** 🇹🇷 and **English** 🇬🇧  
 
-Access the GeoGame website to experience the game:  
+---
 
-➡️ [**GeoGame Website**](https://geogame.keremkk.com.tr)  
+## 🌐 Website
 
-## **Download**  
+Play the game or explore updates on the official website:  
+➡️ [**GeoGame Website**](https://geogame.keremkk.com.tr)
 
-Download and experience the game from the latest release:  
+---
 
-➡️ [**GeoGame - Latest Release**](https://github.com/keremkuyucu/GeoGame/releases/latest)  
+## 📦 Download
 
-## **Supported Languages**  
+Download the latest release and play GeoGame:  
+➡️ [**GeoGame - Latest Release**](https://github.com/keremkuyucu/GeoGame/releases/latest)
 
-- **Turkish**  
-- **English**  
+---
 
-## **Features**  
+## 🧠 Features
 
-✅ Quiz questions about countries' capitals, flags, and other geographical details  
-✅ Learn about continents such as Europe, Asia, and Africa  
-✅ User-friendly interface for an engaging experience  
-✅ Compatible with both **mobile** and **Windows** platforms  
+- ✅ Quiz on countries’ capitals, flags, and distances  
+- ✅ Continent-focused levels: Europe, Asia, Africa & more  
+- ✅ Real-time leaderboard powered by Discord  
+- ✅ Simple and intuitive UI (Material Design)  
+- ✅ Cross-platform: works on **mobile devices** and **desktop (Windows)**  
+- ✅ Cloud login system via Google Sign-In  
 
-## **Screenshots**  
+---
 
-Below are some screenshots from the game:  
+## 🖼️ Screenshots
 
 <p align="center">
   <img src="Resimler/baskentoyun.png" alt="Capital Quiz" width="200"/>
@@ -57,25 +58,58 @@ Below are some screenshots from the game:
   <img src="Resimler/ulkeler.png" alt="Countries" width="200"/>
   <img src="Resimler/profiles.png" alt="Profile Page" width="200"/>
   <img src="Resimler/settings.png" alt="Settings" width="200"/>
-</p>  
+</p>
 
-## **Technologies Used**  
+---
 
-- **Flutter** – A framework for mobile and web app development  
-- **Dart** – The programming language used to develop the application  
-- **Glitch** – A platform for hosting the web application  
-- **Discord** – Used for storing and managing leaderboard data  
+## 🧰 Tech Stack
 
-## **Backend Functionality**  
+| Layer        | Tech Used                             |
+|--------------|----------------------------------------|
+| **Frontend** | Flutter, Dart                          |
+| **Backend**  | Next.js (hosted on Vercel)             |
+| **Auth**     | Google Sign-In via Firebase & Web App  |
+| **Database** | Discord Webhooks (for leaderboard)     |
+| **Web**      | Next.js                                |
 
-GeoGame retrieves **real-time API links from GitHub** to update the **leaderboard on Discord**.  
-A server-side application **processes scores**, **updates the leaderboard table**, and **modifies webhook messages** for data retrieval when necessary.  
+---
 
-## **Server Code**
+## 🧩 Project Structure
 
-[Code](https://glitch.com/edit/#!/keremkk?path=routes/geogame.js)
+GeoGame consists of multiple open-source repositories that work together as a full system:
 
+| Repository | Description |
+|------------|-------------|
+| [**GeoGame**](https://github.com/keremkuyucu/GeoGame) | Main Flutter app for mobile and PC |
+| [**geogame-api**](https://github.com/keremkuyucu/geogame-api) | REST API for score handling, user data, leaderboard updates |
+| [**geogame-auth-web**](https://github.com/keremkuyucu/geogame-auth-web) | Google Sign-In authentication and redirect handling |
+| [**geogame-cdn**](https://github.com/keremkuyucu/geogame-cdn) | CDN for JSON data, country info and assets |
+| [**geogame-website**](https://github.com/keremkuyucu/geogame-website) | Official website and landing page |
+| [**GeoGameCPP**](https://github.com/keremkuyucu/GeoGameCPP) | The original version of GeoGame developed in C++ |
 
-## **License**  
+---
 
-This project is licensed under the **GPL License**. For more details, refer to the [**LICENSE**](LICENSE) file.
+## 🖥️ Backend Functionality
+
+- 📡 **Real-time leaderboard updates** using Discord Webhooks  
+- 🔁 **GitHub JSON as data source** for country info and quiz questions  
+- 🧠 **Server-side logic** for verifying scores and managing user profiles  
+- 🔐 **OAuth-based login system** using Firebase & Web Gateway
+
+---
+
+## 📜 License
+
+This project is licensed under the **GNU General Public License v3.0**.  
+See the [**LICENSE**](LICENSE) file for full details.
+
+---
+
+## 🙋‍♂️ Author
+
+Developed with ❤️ by [Kerem Kuyucu](https://github.com/keremkuyucu)  
+> Student and Developer
+> 📍 Bilecik, Türkiye
+
+---
+
