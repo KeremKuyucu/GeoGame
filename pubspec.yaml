@@ -10,8 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   path_provider: ^2.1.5
-  just_audio: ^0.10.2
-  just_audio_windows: ^0.2.2
   easy_url_launcher: ^0.0.7
   font_awesome_flutter: ^10.8.0
   theme_mode_builder: ^2.0.0

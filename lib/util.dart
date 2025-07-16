@@ -2,7 +2,6 @@ export 'package:flutter/material.dart';
 export 'package:flutter/foundation.dart';
 export 'package:flutter/services.dart';
 export 'package:path_provider/path_provider.dart';
-export 'package:just_audio/just_audio.dart';
 export 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:package_info_plus/package_info_plus.dart';
