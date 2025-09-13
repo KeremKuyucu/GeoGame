@@ -12,13 +12,21 @@ class Ulkeler {
   final double enlem;
   final double boylam;
   Ulkeler({
-    required this.bayrak, required this.enisim, required this.isim, required this.baskent, required this.kita,
-    required this.url, required this.bm, required this.enlem, required this.boylam,
+    required this.bayrak,
+    required this.enisim,
+    required this.isim,
+    required this.baskent,
+    required this.kita,
+    required this.url,
+    required this.bm,
+    required this.enlem,
+    required this.boylam,
   });
   bool ks(String yapilantahmin) {
     return yapilantahmin == isim || yapilantahmin == enisim;
   }
 }
+
 class Yazi {
   static Map<String, dynamic>? _localizedStrings;
   static String _currentLanguage = 'English';
@@ -28,20 +36,19 @@ class Yazi {
       return; // Dil zaten yüklü, ekstra işlem yapma
     }
 
-      try {
-        String jsonString = await rootBundle.loadString('assets/dil.json');
-        Map<String, dynamic> jsonMap = json.decode(jsonString);
+    try {
+      String jsonString = await rootBundle.loadString('assets/dil.json');
+      Map<String, dynamic> jsonMap = json.decode(jsonString);
 
-        if (jsonMap['Veriler'] != null) {
-          _localizedStrings = jsonMap['Veriler'];
-          _currentLanguage = dilKodu;
-        } else {
-          throw Exception('JSON dosyasında "Veriler" anahtarı bulunamadı!');
-        }
-      } catch (e) {
-        _localizedStrings = {};
+      if (jsonMap['Veriler'] != null) {
+        _localizedStrings = jsonMap['Veriler'];
+        _currentLanguage = dilKodu;
+      } else {
+        throw Exception('JSON dosyasında "Veriler" anahtarı bulunamadı!');
       }
-
+    } catch (e) {
+      _localizedStrings = {};
+    }
   }
 
   static String get(String key) {
@@ -63,32 +70,33 @@ class Yazi {
       secilenDil = diltercihi == 'tr' ? "Türkçe" : "English";
     //await loadDil(secilenDil);
     await Yazi.loadDil(secilenDil).then((_) {
-        navBarItems = [
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.home),
-            title: Text(Yazi.get('navigasyonbar1')),
-            selectedColor: Colors.purple,
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.leaderboard),
-            title: Text(Yazi.get('navigasyonbar2')),
-            selectedColor: Colors.pink,
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.person),
-            title: Text(Yazi.get('navigasyonbar3')),
-            selectedColor: Colors.teal,
-          ),
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.settings),
-            title: Text(Yazi.get('navigasyonbar4')),
-            selectedColor: Colors.orange,
-          ),
-        ];
-      });
+      navBarItems = [
+        SalomonBottomBarItem(
+          icon: const Icon(Icons.home),
+          title: Text(Yazi.get('navigasyonbar1')),
+          selectedColor: Colors.purple,
+        ),
+        SalomonBottomBarItem(
+          icon: const Icon(Icons.leaderboard),
+          title: Text(Yazi.get('navigasyonbar2')),
+          selectedColor: Colors.pink,
+        ),
+        SalomonBottomBarItem(
+          icon: const Icon(Icons.person),
+          title: Text(Yazi.get('navigasyonbar3')),
+          selectedColor: Colors.teal,
+        ),
+        SalomonBottomBarItem(
+          icon: const Icon(Icons.settings),
+          title: Text(Yazi.get('navigasyonbar4')),
+          selectedColor: Colors.orange,
+        ),
+      ];
+    });
     isEnglish = (secilenDil != 'Türkçe');
   }
 }
+
 class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -96,7 +104,7 @@ class DrawerWidget extends StatelessWidget {
     final TextEditingController _messageController = TextEditingController();
 
     Future<void> sendMessage(String sebep, String message) async {
-      final url = Uri.parse('$apiserver/feedback');
+      final url = Uri.parse('https://geogame-api.keremkk.com.tr/api/feedback');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -151,7 +159,10 @@ class DrawerWidget extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.report, color: Colors.blueAccent),
-            title: Text(Yazi.get('hatabildir'), style: TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(
+              Yazi.get('hatabildir'),
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             onTap: () {
               showDialog(
                 context: context,
@@ -176,9 +187,15 @@ class DrawerWidget extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20),
-                          _buildTextField(_sebepController, Yazi.get('hatabaslik')),
+                          _buildTextField(
+                            _sebepController,
+                            Yazi.get('hatabaslik'),
+                          ),
                           SizedBox(height: 10),
-                          _buildTextField(_messageController, Yazi.get('hatametin')),
+                          _buildTextField(
+                            _messageController,
+                            Yazi.get('hatametin'),
+                          ),
                           SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -200,7 +217,10 @@ class DrawerWidget extends StatelessWidget {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 10,
+                                  ),
                                   child: Text('Gönder'),
                                 ),
                               ),
@@ -216,7 +236,10 @@ class DrawerWidget extends StatelessWidget {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 10,
+                                  ),
                                   child: Text('İptal'),
                                 ),
                               ),
@@ -238,18 +261,43 @@ class DrawerWidget extends StatelessWidget {
             dense: true,
           ),
           Divider(),
-          _buildListTile(Icons.share, Color(0xFF5865F2), Yazi.get('uygpaylas'), () async {
-            await Share.share(Yazi.get('davetpromt'));
-          }),
-          _buildListTile(Icons.person, Color(0xFF5865F2), Yazi.get('yapimcimetin'), () async {
-            await EasyLauncher.url(url: 'https://keremkk.com.tr', mode: Mode.platformDefault);
-          }),
-          _buildListTile(Icons.public, Colors.red, Yazi.get('website'), () async {
-            await EasyLauncher.url(url: 'https://keremkk.com.tr/geogame');
-          }),
-          _buildListTile(FontAwesomeIcons.github, Colors.black, Yazi.get('github'), () async {
-            await EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame');
-          }),
+          _buildListTile(
+            Icons.share,
+            Color(0xFF5865F2),
+            Yazi.get('uygpaylas'),
+            () async {
+              await Share.share(Yazi.get('davetpromt'));
+            },
+          ),
+          _buildListTile(
+            Icons.person,
+            Color(0xFF5865F2),
+            Yazi.get('yapimcimetin'),
+            () async {
+              await EasyLauncher.url(
+                url: 'https://keremkk.com.tr',
+                mode: Mode.platformDefault,
+              );
+            },
+          ),
+          _buildListTile(
+            Icons.public,
+            Colors.red,
+            Yazi.get('website'),
+            () async {
+              await EasyLauncher.url(url: 'https://keremkk.com.tr/geogame');
+            },
+          ),
+          _buildListTile(
+            FontAwesomeIcons.github,
+            Colors.black,
+            Yazi.get('github'),
+            () async {
+              await EasyLauncher.url(
+                url: 'https://github.com/KeremKuyucu/GeoGame',
+              );
+            },
+          ),
           Divider(),
           ListTile(
             title: Text(
@@ -278,7 +326,12 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildListTile(IconData icon, Color iconColor, String title, Function() onTap) {
+  Widget _buildListTile(
+    IconData icon,
+    Color iconColor,
+    String title,
+    Function() onTap,
+  ) {
     return ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(title),
@@ -286,11 +339,12 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 }
+
 class CustomNotification extends StatelessWidget {
   final String baslik;
   final String metin;
 
-  CustomNotification({required this.baslik,required this.metin});
+  CustomNotification({required this.baslik, required this.metin});
 
   @override
   Widget build(BuildContext context) {
@@ -306,15 +360,9 @@ class CustomNotification extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                baslik,
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
+              Text(baslik, style: TextStyle(fontSize: 18, color: Colors.white)),
               SizedBox(height: 10),
-              Text(
-                metin,
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
+              Text(metin, style: TextStyle(fontSize: 16, color: Colors.white)),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -322,16 +370,16 @@ class CustomNotification extends StatelessWidget {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 4.0, horizontal: 4.0),
+                        vertical: 4.0,
+                        horizontal: 4.0,
+                      ),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pop();  // Bildirimi kapat
+                          Navigator.of(context).pop(); // Bildirimi kapat
                         },
                         child: Text(
                           Yazi.get('tamam'),
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
+                          style: TextStyle(color: Colors.black),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepOrangeAccent,
@@ -357,75 +405,112 @@ class CustomNotification extends StatelessWidget {
 //         return CustomNotification(baslik: baslikmetin,metin: icerikmetin);
 //       },
 
-bool amerikakitasi = true, asyakitasi = true, afrikakitasi = true, avrupakitasi = true, okyanusyakitasi = true, antartikakitasi = true, bmuyeligi = false, sadecebm= false, yazmamodu = true, backgroundMusicPlaying = false, darktema=true, isEnglish=false;
-final List<String> diller = ['Türkçe','English'];
+bool amerikakitasi = true,
+    asyakitasi = true,
+    afrikakitasi = true,
+    avrupakitasi = true,
+    okyanusyakitasi = true,
+    antartikakitasi = true,
+    bmuyeligi = false,
+    sadecebm = false,
+    yazmamodu = true,
+    backgroundMusicPlaying = false,
+    darktema = true,
+    isEnglish = false;
+final List<String> diller = ['Türkçe', 'English'];
 String diltercihi = '';
-int mesafedogru=0, mesafeyanlis=0, bayrakdogru=0, bayrakyanlis=0, baskentdogru=0, baskentyanlis=0, mesafepuan=0, bayrakpuan=0, baskentpuan=0, toplampuan=0, selectedIndex = 0;
-String name = "",profilurl= "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363",uid = '', secilenDil='', apiserver = "https://geogame-api.keremkk.com.tr/api";
+int mesafedogru = 0,
+    mesafeyanlis = 0,
+    bayrakdogru = 0,
+    bayrakyanlis = 0,
+    baskentdogru = 0,
+    baskentyanlis = 0,
+    mesafepuan = 0,
+    bayrakpuan = 0,
+    baskentpuan = 0,
+    toplampuan = 0,
+    selectedIndex = 0;
+String name = "",
+    profilurl = "https://geogame-cdn.keremkk.com.tr/anon.png",
+    uid = '',
+    secilenDil = '';
 List<dynamic> users = [];
 final List<Color> buttonColors = [
   Colors.green,
   Colors.yellow,
   Colors.blue,
-  Colors.red
+  Colors.red,
 ];
-final List<bool> butontiklama = [
-  true,true,true,true,true
-];
+List<bool> butontiklama = [true, true, true, true];
 final random = Random();
 
-// Fonksiyonlar
+List<Ulkeler> getFilteredCountries() {
+  if (!amerikakitasi &&
+      !asyakitasi &&
+      !afrikakitasi &&
+      !avrupakitasi &&
+      !okyanusyakitasi &&
+      !antartikakitasi) {
+    return [];
+  }
+
+  List<Ulkeler> filteredList = [];
+  for (var u in ulke) {
+    // Kıta kontrolü
+    bool kitaUygun =
+        (amerikakitasi && u.kita == "Americas") ||
+        (asyakitasi && u.kita == "Asia") ||
+        (afrikakitasi && u.kita == "Africa") ||
+        (avrupakitasi && u.kita == "Europe") ||
+        (okyanusyakitasi && u.kita == "Oceania") ||
+        (antartikakitasi && u.kita == "Antarctic");
+
+    if (!kitaUygun) {
+      continue;
+    }
+
+    bool bmUygun = bmuyeligi || u.bm;
+
+    if (!bmUygun) {
+      continue;
+    }
+
+    filteredList.add(u);
+  }
+
+  return filteredList;
+}
+
 Future<void> yeniulkesec() async {
   print("yeni ülke seçildi");
-  butontiklama[0]=true;
-  butontiklama[1]=true;
-  butontiklama[2]=true;
-  butontiklama[3]=true;
-  int butonRandomNumber = random.nextInt(4);
-  Set<int> selectedIndices = {};
+
+  List<Ulkeler> uygunUlkeler = getFilteredCountries();
+
+  if (uygunUlkeler.length < 4) {
+    print(
+      "HATA: Seçenek oluşturmak için yeterli ülke bulunamadı! (${uygunUlkeler.length} adet)",
+    );
+    return;
+  }
+
+  uygunUlkeler.shuffle();
+  List<Ulkeler> secilenUlkeler = uygunUlkeler.take(4).toList();
+
+  kalici = secilenUlkeler[random.nextInt(4)];
 
   for (int i = 0; i < 4; i++) {
-    int randomNumber;
-    if(!sadecebm){
-      do {
-        randomNumber = random.nextInt(ulke.length);
-      } while (((!amerikakitasi && ulke[randomNumber].kita == "Americas") ||
-          (!asyakitasi && ulke[randomNumber].kita == "Asia") ||
-          (!afrikakitasi && ulke[randomNumber].kita == "Africa") ||
-          (!avrupakitasi && ulke[randomNumber].kita == "Europe") ||
-          (!okyanusyakitasi && ulke[randomNumber].kita == "Oceania") ||
-          (!antartikakitasi && ulke[randomNumber].kita == "Antarctic") ||
-          (!bmuyeligi && !ulke[randomNumber].bm) ||
-          selectedIndices.contains(randomNumber)));
-    }
-    else {
-      do {
-        randomNumber = random.nextInt(ulke.length);
-      } while (ulke[randomNumber].bm || selectedIndices.contains(randomNumber));
-    }
-    if (butonRandomNumber == i) {
-      kalici = ulke[randomNumber];
-    }
-    butonAnahtarlar[i] = isEnglish ? ulke[randomNumber].enisim : ulke[randomNumber].isim;
-    selectedIndices.add(randomNumber);
+    butonAnahtarlar[i] = isEnglish
+        ? secilenUlkeler[i].enisim
+        : secilenUlkeler[i].isim;
   }
+
+  butontiklama = [true, true, true, true];
 }
+
 int getSelectableCountryCount() {
-  int count = 0;
-  for (var u in ulke) {
-    if ((u.kita == "Americas" && amerikakitasi ||
-            u.kita == "Asia" && asyakitasi ||
-            u.kita == "Africa" && afrikakitasi ||
-            u.kita == "Europe" && avrupakitasi ||
-            u.kita == "Oceania" && okyanusyakitasi ||
-            u.kita == "Antarctic" && antartikakitasi) &&
-        (u.bm || bmuyeligi)) {
-      count++;
-    }
-  }
-  //print('Ülke Sayısı: $count');
-  return count;
+  return getFilteredCountries().length;
 }
+
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
   final filePath = '${directory.path}/geogame.json';
@@ -448,7 +533,9 @@ Future<void> readFromFile(Function updateState) async {
 
       name = jsonData['name'] ?? '';
       uid = jsonData['uid'] ?? '';
-      profilurl = jsonData['profilurl'] ?? 'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
+      profilurl =
+          jsonData['profilurl'] ??
+          'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
       secilenDil = jsonData['secilenDil'] ?? 'Türkçe';
 
       toplampuan = jsonData['toplampuan'] ?? 0;
@@ -461,18 +548,19 @@ Future<void> readFromFile(Function updateState) async {
       mesafepuan = jsonData['mesafepuan'] ?? 0;
       bayrakpuan = jsonData['bayrakpuan'] ?? 0;
       baskentpuan = jsonData['baskentpuan'] ?? 0;
-      print ("dosyadan okundu");
+      print("dosyadan okundu");
     });
   } else {
     debugPrint('Dosya bulunamadı: kurallar.json');
     writeToFile();
   }
 }
+
 Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
   final filePath = '${directory.path}/geogame.json';
   final file = File(filePath);
-  toplampuan=bayrakpuan+baskentpuan+mesafepuan;
+  toplampuan = bayrakpuan + baskentpuan + mesafepuan;
   final data = {
     'amerikakitasi': amerikakitasi,
     'asyakitasi': asyakitasi,
@@ -503,10 +591,11 @@ Future<void> writeToFile() async {
   await file.writeAsString(jsonData);
   print("dosyaya yazıldı");
 }
+
 Future<void> puanguncelle() async {
   try {
     final response = await http.get(
-      Uri.parse('${apiserver}/get_leadboard'),
+      Uri.parse('https://geogame-api.keremkk.com.tr/api/get_leadboard'),
     );
 
     if (response.statusCode == 200) {
@@ -516,7 +605,8 @@ Future<void> puanguncelle() async {
         return {
           'name': user['name'] ?? '',
           'uid': user['uid'] ?? '',
-          'profilurl': user['profilurl'] ??
+          'profilurl':
+              user['profilurl'] ??
               'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
           'puan': int.parse(user['puan'] ?? "0"),
           'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
@@ -532,7 +622,7 @@ Future<void> puanguncelle() async {
       }).toList();
 
       for (var user in users) {
-        if (user['uid'] ==  uid) {
+        if (user['uid'] == uid) {
           debugPrint('uidler eşleşti');
           if (toplampuan < user['puan']) {
             debugPrint('puan daha düşük güncellendi');
@@ -563,6 +653,7 @@ Future<void> puanguncelle() async {
     print('Hata: $e');
   }
 }
+
 Future<String> getCountry() async {
   final url = Uri.parse('https://am.i.mullvad.net/country');
   try {
@@ -579,13 +670,15 @@ Future<String> getCountry() async {
     throw Exception('Hata oluştu: $e');
   }
 }
+
 Future<void> postLeadboard() async {
   try {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
 
-    final fullMessage = '{\n'
+    final fullMessage =
+        '{\n'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
         '"uid": "$uid",\n'
@@ -605,34 +698,35 @@ Future<void> postLeadboard() async {
         '}';
 
     // Diğer mesajı gönder
-    final targetUrl = '${apiserver}/post_leadboard';
-    final response = await http.post(
-      Uri.parse(targetUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'message': fullMessage,
-      }),
-    ).timeout(Duration(seconds: 30));
+    final targetUrl = 'https://geogame-api.keremkk.com.tr/api/post_leadboard';
+    final response = await http
+        .post(
+          Uri.parse(targetUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'message': fullMessage}),
+        )
+        .timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
       debugPrint('Log başarıyla gönderildi!');
     } else {
-     debugPrint('Log gönderilemedi: ${response.statusCode}');
+      debugPrint('Log gönderilemedi: ${response.statusCode}');
     }
   } catch (e) {
     debugPrint('Hata: $e');
   }
 }
+
 Future<void> postUlkeLog(String message) async {
   try {
-    final targetUrl = '${apiserver}/ulkelog';
-    final response = await http.post(
-      Uri.parse(targetUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'message': message,
-      }),
-    ).timeout(Duration(seconds: 30));
+    final targetUrl = 'https://geogame-api.keremkk.com.tr/api/ulkelog';
+    final response = await http
+        .post(
+          Uri.parse(targetUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({'message': message}),
+        )
+        .timeout(Duration(seconds: 30));
 
     if (response.statusCode == 200) {
       debugPrint('Ulke Log başarıyla gönderildi!');
@@ -643,6 +737,7 @@ Future<void> postUlkeLog(String message) async {
     debugPrint('Hata: $e');
   }
 }
+
 // Listeler
 Ulkeler gecici = Ulkeler(
   bayrak: '',
@@ -667,7 +762,7 @@ Ulkeler kalici = Ulkeler(
   boylam: 0.0,
 );
 List<String> butonAnahtarlar = ['', '', '', ''];
-List<int> butonnumaralari = [-1,-2,-3,-4];
+List<int> butonnumaralari = [-1, -2, -3, -4];
 List<SalomonBottomBarItem> navBarItems = [
   SalomonBottomBarItem(
     icon: const Icon(Icons.home),
@@ -1078,7 +1173,8 @@ List<Ulkeler> ulke = [
     boylam: 30,
   ),
   Ulkeler(
-    url: "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/suriye?v=1739643150915",
+    url:
+        "https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/suriye?v=1739643150915",
     bayrak: "assets/bayraklar/suriye.png",
     enisim: "Syria",
     isim: "Suriye",
@@ -2662,7 +2758,8 @@ List<Ulkeler> ulke = [
     boylam: -72.42,
   ),
   Ulkeler(
-    url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/320px-Flag_of_the_Taliban.svg.png",
+    url:
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_the_Taliban.svg/320px-Flag_of_the_Taliban.svg.png",
     bayrak: "assets/bayraklar/afganistan.png",
     enisim: "Afghanistan",
     isim: "Afganistan",

@@ -134,7 +134,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
     try {
-      final targetUrl = '${apiserver}/geogamesignlog';
+      final targetUrl = 'https://geogame-api.keremkk.com.tr/api/geogamesignlog';
       final response = await http
           .post(
             Uri.parse(targetUrl),

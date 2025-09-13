@@ -45,7 +45,7 @@ class _LeadboardState extends State<Leadboard> {
   Future<void> fetchData() async {
     try {
       final response = await http.get(
-        Uri.parse('${apiserver}/get_leadboard'),
+        Uri.parse('https://geogame-api.keremkk.com.tr/api/get_leadboard'),
       );
 
       if (response.statusCode == 200) {
