@@ -6,9 +6,9 @@ class MesafeOyun extends StatefulWidget {
 }
 
 class _MesafeOyunState extends State<MesafeOyun> {
-  String message='';
+  String message = '';
   late TextEditingController _controller = TextEditingController();
-  int puan=100;
+  int puan = 100;
 
   @override
   void initState() {
@@ -21,17 +21,18 @@ class _MesafeOyunState extends State<MesafeOyun> {
     yeniulkesec();
     await mesafeoyunkurallari();
   }
+
   Future<void> mesafeoyunkurallari() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(Yazi.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Yazi.get('mesafekural1')),
+                Text(Yazi.get('kural1')),
                 Text(Yazi.get('mesafekural2')),
                 Text(Yazi.get('mesafekural3')),
               ],
@@ -49,96 +50,135 @@ class _MesafeOyunState extends State<MesafeOyun> {
       },
     );
   }
+
   void _checkAnswer() {
     setState(() {
-      for (int a=0;a<250;a++){
-        if(ulke[a].ks(_controller.text.trim())){
-          gecici= ulke[a];
+      for (int a = 0; a < 250; a++) {
+        if (ulke[a].ks(_controller.text.trim())) {
+          gecici = ulke[a];
           break;
         }
       }
-      message += Yazi.get('tahminmetin') + (isEnglish ? gecici.enisim : gecici.isim) + "    ";
-      message += Yazi.get('mesafe') + mesafeHesapla(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam).toString() + " Km   ";
-      message += Yazi.get('yon') + pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) + "\n";
+      message += Yazi.get('tahminmetin') +
+          (isEnglish ? gecici.enisim : gecici.isim) +
+          "    ";
+      message += Yazi.get('mesafe') +
+          mesafeHesapla(
+                  gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam)
+              .toString() +
+          " Km   ";
+      message += Yazi.get('yon') +
+          pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) +
+          "\n";
       if (kalici.ks(_controller.text.trim())) {
         String ulke = _controller.text.trim();
         _controller.clear();
-        message='';
+        message = '';
         yeniulkesec();
         mesafedogru++;
-        mesafepuan+=puan;
+        mesafepuan += puan;
         writeToFile();
-        postUlkeLog(
-            '{\n"name": "$name",\n'
-                '"uid": "$uid",\n'
-                '"oyunmodu": "mesafe",\n'
-                '"mesaj": "Cevap Doğru",\n'
-                '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n');
-        puan=300;
+        postUlkeLog('{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
+            '"oyunmodu": "mesafe",\n'
+            '"mesaj": "Cevap Doğru",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap": "$ulke",\n');
+        puan = 300;
+        Dogru();
       } else {
         String ulke = _controller.text.trim();
-        puan-=10;
-        if(puan<100)
-          puan=100;
+        puan -= 10;
+        Yanlis();
+        if (puan < 100) puan = 100;
         _controller.clear();
         mesafeyanlis++;
         writeToFile();
-        postUlkeLog(
-            '{\n"name": "$name",\n'
-                '"uid": "$uid",\n'
-                '"oyunmodu": "mesafe",\n'
-                '"mesaj": "Cevap Yanlış",\n'
-                '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n');
+        postUlkeLog('{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
+            '"oyunmodu": "mesafe",\n'
+            '"mesaj": "Cevap Yanlış",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap": "$ulke",\n');
       }
     });
   }
+
   void _pasButtonPressed() {
-    puan=300;
+    puan = 300;
+    Yanlis();
     String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(baslik: Yazi.get('pascevap'),metin: pasulke);
+        return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
       },
     );
     String ulke = _controller.text.trim();
-    postUlkeLog(
-        '{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "mesafe",\n'
-            '"mesaj": "Pas Geçildi",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n');
+    postUlkeLog('{\n"name": "$name",\n'
+        '"uid": "$uid",\n'
+        '"oyunmodu": "mesafe",\n'
+        '"mesaj": "Pas Geçildi",\n'
+        '"dogrucevap": "${kalici.isim}",\n'
+        '"verilencevap": "$ulke",\n');
     setState(() {
-      message='';
+      message = '';
       yeniulkesec();
       _controller.clear();
     });
   }
-  double mesafeHesapla(double latitude1, double longitude1, double latitude2, double longitude2) {
+
+  double mesafeHesapla(double latitude1, double longitude1, double latitude2,
+      double longitude2) {
     const double PI = 3.14159265358979323846264338327950288;
     double theta = longitude1 - longitude2;
-    double distance = acos(sin(latitude1 * PI / 180.0) * sin(latitude2 * PI / 180.0) +
-        cos(latitude1 * PI / 180.0) * cos(latitude2 * PI / 180.0) * cos(theta * PI / 180.0)) * 180.0 / PI;
+    double distance = acos(
+            sin(latitude1 * PI / 180.0) * sin(latitude2 * PI / 180.0) +
+                cos(latitude1 * PI / 180.0) *
+                    cos(latitude2 * PI / 180.0) *
+                    cos(theta * PI / 180.0)) *
+        180.0 /
+        PI;
     distance *= 60 * 1.1515 * 1.609344; // Miles to kilometers conversion
     return distance.roundToDouble();
   }
+
   String pusula(double lat1, double lon1, double lat2, double lon2) {
     const double PI = 3.14159265358979323846264338327950288;
     lat1 *= PI / 180.0;
     lon1 *= PI / 180.0;
     lat2 *= PI / 180.0;
     lon2 *= PI / 180.0;
-    double brng = atan2(sin(lon2 - lon1) * cos(lat2), cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)) * 180 / PI;
+    double brng = atan2(sin(lon2 - lon1) * cos(lat2),
+            cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)) *
+        180 /
+        PI;
     brng = (brng + 360) % 360;
 
-    const List<String> yonlerTR = ["Kuzey", "Kuzeydoğu", "Doğu", "Güneydoğu", "Güney", "Güneybatı", "Batı", "Kuzeybatı"];
-    const List<String> yonlerEN = ["North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest"];
+    const List<String> yonlerTR = [
+      "Kuzey",
+      "Kuzeydoğu",
+      "Doğu",
+      "Güneydoğu",
+      "Güney",
+      "Güneybatı",
+      "Batı",
+      "Kuzeybatı"
+    ];
+    const List<String> yonlerEN = [
+      "North",
+      "Northeast",
+      "East",
+      "Southeast",
+      "South",
+      "Southwest",
+      "West",
+      "Northwest"
+    ];
     List<String> yonler = isEnglish ? yonlerEN : yonlerTR;
     return yonler[((brng + 22.5) / 45.0).floor() % 8];
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,7 +218,8 @@ class _MesafeOyunState extends State<MesafeOyun> {
               ),
               SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Butonlar arasında eşit boşluk bırakır
+                mainAxisAlignment: MainAxisAlignment
+                    .spaceEvenly, // Butonlar arasında eşit boşluk bırakır
                 children: [
                   Expanded(
                     child: Padding(
@@ -236,16 +277,17 @@ class _MesafeOyunState extends State<MesafeOyun> {
                       .map(
                         (e) => SearchFieldListItem<Ulkeler>(
                           isEnglish ? e.enisim : e.isim,
-                      item: e,
-                      child: Row(
-                        children: [
-                          CircleAvatar(backgroundImage: NetworkImage(e.url)),
-                          const SizedBox(width: 10),
-                          Text(isEnglish ? e.enisim : e.isim),
-                        ],
-                      ),
-                    ),
-                  )
+                          item: e,
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                  backgroundImage: NetworkImage(e.url)),
+                              const SizedBox(width: 10),
+                              Text(isEnglish ? e.enisim : e.isim),
+                            ],
+                          ),
+                        ),
+                      )
                       .toList(),
                   controller: _controller,
                   onSuggestionTap: (value) {

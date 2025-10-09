@@ -15,22 +15,24 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
     super.initState();
     _initializeGame();
   }
+
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     yeniulkesec();
     await baskentoyunkurallari();
   }
+
   Future<void> baskentoyunkurallari() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(Yazi.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Yazi.get('baskentkural1')),
+                Text(Yazi.get('kural1')),
                 Text(Yazi.get('baskentkural2')),
                 Text(Yazi.get('baskentkural3')),
               ],
@@ -48,6 +50,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
       },
     );
   }
+
   void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(_controller.text.trim())) {
@@ -58,40 +61,41 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         baskentdogru++;
         baskentpuan += puan;
         writeToFile();
-        postUlkeLog(
-            '{\n"name": "$name",\n'
-                '"uid": "$uid",\n'
-                '"oyunmodu": "baskent coop",\n'
-                '"mesaj": "Cevap Doğru",\n'
-                '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n'
-                '"yesil": "${butonAnahtarlar[0]}",\n'
-                '"sari": "${butonAnahtarlar[1]}",\n'
-                '"mavi": "${butonAnahtarlar[2]}",\n'
-                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+        postUlkeLog('{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
+            '"oyunmodu": "baskent coop",\n'
+            '"mesaj": "Cevap Doğru",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap": "$ulke",\n'
+            '"yesil": "${butonAnahtarlar[0]}",\n'
+            '"sari": "${butonAnahtarlar[1]}",\n'
+            '"mavi": "${butonAnahtarlar[2]}",\n'
+            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
+        Dogru();
       } else {
         String ulke = _controller.text.trim();
         puan -= 10;
+        Yanlis();
         if (puan < 20) puan = 20;
         _controller.clear();
         baskentyanlis++;
         writeToFile();
-        butontiklama[i]=false;
-        postUlkeLog(
-            '{\n"name": "$name",\n'
-                '"uid": "$uid",\n'
-                '"oyunmodu": "baskent",\n'
-                '"mesaj": "Cevap Yanlış",\n'
-                '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n'
-                '"yesil": "${butonAnahtarlar[0]}",\n'
-                '"sari": "${butonAnahtarlar[1]}",\n'
-                '"mavi": "${butonAnahtarlar[2]}",\n'
-                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+        butontiklama[i] = false;
+        postUlkeLog('{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
+            '"oyunmodu": "baskent",\n'
+            '"mesaj": "Cevap Yanlış",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap": "$ulke",\n'
+            '"yesil": "${butonAnahtarlar[0]}",\n'
+            '"sari": "${butonAnahtarlar[1]}",\n'
+            '"mavi": "${butonAnahtarlar[2]}",\n'
+            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
     });
   }
+
   void ekrancevir() {
     // Yön değiştirmek için UI'dan sonra yapılacak işlemleri belirleyelim.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -186,10 +190,12 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 4.0, horizontal: 4.0),
                                 child: ElevatedButton(
-                                  onPressed: butontiklama[i] ? () {
-                                    _controller.text = butonAnahtarlar[i];
-                                    _checkAnswer(i);
-                                  } : null,
+                                  onPressed: butontiklama[i]
+                                      ? () {
+                                          _controller.text = butonAnahtarlar[i];
+                                          _checkAnswer(i);
+                                        }
+                                      : null,
                                   child: Text(
                                     butonAnahtarlar[i],
                                     style: TextStyle(
@@ -198,7 +204,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                    buttonColors[i], // Buton rengini ayarla
+                                        buttonColors[i], // Buton rengini ayarla
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                     ),
@@ -217,10 +223,12 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 4.0, horizontal: 4.0),
                                 child: ElevatedButton(
-                                  onPressed: butontiklama[i] ? () {
-                                    _controller.text = butonAnahtarlar[i];
-                                    _checkAnswer(i);
-                                  } : null,
+                                  onPressed: butontiklama[i]
+                                      ? () {
+                                          _controller.text = butonAnahtarlar[i];
+                                          _checkAnswer(i);
+                                        }
+                                      : null,
                                   child: Text(
                                     butonAnahtarlar[i],
                                     style: TextStyle(
@@ -229,7 +237,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:
-                                    buttonColors[i], // Buton rengini ayarla
+                                        buttonColors[i], // Buton rengini ayarla
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                     ),
@@ -247,7 +255,7 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                       )
                     ],
                   ),
-                if(!yazmamodu)
+                if (!yazmamodu)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SearchField<Ulkeler>(
@@ -255,16 +263,17 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
                           .map(
                             (e) => SearchFieldListItem<Ulkeler>(
                               isEnglish ? e.enisim : e.isim,
-                          item: e,
-                          child: Row(
-                            children: [
-                              CircleAvatar(backgroundImage: NetworkImage(e.url)),
-                              const SizedBox(width: 10),
-                              Text(isEnglish ? e.enisim : e.isim),
-                            ],
-                          ),
-                        ),
-                      )
+                              item: e,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                      backgroundImage: NetworkImage(e.url)),
+                                  const SizedBox(width: 10),
+                                  Text(isEnglish ? e.enisim : e.isim),
+                                ],
+                              ),
+                            ),
+                          )
                           .toList(),
                       controller: _controller,
                       onSuggestionTap: (value) {
