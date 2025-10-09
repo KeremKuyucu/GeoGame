@@ -14,22 +14,24 @@ class _BaskentOyunState extends State<BaskentOyun> {
     super.initState();
     _initializeGame();
   }
+
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
     yeniulkesec();
     baskentoyunkurallari();
   }
+
   Future<void> baskentoyunkurallari() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // kullanıcı mutlaka düğmeye basmalı
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(Yazi.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Yazi.get('baskentkural1')),
+                Text(Yazi.get('kural1')),
                 Text(Yazi.get('baskentkural2')),
                 Text(Yazi.get('baskentkural3')),
               ],
@@ -47,6 +49,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
       },
     );
   }
+
   void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(_controller.text.trim())) {
@@ -57,60 +60,61 @@ class _BaskentOyunState extends State<BaskentOyun> {
         baskentpuan += puan;
         writeToFile();
         puan = 50;
-        postUlkeLog(
-            '{\n"name": "$name",\n'
-                '"uid": "$uid",\n'
-                '"oyunmodu": "baskent",\n'
-                '"mesaj": "Cevap Doğru",\n'
-                '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n'
-                '"yesil": "${butonAnahtarlar[0]}",\n'
-                '"sari": "${butonAnahtarlar[1]}",\n'
-                '"mavi": "${butonAnahtarlar[2]}",\n'
-                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
-      } else {
-        String ulke = _controller.text.trim();
-        puan -= 10;
-        if (puan < 20) puan = 20;
-        _controller.clear();
-        baskentyanlis++;
-        writeToFile();
-        butontiklama[i]=false;
-        postUlkeLog(
-            '{\n"name": "$name",\n'
-                '"uid": "$uid",\n'
-                '"oyunmodu": "baskent",\n'
-                '"mesaj": "Cevap Yanlış",\n'
-                '"dogrucevap": "${kalici.isim}",\n'
-                '"verilencevap": "$ulke",\n'
-                '"yesil": "${butonAnahtarlar[0]}",\n'
-                '"sari": "${butonAnahtarlar[1]}",\n'
-                '"mavi": "${butonAnahtarlar[2]}",\n'
-                '"kirmizi": "${butonAnahtarlar[3]}"\n}');
-      }
-    });
-  }
-  void _pasButtonPressed() {
-    puan = 50;
-    String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CustomNotification(baslik: Yazi.get('pascevap'),metin: pasulke);
-      },
-    );
-    String ulke = _controller.text.trim();
-    postUlkeLog(
-        '{\n"name": "$name",\n'
+        Dogru();
+        postUlkeLog('{\n"name": "$name",\n'
             '"uid": "$uid",\n'
             '"oyunmodu": "baskent",\n'
-            '"mesaj": "Pas Geçildi",\n'
+            '"mesaj": "Cevap Doğru",\n'
             '"dogrucevap": "${kalici.isim}",\n'
             '"verilencevap": "$ulke",\n'
             '"yesil": "${butonAnahtarlar[0]}",\n'
             '"sari": "${butonAnahtarlar[1]}",\n'
             '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"}');
+            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+      } else {
+        String ulke = _controller.text.trim();
+        puan -= 10;
+        Yanlis();
+        if (puan < 20) puan = 20;
+        _controller.clear();
+        baskentyanlis++;
+        writeToFile();
+        butontiklama[i] = false;
+        postUlkeLog('{\n"name": "$name",\n'
+            '"uid": "$uid",\n'
+            '"oyunmodu": "baskent",\n'
+            '"mesaj": "Cevap Yanlış",\n'
+            '"dogrucevap": "${kalici.isim}",\n'
+            '"verilencevap": "$ulke",\n'
+            '"yesil": "${butonAnahtarlar[0]}",\n'
+            '"sari": "${butonAnahtarlar[1]}",\n'
+            '"mavi": "${butonAnahtarlar[2]}",\n'
+            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
+      }
+    });
+  }
+
+  void _pasButtonPressed() {
+    puan = 50;
+    Yanlis();
+    String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
+      },
+    );
+    String ulke = _controller.text.trim();
+    postUlkeLog('{\n"name": "$name",\n'
+        '"uid": "$uid",\n'
+        '"oyunmodu": "baskent",\n'
+        '"mesaj": "Pas Geçildi",\n'
+        '"dogrucevap": "${kalici.isim}",\n'
+        '"verilencevap": "$ulke",\n'
+        '"yesil": "${butonAnahtarlar[0]}",\n'
+        '"sari": "${butonAnahtarlar[1]}",\n'
+        '"mavi": "${butonAnahtarlar[2]}",\n'
+        '"kirmizi": "${butonAnahtarlar[3]}"}');
     setState(() {
       yeniulkesec();
       _controller.clear();
@@ -195,10 +199,12 @@ class _BaskentOyunState extends State<BaskentOyun> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 4.0, horizontal: 4.0),
                                 child: ElevatedButton(
-                                  onPressed: butontiklama[i] ? () {
-                                    _controller.text = butonAnahtarlar[i];
-                                    _checkAnswer(i);
-                                  } : null,
+                                  onPressed: butontiklama[i]
+                                      ? () {
+                                          _controller.text = butonAnahtarlar[i];
+                                          _checkAnswer(i);
+                                        }
+                                      : null,
                                   child: Text(
                                     butonAnahtarlar[i],
                                     style: TextStyle(
@@ -226,10 +232,12 @@ class _BaskentOyunState extends State<BaskentOyun> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 4.0, horizontal: 4.0),
                                 child: ElevatedButton(
-                                  onPressed: butontiklama[i] ? () {
-                                    _controller.text = butonAnahtarlar[i];
-                                    _checkAnswer(i);
-                                  } : null,
+                                  onPressed: butontiklama[i]
+                                      ? () {
+                                          _controller.text = butonAnahtarlar[i];
+                                          _checkAnswer(i);
+                                        }
+                                      : null,
                                   child: Text(
                                     butonAnahtarlar[i],
                                     style: TextStyle(
@@ -256,7 +264,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                       )
                     ],
                   ),
-                if(!yazmamodu)
+                if (!yazmamodu)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SearchField<Ulkeler>(
@@ -264,16 +272,17 @@ class _BaskentOyunState extends State<BaskentOyun> {
                           .map(
                             (e) => SearchFieldListItem<Ulkeler>(
                               isEnglish ? e.enisim : e.isim,
-                          item: e,
-                          child: Row(
-                            children: [
-                              CircleAvatar(backgroundImage: NetworkImage(e.url)),
-                              const SizedBox(width: 10),
-                              Text(isEnglish ? e.enisim : e.isim),
-                            ],
-                          ),
-                        ),
-                      )
+                              item: e,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                      backgroundImage: NetworkImage(e.url)),
+                                  const SizedBox(width: 10),
+                                  Text(isEnglish ? e.enisim : e.isim),
+                                ],
+                              ),
+                            ),
+                          )
                           .toList(),
                       controller: _controller,
                       onSuggestionTap: (value) {

@@ -79,9 +79,9 @@
       "Türkçe": "Kurallar",
       "English": "Rules"
     },
-    "baskentkural1": {
-      "Türkçe": "Baskent Bilme Oyunu",
-      "English": "Capital City Quiz"
+    "kural1": {
+      "Türkçe": "Puanlarınızın kayıt edilmesi için ana menüye dönün.",
+      "English": "Return to the main menu to save your points."
     },
     "baskentkural2": {
       "Türkçe": "Baskent Bilme Oyununa hos geldiniz.\nAmaciniz 250 ulkeden rastgele secilen bir ulkenin baskentini bilmek.",
@@ -99,10 +99,6 @@
       "Türkçe": "Tahmin Edilecek Ülkenin\n Başkenti: ",
       "English": "Capital of the country to guess: "
     },
-    "bayrakkural1": {
-      "Türkçe": "Bayrak Bilme Oyunu",
-      "English": "Flag Quiz"
-    },
     "bayrakkural2": {
       "Türkçe": "Bayrak Bilme Oyununa hos geldiniz.\nAmaciniz, 250 ulkeden rastgele secilen bir ulkenin bayragini bilmek.",
       "English": "Welcome to the Flag Quiz.\nYour goal is to guess the flag of a randomly selected country from 250 countries."
@@ -114,10 +110,6 @@
     "bayrakbaslik": {
       "Türkçe": "Bayrak Oyun",
       "English": "Flag Game"
-    },
-    "mesafekural1": {
-      "Türkçe": "Mesafeden Ulke Bilme Oyunu",
-      "English": "Distance Country Quiz"
     },
     "mesafekural2": {
       "Türkçe": "Mesafeden ulke bilme oyununa hos geldiniz.\nAmaciniz, 250 ülkeden rastgele secilen bir ulkeyi bilmek.\nMesafeler +-100 Km fark olabilir.\nKonum olarak ülkelerin tam ortalari baz alinmistir.",

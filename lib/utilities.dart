@@ -414,7 +414,7 @@ bool amerikakitasi = true,
     bmuyeligi = false,
     sadecebm = false,
     yazmamodu = true,
-    backgroundMusicPlaying = false,
+    effectPlaying = true,
     darktema = true,
     isEnglish = false;
 final List<String> diller = ['Türkçe', 'English'];
@@ -442,7 +442,42 @@ final List<Color> buttonColors = [
   Colors.red,
 ];
 List<bool> butontiklama = [true, true, true, true];
-final random = Random();
+final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer();
+Future<void> playAudioFromAssetOrUrl(
+    AudioPlayer player, String assetPath, String url) async {
+  if (!effectPlaying) {
+    try {
+      if (player.playing) {
+        await player.stop();
+      }
+      await player.setAsset(assetPath);
+      await player.setVolume(0.25); // 🔊 Ses %25
+      await player.play();
+    } catch (e) {
+      debugPrint('Error playing asset: $e');
+      try {
+        if (player.playing) {
+          await player.stop();
+        }
+        await player.setUrl(url);
+        await player.setVolume(0.25); // 🔊 Ses %25
+        await player.play();
+      } catch (urlError) {
+        debugPrint('Error playing audio from URL: $urlError');
+      }
+    }
+  }
+}
+
+Future<void> Dogru() async {
+  await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3',
+      'https://github.com/KeremKuyucu/GeoGame/raw/main/assets/sesler/dogru.mp3');
+}
+
+Future<void> Yanlis() async {
+  await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3',
+      'https://github.com/KeremKuyucu/GeoGame/raw/main/assets/sesler/yanlis.mp3');
+}
 
 List<Ulkeler> getFilteredCountries() {
   if (!amerikakitasi &&
@@ -457,8 +492,7 @@ List<Ulkeler> getFilteredCountries() {
   List<Ulkeler> filteredList = [];
   for (var u in ulke) {
     // Kıta kontrolü
-    bool kitaUygun =
-        (amerikakitasi && u.kita == "Americas") ||
+    bool kitaUygun = (amerikakitasi && u.kita == "Americas") ||
         (asyakitasi && u.kita == "Asia") ||
         (afrikakitasi && u.kita == "Africa") ||
         (avrupakitasi && u.kita == "Europe") ||
@@ -499,9 +533,8 @@ Future<void> yeniulkesec() async {
   kalici = secilenUlkeler[random.nextInt(4)];
 
   for (int i = 0; i < 4; i++) {
-    butonAnahtarlar[i] = isEnglish
-        ? secilenUlkeler[i].enisim
-        : secilenUlkeler[i].isim;
+    butonAnahtarlar[i] =
+        isEnglish ? secilenUlkeler[i].enisim : secilenUlkeler[i].isim;
   }
 
   butontiklama = [true, true, true, true];
@@ -530,11 +563,11 @@ Future<void> readFromFile(Function updateState) async {
       bmuyeligi = jsonData['bmuyeligi'] == true;
       yazmamodu = jsonData['yazmamodu'] == true;
       darktema = jsonData['darktema'] == true;
+      effectPlaying = jsonData['effectPlaying'] == true;
 
       name = jsonData['name'] ?? '';
       uid = jsonData['uid'] ?? '';
-      profilurl =
-          jsonData['profilurl'] ??
+      profilurl = jsonData['profilurl'] ??
           'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
       secilenDil = jsonData['secilenDil'] ?? 'Türkçe';
 
@@ -571,6 +604,7 @@ Future<void> writeToFile() async {
     'bmuyeligi': bmuyeligi,
     'yazmamodu': yazmamodu,
     'darktema': darktema,
+    'effectPlaying': effectPlaying,
     'name': name,
     'uid': uid,
     'profilurl': profilurl,
@@ -605,8 +639,7 @@ Future<void> puanguncelle() async {
         return {
           'name': user['name'] ?? '',
           'uid': user['uid'] ?? '',
-          'profilurl':
-              user['profilurl'] ??
+          'profilurl': user['profilurl'] ??
               'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
           'puan': int.parse(user['puan'] ?? "0"),
           'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
@@ -677,8 +710,7 @@ Future<void> postLeadboard() async {
     String localVersion = packageInfo.version;
     String country = (await getCountry()).replaceAll('\n', '');
 
-    final fullMessage =
-        '{\n'
+    final fullMessage = '{\n'
         '"mesaj": "Log Mesajı",\n'
         '"name": "$name",\n'
         '"uid": "$uid",\n'
