@@ -330,6 +330,46 @@
     "pascevap": {
       "Türkçe": "Geçilen ülke",
       "English": "Country crossed"
+    },
+    "misafir": {
+      "Türkçe": "Misafir",
+      "English": "Guest"
+    },
+    "girisaciklama": {
+      "Türkçe": "GeoGame'a giriş yapmak için aşağıdaki düğmeye tıklayabilirsiniz.",
+      "English": "You can log in to GeoGame by clicking the button below."
+    },
+    "kayitol": {
+      "Türkçe": "Kayıt Ol",
+      "English": "Sign Up"
+    },
+    "profilduzenleme": {
+      "Türkçe": "Profil Düzenle",
+      "English": "Edit Profile"
+    },
+    "toplampuan": {
+      "Türkçe": "Toplam Puan: ",
+      "English": "Total Points: "
+    },
+    "cikisbasarili": {
+      "Türkçe": "Çıkış Yapıldı",
+      "English": "Log Out Successful"
+    },
+    "hata_baslik": {
+      "Türkçe": "Hata",
+      "English": "Error"
+    },
+    "giris_yap_mesaj": {
+      "Türkçe": "Lütfen önce giriş yapın.",
+      "English": "Please log in first."
+    },
+    "basarili_baslik": {
+      "Türkçe": "Başarılı",
+      "English": "Successful"
+    },
+    "feedback_gonderildi": {
+      "Türkçe": "Geri bildiriminiz iletildi.",
+      "English": "Your feedback has been sent."
     }
   }
 }

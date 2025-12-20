@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 
 class Userprofile extends StatefulWidget {
   final int userindex;
@@ -13,54 +13,75 @@ class _UserProfileState extends State<Userprofile> {
     super.initState();
     _initializeGame();
   }
+
   Future<void> _initializeGame() async {
     await readFromFile((update) => setState(update));
   }
+
   @override
   Widget build(BuildContext context) {
+    // ✅ Güvenlik kontrolü: users listesi boş veya index geçersizse
+    if (users.isEmpty || widget.userindex < 0 || widget.userindex >= users.length) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(Yazi.get('navigasyonbar2')),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 80, color: Colors.grey),
+              SizedBox(height: 16),
+              Text(
+                'Kullanıcı bulunamadı',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Geri Dön'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // ✅ Seçili kullanıcının verilerini al
+    final user = users[widget.userindex];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(Yazi.get('navigasyonbar2')),
         centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
       ),
       drawer: DrawerWidget(),
-      body: Card(
-        margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        elevation: 15.0, // Daha belirgin gölge
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25.0), // Daha yuvarlak köşeler
-        ),
-        shadowColor: Colors.black.withOpacity(0.3), // Daha derin gölge
-        color: Colors.grey.shade800, // Koyu, şık bir arka plan rengi
-        child: Container(
-          padding: const EdgeInsets.all(25.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25.0), // Yuvarlak köşe
-            gradient: LinearGradient(
-              colors: [Colors.black, Colors.grey.shade900], // Sofistike renk geçişi
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            elevation: 15.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
             ),
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Column(
+            shadowColor: Colors.black.withOpacity(0.3),
+            color: Colors.grey.shade800,
+            child: Container(
+              padding: const EdgeInsets.all(25.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25.0),
+                gradient: LinearGradient(
+                  colors: [Colors.black, Colors.grey.shade900],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Profil başlığı
@@ -68,32 +89,51 @@ class _UserProfileState extends State<Userprofile> {
                     children: [
                       // Profil Resmi
                       CircleAvatar(
-                          radius: 25.0,
-                          backgroundImage: NetworkImage('${users[widget.userindex]['profilurl']}')
+                        radius: 35.0,
+                        backgroundImage: NetworkImage(
+                          user['profilurl'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+                        ),
+                        backgroundColor: Colors.grey,
                       ),
-                      SizedBox(width: 10.0),
+                      SizedBox(width: 16.0),
                       // Kullanıcı adı
-                      Text(
-                        ('${users[widget.userindex]['name']}'),
-                        style: TextStyle(
-                          fontSize: 26.0, // Daha büyük başlık
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.2, // Harf aralığı ekleyerek şıklık katma
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user['name'] ?? 'Anonim Oyuncu',
+                              style: TextStyle(
+                                fontSize: 26.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Sıralama: #${widget.userindex + 1}',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.amber,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 12.0),
                   Divider(
-                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
-                    thickness: 1.2, // Divider'ın kalınlığı
+                    color: Colors.white.withOpacity(0.6),
+                    thickness: 1.2,
                   ),
                   SizedBox(height: 10.0),
 
-                  // Kullanıcı puanı
+                  // Toplam Puan
                   Text(
-                    '${Yazi.get('profil1')} ${users[widget.userindex]['puan']}',
+                    '${Yazi.get('profil1')} ${user['puan'] ?? 0}',
                     style: TextStyle(
                       fontSize: 20.0,
                       color: Colors.purpleAccent,
@@ -102,101 +142,189 @@ class _UserProfileState extends State<Userprofile> {
                   ),
                   SizedBox(height: 10.0),
 
-                  // Mesafe puan doğru / yanlış
+                  // Mesafe İstatistikleri
                   Divider(
-                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
-                    thickness: 1.2, // Divider'ın kalınlığı
+                    color: Colors.white.withOpacity(0.6),
+                    thickness: 1.2,
                   ),
-                  Text(
-                    '${Yazi.get('profil2')} ${users[widget.userindex]['mesafepuan']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.tealAccent,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil2'),
+                    '${user['mesafepuan'] ?? 0}',
+                    Colors.tealAccent,
                   ),
-                  Text(
-                    '${Yazi.get('profil3')} ${users[widget.userindex]['mesafedogru']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil3'),
+                    '${user['mesafedogru'] ?? 0}',
+                    Colors.green,
                   ),
-                  Text(
-                    '${Yazi.get('profil4')} ${users[widget.userindex]['mesafeyanlis']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil4'),
+                    '${user['mesafeyanlis'] ?? 0}',
+                    Colors.red,
                   ),
                   SizedBox(height: 10.0),
+
+                  // Bayrak İstatistikleri
                   Divider(
-                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
-                    thickness: 1.2, // Divider'ın kalınlığı
+                    color: Colors.white.withOpacity(0.6),
+                    thickness: 1.2,
                   ),
-                  // Bayrak puan doğru / yanlış
-                  Text(
-                    '${Yazi.get('profil5')} ${users[widget.userindex]['bayrakpuan']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.tealAccent,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil5'),
+                    '${user['bayrakpuan'] ?? 0}',
+                    Colors.tealAccent,
                   ),
-                  Text(
-                    '${Yazi.get('profil6')} ${users[widget.userindex]['bayrakdogru']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil6'),
+                    '${user['bayrakdogru'] ?? 0}',
+                    Colors.green,
                   ),
-                  Text(
-                    '${Yazi.get('profil7')} ${users[widget.userindex]['bayrakyanlis']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil7'),
+                    '${user['bayrakyanlis'] ?? 0}',
+                    Colors.red,
                   ),
                   SizedBox(height: 10.0),
+
+                  // Başkent İstatistikleri
                   Divider(
-                    color: Colors.white.withOpacity(0.6), // Daha yumuşak divider
-                    thickness: 1.2, // Divider'ın kalınlığı
+                    color: Colors.white.withOpacity(0.6),
+                    thickness: 1.2,
                   ),
-                  // Başkent puan doğru / yanlış
-                  Text(
-                    '${Yazi.get('profil8')} ${users[widget.userindex]['baskentpuan']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.tealAccent,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil8'),
+                    '${user['baskentpuan'] ?? 0}',
+                    Colors.tealAccent,
                   ),
-                  Text(
-                    '${Yazi.get('profil9')} ${users[widget.userindex]['baskentdogru']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil9'),
+                    '${user['baskentdogru'] ?? 0}',
+                    Colors.green,
                   ),
-                  Text(
-                    '${Yazi.get('profil10')} ${users[widget.userindex]['baskentyanlis']}',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.red,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  _buildStatRow(
+                    Yazi.get('profil10'),
+                    '${user['baskentyanlis'] ?? 0}',
+                    Colors.red,
                   ),
+
+                  // ✅ Başarı oranları (opsiyonel)
+                  SizedBox(height: 20.0),
+                  Divider(
+                    color: Colors.white.withOpacity(0.6),
+                    thickness: 1.2,
+                  ),
+                  _buildSuccessRates(user),
                 ],
-              );
-            },
+              ),
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  /// ✅ İstatistik satırı widget'ı
+  Widget _buildStatRow(String label, String value, Color color) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18.0,
+              color: color,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18.0,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ✅ Başarı oranlarını hesapla ve göster
+  Widget _buildSuccessRates(Map<String, dynamic> user) {
+    // Mesafe başarı oranı
+    int mesafeTotal = (user['mesafedogru'] ?? 0) + (user['mesafeyanlis'] ?? 0);
+    double mesafeRate = mesafeTotal > 0
+        ? ((user['mesafedogru'] ?? 0) / mesafeTotal * 100)
+        : 0;
+
+    // Bayrak başarı oranı
+    int bayrakTotal = (user['bayrakdogru'] ?? 0) + (user['bayrakyanlis'] ?? 0);
+    double bayrakRate = bayrakTotal > 0
+        ? ((user['bayrakdogru'] ?? 0) / bayrakTotal * 100)
+        : 0;
+
+    // Başkent başarı oranı
+    int baskentTotal = (user['baskentdogru'] ?? 0) + (user['baskentyanlis'] ?? 0);
+    double baskentRate = baskentTotal > 0
+        ? ((user['baskentdogru'] ?? 0) / baskentTotal * 100)
+        : 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Başarı Oranları',
+          style: TextStyle(
+            fontSize: 20.0,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 10),
+        _buildProgressBar('Mesafe', mesafeRate, Colors.tealAccent),
+        SizedBox(height: 8),
+        _buildProgressBar('Bayrak', bayrakRate, Colors.orangeAccent),
+        SizedBox(height: 8),
+        _buildProgressBar('Başkent', baskentRate, Colors.purpleAccent),
+      ],
+    );
+  }
+
+  /// ✅ İlerleme çubuğu
+  Widget _buildProgressBar(String label, double percentage, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(color: Colors.white70, fontSize: 16),
+            ),
+            Text(
+              '${percentage.toStringAsFixed(1)}%',
+              style: TextStyle(
+                color: color,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: percentage / 100,
+            backgroundColor: Colors.grey.shade700,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 8,
+          ),
+        ),
+      ],
     );
   }
 }

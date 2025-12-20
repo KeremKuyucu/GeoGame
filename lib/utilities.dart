@@ -1,5 +1,6 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Ulkeler {
   final String url;
@@ -104,22 +105,47 @@ class DrawerWidget extends StatelessWidget {
     final TextEditingController _messageController = TextEditingController();
 
     Future<void> sendMessage(String sebep, String message) async {
-      final url = Uri.parse('https://geogame-api.keremkk.com.tr/api/feedback');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
+      void _showResult(String baslik, String metin) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return CustomNotification(
+              baslik: baslik,
+              metin: metin,
+            );
+          },
+        );
+      }
+      final user = Supabase.instance.client.auth.currentUser;
+
+      if (user == null) {
+        _showResult(
+            Yazi.get('hata_baslik') ?? "Hata",
+            Yazi.get('giris_yap_mesaj') ?? "Lütfen önce giriş yapın."
+        );
+        return;
+      }
+
+      try {
+        await Supabase.instance.client.from('feedbacks').insert({
           'sebep': sebep,
           'message': message,
-          'isim': name,
-          'uid': uid,
-        }),
-      );
+          'isim': name, // Sınıfındaki isim değişkeni
+          'user_id': user.id,
+        });
 
-      if (response.statusCode == 200) {
-        print('Mesaj başarıyla gönderildi.');
-      } else {
-        print('Mesaj gönderilemedi.');
+        // Başarılı durumu
+        _showResult(
+            Yazi.get('basarili_baslik') ?? "Başarılı",
+            Yazi.get('feedback_gonderildi') ?? "Geri bildiriminiz iletildi."
+        );
+
+      } catch (e) {
+        // Başarısız durumu
+        _showResult(
+            Yazi.get('hata_baslik') ?? "Hata",
+            "Bir sorun oluştu: $e"
+        );
       }
     }
 
@@ -405,6 +431,8 @@ class CustomNotification extends StatelessWidget {
 //         return CustomNotification(baslik: baslikmetin,metin: icerikmetin);
 //       },
 
+final List<String> diller = ['Türkçe', 'English'];
+
 bool amerikakitasi = true,
     asyakitasi = true,
     afrikakitasi = true,
@@ -417,7 +445,6 @@ bool amerikakitasi = true,
     effectPlaying = true,
     darktema = true,
     isEnglish = false;
-final List<String> diller = ['Türkçe', 'English'];
 String diltercihi = '';
 int mesafedogru = 0,
     mesafeyanlis = 0,
@@ -443,8 +470,7 @@ final List<Color> buttonColors = [
 ];
 List<bool> butontiklama = [true, true, true, true];
 final random = Random(), dogru = AudioPlayer(), yanlis = AudioPlayer();
-Future<void> playAudioFromAssetOrUrl(
-    AudioPlayer player, String assetPath, String url) async {
+Future<void> playAudioFromAssetOrUrl( AudioPlayer player, String assetPath, String url) async {
   if (!effectPlaying) {
     try {
       if (player.playing) {
@@ -468,17 +494,14 @@ Future<void> playAudioFromAssetOrUrl(
     }
   }
 }
-
 Future<void> Dogru() async {
   await playAudioFromAssetOrUrl(dogru, 'assets/sesler/dogru.mp3',
       'https://github.com/KeremKuyucu/GeoGame/raw/main/assets/sesler/dogru.mp3');
 }
-
 Future<void> Yanlis() async {
   await playAudioFromAssetOrUrl(yanlis, 'assets/sesler/yanlis.mp3',
       'https://github.com/KeremKuyucu/GeoGame/raw/main/assets/sesler/yanlis.mp3');
 }
-
 List<Ulkeler> getFilteredCountries() {
   if (!amerikakitasi &&
       !asyakitasi &&
@@ -514,35 +537,31 @@ List<Ulkeler> getFilteredCountries() {
 
   return filteredList;
 }
-
 Future<void> yeniulkesec() async {
-  print("yeni ülke seçildi");
-
-  List<Ulkeler> uygunUlkeler = getFilteredCountries();
+  final List<Ulkeler> uygunUlkeler = getFilteredCountries();
 
   if (uygunUlkeler.length < 4) {
-    print(
-      "HATA: Seçenek oluşturmak için yeterli ülke bulunamadı! (${uygunUlkeler.length} adet)",
-    );
+    debugPrint("HATA: Yeterli ülke yok! Mevcut: ${uygunUlkeler.length}");
     return;
   }
+  final List<Ulkeler> secenekler = (List<Ulkeler>.from(uygunUlkeler)..shuffle()).take(4).toList();
 
-  uygunUlkeler.shuffle();
-  List<Ulkeler> secilenUlkeler = uygunUlkeler.take(4).toList();
+  kalici = secenekler[random.nextInt(4)];
 
-  kalici = secilenUlkeler[random.nextInt(4)];
+  final bool english = isEnglish;
 
   for (int i = 0; i < 4; i++) {
-    butonAnahtarlar[i] =
-        isEnglish ? secilenUlkeler[i].enisim : secilenUlkeler[i].isim;
+    butontiklama[i] = true;
+    butonAnahtarlar[i] = english ? secenekler[i].enisim : secenekler[i].isim;
   }
 
-  butontiklama = [true, true, true, true];
+  debugPrint("Yeni hedef ülke: ${kalici.isim} olarak belirlendi.");
 }
-
 int getSelectableCountryCount() {
   return getFilteredCountries().length;
 }
+
+final _supabase = Supabase.instance.client;
 
 Future<void> readFromFile(Function updateState) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -550,50 +569,68 @@ Future<void> readFromFile(Function updateState) async {
   final file = File(filePath);
 
   if (await file.exists()) {
-    final contents = await file.readAsString();
-    final jsonData = jsonDecode(contents);
+    try {
+      final contents = await file.readAsString();
+      final jsonData = jsonDecode(contents);
 
-    updateState(() {
-      amerikakitasi = jsonData['amerikakitasi'] == true;
-      asyakitasi = jsonData['asyakitasi'] == true;
-      afrikakitasi = jsonData['afrikakitasi'] == true;
-      avrupakitasi = jsonData['avrupakitasi'] == true;
-      okyanusyakitasi = jsonData['okyanusyakitasi'] == true;
-      antartikakitasi = jsonData['antartikakitasi'] == true;
-      bmuyeligi = jsonData['bmuyeligi'] == true;
-      yazmamodu = jsonData['yazmamodu'] == true;
-      darktema = jsonData['darktema'] == true;
-      effectPlaying = jsonData['effectPlaying'] == true;
+      updateState(() {
+        // Ayarlar
+        amerikakitasi = jsonData['amerikakitasi'] == true;
+        asyakitasi = jsonData['asyakitasi'] == true;
+        afrikakitasi = jsonData['afrikakitasi'] == true;
+        avrupakitasi = jsonData['avrupakitasi'] == true;
+        okyanusyakitasi = jsonData['okyanusyakitasi'] == true;
+        antartikakitasi = jsonData['antartikakitasi'] == true;
+        bmuyeligi = jsonData['bmuyeligi'] == true;
+        yazmamodu = jsonData['yazmamodu'] == true;
+        darktema = jsonData['darktema'] == true;
+        effectPlaying = jsonData['effectPlaying'] == true;
 
-      name = jsonData['name'] ?? '';
-      uid = jsonData['uid'] ?? '';
-      profilurl = jsonData['profilurl'] ??
-          'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
-      secilenDil = jsonData['secilenDil'] ?? 'Türkçe';
+        // Kullanıcı Bilgileri
+        name = jsonData['name'] ?? '';
+        uid = jsonData['uid'] ?? '';
+        profilurl = jsonData['profilurl'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
+        secilenDil = jsonData['secilenDil'] ?? 'English';
 
-      toplampuan = jsonData['toplampuan'] ?? 0;
-      mesafedogru = jsonData['mesafedogru'] ?? 0;
-      mesafeyanlis = jsonData['mesafeyanlis'] ?? 0;
-      bayrakdogru = jsonData['bayrakdogru'] ?? 0;
-      bayrakyanlis = jsonData['bayrakyanlis'] ?? 0;
-      baskentdogru = jsonData['baskentdogru'] ?? 0;
-      baskentyanlis = jsonData['baskentyanlis'] ?? 0;
-      mesafepuan = jsonData['mesafepuan'] ?? 0;
-      bayrakpuan = jsonData['bayrakpuan'] ?? 0;
-      baskentpuan = jsonData['baskentpuan'] ?? 0;
-      print("dosyadan okundu");
-    });
+        // İstatistikler
+        toplampuan = jsonData['toplampuan'] ?? 0;
+
+        mesafedogru = jsonData['mesafedogru'] ?? 0;
+        mesafeyanlis = jsonData['mesafeyanlis'] ?? 0;
+        mesafepuan = jsonData['mesafepuan'] ?? 0;
+
+        bayrakdogru = jsonData['bayrakdogru'] ?? 0;
+        bayrakyanlis = jsonData['bayrakyanlis'] ?? 0;
+        bayrakpuan = jsonData['bayrakpuan'] ?? 0;
+
+        baskentdogru = jsonData['baskentdogru'] ?? 0;
+        baskentyanlis = jsonData['baskentyanlis'] ?? 0;
+        baskentpuan = jsonData['baskentpuan'] ?? 0;
+
+        debugPrint("Yerel dosyadan veriler yüklendi.");
+      });
+
+      // Eğer kullanıcı giriş yapmışsa, bulut verisini kontrol et (Senkronizasyon)
+      if (uid.isNotEmpty) {
+        await puanguncelle();
+      }
+
+    } catch (e) {
+      debugPrint('Dosya okuma hatası: $e');
+    }
   } else {
-    debugPrint('Dosya bulunamadı: kurallar.json');
+    debugPrint('Dosya bulunamadı, varsayılan oluşturuluyor...');
     writeToFile();
   }
 }
-
 Future<void> writeToFile() async {
   final directory = await getApplicationDocumentsDirectory();
   final filePath = '${directory.path}/geogame.json';
   final file = File(filePath);
+
+  // Toplam puanı hesapla
   toplampuan = bayrakpuan + baskentpuan + mesafepuan;
+
   final data = {
     'amerikakitasi': amerikakitasi,
     'asyakitasi': asyakitasi,
@@ -621,156 +658,105 @@ Future<void> writeToFile() async {
     'baskentpuan': baskentpuan,
   };
 
-  final jsonData = jsonEncode(data);
-  await file.writeAsString(jsonData);
-  print("dosyaya yazıldı");
-}
+  try {
+    final jsonData = jsonEncode(data);
+    await file.writeAsString(jsonData);
+    debugPrint("Yerel dosyaya yazıldı.");
 
+  } catch (e) {
+    debugPrint('Dosya yazma hatası: $e');
+  }
+}
 Future<void> puanguncelle() async {
+  if (uid.isEmpty) return;
+
   try {
-    final response = await http.get(
-      Uri.parse('https://geogame-api.keremkk.com.tr/api/get_leadboard'),
-    );
+    final data = await _supabase
+        .from('geogame_stats')
+        .select(
+      'puan, mesafepuan, bayrakpuan, baskentpuan, '
+          'mesafedogru, mesafeyanlis, '
+          'bayrakdogru, bayrakyanlis, '
+          'baskentdogru, baskentyanlis',
+    )
+        .eq('user_id', uid)
+        .maybeSingle();
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+    if (data == null) return;
 
-      users = data['users'].map((user) {
-        return {
-          'name': user['name'] ?? '',
-          'uid': user['uid'] ?? '',
-          'profilurl': user['profilurl'] ??
-              'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
-          'puan': int.parse(user['puan'] ?? "0"),
-          'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
-          'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
-          'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
-          'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
-          'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
-          'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
-          'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
-          'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
-          'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
-        };
-      }).toList();
+    final cloudPuan = (data['puan'] ?? 0) as int;
 
-      for (var user in users) {
-        if (user['uid'] == uid) {
-          debugPrint('uidler eşleşti');
-          if (toplampuan < user['puan']) {
-            debugPrint('puan daha düşük güncellendi');
-            uid = user['uid'];
-            name = user['name'];
-            profilurl = user['profilurl'];
-            toplampuan = user['puan'];
-            mesafepuan = user['mesafepuan'];
-            baskentpuan = user['baskentpuan'];
-            bayrakpuan = user['bayrakpuan'];
-            mesafedogru = user['mesafedogru'];
-            baskentdogru = user['baskentdogru'];
-            bayrakdogru = user['bayrakdogru'];
-            mesafeyanlis = user['mesafeyanlis'];
-            baskentyanlis = user['baskentyanlis'];
-            bayrakyanlis = user['bayrakyanlis'];
-            writeToFile();
-          }
-          break;
-        }
-      }
+    // 🔹 Bulut > Local → Local güncelle
+    if (cloudPuan > toplampuan) {
+      debugPrint(
+        '☁️ Bulut puanı ($cloudPuan) yerel puandan ($toplampuan) yüksek. Senkronize ediliyor...',
+      );
 
-      print("Veri başarıyla güncellendi.");
-    } else {
-      throw Exception('Veri yüklenemedi.');
+      toplampuan = cloudPuan;
+
+      mesafepuan = data['mesafepuan'] ?? 0;
+      bayrakpuan = data['bayrakpuan'] ?? 0;
+      baskentpuan = data['baskentpuan'] ?? 0;
+
+      mesafedogru = data['mesafedogru'] ?? 0;
+      mesafeyanlis = data['mesafeyanlis'] ?? 0;
+      bayrakdogru = data['bayrakdogru'] ?? 0;
+      bayrakyanlis = data['bayrakyanlis'] ?? 0;
+      baskentdogru = data['baskentdogru'] ?? 0;
+      baskentyanlis = data['baskentyanlis'] ?? 0;
+
+      await writeToFile();
+    }
+
+    // 🔹 Local > Bulut → Buluta gönder
+    else if (toplampuan > cloudPuan) {
+      debugPrint('📤 Yerel puan daha yüksek. Buluta gönderiliyor...');
+
+      await _supabase.from('geogame_stats').upsert({
+        'user_id': uid,
+        'puan': toplampuan,
+
+        'mesafepuan': mesafepuan,
+        'mesafedogru': mesafedogru,
+        'mesafeyanlis': mesafeyanlis,
+
+        'bayrakpuan': bayrakpuan,
+        'bayrakdogru': bayrakdogru,
+        'bayrakyanlis': bayrakyanlis,
+
+        'baskentpuan': baskentpuan,
+        'baskentdogru': baskentdogru,
+        'baskentyanlis': baskentyanlis,
+
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id');
+
+      debugPrint('✅ Skorlar Supabase\'e gönderildi');
     }
   } catch (e) {
-    print('Hata: $e');
+    debugPrint('❌ Puan senkronizasyon hatası: $e');
   }
 }
 
-Future<String> getCountry() async {
-  final url = Uri.parse('https://am.i.mullvad.net/country');
-  try {
-    // HTTP GET isteği gönderiyoruz
-    final response = await http.get(url);
+Future<void> sendAnalytics() async {
+  final session = _supabase.auth.currentSession;
 
-    if (response.statusCode == 200) {
-      // İstek başarılıysa, cevabı string olarak döndürüyoruz
-      return response.body;
-    } else {
-      throw Exception('Hata: ${response.statusCode}');
+  final response = await _supabase.functions.invoke(
+    'collect-analytics',
+    headers: session != null
+        ? {
+      'Authorization': 'Bearer ${session.accessToken}',
     }
-  } catch (e) {
-    throw Exception('Hata oluştu: $e');
-  }
+        : null, // session yoksa anonim gider
+    body: {
+      'appId': 'geogame',
+      'uid': uid,
+      'endpoint': '/page/main',
+    },
+  );
+  //debugPrint("Analytics response: ${response.data}");
 }
 
-Future<void> postLeadboard() async {
-  try {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String localVersion = packageInfo.version;
-    String country = (await getCountry()).replaceAll('\n', '');
-
-    final fullMessage = '{\n'
-        '"mesaj": "Log Mesajı",\n'
-        '"name": "$name",\n'
-        '"uid": "$uid",\n'
-        '"profilurl": "$profilurl",\n'
-        '"surum": "$localVersion",\n'
-        '"ulke": "$country",\n'
-        '"toplampuan": "$toplampuan",\n'
-        '"mesafedogru": "$mesafedogru",\n'
-        '"mesafeyanlis": "$mesafeyanlis",\n'
-        '"bayrakdogru": "$bayrakdogru",\n'
-        '"bayrakyanlis": "$bayrakyanlis",\n'
-        '"baskentdogru": "$baskentdogru",\n'
-        '"baskentyanlis": "$baskentyanlis",\n'
-        '"mesafepuan": "$mesafepuan",\n'
-        '"bayrakpuan": "$bayrakpuan",\n'
-        '"baskentpuan": "$baskentpuan"\n'
-        '}';
-
-    // Diğer mesajı gönder
-    final targetUrl = 'https://geogame-api.keremkk.com.tr/api/post_leadboard';
-    final response = await http
-        .post(
-          Uri.parse(targetUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({'message': fullMessage}),
-        )
-        .timeout(Duration(seconds: 30));
-
-    if (response.statusCode == 200) {
-      debugPrint('Log başarıyla gönderildi!');
-    } else {
-      debugPrint('Log gönderilemedi: ${response.statusCode}');
-    }
-  } catch (e) {
-    debugPrint('Hata: $e');
-  }
-}
-
-Future<void> postUlkeLog(String message) async {
-  try {
-    final targetUrl = 'https://geogame-api.keremkk.com.tr/api/ulkelog';
-    final response = await http
-        .post(
-          Uri.parse(targetUrl),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({'message': message}),
-        )
-        .timeout(Duration(seconds: 30));
-
-    if (response.statusCode == 200) {
-      debugPrint('Ulke Log başarıyla gönderildi!');
-    } else {
-      debugPrint('Ulke Log gönderilemedi: ${response.statusCode}');
-    }
-  } catch (e) {
-    debugPrint('Hata: $e');
-  }
-}
-
-// Listeler
 Ulkeler gecici = Ulkeler(
   bayrak: '',
   enisim: '',
@@ -1120,8 +1106,8 @@ List<Ulkeler> ulke = [
     url: "https://flagcdn.com/w320/za.png",
     bayrak: "assets/bayraklar/guneyafrika.png",
     enisim: "Southafrica",
-    isim: "Guneyafrika",
-    baskent: "Pretoriabloemfonteincapetown",
+    isim: "Guney afrika",
+    baskent: "Pretoria bloemfontein capetown",
     kita: "Africa",
     bm: true,
     enlem: -29,
@@ -3476,8 +3462,8 @@ List<Ulkeler> ulke = [
     url: "https://flagcdn.com/w320/ge.png",
     bayrak: "assets/bayraklar/gurcistan.png",
     enisim: "Georgia",
-    isim: "Gurcistan",
-    baskent: "Tbilisi",
+    isim: "Gürcistan",
+    baskent: "Tiflis",
     kita: "Asia",
     bm: true,
     enlem: 42,

@@ -7,7 +7,7 @@ plugins {
 android {
     compileSdkVersion 35
 
-    namespace = "com.kk.geogame"
+    namespace = "com.keremkuyucu.geogame"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -37,16 +37,16 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file("C:\\Users\\Kerem\\Projects\\Flutter\\geogame\\ksk.jks")  // Gerçek dosya yolu
-            storePassword "kerem2008"  // Keystore şifresi
-            keyAlias "ksk"  // Keystore'da belirlediğiniz alias
-            keyPassword "kerem2008"  // Alias'a ait şifre
+            storeFile file("C:\\Users\\Kerem\\Projects\\Flutter\\geogame\\ksk.jks")
+            storePassword "kerem2008"
+            keyAlias "ksk"
+            keyPassword "kerem2008"
         }
         release {
-            storeFile file("C:\\Users\\Kerem\\Projects\\Flutter\\geogame\\ksk.jks")  // Gerçek dosya yolu
-            storePassword "kerem2008"  // Keystore şifresi
-            keyAlias "ksk"  // Keystore'da belirlediğiniz alias
-            keyPassword "kerem2008"  // Alias'a ait şifre
+            storeFile file("C:\\Users\\Kerem\\Projects\\Flutter\\geogame\\ksk.jks")
+            storePassword "kerem2008"
+            keyAlias "ksk"
+            keyPassword "kerem2008"
         }
     }
     buildTypes {
@@ -69,4 +69,12 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.browser:browser:1.8.0'
+        force 'androidx.core:core-ktx:1.13.1'
+        force 'androidx.core:core:1.13.1'
+    }
 }

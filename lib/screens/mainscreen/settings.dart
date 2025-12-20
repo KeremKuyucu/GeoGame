@@ -1,5 +1,9 @@
-import 'package:GeoGame/util.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:geogame/util.dart';
+import 'package:geogame/screens/auth/authpage.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -7,170 +11,146 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  Timer? _clipboardTimer;
+  final SupabaseClient _supabase = Supabase.instance.client;
 
   @override
   void initState() {
     super.initState();
-    readFromFile((update) => setState(update));
+    _initializeSettings();
+  }
+
+  /// Uygulama başladığında yerel verileri yükle ve oturumu doğrula
+  Future<void> _initializeSettings() async {
+    await readFromFile((update) => setState(update));
+    await _checkCurrentUser();
+
     if (getSelectableCountryCount() < 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _kitaUyari();
       });
     }
   }
-  void dispose() {
-    _clipboardTimer?.cancel();
-    super.dispose();
-  }
-  void _startClipboardTimer() {
-    _clipboardTimer = Timer.periodic(Duration(seconds: 2), _checkClipboard);
-  }
-  void _stopClipboardTimer() {
-    _clipboardTimer?.cancel();
-    _clipboardTimer = null;
-  }
-  void _checkClipboard(Timer timer) async {
-    if (uid.isNotEmpty) {
-      _stopClipboardTimer();
+
+  // --- SUPABASE İŞLEMLERİ ---
+
+  Future<void> _checkCurrentUser() async {
+    final session = _supabase.auth.currentSession;
+
+    if (session == null || session.user == null) {
+      await _handleLocalReset(); // Oturum yoksa merkezi sıfırlama
       return;
     }
 
-    ClipboardData? clipboardData = await Clipboard.getData('text/plain');
-    String? text = clipboardData?.text;
-    if (text != null && text.isNotEmpty) {
-      try {
-        var jsonData = jsonDecode(text);
-        if (jsonData is Map && jsonData.containsKey('user') && jsonData['user'] is Map) {
-          var user = jsonData['user'];
-          setState(() {
-            uid = user['uid'];
-            name = user['displayName'];
-            profilurl = user['profilePicture'];
-            writeToFile();
-            puanguncelle();
-            Clipboard.setData(ClipboardData(text: ''));
-          });
+    final authUser = session.user!;
+    uid = authUser.id;
 
-          debugPrint('Geçerli JSON verisi: $jsonData');
-          debugPrint('UID: $uid');
-          debugPrint('Display Name: $name');
-          debugPrint('Profile Picture: $profilurl');
-          _stopClipboardTimer();
-        } else {
-          debugPrint('Geçerli JSON verisi değil.');
-        }
-      } catch (e) {
-        debugPrint('Geçerli bir JSON verisi değil: $e');
+    // Yerel veriler zaten varsa gereksiz ağ trafiğini engelle
+    if (name.isNotEmpty && profilurl != 'https://geogame-cdn.keremkk.com.tr/anon.png') {
+      puanguncelle();
+      return;
+    }
+
+    try {
+      final profileData = await _supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('uid', authUser.id)
+          .maybeSingle();
+
+      if (mounted && profileData != null) {
+        setState(() {
+          name = profileData['full_name'] ?? authUser.email?.split('@')[0] ?? 'Oyuncu';
+          profilurl = profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
+        });
+        await writeToFile();
+        puanguncelle();
       }
+    } catch (e) {
+      debugPrint("Senkronizasyon Hatası: $e");
     }
   }
-  void _selectIndex(int index) async {
+  Future<void> _signOut() async {
+    try {
+      await _supabase.auth.signOut();
+      await _handleLocalReset(); // Çıkış yapınca merkezi sıfırlama
+      _showSnackBar(Yazi.get('cikisbasarili'), Colors.green);
+    } catch (e) {
+      _showSnackBar(Yazi.get('cikishata'), Colors.red);
+    }
+  }
+  Future<void> _handleLocalReset() async {
+    if (!mounted) return;
+
     setState(() {
-      selectedIndex = index;
+      uid = '';
+      name = '';
+      profilurl = 'https://geogame-cdn.keremkk.com.tr/anon.png';
+      mesafedogru = 0; mesafeyanlis = 0;
+      bayrakdogru = 0; bayrakyanlis = 0;
+      baskentdogru = 0; baskentyanlis = 0;
+      mesafepuan = 0; bayrakpuan = 0; baskentpuan = 0;
+      toplampuan = 0;
     });
-    if (selectedIndex == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => GeoGameLobi()),
-      );
-    } else if (selectedIndex == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Leadboard()),
-      );
-    } else if (selectedIndex == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Profiles()),
-      );
-    } else if (selectedIndex == 3 ) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SettingsPage()),
+
+    await writeToFile();
+    puanguncelle(); // UI üzerindeki tüm puan hesaplamalarını sıfırla
+  }
+
+  // --- YARDIMCI METODLAR ---
+
+  Future<void> _openWebAuth() async {
+    final Uri url = Uri.parse('https://auth.keremkk.com.tr');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      _showSnackBar('Site açılamadı.', Colors.red);
+    }
+  }
+
+  void _showSnackBar(String message, Color color) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: color,
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 3),
+        ),
       );
     }
   }
+
+  void _selectIndex(int index) {
+    if (index == selectedIndex) return;
+    setState(() => selectedIndex = index);
+
+    Widget page;
+    switch (index) {
+      case 0: page = GeoGameLobi(); break;
+      case 1: page = Leadboard(); break;
+      case 2: page = Profiles(); break;
+      case 3: return;
+      default: page = GeoGameLobi();
+    }
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => page));
+  }
+
   void restartApp() {
     selectedIndex = 0;
     Yazi.loadDil(secilenDil);
-    Navigator.pushReplacement(
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeoGameLobi()));
+  }
+
+  /// Login sayfasına git
+  void _navigateToLogin() {
+    Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => GeoGameLobi()),
-    );
-  }
-  Future<void> _kitaUyari() async {
-    Yazi.loadDil(secilenDil);
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(Yazi.get('kitayari')),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(Yazi.get('kitayari1')),
-                Text(Yazi.get('kitayari2')),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(Yazi.get('tamam')),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  Future<void> signOut() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('"$name" adlı hesaptan çıkış yaptınız.'),
+      MaterialPageRoute(
+        builder: (context) => LoginPage(
+          onLoginSuccess: () {
+            setState(() {}); // Settings sayfasını yenile
+          },
+        ),
       ),
     );
-    try {
-      final targetUrl = 'https://geogame-api.keremkk.com.tr/api/geogamesignlog';
-      final response = await http
-          .post(
-            Uri.parse(targetUrl),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode({
-              'uid': uid,
-              'name': name,
-            }),
-          )
-          .timeout(Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
-        debugPrint('Mesaj başarıyla gönderildi!');
-      } else {
-        debugPrint('Mesaj gönderilemedi: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Hata: $e');
-    }
-    setState(() {
-      name = '';
-      uid = '';
-      profilurl = 'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363';
-      toplampuan = 0;
-      mesafepuan = 0;
-      baskentpuan = 0;
-      bayrakpuan = 0;
-      mesafedogru = 0;
-      baskentdogru = 0;
-      bayrakdogru = 0;
-      mesafeyanlis = 0;
-      baskentyanlis = 0;
-      bayrakyanlis = 0;
-      writeToFile();
-    });
-    _startClipboardTimer();
   }
 
   @override
@@ -182,263 +162,22 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
       ),
       drawer: DrawerWidget(),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  elevation: 12.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  shadowColor: Colors.black.withOpacity(0.3),
-                  color: Colors.grey.shade900,
-                  child: Container(
-                    padding: const EdgeInsets.all(25.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30.0),
-                      gradient: LinearGradient(
-                        colors: [Colors.grey.shade800, Colors.black87],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (uid.isEmpty) ...[
-                          ElevatedButton(
-                            onPressed: () {
-                              _startClipboardTimer();
-                              EasyLauncher.url(url: 'https://geogame-auth.keremkk.com.tr');
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 35.0, vertical: 14.0),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              Yazi.get('giris'),
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            Yazi.get('oturummesaj'),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
-                        ] else ...[
-                          AnimatedContainer(
-                            duration: Duration(milliseconds: 600),
-                            curve: Curves.easeInOut,
-                            height: 110.0,
-                            width: 110.0,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: NetworkImage(profilurl),
-                                fit: BoxFit.cover,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 10.0,
-                                  spreadRadius: 1.5,
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 12),
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                          SizedBox(height: 15),
-                          ElevatedButton(
-                            onPressed: signOut,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              padding: EdgeInsets.symmetric(horizontal: 35.0, vertical: 14.0),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              Yazi.get('cikis'),
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-              ), // oturum açma
+              _buildAccountCard(),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  Yazi.get('digerayarlar'),
-                  style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                ),
-              ), // baslık
-              buildSwitch(Yazi.get('siklimod'), yazmamodu, (value) {
-                setState(() {
-                  yazmamodu = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('tema') + (darktema ? 'Dark' : 'Light'), darktema, (value) {
-                setState(() {
-                  darktema = value;
-                  if (darktema)
-                    ThemeModeBuilderConfig.setDark();
-                  else
-                    ThemeModeBuilderConfig.setLight();
-                  writeToFile();
-                });
-              }),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(Yazi.get('dil'), style: TextStyle(fontSize: 16.0)),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      child: DropdownButton<String>(
-                        hint: Text(secilenDil),
-                        isExpanded: true,
-                        items: diller.map((String dil) {
-                          return DropdownMenuItem<String>(
-                            value: dil,
-                            child: Text(dil),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            secilenDil = value.toString();
-                            writeToFile();
-                          });
-                          restartApp();
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ), // dil değiştirme
-              if (secilenDil != "Türkçe")
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'If there is a translation error,',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'please report the error.',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'The translations are machine translations.',
-                          style: TextStyle(
-                              fontSize: 16.0, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
-                ), // makine çeviri uyarısı
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  Yazi.get('kitasecenek'),
-                  style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
-                ),
-              ), // baslık
-              buildSwitch(Yazi.get('sadecebm'), sadecebm, (value) {
-                setState(() {
-                  sadecebm = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('amerika'), amerikakitasi, (value) {
-                setState(() {
-                  amerikakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('asya'), asyakitasi, (value) {
-                setState(() {
-                  asyakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('afrika'), afrikakitasi, (value) {
-                setState(() {
-                  afrikakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('avrupa'), avrupakitasi, (value) {
-                setState(() {
-                  avrupakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('okyanusya'), okyanusyakitasi, (value) {
-                setState(() {
-                  okyanusyakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('antartika'), antartikakitasi, (value) {
-                setState(() {
-                  antartikakitasi = value;
-                  writeToFile();
-                });
-              }),
-              buildSwitch(Yazi.get('bmuyelik'), bmuyeligi, (value) {
-                setState(() {
-                  bmuyeligi = value;
-                  writeToFile();
-                });
-              }),
+              _buildGeneralSettings(),
+              _buildContinentSettings(),
+              SizedBox(height: 40),
             ],
           ),
         ),
@@ -448,32 +187,317 @@ class _SettingsPageState extends State<SettingsPage> {
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) {
-          setState(() {
-            if (getSelectableCountryCount() > 0) selectedIndex = index;
-          });
-          _selectIndex(selectedIndex);
+          if (getSelectableCountryCount() > 0 || index == 3) {
+            _selectIndex(index);
+          } else {
+            _kitaUyari();
+          }
         },
         items: navBarItems,
       ),
     );
   }
-}
 
-Widget buildSwitch( String title, bool currentValue, ValueChanged<bool> onChanged) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  // --- UI BİLEŞENLERİ ---
+
+  Widget _buildAccountCard() {
+    return Card(
+      elevation: 12.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(25.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30.0),
+          gradient: LinearGradient(
+            colors: darktema
+                ? [Colors.grey.shade900, Colors.black87]
+                : [Colors.blue.shade50, Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: uid.isEmpty ? _buildGuestUI() : _buildProfileUI(),
+      ),
+    );
+  }
+
+  /// Misafir kullanıcı UI (Giriş yap butonu)
+  Widget _buildGuestUI() {
+    return Column(
       children: [
-        Text(title, style: TextStyle(fontSize: 16.0)),
-        Switch(
-          value: currentValue,
-          onChanged: onChanged,
-          activeColor: Colors.green,
-          inactiveTrackColor: Colors.grey,
-          inactiveThumbColor: Colors.red,
+        Icon(
+          Icons.account_circle,
+          size: 80,
+          color: darktema ? Colors.white38 : Colors.grey[400],
+        ),
+        SizedBox(height: 15),
+        Text(
+          Yazi.get('misafir'),
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: darktema ? Colors.white : Colors.black87,
+          ),
+        ),
+        SizedBox(height: 10),
+        Text(
+          Yazi.get('girisaciklama'),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            color: darktema ? Colors.white70 : Colors.grey[700],
+          ),
+        ),
+        SizedBox(height: 25),
+
+        // Giriş Yap Butonu
+        ElevatedButton.icon(
+          onPressed: _navigateToLogin,
+          icon: Icon(Icons.login),
+          label: Text(Yazi.get('giris')),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 5,
+          ),
+        ),
+        SizedBox(height: 15),
+
+        // Kayıt ol linki
+        TextButton(
+          onPressed: _openWebAuth,
+          child: Text(
+            Yazi.get('kayitol'),
+            style: TextStyle(
+              color: darktema ? Colors.white70 : Colors.blueAccent,
+              decoration: TextDecoration.underline,
+            ),
+          ),
         ),
       ],
-    ),
-  );
+    );
+  }
+
+  /// Giriş yapmış kullanıcı UI
+  Widget _buildProfileUI() {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 50,
+          backgroundImage: NetworkImage(profilurl),
+          backgroundColor: Colors.white10,
+        ),
+        SizedBox(height: 12),
+        Text(
+          name,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: darktema ? Colors.white : Colors.black87,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          '${Yazi.get('toplampuan')}: $toplampuan',
+          style: TextStyle(
+            fontSize: 16,
+            color: darktema ? Colors.white70 : Colors.grey[700],
+          ),
+        ),
+        SizedBox(height: 20),
+
+        // Profil düzenle butonu
+        OutlinedButton.icon(
+          onPressed: _openWebAuth,
+          icon: Icon(Icons.edit, color: Colors.blueAccent),
+          label: Text(Yazi.get('profilduzenleme')),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: Colors.blueAccent),
+            foregroundColor: Colors.blueAccent,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+        SizedBox(height: 10),
+
+        // Çıkış yap butonu
+        ElevatedButton.icon(
+          onPressed: _signOut,
+          icon: Icon(Icons.logout),
+          label: Text(Yazi.get('cikis')),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGeneralSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          Yazi.get('digerayarlar'),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        _switchRow(
+          Yazi.get('siklimod'),
+          yazmamodu,
+              (v) => setState(() {
+            yazmamodu = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('tema') + (darktema ? ' Dark' : ' Light'),
+          darktema,
+              (v) {
+            setState(() {
+              darktema = v;
+              darktema
+                  ? ThemeModeBuilderConfig.setDark()
+                  : ThemeModeBuilderConfig.setLight();
+              writeToFile();
+            });
+          },
+        ),
+        _buildLanguageSelector(),
+      ],
+    );
+  }
+
+  Widget _buildLanguageSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(Yazi.get('dil'), style: TextStyle(fontSize: 16.0)),
+          DropdownButton<String>(
+            value: secilenDil,
+            items: diller
+                .map((dil) => DropdownMenuItem(value: dil, child: Text(dil)))
+                .toList(),
+            onChanged: (v) {
+              if (v != null) {
+                setState(() => secilenDil = v);
+                writeToFile();
+                restartApp();
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContinentSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
+        Text(
+          Yazi.get('kitasecenek'),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        _switchRow(
+          Yazi.get('sadecebm'),
+          sadecebm,
+              (v) => setState(() {
+            sadecebm = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('amerika'),
+          amerikakitasi,
+              (v) => setState(() {
+            amerikakitasi = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('asya'),
+          asyakitasi,
+              (v) => setState(() {
+            asyakitasi = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('afrika'),
+          afrikakitasi,
+              (v) => setState(() {
+            afrikakitasi = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('avrupa'),
+          avrupakitasi,
+              (v) => setState(() {
+            avrupakitasi = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('okyanusya'),
+          okyanusyakitasi,
+              (v) => setState(() {
+            okyanusyakitasi = v;
+            writeToFile();
+          }),
+        ),
+        _switchRow(
+          Yazi.get('bmuyelik'),
+          bmuyeligi,
+              (v) => setState(() {
+            bmuyeligi = v;
+            writeToFile();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _switchRow(String title, bool val, ValueChanged<bool> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: TextStyle(fontSize: 16.0)),
+          Switch(
+            value: val,
+            onChanged: onChanged,
+            activeColor: Colors.green,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _kitaUyari() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(Yazi.get('kitayari')),
+        content: Text("${Yazi.get('kitayari1')}\n${Yazi.get('kitayari2')}"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(Yazi.get('tamam')),
+          )
+        ],
+      ),
+    );
+  }
 }

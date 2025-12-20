@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 
 class BayrakOyun extends StatefulWidget {
   @override
@@ -53,26 +53,14 @@ class _BayrakOyunState extends State<BayrakOyun> {
   void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(_controller.text.trim())) {
-        String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
         bayrakdogru++;
         bayrakpuan += puan;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "bayrak",\n'
-            '"mesaj": "Cevap Doğru",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
         Dogru();
       } else {
-        String ulke = _controller.text.trim();
         puan -= 10;
         Yanlis();
         if (puan < 20) puan = 20;
@@ -80,16 +68,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
         _controller.clear();
         bayrakyanlis++;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "bayrak",\n'
-            '"mesaj": "Cevap Yanlış",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
     });
   }
@@ -104,17 +82,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
         return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
       },
     );
-    String ulke = _controller.text.trim();
-    postUlkeLog('{\n"name": "$name",\n'
-        '"uid": "$uid",\n'
-        '"oyunmodu": "bayrak",\n'
-        '"mesaj": "Pas Geçildi",\n'
-        '"dogrucevap": "${kalici.isim}",\n'
-        '"verilencevap": "$ulke",\n'
-        '"yesil": "${butonAnahtarlar[0]}",\n'
-        '"sari": "${butonAnahtarlar[1]}",\n'
-        '"mavi": "${butonAnahtarlar[2]}",\n'
-        '"kirmizi": "${butonAnahtarlar[3]}"\n}');
     setState(() {
       yeniulkesec();
       _controller.clear();

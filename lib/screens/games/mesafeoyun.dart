@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 
 class MesafeOyun extends StatefulWidget {
   @override
@@ -71,35 +71,21 @@ class _MesafeOyunState extends State<MesafeOyun> {
           pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) +
           "\n";
       if (kalici.ks(_controller.text.trim())) {
-        String ulke = _controller.text.trim();
         _controller.clear();
         message = '';
         yeniulkesec();
         mesafedogru++;
         mesafepuan += puan;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "mesafe",\n'
-            '"mesaj": "Cevap Doğru",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n');
         puan = 300;
         Dogru();
       } else {
-        String ulke = _controller.text.trim();
         puan -= 10;
         Yanlis();
         if (puan < 100) puan = 100;
         _controller.clear();
         mesafeyanlis++;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "mesafe",\n'
-            '"mesaj": "Cevap Yanlış",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n');
       }
     });
   }
@@ -114,13 +100,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
         return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
       },
     );
-    String ulke = _controller.text.trim();
-    postUlkeLog('{\n"name": "$name",\n'
-        '"uid": "$uid",\n'
-        '"oyunmodu": "mesafe",\n'
-        '"mesaj": "Pas Geçildi",\n'
-        '"dogrucevap": "${kalici.isim}",\n'
-        '"verilencevap": "$ulke",\n');
     setState(() {
       message = '';
       yeniulkesec();

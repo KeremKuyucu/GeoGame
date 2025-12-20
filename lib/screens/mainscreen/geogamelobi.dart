@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 import 'package:http/http.dart' as http;
 
 class GeoGameLobi extends StatefulWidget {
@@ -19,26 +19,32 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
+    await readFromFile((update) {
+      if (!mounted) return;
+      setState(update);
+    });
+    if (!mounted) return;
     setState(() {
       Yazi.dilDegistir();
     });
     yeniulkesec();
     surumKiyasla();
+    if (!mounted) return;
     if (uid.isEmpty) {
-      selectedIndex=4;
+      selectedIndex = 4;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
       );
+      return;
     } else {
-      postLeadboard();
-      puanguncelle();
+      sendAnalytics();
     }
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
   }
+
   Future<void> surumKiyasla() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String localVersion = packageInfo.version;
@@ -101,7 +107,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       print('Hata: $e');
     }
   }
-
   void _selectOption(int index) async {
     setState(() {
       _selectedOption = index;
@@ -164,6 +169,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
