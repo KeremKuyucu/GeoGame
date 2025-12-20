@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 
 class BayrakOyunCoop extends StatefulWidget {
   @override
@@ -53,7 +53,6 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
   void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(_controller.text.trim())) {
-        String ulke = _controller.text.trim();
         ekrancevir();
         _controller.clear();
         _controller.text = "";
@@ -61,20 +60,9 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
         bayrakdogru++;
         bayrakpuan += puan;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "bayrak coop",\n'
-            '"mesaj": "Cevap Doğru",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
         Dogru();
       } else {
-        String ulke = _controller.text.trim();
         puan -= 10;
         Yanlis();
         if (puan < 20) puan = 20;
@@ -83,16 +71,6 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
         _controller.text = "";
         bayrakyanlis++;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "bayrak",\n'
-            '"mesaj": "Cevap Yanlış",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
     });
   }

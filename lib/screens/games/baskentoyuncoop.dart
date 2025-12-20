@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 
 class BaskentOyunCoop extends StatefulWidget {
   @override
@@ -54,27 +54,15 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
   void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(_controller.text.trim())) {
-        String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
         ekrancevir();
         baskentdogru++;
         baskentpuan += puan;
         writeToFile();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "baskent coop",\n'
-            '"mesaj": "Cevap Doğru",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
         puan = 50;
         Dogru();
       } else {
-        String ulke = _controller.text.trim();
         puan -= 10;
         Yanlis();
         if (puan < 20) puan = 20;
@@ -82,16 +70,6 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         baskentyanlis++;
         writeToFile();
         butontiklama[i] = false;
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "baskent",\n'
-            '"mesaj": "Cevap Yanlış",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
     });
   }

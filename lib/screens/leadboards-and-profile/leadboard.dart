@@ -1,11 +1,15 @@
-import 'package:GeoGame/util.dart';
-import 'package:http/http.dart' as http;
+import 'package:geogame/util.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Leadboard extends StatefulWidget {
   @override
   _LeadboardState createState() => _LeadboardState();
 }
+
 class _LeadboardState extends State<Leadboard> {
+  final SupabaseClient _supabase = Supabase.instance.client;
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -13,9 +17,10 @@ class _LeadboardState extends State<Leadboard> {
   }
 
   Future<void> _initializeGame() async {
-    fetchData();
+    await fetchLeaderboardFromSupabase();
     await readFromFile((update) => setState(update));
   }
+
   void _selectIndex(int index) async {
     setState(() {
       selectedIndex = index;
@@ -35,54 +40,93 @@ class _LeadboardState extends State<Leadboard> {
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 3 ) {
+    } else if (selectedIndex == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
       );
     }
   }
-  Future<void> fetchData() async {
+
+  /// ✅ Supabase'den leaderboard verilerini çek
+  Future<void> fetchLeaderboardFromSupabase() async {
+    setState(() => _isLoading = true);
+
     try {
-      final response = await http.get(
-        Uri.parse('https://geogame-api.keremkk.com.tr/api/get_leadboard'),
-      );
+      // 1️⃣ Tüm kullanıcı ID'lerini ve istatistiklerini çek
+      final statsResponse = await _supabase
+          .from('geogame_stats')
+          .select()
+          .order('puan', ascending: false);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(utf8.decode(response.bodyBytes));
-
-    setState(() {
-          users = data['users'].map((user) {
-            return {
-              'name': user['name'] ?? '',
-              'uid': user['uid'] ?? '',
-              'profilurl': user['profilurl'] ??
-                  'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363',
-              'puan': int.parse(user['puan'] ?? "0"),
-              'mesafepuan': int.tryParse(user['mesafepuan'] ?? '0') ?? 0,
-              'baskentpuan': int.tryParse(user['baskentpuan'] ?? '0') ?? 0,
-              'bayrakpuan': int.tryParse(user['bayrakpuan'] ?? '0') ?? 0,
-              'mesafedogru': int.tryParse(user['mesafedogru'] ?? '0') ?? 0,
-              'baskentdogru': int.tryParse(user['baskentdogru'] ?? '0') ?? 0,
-              'bayrakdogru': int.tryParse(user['bayrakdogru'] ?? '0') ?? 0,
-              'mesafeyanlis': int.tryParse(user['mesafeyanlis'] ?? '0') ?? 0,
-              'baskentyanlis': int.tryParse(user['baskentyanlis'] ?? '0') ?? 0,
-              'bayrakyanlis': int.tryParse(user['bayrakyanlis'] ?? '0') ?? 0,
-            };
-          }).toList();
-
-          // Kullanıcıları puanlarına göre sıralama
-          users.sort((a, b) => b['puan'].compareTo(a['puan']));
+      if (statsResponse == null || statsResponse.isEmpty) {
+        debugPrint('Hiç istatistik verisi bulunamadı');
+        setState(() {
+          users = [];
+          _isLoading = false;
         });
-
-        print("Veri başarıyla güncellendi.");
-      } else {
-        throw Exception('Veri yüklenemedi.');
+        return;
       }
+
+      // 2️⃣ Tüm kullanıcı ID'lerini topla
+      final userIds = statsResponse.map((stat) => stat['user_id'] as String).toList();
+
+      // 3️⃣ Tüm profilleri tek seferde çek
+      final profilesResponse = await _supabase
+          .from('profiles')
+          .select()
+          .inFilter('uid', userIds); // ✅ in_ yerine inFilter
+
+      // 4️⃣ Profilleri Map'e çevir (hızlı erişim için)
+      final profilesMap = <String, Map<String, dynamic>>{};
+      for (var profile in profilesResponse) {
+        profilesMap[profile['uid']] = profile;
+      }
+
+      // 5️⃣ Verileri birleştir
+      List<Map<String, dynamic>> leaderboardData = statsResponse.map<Map<String, dynamic>>((stat) {
+        final userId = stat['user_id'] as String;
+        final profile = profilesMap[userId];
+
+        return {
+          'name': profile?['full_name'] ?? 'Anonim Oyuncu',
+          'uid': userId,
+          'profilurl': profile?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+          'puan': (stat['puan'] ?? 0) as int,
+          'mesafepuan': (stat['mesafepuan'] ?? 0) as int,
+          'baskentpuan': (stat['baskentpuan'] ?? 0) as int,
+          'bayrakpuan': (stat['bayrakpuan'] ?? 0) as int,
+          'mesafedogru': (stat['mesafedogru'] ?? 0) as int,
+          'baskentdogru': (stat['baskentdogru'] ?? 0) as int,
+          'bayrakdogru': (stat['bayrakdogru'] ?? 0) as int,
+          'mesafeyanlis': (stat['mesafeyanlis'] ?? 0) as int,
+          'baskentyanlis': (stat['baskentyanlis'] ?? 0) as int,
+          'bayrakyanlis': (stat['bayrakyanlis'] ?? 0) as int,
+        };
+      }).toList();
+
+      setState(() {
+        users = leaderboardData;
+        _isLoading = false;
+      });
+
+      debugPrint('✅ Leaderboard başarıyla yüklendi: ${users.length} kullanıcı');
+
     } catch (e) {
-      print('Hata: $e');
+      debugPrint('❌ Leaderboard yükleme hatası: $e');
+      setState(() => _isLoading = false);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sıralama yüklenemedi: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
+
   Color _getBackgroundColor(int index) {
     switch (index) {
       case 0:
@@ -110,82 +154,107 @@ class _LeadboardState extends State<Leadboard> {
             },
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: fetchLeaderboardFromSupabase,
+            tooltip: 'Yenile',
+          ),
+        ],
       ),
       drawer: DrawerWidget(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: users.isEmpty
+        child: _isLoading
             ? Center(child: CircularProgressIndicator())
+            : users.isEmpty
+            ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.leaderboard, size: 80, color: Colors.grey),
+              SizedBox(height: 16),
+              Text(
+                'Henüz sıralamada kimse yok',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            ],
+          ),
+        )
             : ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Userprofile(
-                                  userindex: index,
-                                )),
-                      );
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Userprofile(
+                      userindex: index,
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                elevation: 5,
+                margin: EdgeInsets.symmetric(vertical: 10),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        child: Text(
+                          '${index + 1}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        radius: 15,
+                        backgroundColor: _getBackgroundColor(index),
                       ),
-                      elevation: 5,
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
+                      SizedBox(width: 8),
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          users[index]['profilurl'] ??
+                              'https://geogame-cdn.keremkk.com.tr/anon.png',
+                        ),
+                        radius: 30,
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CircleAvatar(
-                              child: Text(
-                                '${index + 1}',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              users[index]['name'] ?? 'Anonim Oyuncu',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              radius: 15,
-                              backgroundColor: _getBackgroundColor(index),
                             ),
-                            CircleAvatar(
-                                backgroundImage: NetworkImage(users[index]
-                                        ['profilurl'] ??
-                                    'https://cdn.glitch.global/e74d89f5-045d-4ad2-94c7-e2c99ed95318/2815428.png?v=1738114346363'),
-                                radius: 30),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    users[index]['name'] ?? 'Unknown Name',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Score: ${users[index]['puan'] ?? '0'}',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ],
+                            SizedBox(height: 8),
+                            Text(
+                              'Puan: ${users[index]['puan'] ?? 0}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[700],
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                ),
               ),
+            );
+          },
+        ),
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: selectedIndex,

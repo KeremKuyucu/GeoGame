@@ -1,4 +1,4 @@
-import 'package:GeoGame/util.dart';
+import 'package:geogame/util.dart';
 
 class BaskentOyun extends StatefulWidget {
   @override
@@ -53,7 +53,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
   void _checkAnswer(int i) {
     setState(() {
       if (kalici.ks(_controller.text.trim())) {
-        String ulke = _controller.text.trim();
         _controller.clear();
         yeniulkesec();
         baskentdogru++;
@@ -61,18 +60,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
         writeToFile();
         puan = 50;
         Dogru();
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "baskent",\n'
-            '"mesaj": "Cevap Doğru",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       } else {
-        String ulke = _controller.text.trim();
         puan -= 10;
         Yanlis();
         if (puan < 20) puan = 20;
@@ -80,16 +68,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
         baskentyanlis++;
         writeToFile();
         butontiklama[i] = false;
-        postUlkeLog('{\n"name": "$name",\n'
-            '"uid": "$uid",\n'
-            '"oyunmodu": "baskent",\n'
-            '"mesaj": "Cevap Yanlış",\n'
-            '"dogrucevap": "${kalici.isim}",\n'
-            '"verilencevap": "$ulke",\n'
-            '"yesil": "${butonAnahtarlar[0]}",\n'
-            '"sari": "${butonAnahtarlar[1]}",\n'
-            '"mavi": "${butonAnahtarlar[2]}",\n'
-            '"kirmizi": "${butonAnahtarlar[3]}"\n}');
       }
     });
   }
@@ -104,17 +82,6 @@ class _BaskentOyunState extends State<BaskentOyun> {
         return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
       },
     );
-    String ulke = _controller.text.trim();
-    postUlkeLog('{\n"name": "$name",\n'
-        '"uid": "$uid",\n'
-        '"oyunmodu": "baskent",\n'
-        '"mesaj": "Pas Geçildi",\n'
-        '"dogrucevap": "${kalici.isim}",\n'
-        '"verilencevap": "$ulke",\n'
-        '"yesil": "${butonAnahtarlar[0]}",\n'
-        '"sari": "${butonAnahtarlar[1]}",\n'
-        '"mavi": "${butonAnahtarlar[2]}",\n'
-        '"kirmizi": "${butonAnahtarlar[3]}"}');
     setState(() {
       yeniulkesec();
       _controller.clear();
