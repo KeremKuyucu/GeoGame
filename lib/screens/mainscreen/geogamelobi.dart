@@ -1,5 +1,10 @@
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/util.dart';
 import 'package:http/http.dart' as http;
+
+import '../../data/app_context.dart';
+import '../../data/bottomBar.dart';
+import '../../services/storage_service.dart';
 
 class GeoGameLobi extends StatefulWidget {
   @override
@@ -12,33 +17,28 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   @override
   void initState() {
     super.initState();
-    if (darktema)
+    if (AppState.settings.darkTheme)
       ThemeModeBuilderConfig.setDark();
     else
       ThemeModeBuilderConfig.setLight();
     _initializeGame();
   }
   Future<void> _initializeGame() async {
-    await readFromFile((update) {
-      if (!mounted) return;
-      setState(update);
-    });
+    await StorageService.loadLocalData();
     if (!mounted) return;
     setState(() {
-      Yazi.dilDegistir();
+      Localization.languageSwitch();
     });
     yeniulkesec();
     surumKiyasla();
     if (!mounted) return;
-    if (uid.isEmpty) {
-      selectedIndex = 4;
+    if (!AuthService.isAuthenticated) {
+      AppState.selectedIndex = 4;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
       );
       return;
-    } else {
-      sendAnalytics();
     }
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -69,7 +69,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
             barrierDismissible: false,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text(Yazi.get('surum1')),
+                title: Text(Localization.get('surum1')),
                 content: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,13 +83,13 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
                 ),
                 actions: <Widget>[
                   TextButton(
-                    child: Text(Yazi.get('surum2')),
+                    child: Text(Localization.get('surum2')),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                   ),
                   TextButton(
-                    child: Text(Yazi.get('surum3')),
+                    child: Text(Localization.get('surum3')),
                     onPressed: () {
                       Navigator.of(context).pop();
                       EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame/releases/latest');
@@ -126,17 +126,7 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         context,
         MaterialPageRoute(builder: (context) => MesafeOyun()),
       );
-    } else if (_selectedOption == 3 && getFilteredCountries().length > 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => BaskentOyunCoop()),
-      );
-    } else if (_selectedOption == 4 && getFilteredCountries().length > 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => BayrakOyunCoop()),
-      );
-    }else if (getFilteredCountries().length < 1) {
+    } else if (getFilteredCountries().length < 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -145,24 +135,24 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
   }
   void _selectIndex(int index) async {
     setState(() {
-      selectedIndex = index;
+      AppState.selectedIndex = index;
     });
-    if (selectedIndex == 0) {
+    if (AppState.selectedIndex == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
-    } else if (selectedIndex == 1) {
+    } else if (AppState.selectedIndex == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2) {
+    } else if (AppState.selectedIndex == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 3 ) {
+    } else if (AppState.selectedIndex == 3 ) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -193,31 +183,25 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
-          itemCount: 5,
+          itemCount: 3,
           itemBuilder: (context, index) {
             // Listelerle yapılandırma
             final titles = [
-              Yazi.get('baskenttitle'),
-              Yazi.get('bayraktitle'),
-              Yazi.get('mesafetitle'),
-              Yazi.get('baskentcooptitle'),
-              Yazi.get('bayrakcooptitle'),
+              Localization.get('baskenttitle'),
+              Localization.get('bayraktitle'),
+              Localization.get('mesafetitle'),
             ];
 
             final descriptions = [
-              Yazi.get('baskentdescription'),
-              Yazi.get('bayrakdescription'),
-              Yazi.get('mesafedescription'),
-              Yazi.get('baskentcoopdescription'),
-              Yazi.get('bayrakcoopdescription'),
+              Localization.get('baskentdescription'),
+              Localization.get('bayrakdescription'),
+              Localization.get('mesafedescription'),
             ];
 
             final images = [
               'assets/baskent.jpg',
               'assets/bayrak.jpg',
               'assets/mesafe.jpg',
-              'assets/baskent.jpg',
-              'assets/bayrak.jpg',
             ];
 
             return Card(
@@ -276,14 +260,14 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ),
       drawer: DrawerWidget(),
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: selectedIndex,
+        currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) async {
           setState(() {
-            selectedIndex = index;
+            AppState.selectedIndex = index;
           });
-          _selectIndex(selectedIndex);
+          _selectIndex(AppState.selectedIndex);
         },
         items: navBarItems,
       ),

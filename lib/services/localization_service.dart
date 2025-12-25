@@ -1,10 +1,13 @@
 import 'package:geogame/util.dart';
 
-class Yazi {
+import '../data/app_context.dart';
+import '../data/bottomBar.dart';
+
+class Localization {
   static Map<String, dynamic>? _localizedStrings;
   static String _currentLanguage = 'English';
 
-  static Future<void> loadDil(String dilKodu) async {
+  static Future<void> loadLocalization(String dilKodu) async {
     if (_currentLanguage == dilKodu && _localizedStrings != null) {
       return; // Dil zaten yüklü, ekstra işlem yapma
     }
@@ -26,7 +29,7 @@ class Yazi {
 
   static String get(String key) {
     if (_localizedStrings == null) {
-      dilDegistir();
+      languageSwitch();
       return '⚠️ Dil dosyası yükleniyor...';
     }
 
@@ -38,35 +41,33 @@ class Yazi {
     return '⚠️ $key bulunamadı';
   }
 
-  static Future<void> dilDegistir() async {
-    if (secilenDil.isEmpty)
-      secilenDil = diltercihi == 'tr' ? "Türkçe" : "English";
-    //await loadDil(secilenDil);
-    await Yazi.loadDil(secilenDil).then((_) {
+  static Future<void> languageSwitch() async {
+    if (AppState.settings.language.isEmpty)
+      AppState.settings.language = AppState.settings.languagePref == 'tr' ? "Türkçe" : "English";
+    await Localization.loadLocalization(AppState.settings.language).then((_) {
       navBarItems = [
         SalomonBottomBarItem(
           icon: const Icon(Icons.home),
-          title: Text(Yazi.get('navigasyonbar1')),
+          title: Text(Localization.get('navigasyonbar1')),
           selectedColor: Colors.purple,
         ),
         SalomonBottomBarItem(
           icon: const Icon(Icons.leaderboard),
-          title: Text(Yazi.get('navigasyonbar2')),
+          title: Text(Localization.get('navigasyonbar2')),
           selectedColor: Colors.pink,
         ),
         SalomonBottomBarItem(
           icon: const Icon(Icons.person),
-          title: Text(Yazi.get('navigasyonbar3')),
+          title: Text(Localization.get('navigasyonbar3')),
           selectedColor: Colors.teal,
         ),
         SalomonBottomBarItem(
           icon: const Icon(Icons.settings),
-          title: Text(Yazi.get('navigasyonbar4')),
+          title: Text(Localization.get('navigasyonbar4')),
           selectedColor: Colors.orange,
         ),
       ];
     });
-    isEnglish = (secilenDil != 'Türkçe');
   }
 }
 

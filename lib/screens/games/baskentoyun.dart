@@ -1,5 +1,8 @@
 import 'package:geogame/util.dart';
 
+import '../../data/app_context.dart';
+import '../../services/storage_service.dart';
+
 class BaskentOyun extends StatefulWidget {
   @override
   _BaskentOyunState createState() => _BaskentOyunState();
@@ -16,9 +19,10 @@ class _BaskentOyunState extends State<BaskentOyun> {
   }
 
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
     yeniulkesec();
-    baskentoyunkurallari();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      baskentoyunkurallari();
+    });
   }
 
   Future<void> baskentoyunkurallari() async {
@@ -27,19 +31,19 @@ class _BaskentOyunState extends State<BaskentOyun> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Yazi.get('kurallar')),
+          title: Text(Localization.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Yazi.get('kural1')),
-                Text(Yazi.get('baskentkural2')),
-                Text(Yazi.get('baskentkural3')),
+                Text(Localization.get('kural1')),
+                Text(Localization.get('baskentkural2')),
+                Text(Localization.get('baskentkural3')),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('tamam')),
+              child: Text(Localization.get('tamam')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -57,26 +61,25 @@ class _BaskentOyunState extends State<BaskentOyun> {
         yeniulkesec();
         baskentdogru++;
         baskentpuan += puan;
-        writeToFile();
         puan = 50;
       } else {
         puan -= 10;
         if (puan < 20) puan = 20;
         _controller.clear();
         baskentyanlis++;
-        writeToFile();
         butontiklama[i] = false;
       }
+      StorageService.saveLocalData();
     });
   }
 
   void _pasButtonPressed() {
     puan = 50;
-    String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
+    String pasulke = (AppState.settings.isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
+        return CustomNotification(baslik: Localization.get('pascevap'), metin: pasulke);
       },
     );
     setState(() {
@@ -89,7 +92,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('baskentbaslik')),
+        title: Text(Localization.get('baskentbaslik')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -119,7 +122,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  Yazi.get('baskenticerik') + kalici.baskent,
+                  Localization.get('baskenticerik') + kalici.baskent,
                   style: TextStyle(fontSize: 24),
                   textAlign: TextAlign.center,
                 ),
@@ -134,7 +137,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                         child: ElevatedButton(
                           onPressed: _pasButtonPressed,
                           child: Text(
-                            Yazi.get('pas'),
+                            Localization.get('pas'),
                             style: TextStyle(
                               color: Colors.black,
                             ),
@@ -151,7 +154,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                   ],
                 ),
                 SizedBox(height: 20),
-                if (yazmamodu)
+                if (AppState.filter.isButtonMode)
                   Column(
                     children: [
                       Row(
@@ -223,26 +226,26 @@ class _BaskentOyunState extends State<BaskentOyun> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(Yazi.get('sikgizle')),
+                          Text(Localization.get('sikgizle')),
                         ],
                       )
                     ],
                   ),
-                if (!yazmamodu)
+                if (!AppState.filter.isButtonMode)
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SearchField<Ulkeler>(
                       suggestions: ulke
                           .map(
                             (e) => SearchFieldListItem<Ulkeler>(
-                              isEnglish ? e.enisim : e.isim,
+                              AppState.settings.isEnglish ? e.enisim : e.isim,
                               item: e,
                               child: Row(
                                 children: [
                                   CircleAvatar(
                                       backgroundImage: NetworkImage(e.url)),
                                   const SizedBox(width: 10),
-                                  Text(isEnglish ? e.enisim : e.isim),
+                                  Text(AppState.settings.isEnglish ? e.enisim : e.isim),
                                 ],
                               ),
                             ),

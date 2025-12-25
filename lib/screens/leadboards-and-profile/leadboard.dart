@@ -1,6 +1,11 @@
 import 'package:geogame/util.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../data/app_context.dart';
+import '../../data/bottomBar.dart';
+
+List<dynamic> users = [];
+
 class Leadboard extends StatefulWidget {
   @override
   _LeadboardState createState() => _LeadboardState();
@@ -18,29 +23,28 @@ class _LeadboardState extends State<Leadboard> {
 
   Future<void> _initializeGame() async {
     await fetchLeaderboardFromSupabase();
-    await readFromFile((update) => setState(update));
   }
 
   void _selectIndex(int index) async {
     setState(() {
-      selectedIndex = index;
+      AppState.selectedIndex = index;
     });
-    if (selectedIndex == 0) {
+    if (AppState.selectedIndex == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
-    } else if (selectedIndex == 1) {
+    } else if (AppState.selectedIndex == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2) {
+    } else if (AppState.selectedIndex == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 3) {
+    } else if (AppState.selectedIndex == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -144,7 +148,7 @@ class _LeadboardState extends State<Leadboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('navigasyonbar2')),
+        title: Text(Localization.get('navigasyonbar2')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -257,14 +261,14 @@ class _LeadboardState extends State<Leadboard> {
         ),
       ),
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: selectedIndex,
+        currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) {
           setState(() {
-            selectedIndex = index;
+            AppState.selectedIndex = index;
           });
-          _selectIndex(selectedIndex);
+          _selectIndex(AppState.selectedIndex);
         },
         items: navBarItems,
       ),
