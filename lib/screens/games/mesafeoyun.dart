@@ -78,10 +78,8 @@ class _MesafeOyunState extends State<MesafeOyun> {
         mesafepuan += puan;
         writeToFile();
         puan = 300;
-        Dogru();
       } else {
         puan -= 10;
-        Yanlis();
         if (puan < 100) puan = 100;
         _controller.clear();
         mesafeyanlis++;
@@ -92,7 +90,6 @@ class _MesafeOyunState extends State<MesafeOyun> {
 
   void _pasButtonPressed() {
     puan = 300;
-    Yanlis();
     String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,

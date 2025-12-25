@@ -111,32 +111,32 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
     setState(() {
       _selectedOption = index;
     });
-    if (_selectedOption == 0 && getSelectableCountryCount() > 0) {
+    if (_selectedOption == 0 && getFilteredCountries().length > 0) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BaskentOyun()),
       );
-    } else if (_selectedOption == 1 && getSelectableCountryCount() > 0) {
+    } else if (_selectedOption == 1 && getFilteredCountries().length > 0) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BayrakOyun()),
       );
-    } else if (_selectedOption == 2 && getSelectableCountryCount() > 0) {
+    } else if (_selectedOption == 2 && getFilteredCountries().length > 0) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MesafeOyun()),
       );
-    } else if (_selectedOption == 3 && getSelectableCountryCount() > 0) {
+    } else if (_selectedOption == 3 && getFilteredCountries().length > 0) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BaskentOyunCoop()),
       );
-    } else if (_selectedOption == 4 && getSelectableCountryCount() > 0) {
+    } else if (_selectedOption == 4 && getFilteredCountries().length > 0) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BayrakOyunCoop()),
       );
-    }else if (getSelectableCountryCount() < 1) {
+    }else if (getFilteredCountries().length < 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),

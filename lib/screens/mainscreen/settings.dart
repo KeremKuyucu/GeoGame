@@ -19,12 +19,12 @@ class _SettingsPageState extends State<SettingsPage> {
     _initializeSettings();
   }
 
-  /// Uygulama başladığında yerel verileri yükle ve oturumu doğrula
+
   Future<void> _initializeSettings() async {
     await readFromFile((update) => setState(update));
     await _checkCurrentUser();
 
-    if (getSelectableCountryCount() < 1) {
+    if (getFilteredCountries().length < 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _kitaUyari();
       });
@@ -36,12 +36,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _checkCurrentUser() async {
     final session = _supabase.auth.currentSession;
 
-    if (session == null || session.user == null) {
-      await _handleLocalReset(); // Oturum yoksa merkezi sıfırlama
+    if (session == null) {
+      await _handleLocalReset();
       return;
     }
 
-    final authUser = session.user!;
+    final authUser = session.user;
     uid = authUser.id;
 
     // Yerel veriler zaten varsa gereksiz ağ trafiğini engelle
@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
         puanguncelle();
       }
     } catch (e) {
-      debugPrint("Senkronizasyon Hatası: $e");
+      debugPrint("Synchronization Error: $e");
     }
   }
   Future<void> _signOut() async {
@@ -101,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _openWebAuth() async {
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _showSnackBar('Site açılamadı.', Colors.red);
+      _showSnackBar(Yazi.get('siteuyari'), Colors.red);
     }
   }
 
@@ -187,7 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) {
-          if (getSelectableCountryCount() > 0 || index == 3) {
+          if (getFilteredCountries().length > 0 || index == 3) {
             _selectIndex(index);
           } else {
             _kitaUyari();

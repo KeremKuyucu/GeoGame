@@ -61,10 +61,8 @@ class _BayrakOyunCoopState extends State<BayrakOyunCoop> {
         bayrakpuan += puan;
         writeToFile();
         puan = 50;
-        Dogru();
       } else {
         puan -= 10;
-        Yanlis();
         if (puan < 20) puan = 20;
         butontiklama[i] = false;
         _controller.clear();

@@ -343,6 +343,14 @@
       "Türkçe": "Kayıt Ol",
       "English": "Sign Up"
     },
+    "loginmesaj1": {
+      "Türkçe": "Hesabınız yok mu?",
+      "English": "Don't have an account?"
+    },
+    "loginmesaj2": {
+      "Türkçe": "Web sitesinden kayıt olun",
+      "English": "Sign up with"
+    },
     "profilduzenleme": {
       "Türkçe": "Profil Düzenle",
       "English": "Edit Profile"
@@ -370,6 +378,30 @@
     "feedback_gonderildi": {
       "Türkçe": "Geri bildiriminiz iletildi.",
       "English": "Your feedback has been sent."
+    },
+    "siteuyari": {
+      "Türkçe": "Site açılamadı.",
+      "English": "Site could not be opened."
+    },
+    "boslukuyari": {
+      "Türkçe": "Lütfen tüm alanları doldurun.",
+      "English": "Please fill in all fields."
+    },
+    "girisbasarili": {
+      "Türkçe": "Giriş Başarılı",
+      "English": "Login Successful"
+    },
+    "sifre": {
+      "Türkçe": "Şifre",
+      "English": "Password"
+    },
+    "eposta": {
+      "Türkçe": "E-posta",
+      "English": "E-mail"
+    },
+    "siteuyari": {
+      "Türkçe": "Site açılamadı.",
+      "English": "Site could not be opened."
     }
   }
 }

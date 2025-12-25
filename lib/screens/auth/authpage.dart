@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackBar('Lütfen tüm alanları doldurun.', Colors.orange);
+      _showSnackBar(Yazi.get('boslukuyari'), Colors.orange);
       return;
     }
 
@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
         // Başarılı giriş - Kullanıcı bilgilerini senkronize et
         await _syncUserData(res.user!);
 
-        _showSnackBar('Giriş başarılı!', Colors.green);
+        _showSnackBar(Yazi.get('girisbasarili'), Colors.green);
         _emailController.clear();
         _passwordController.clear();
 
@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (e) {
       _showSnackBar(e.message, Colors.red);
     } catch (e) {
-      _showSnackBar('Bir hata oluştu: $e', Colors.red);
+      _showSnackBar('An error occurred: $e', Colors.red);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -149,10 +149,10 @@ class _LoginPageState extends State<LoginPage> {
       // 4️⃣ Tüm verileri locale kaydet
       await writeToFile();
 
-      debugPrint('✅ Kullanıcı verileri başarıyla senkronize edildi!');
+      debugPrint('✅ User data has been successfully synchronized!');
 
     } catch (e) {
-      debugPrint('❌ Kullanıcı verisi senkronizasyon hatası: $e');
+      debugPrint('❌ User data synchronization error: $e');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -175,9 +175,9 @@ class _LoginPageState extends State<LoginPage> {
         'avatar_url': authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
       }, onConflict: 'uid'); // ✅ uid'ye göre güncelle
 
-      debugPrint('✅ Profil oluşturuldu/güncellendi');
+      debugPrint('✅ Profile created/updated');
     } catch (e) {
-      debugPrint('❌ Profil oluşturma hatası: $e');
+      debugPrint('❌ Profile creation error: $e');
     }
   }
 
@@ -198,9 +198,9 @@ class _LoginPageState extends State<LoginPage> {
         'baskentyanlis': 0,
       }, onConflict: 'user_id'); // ✅ user_id'ye göre güncelle
 
-      debugPrint('✅ İstatistikler oluşturuldu/güncellendi');
+      debugPrint('✅ Statistics created/updated');
     } catch (e) {
-      debugPrint('❌ İstatistik oluşturma hatası: $e');
+      debugPrint('❌ Error generating statistics: $e');
     }
   }
 
@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _openWebAuth() async {
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _showSnackBar('Site açılamadı.', Colors.red);
+      _showSnackBar(Yazi.get('siteuyari'), Colors.red);
     }
   }
 
@@ -230,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Giriş Yap'),
+        title: Text(Yazi.get('giris')),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -258,14 +258,6 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Hesabınıza giriş yapın',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
                 ),
               ),
               SizedBox(height: 50),
@@ -303,53 +295,63 @@ class _LoginPageState extends State<LoginPage> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Column(
-          children: [
-            // Email alanı
-            _buildTextField(
-              controller: _emailController,
-              label: 'E-posta',
-              icon: Icons.email,
-              obscure: false,
-            ),
-            SizedBox(height: 20),
+        child: AutofillGroup(
+          child: Column(
+            children: [
+              // Email alanı
+              _buildTextField(
+                controller: _emailController,
+                label: Yazi.get('eposta'),
+                icon: Icons.email,
+                obscure: false,
+                // E-posta olduğunu belirtiyoruz
+                autofillHints: const [AutofillHints.email],
+              ),
+              SizedBox(height: 20),
 
-            // Şifre alanı
-            _buildTextField(
-              controller: _passwordController,
-              label: 'Şifre',
-              icon: Icons.lock,
-              obscure: true,
-            ),
-            SizedBox(height: 30),
+              // Şifre alanı
+              _buildTextField(
+                controller: _passwordController,
+                label: Yazi.get('sifre'),
+                icon: Icons.lock,
+                obscure: true,
+                // Şifre olduğunu belirtiyoruz
+                autofillHints: const [AutofillHints.password],
+              ),
+              SizedBox(height: 30),
 
-            // Giriş butonu
-            if (_isLoading)
-              CircularProgressIndicator()
-            else
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _signIn,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
+              // Giriş butonu
+              if (_isLoading)
+                CircularProgressIndicator()
+              else
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Butona basıldığında şifre kaydetme önerisini tetikle
+                      TextInput.finishAutofillContext();
+                      _signIn();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 5,
                     ),
-                    elevation: 5,
-                  ),
-                  child: Text(
-                    'Giriş Yap',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    child: Text(
+                      Yazi.get('giris'),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -360,7 +362,7 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: [
         Text(
-          'Hesabınız yok mu?',
+          Yazi.get('loginmesaj1'),
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey[600],
@@ -370,7 +372,7 @@ class _LoginPageState extends State<LoginPage> {
         TextButton.icon(
           onPressed: _openWebAuth,
           icon: Icon(Icons.open_in_browser),
-          label: Text('Web sitesinden kayıt olun'),
+          label: Text(Yazi.get('loginmesaj2')),
           style: TextButton.styleFrom(
             foregroundColor: Colors.blueAccent,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -386,10 +388,16 @@ class _LoginPageState extends State<LoginPage> {
     required String label,
     required IconData icon,
     required bool obscure,
+    Iterable<String>? autofillHints, // <-- YENİ EKLENDİ
   }) {
     return TextField(
       controller: controller,
       obscureText: obscure,
+      // Email ipucu varsa klavyede @ işaretini öne çıkar
+      keyboardType: autofillHints?.contains(AutofillHints.email) == true
+          ? TextInputType.emailAddress
+          : TextInputType.text,
+      autofillHints: autofillHints, // <-- İŞLETİM SİSTEMİNE BİLDİRİM
       style: TextStyle(
         color: darktema ? Colors.white : Colors.black87,
       ),
