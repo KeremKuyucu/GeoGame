@@ -1,7 +1,6 @@
 export 'package:flutter/material.dart';
 export 'package:flutter/foundation.dart';
 export 'package:flutter/services.dart';
-export 'package:just_audio/just_audio.dart';
 export 'package:path_provider/path_provider.dart';
 export 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,14 +16,12 @@ export 'dart:math';
 export 'dart:async';
 export 'dart:isolate';
 
-export 'services/language.dart';
+export 'services/localization_service.dart';
 export 'data/ulkeler.dart';
 export 'utilities.dart';
 export 'screens/games/baskentoyun.dart';
 export 'screens/games/bayrakoyun.dart';
 export 'screens/games/mesafeoyun.dart';
-export 'screens/games/baskentoyuncoop.dart';
-export 'screens/games/bayrakoyuncoop.dart';
 export 'screens/leadboards-and-profile/profiles.dart';
 export 'screens/leadboards-and-profile/leadboard.dart';
 export 'screens/leadboards-and-profile/userprofile.dart';

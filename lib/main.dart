@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/util.dart';
 
+import 'data/app_context.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
@@ -11,7 +13,7 @@ void main() async {
   );
 
   Locale deviceLocale = PlatformDispatcher.instance.locale;
-  diltercihi = deviceLocale.languageCode;
+  AppState.settings.languagePref = deviceLocale.languageCode;
 
   runApp(Geogame());
 }

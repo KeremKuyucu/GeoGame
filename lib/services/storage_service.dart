@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../data/app_context.dart';
 
-// Önceki cevaptaki sınıfların olduğu dosyayı import etmelisin
-// import 'app_state.dart';
+import '../data/app_context.dart'; // AppState, GameStats, GameFilter burada
+import 'auth_service.dart'; // AuthService burada
 
 class StorageService {
   static final _supabase = Supabase.instance.client;
@@ -15,11 +14,11 @@ class StorageService {
   static Future<void> loadLocalData() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/geogame_v2.json'); // v2 ile temiz başlangıç
+      final file = File('${directory.path}/geogame_v2.json');
 
       if (!await file.exists()) {
-        debugPrint('⚠️ Dosya bulunamadı, varsayılanlar kullanılacak.');
-        await saveLocalData(); // Varsayılan dosyayı oluştur
+        debugPrint('⚠️ Dosya bulunamadı, varsayılanlar oluşturuluyor.');
+        await saveLocalData();
         return;
       }
 
@@ -29,10 +28,10 @@ class StorageService {
       // 1. Ayarları Yükle
       AppState.settings = AppSettings(
         darkTheme: data['darkTheme'] ?? true,
-        languageCode: data['languageCode'] ?? 'tr',
+        language: data['languageCode'] ?? 'tr',
       );
 
-      // 2. Filtreleri Yükle (Enum dönüşümüne dikkat!)
+      // 2. Filtreleri Yükle
       AppState.filter = GameFilter(
         amerika: data['amerika'] ?? true,
         asya: data['asya'] ?? true,
@@ -40,8 +39,7 @@ class StorageService {
         avrupa: data['avrupa'] ?? true,
         okyanusya: data['okyanusya'] ?? true,
         antarktika: data['antarktika'] ?? true,
-        yazmaModu: data['yazmaModu'] ?? true,
-        // Integer'dan Enum'a çeviriyoruz
+        isButtonMode: data['isButtonMode'] ?? true,
         unFilter: UnFilterStatus.values[data['unFilterIndex'] ?? 0],
       );
 
@@ -58,23 +56,21 @@ class StorageService {
         baskentPuan: data['baskentPuan'] ?? 0,
       );
 
-      // 4. Kullanıcı Bilgisi (Sadece yerel cache, asıl doğrulama Supabase Auth'dan gelir)
-      AppState.user = UserProfile(
-        uid: data['uid'] ?? '',
-        name: data['name'] ?? '',
-        avatarUrl: data['avatarUrl'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
-      );
+      // 4. (Opsiyonel) Yerel Kullanıcı Önbelleğini Yükle
+      // Offline modda isim ve avatar gözüksün diye
+      if (data['uid'] != null) {
+        // AppState.user güncellemesi yapılabilir, ama asıl yetki AuthService'de.
+      }
 
       debugPrint("✅ Yerel veriler AppState'e yüklendi.");
 
-      // Kullanıcı giriş yapmışsa senkronizasyonu başlat
-      if (AppState.user.isLoggedIn) {
+      // Eğer internet ve oturum varsa senkronize et
+      if (AuthService.isAuthenticated) {
         await syncWithCloud();
       }
 
     } catch (e) {
       debugPrint('❌ Kritik Dosya Okuma Hatası: $e');
-      // Hata durumunda dosyayı silip sıfırlamak bir seçenek olabilir
     }
   }
 
@@ -87,7 +83,7 @@ class StorageService {
       final data = {
         // Settings
         'darkTheme': AppState.settings.darkTheme,
-        'languageCode': AppState.settings.languageCode,
+        'languageCode': AppState.settings.language,
 
         // Filter
         'amerika': AppState.filter.amerika,
@@ -96,8 +92,8 @@ class StorageService {
         'avrupa': AppState.filter.avrupa,
         'okyanusya': AppState.filter.okyanusya,
         'antarktika': AppState.filter.antarktika,
-        'yazmaModu': AppState.filter.yazmaModu,
-        'unFilterIndex': AppState.filter.unFilter.index, // Enum -> int
+        'isButtonMode': AppState.filter.isButtonMode,
+        'unFilterIndex': AppState.filter.unFilter.index,
 
         // Stats
         'mesafeDogru': AppState.stats.mesafeDogru,
@@ -111,10 +107,6 @@ class StorageService {
         'baskentPuan': AppState.stats.baskentPuan,
         'toplamPuan': AppState.stats.totalScore,
 
-        // User
-        'uid': AppState.user.uid,
-        'name': AppState.user.name,
-        'avatarUrl': AppState.user.avatarUrl,
       };
 
       await file.writeAsString(jsonEncode(data));
@@ -125,10 +117,15 @@ class StorageService {
     }
   }
 
-  /// ☁️ Bulut Senkronizasyonu (Mantık Güncellendi)
+  /// ☁️ Bulut Senkronizasyonu
   static Future<void> syncWithCloud() async {
-    final uid = AppState.user.uid;
-    if (uid.isEmpty) return;
+    // 🛠️ DÜZELTME: 'user.uid' yerine AuthService kullanıyoruz
+    final uid = AuthService.currentUserId;
+
+    if (uid == null) {
+      debugPrint("⚠️ Sync iptal: Kullanıcı girişi yok.");
+      return;
+    }
 
     try {
       final response = await _supabase
@@ -143,41 +140,39 @@ class StorageService {
         return;
       }
 
-      final int cloudScore = response['puan'] ?? 0;
+      final int cloudScore = (response['puan'] ?? 0) as int;
       final int localScore = AppState.stats.totalScore;
 
-      debugPrint('🔄 Sync Kontrol: Bulut($cloudScore) vs Yerel($localScore)');
+      debugPrint('🔄 Sync: Bulut($cloudScore) vs Yerel($localScore)');
 
       // 1. Durum: Yerel Puan Daha Yüksek -> Buluta Yükle
       if (localScore > cloudScore) {
-        debugPrint('🚀 Yerel skor daha yüksek. Bulut güncelleniyor...');
+        debugPrint('🚀 Yerel skor yüksek -> Buluta gönderiliyor.');
         await _uploadToCloud();
       }
       // 2. Durum: Bulut Puanı Daha Yüksek -> Yerele İndir
-      // DİKKAT: Bu basit mantık hala "offline data kaybı" riski taşır ama
-      // senin mevcut mantığını class yapısına uyarladım.
       else if (cloudScore > localScore) {
-        debugPrint('📥 Bulut skoru daha yüksek. Yerel güncelleniyor...');
+        debugPrint('📥 Bulut skor yüksek -> Yerele indiriliyor.');
 
         AppState.stats = GameStats(
-          mesafePuan: response['mesafepuan'] ?? 0,
-          bayrakPuan: response['bayrakpuan'] ?? 0,
-          baskentPuan: response['baskentpuan'] ?? 0,
+          mesafePuan: (response['mesafepuan'] ?? 0) as int,
+          bayrakPuan: (response['bayrakpuan'] ?? 0) as int,
+          baskentPuan: (response['baskentpuan'] ?? 0) as int,
 
-          mesafeDogru: response['mesafedogru'] ?? 0,
-          mesafeYanlis: response['mesafeyanlis'] ?? 0,
+          mesafeDogru: (response['mesafedogru'] ?? 0) as int,
+          mesafeYanlis: (response['mesafeyanlis'] ?? 0) as int,
 
-          bayrakDogru: response['bayrakdogru'] ?? 0,
-          bayrakYanlis: response['bayrakyanlis'] ?? 0,
+          bayrakDogru: (response['bayrakdogru'] ?? 0) as int,
+          bayrakYanlis: (response['bayrakyanlis'] ?? 0) as int,
 
-          baskentDogru: response['baskentdogru'] ?? 0,
-          baskentYanlis: response['baskentyanlis'] ?? 0,
+          baskentDogru: (response['baskentdogru'] ?? 0) as int,
+          baskentYanlis: (response['baskentyanlis'] ?? 0) as int,
         );
 
         await saveLocalData();
       }
       else {
-        debugPrint('✅ Veriler senkronize.');
+        debugPrint('✅ Puanlar eşit, senkronizasyon tamam.');
       }
 
     } catch (e) {
@@ -186,25 +181,35 @@ class StorageService {
   }
 
   static Future<void> _uploadToCloud() async {
+    // 🛠️ DÜZELTME: Session kontrolü yerine AuthService ID kontrolü
+    final uid = AuthService.currentUserId;
+    if (uid == null) return;
+
     final stats = AppState.stats;
 
-    await _supabase.from('geogame_stats').upsert({
-      'user_id': AppState.user.uid,
-      'puan': stats.totalScore,
+    try {
+      await _supabase.from('geogame_stats').upsert({
+        'user_id': uid, // Session'dan değil, direkt ID'den
+        'puan': stats.totalScore,
 
-      'mesafepuan': stats.mesafePuan,
-      'mesafedogru': stats.mesafeDogru,
-      'mesafeyanlis': stats.mesafeYanlis,
+        'mesafepuan': stats.mesafePuan,
+        'mesafedogru': stats.mesafeDogru,
+        'mesafeyanlis': stats.mesafeYanlis,
 
-      'bayrakpuan': stats.bayrakPuan,
-      'bayrakdogru': stats.bayrakDogru,
-      'bayrakyanlis': stats.bayrakYanlis,
+        'bayrakpuan': stats.bayrakPuan,
+        'bayrakdogru': stats.bayrakDogru,
+        'bayrakyanlis': stats.bayrakYanlis,
 
-      'baskentpuan': stats.baskentPuan,
-      'baskentdogru': stats.baskentDogru,
-      'baskentyanlis': stats.baskentYanlis,
+        'baskentpuan': stats.baskentPuan,
+        'baskentdogru': stats.baskentDogru,
+        'baskentyanlis': stats.baskentYanlis,
 
-      'updated_at': DateTime.now().toIso8601String(),
-    }, onConflict: 'user_id');
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id');
+
+      debugPrint("☁️ Veriler buluta başarıyla yüklendi.");
+    } catch (e) {
+      debugPrint("❌ Bulut Yükleme Hatası: $e");
+    }
   }
 }

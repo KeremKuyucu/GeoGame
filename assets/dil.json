@@ -299,22 +299,6 @@
       "Türkçe": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
       "English": "Guess countries based on distance and direction."
     },
-    "baskentcooptitle": {
-      "Türkçe": "Başkentten Ülke Bilme Coop",
-      "English": "Country Guessing from Capital Coop"
-    },
-    "baskentcoopdescription": {
-      "Türkçe": "Başkentten ülkeyi tanıyın, her cevapta ekran döner, pas kullanılmamaktadır.",
-      "English": "Guess the country from its capital. The screen will rotate with every answer, and no pass option is available."
-    },
-    "bayrakcooptitle": {
-      "Türkçe": "Bayraktan Ülke Bilme Coop",
-      "English": "Country Guessing from Flag Coop"
-    },
-    "bayrakcoopdescription": {
-      "Türkçe": "Bayraktan ülkeyi tanıyın, her cevapta ekran döner, pas kullanılmamaktadır.",
-      "English": "Guess the country from its flag. The screen will rotate with every answer, and no pass option is available."
-    },
     "giris": {
       "Türkçe": "Giriş Yap",
       "English": "Log In"

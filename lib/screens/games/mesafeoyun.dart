@@ -1,5 +1,8 @@
 import 'package:geogame/util.dart';
 
+import '../../data/app_context.dart';
+import '../../services/storage_service.dart';
+
 class MesafeOyun extends StatefulWidget {
   @override
   _MesafeOyunState createState() => _MesafeOyunState();
@@ -17,9 +20,10 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
 
   Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
     yeniulkesec();
-    await mesafeoyunkurallari();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      mesafeoyunkurallari();
+    });
   }
 
   Future<void> mesafeoyunkurallari() async {
@@ -28,19 +32,19 @@ class _MesafeOyunState extends State<MesafeOyun> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Yazi.get('kurallar')),
+          title: Text(Localization.get('kurallar')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Yazi.get('kural1')),
-                Text(Yazi.get('mesafekural2')),
-                Text(Yazi.get('mesafekural3')),
+                Text(Localization.get('kural1')),
+                Text(Localization.get('mesafekural2')),
+                Text(Localization.get('mesafekural3')),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Yazi.get('tamam')),
+              child: Text(Localization.get('tamam')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -59,15 +63,15 @@ class _MesafeOyunState extends State<MesafeOyun> {
           break;
         }
       }
-      message += Yazi.get('tahminmetin') +
-          (isEnglish ? gecici.enisim : gecici.isim) +
+      message += Localization.get('tahminmetin') +
+          (AppState.settings.isEnglish ? gecici.enisim : gecici.isim) +
           "    ";
-      message += Yazi.get('mesafe') +
+      message += Localization.get('mesafe') +
           mesafeHesapla(
                   gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam)
               .toString() +
           " Km   ";
-      message += Yazi.get('yon') +
+      message += Localization.get('yon') +
           pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) +
           "\n";
       if (kalici.ks(_controller.text.trim())) {
@@ -76,25 +80,24 @@ class _MesafeOyunState extends State<MesafeOyun> {
         yeniulkesec();
         mesafedogru++;
         mesafepuan += puan;
-        writeToFile();
         puan = 300;
       } else {
         puan -= 10;
         if (puan < 100) puan = 100;
         _controller.clear();
         mesafeyanlis++;
-        writeToFile();
       }
+      StorageService.saveLocalData();
     });
   }
 
   void _pasButtonPressed() {
     puan = 300;
-    String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
+    String pasulke = (AppState.settings.isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
       builder: (context) {
-        return CustomNotification(baslik: Yazi.get('pascevap'), metin: pasulke);
+        return CustomNotification(baslik: Localization.get('pascevap'), metin: pasulke);
       },
     );
     setState(() {
@@ -151,7 +154,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
       "West",
       "Northwest"
     ];
-    List<String> yonler = isEnglish ? yonlerEN : yonlerTR;
+    List<String> yonler = AppState.settings.isEnglish ? yonlerEN : yonlerTR;
     return yonler[((brng + 22.5) / 45.0).floor() % 8];
   }
 
@@ -159,7 +162,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('mesafebaslik')),
+        title: Text(Localization.get('mesafebaslik')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -204,7 +207,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                       child: ElevatedButton(
                         onPressed: _pasButtonPressed,
                         child: Text(
-                          Yazi.get('pas'),
+                          Localization.get('pas'),
                           style: TextStyle(
                             color: Colors.black,
                           ),
@@ -229,7 +232,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
                           });
                         },
                         child: Text(
-                          Yazi.get('tahmintemizle'),
+                          Localization.get('tahmintemizle'),
                           style: TextStyle(
                             color: Colors.black,
                           ),
@@ -252,14 +255,14 @@ class _MesafeOyunState extends State<MesafeOyun> {
                   suggestions: ulke
                       .map(
                         (e) => SearchFieldListItem<Ulkeler>(
-                          isEnglish ? e.enisim : e.isim,
+                          AppState.settings.isEnglish ? e.enisim : e.isim,
                           item: e,
                           child: Row(
                             children: [
                               CircleAvatar(
                                   backgroundImage: NetworkImage(e.url)),
                               const SizedBox(width: 10),
-                              Text(isEnglish ? e.enisim : e.isim),
+                              Text(AppState.settings.isEnglish ? e.enisim : e.isim),
                             ],
                           ),
                         ),

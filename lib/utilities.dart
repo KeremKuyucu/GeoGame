@@ -1,6 +1,8 @@
 import 'package:geogame/util.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'data/app_context.dart';
+
 
 class DrawerWidget extends StatelessWidget {
   @override
@@ -24,8 +26,8 @@ class DrawerWidget extends StatelessWidget {
 
       if (user == null) {
         _showResult(
-            Yazi.get('hata_baslik'),
-            Yazi.get('giris_yap_mesaj'),
+          Localization.get('hata_baslik'),
+          Localization.get('giris_yap_mesaj'),
         );
         return;
       }
@@ -34,21 +36,21 @@ class DrawerWidget extends StatelessWidget {
         await Supabase.instance.client.from('feedbacks').insert({
           'sebep': sebep,
           'message': message,
-          'isim': name, // Sınıfındaki isim değişkeni
+          'isim': AppState.user.name, // Sınıfındaki isim değişkeni
           'user_id': user.id,
         });
 
         // Başarılı durumu
         _showResult(
-            Yazi.get('basarili_baslik'),
-            Yazi.get('feedback_gonderildi')
+            Localization.get('basarili_baslik'),
+            Localization.get('feedback_gonderildi')
         );
 
       } catch (e) {
         // Başarısız durumu
         _showResult(
-            Yazi.get('hata_baslik'),
-            "Bir sorun oluştu: $e"
+            Localization.get('hata_baslik'),
+            "Error sending message: $e"
         );
       }
     }
@@ -90,7 +92,7 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.report, color: Colors.blueAccent),
             title: Text(
-              Yazi.get('hatabildir'),
+              Localization.get('hatabildir'),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             onTap: () {
@@ -109,7 +111,7 @@ class DrawerWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            Yazi.get('hatabildir'),
+                            Localization.get('hatabildir'),
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -119,12 +121,12 @@ class DrawerWidget extends StatelessWidget {
                           SizedBox(height: 20),
                           _buildTextField(
                             _sebepController,
-                            Yazi.get('hatabaslik'),
+                            Localization.get('hatabaslik'),
                           ),
                           SizedBox(height: 10),
                           _buildTextField(
                             _messageController,
-                            Yazi.get('hatametin'),
+                            Localization.get('hatametin'),
                           ),
                           SizedBox(height: 20),
                           Row(
@@ -185,7 +187,7 @@ class DrawerWidget extends StatelessWidget {
           ),
           ListTile(
             title: Text(
-              Yazi.get('sikayet'),
+              Localization.get('sikayet'),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             dense: true,
@@ -194,15 +196,15 @@ class DrawerWidget extends StatelessWidget {
           _buildListTile(
             Icons.share,
             Color(0xFF5865F2),
-            Yazi.get('uygpaylas'),
+            Localization.get('uygpaylas'),
             () async {
-              await Share.share(Yazi.get('davetpromt'));
+              await Share.share(Localization.get('davetpromt'));
             },
           ),
           _buildListTile(
             Icons.person,
             Color(0xFF5865F2),
-            Yazi.get('yapimcimetin'),
+            Localization.get('yapimcimetin'),
             () async {
               await EasyLauncher.url(
                 url: 'https://keremkk.com.tr',
@@ -213,7 +215,7 @@ class DrawerWidget extends StatelessWidget {
           _buildListTile(
             Icons.public,
             Colors.red,
-            Yazi.get('website'),
+            Localization.get('website'),
             () async {
               await EasyLauncher.url(url: 'https://keremkk.com.tr/geogame');
             },
@@ -221,7 +223,7 @@ class DrawerWidget extends StatelessWidget {
           _buildListTile(
             FontAwesomeIcons.github,
             Colors.black,
-            Yazi.get('github'),
+            Localization.get('github'),
             () async {
               await EasyLauncher.url(
                 url: 'https://github.com/KeremKuyucu/GeoGame',
@@ -231,7 +233,7 @@ class DrawerWidget extends StatelessWidget {
           Divider(),
           ListTile(
             title: Text(
-              Yazi.get('yapimci'),
+              Localization.get('yapimci'),
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             dense: true,
@@ -308,7 +310,7 @@ class CustomNotification extends StatelessWidget {
                           Navigator.of(context).pop(); // Bildirimi kapat
                         },
                         child: Text(
-                          Yazi.get('tamam'),
+                          Localization.get('tamam'),
                           style: TextStyle(color: Colors.black),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -330,80 +332,6 @@ class CustomNotification extends StatelessWidget {
   }
 }
 
-class GameFilter {
-  bool amerika;
-  bool asya;
-  bool afrika;
-  bool avrupa;
-  bool okyanusya;
-  bool antarktika;
-
-  bool onlyUN;
-  bool justUN; // sadecebm
-
-  GameFilter({
-    this.amerika = true,
-    this.asya = true,
-    this.afrika = true,
-    this.avrupa = true,
-    this.okyanusya = true,
-    this.antarktika = true,
-    this.onlyUN = false,
-    this.justUN = false,
-  });
-}
-class AppSettings {
-  bool darkTheme;
-  bool isEnglish;
-  String languageCode; // secilenDil
-
-  AppSettings({
-    this.darkTheme = true,
-    this.isEnglish = false,
-    this.languageCode = '',
-  });
-}
-class UserProfile {
-  final String uid;
-  final String name;
-  final String avatarUrl;
-
-  UserProfile({
-    required this.uid,
-    required this.name,
-    required this.avatarUrl,
-  });
-
-  bool get isLoggedIn => uid.isNotEmpty;
-}
-class GameStats {
-  int mesafeDogru;
-  int mesafeYanlis;
-  int bayrakDogru;
-  int bayrakYanlis;
-  int baskentDogru;
-  int baskentYanlis;
-
-  int mesafePuan;
-  int bayrakPuan;
-  int baskentPuan;
-
-  GameStats({
-    this.mesafeDogru = 0,
-    this.mesafeYanlis = 0,
-    this.bayrakDogru = 0,
-    this.bayrakYanlis = 0,
-    this.baskentDogru = 0,
-    this.baskentYanlis = 0,
-    this.mesafePuan = 0,
-    this.bayrakPuan = 0,
-    this.baskentPuan = 0,
-  });
-
-  int get toplamPuan =>
-      mesafePuan + bayrakPuan + baskentPuan;
-}
-
 bool amerikakitasi = true,
     asyakitasi = true,
     afrikakitasi = true,
@@ -411,11 +339,7 @@ bool amerikakitasi = true,
     okyanusyakitasi = true,
     antartikakitasi = true,
     bmuyeligi = false,
-    sadecebm = false,
-    yazmamodu = true,
-    darktema = true,
-    isEnglish = false;
-String diltercihi = '';
+    sadecebm = false;
 int mesafedogru = 0,
     mesafeyanlis = 0,
     bayrakdogru = 0,
@@ -425,225 +349,4 @@ int mesafedogru = 0,
     mesafepuan = 0,
     bayrakpuan = 0,
     baskentpuan = 0,
-    toplampuan = 0,
-    selectedIndex = 0;
-String name = "",
-    profilurl = "https://geogame-cdn.keremkk.com.tr/anon.png",
-    uid = '',
-    secilenDil = '';
-List<dynamic> users = [];
-List<SalomonBottomBarItem> navBarItems = [
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.home),
-    selectedColor: Colors.purple,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.leaderboard),
-    selectedColor: Colors.pink,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.person),
-    selectedColor: Colors.teal,
-    title: const Text(''),
-  ),
-  SalomonBottomBarItem(
-    icon: const Icon(Icons.settings),
-    selectedColor: Colors.orange,
-    title: const Text(''),
-  ),
-];
-
-final _supabase = Supabase.instance.client;
-Future<void> readFromFile(Function updateState) async {
-  final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/geogame.json';
-  final file = File(filePath);
-
-  if (await file.exists()) {
-    try {
-      final contents = await file.readAsString();
-      final jsonData = jsonDecode(contents);
-
-      updateState(() {
-        // Ayarlar
-        amerikakitasi = jsonData['amerikakitasi'] == true;
-        asyakitasi = jsonData['asyakitasi'] == true;
-        afrikakitasi = jsonData['afrikakitasi'] == true;
-        avrupakitasi = jsonData['avrupakitasi'] == true;
-        okyanusyakitasi = jsonData['okyanusyakitasi'] == true;
-        antartikakitasi = jsonData['antartikakitasi'] == true;
-        bmuyeligi = jsonData['bmuyeligi'] == true;
-        yazmamodu = jsonData['yazmamodu'] == true;
-        darktema = jsonData['darktema'] == true;
-
-        // Kullanıcı Bilgileri
-        name = jsonData['name'] ?? '';
-        uid = jsonData['uid'] ?? '';
-        profilurl = jsonData['profilurl'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
-        secilenDil = jsonData['secilenDil'] ?? 'English';
-
-        // İstatistikler
-        toplampuan = jsonData['toplampuan'] ?? 0;
-
-        mesafedogru = jsonData['mesafedogru'] ?? 0;
-        mesafeyanlis = jsonData['mesafeyanlis'] ?? 0;
-        mesafepuan = jsonData['mesafepuan'] ?? 0;
-
-        bayrakdogru = jsonData['bayrakdogru'] ?? 0;
-        bayrakyanlis = jsonData['bayrakyanlis'] ?? 0;
-        bayrakpuan = jsonData['bayrakpuan'] ?? 0;
-
-        baskentdogru = jsonData['baskentdogru'] ?? 0;
-        baskentyanlis = jsonData['baskentyanlis'] ?? 0;
-        baskentpuan = jsonData['baskentpuan'] ?? 0;
-
-        debugPrint("Yerel dosyadan veriler yüklendi.");
-      });
-
-      // Eğer kullanıcı giriş yapmışsa, bulut verisini kontrol et (Senkronizasyon)
-      if (uid.isNotEmpty) {
-        await puanguncelle();
-      }
-
-    } catch (e) {
-      debugPrint('Dosya okuma hatası: $e');
-    }
-  } else {
-    debugPrint('Dosya bulunamadı, varsayılan oluşturuluyor...');
-    writeToFile();
-  }
-}
-Future<void> writeToFile() async {
-  final directory = await getApplicationDocumentsDirectory();
-  final filePath = '${directory.path}/geogame.json';
-  final file = File(filePath);
-
-  // Toplam puanı hesapla
-  toplampuan = bayrakpuan + baskentpuan + mesafepuan;
-
-  final data = {
-    'amerikakitasi': amerikakitasi,
-    'asyakitasi': asyakitasi,
-    'afrikakitasi': afrikakitasi,
-    'avrupakitasi': avrupakitasi,
-    'okyanusyakitasi': okyanusyakitasi,
-    'antartikakitasi': antartikakitasi,
-    'bmuyeligi': bmuyeligi,
-    'yazmamodu': yazmamodu,
-    'darktema': darktema,
-    'name': name,
-    'uid': uid,
-    'profilurl': profilurl,
-    'secilenDil': secilenDil,
-    'toplampuan': toplampuan,
-    'mesafedogru': mesafedogru,
-    'mesafeyanlis': mesafeyanlis,
-    'bayrakdogru': bayrakdogru,
-    'bayrakyanlis': bayrakyanlis,
-    'baskentdogru': baskentdogru,
-    'baskentyanlis': baskentyanlis,
-    'mesafepuan': mesafepuan,
-    'bayrakpuan': bayrakpuan,
-    'baskentpuan': baskentpuan,
-  };
-
-  try {
-    final jsonData = jsonEncode(data);
-    await file.writeAsString(jsonData);
-    debugPrint("Yerel dosyaya yazıldı.");
-
-  } catch (e) {
-    debugPrint('Dosya yazma hatası: $e');
-  }
-}
-Future<void> puanguncelle() async {
-  if (uid.isEmpty) return;
-
-  try {
-    final data = await _supabase
-        .from('geogame_stats')
-        .select(
-      'puan, mesafepuan, bayrakpuan, baskentpuan, '
-          'mesafedogru, mesafeyanlis, '
-          'bayrakdogru, bayrakyanlis, '
-          'baskentdogru, baskentyanlis',
-    )
-        .eq('user_id', uid)
-        .maybeSingle();
-
-    if (data == null) return;
-
-    final cloudPuan = (data['puan'] ?? 0) as int;
-
-    // 🔹 Bulut > Local → Local güncelle
-    if (cloudPuan > toplampuan) {
-      debugPrint(
-        '☁️ Bulut puanı ($cloudPuan) yerel puandan ($toplampuan) yüksek. Senkronize ediliyor...',
-      );
-
-      toplampuan = cloudPuan;
-
-      mesafepuan = data['mesafepuan'] ?? 0;
-      bayrakpuan = data['bayrakpuan'] ?? 0;
-      baskentpuan = data['baskentpuan'] ?? 0;
-
-      mesafedogru = data['mesafedogru'] ?? 0;
-      mesafeyanlis = data['mesafeyanlis'] ?? 0;
-      bayrakdogru = data['bayrakdogru'] ?? 0;
-      bayrakyanlis = data['bayrakyanlis'] ?? 0;
-      baskentdogru = data['baskentdogru'] ?? 0;
-      baskentyanlis = data['baskentyanlis'] ?? 0;
-
-      await writeToFile();
-    }
-
-    // 🔹 Local > Bulut → Buluta gönder
-    else if (toplampuan > cloudPuan) {
-      debugPrint('📤 Yerel puan daha yüksek. Buluta gönderiliyor...');
-
-      await _supabase.from('geogame_stats').upsert({
-        'user_id': uid,
-        'puan': toplampuan,
-
-        'mesafepuan': mesafepuan,
-        'mesafedogru': mesafedogru,
-        'mesafeyanlis': mesafeyanlis,
-
-        'bayrakpuan': bayrakpuan,
-        'bayrakdogru': bayrakdogru,
-        'bayrakyanlis': bayrakyanlis,
-
-        'baskentpuan': baskentpuan,
-        'baskentdogru': baskentdogru,
-        'baskentyanlis': baskentyanlis,
-
-        'updated_at': DateTime.now().toIso8601String(),
-      }, onConflict: 'user_id');
-
-      debugPrint('✅ Skorlar Supabase\'e gönderildi');
-    }
-  } catch (e) {
-    debugPrint('❌ Puan senkronizasyon hatası: $e');
-  }
-}
-
-Future<void> sendAnalytics() async {
-  final session = _supabase.auth.currentSession;
-
-  final response = await _supabase.functions.invoke(
-    'collect-analytics',
-    headers: session != null
-        ? {
-      'Authorization': 'Bearer ${session.accessToken}',
-    }
-        : null, // session yoksa anonim gider
-    body: {
-      'appId': 'geogame',
-      'uid': uid,
-      'endpoint': '/page/main',
-    },
-  );
-  //debugPrint("Analytics response: ${response.data}");
-}
+    toplampuan = 0;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:geogame/data/app_context.dart';
 import 'package:geogame/util.dart';
+import 'package:geogame/services/auth_service.dart';
+import 'package:geogame/screens/mainscreen/geogamelobi.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -13,11 +15,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final SupabaseClient _supabase = Supabase.instance.client;
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   bool _isLoading = false;
 
   @override
@@ -27,192 +26,56 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  /// Supabase'e giriş yap
-  Future<void> _signIn() async {
+  /// 🌟 GİRİŞ İŞLEMİ VE YÖNLENDİRME MANTIĞI BURADA
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
+    // 1. Boşluk Kontrolü
     if (email.isEmpty || password.isEmpty) {
-      _showSnackBar(Yazi.get('boslukuyari'), Colors.orange);
+      _showSnackBar(Localization.get('boslukuyari'), Colors.orange);
       return;
     }
 
     setState(() => _isLoading = true);
 
-    try {
-      final AuthResponse res = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
+    // 2. Servise İstek At
+    // AuthService.signIn hata mesajı döner (String?), başarılıysa null döner.
+    final String? error = await AuthService.signIn(email, password);
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    // 3. Sonucu Kontrol Et
+    if (error == null) {
+      // ✅ BAŞARILI
+      _showSnackBar(Localization.get('girisbasarili'), Colors.green);
+
+      // Eğer bir callback varsa (Örn: Ayarlar sayfasını yenilemek için) çalıştır
+      if (widget.onLoginSuccess != null) {
+        widget.onLoginSuccess!();
+      }
+
+      AppState.selectedIndex=0;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => GeoGameLobi()),
+            (Route<dynamic> route) => false, // Geri dönülemesin diye geçmişi sil
       );
 
-      if (res.user != null) {
-        // Başarılı giriş - Kullanıcı bilgilerini senkronize et
-        await _syncUserData(res.user!);
-
-        _showSnackBar(Yazi.get('girisbasarili'), Colors.green);
-        _emailController.clear();
-        _passwordController.clear();
-
-        // Callback çağır (ör: Settings sayfasına dön)
-        if (widget.onLoginSuccess != null) {
-          widget.onLoginSuccess!();
-        } else {
-          Navigator.pop(context);
-        }
-      }
-    } on AuthException catch (e) {
-      _showSnackBar(e.message, Colors.red);
-    } catch (e) {
-      _showSnackBar('An error occurred: $e', Colors.red);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    } else {
+      // ❌ HATA
+      _showSnackBar(error, Colors.red);
     }
   }
 
-  /// Kullanıcı verilerini Supabase'den çek ve locale senkronize et
-  Future<void> _syncUserData(User authUser) async {
-    try {
-      // 1️⃣ UID'yi kaydet
-      if (mounted) {
-        setState(() {
-          uid = authUser.id;
-        });
-      }
-
-      // 2️⃣ Profiles tablosundan kullanıcı bilgilerini çek
-      final profileData = await _supabase
-          .from('profiles')
-          .select()
-          .eq('uid', authUser.id)
-          .maybeSingle();
-
-      if (mounted) {
-        if (profileData != null) {
-          setState(() {
-            name = profileData['full_name'] ?? authUser.email?.split('@')[0] ?? 'Oyuncu';
-            profilurl = profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
-          });
-        } else {
-          // Profil yoksa auth metadata'dan al
-          setState(() {
-            name = authUser.userMetadata?['full_name'] ?? authUser.email?.split('@')[0] ?? 'Oyuncu';
-            profilurl = authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
-          });
-
-          // ✅ Profil yoksa oluştur
-          await _createUserProfile(authUser);
-        }
-      }
-
-      // 3️⃣ geogame_stats tablosundan istatistikleri çek
-      final statsData = await _supabase
-          .from('geogame_stats')
-          .select()
-          .eq('user_id', authUser.id)
-          .maybeSingle();
-
-      if (mounted) {
-        if (statsData != null) {
-          setState(() {
-            mesafepuan = (statsData['mesafepuan'] ?? 0) as int;
-            bayrakpuan = (statsData['bayrakpuan'] ?? 0) as int;
-            baskentpuan = (statsData['baskentpuan'] ?? 0) as int;
-            toplampuan = (statsData['puan'] ?? 0) as int;
-
-            mesafedogru = (statsData['mesafedogru'] ?? 0) as int;
-            mesafeyanlis = (statsData['mesafeyanlis'] ?? 0) as int;
-            bayrakdogru = (statsData['bayrakdogru'] ?? 0) as int;
-            bayrakyanlis = (statsData['bayrakyanlis'] ?? 0) as int;
-            baskentdogru = (statsData['baskentdogru'] ?? 0) as int;
-            baskentyanlis = (statsData['baskentyanlis'] ?? 0) as int;
-          });
-        } else {
-          // ✅ İstatistik yoksa oluştur
-          await _createUserStats(authUser.id);
-
-          // Varsayılan değerler
-          setState(() {
-            mesafepuan = 0;
-            bayrakpuan = 0;
-            baskentpuan = 0;
-            toplampuan = 0;
-            mesafedogru = 0;
-            mesafeyanlis = 0;
-            bayrakdogru = 0;
-            bayrakyanlis = 0;
-            baskentdogru = 0;
-            baskentyanlis = 0;
-          });
-        }
-      }
-
-      // 4️⃣ Tüm verileri locale kaydet
-      await writeToFile();
-
-      debugPrint('✅ User data has been successfully synchronized!');
-
-    } catch (e) {
-      debugPrint('❌ User data synchronization error: $e');
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Senkronizasyon hatası: ${e.toString()}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    }
-  }
-
-  /// ✅ Kullanıcı profili oluştur (yoksa)
-  Future<void> _createUserProfile(User authUser) async {
-    try {
-      await _supabase.from('profiles').upsert({
-        'uid': authUser.id,
-        'email': authUser.email,
-        'full_name': authUser.userMetadata?['full_name'] ?? authUser.email?.split('@')[0] ?? 'Oyuncu',
-        'avatar_url': authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
-      }, onConflict: 'uid'); // ✅ uid'ye göre güncelle
-
-      debugPrint('✅ Profile created/updated');
-    } catch (e) {
-      debugPrint('❌ Profile creation error: $e');
-    }
-  }
-
-  /// ✅ Kullanıcı istatistikleri oluştur (yoksa)
-  Future<void> _createUserStats(String userId) async {
-    try {
-      await _supabase.from('geogame_stats').upsert({
-        'user_id': userId,
-        'puan': 0,
-        'mesafepuan': 0,
-        'bayrakpuan': 0,
-        'baskentpuan': 0,
-        'mesafedogru': 0,
-        'mesafeyanlis': 0,
-        'bayrakdogru': 0,
-        'bayrakyanlis': 0,
-        'baskentdogru': 0,
-        'baskentyanlis': 0,
-      }, onConflict: 'user_id'); // ✅ user_id'ye göre güncelle
-
-      debugPrint('✅ Statistics created/updated');
-    } catch (e) {
-      debugPrint('❌ Error generating statistics: $e');
-    }
-  }
-
-  /// Web tabanlı kayıt sayfasını aç
   Future<void> _openWebAuth() async {
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _showSnackBar(Yazi.get('siteuyari'), Colors.red);
+      _showSnackBar(Localization.get('siteuyari'), Colors.red);
     }
   }
 
-  /// SnackBar göster
   void _showSnackBar(String message, Color color) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -230,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('giris')),
+        title: Text(Localization.get('giris')),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -245,8 +108,6 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: 40),
-
-              // Logo veya başlık
               Icon(
                 Icons.public,
                 size: 100,
@@ -261,13 +122,8 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               SizedBox(height: 50),
-
-              // Login Card
               _buildLoginCard(),
-
               SizedBox(height: 30),
-
-              // Kayıt ol linki
               _buildRegisterSection(),
             ],
           ),
@@ -276,19 +132,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  /// Giriş kartı
   Widget _buildLoginCard() {
     return Card(
       elevation: 8.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       child: Container(
         padding: EdgeInsets.all(30.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
           gradient: LinearGradient(
-            colors: darktema
+            colors: AppState.settings.darkTheme
                 ? [Colors.grey.shade900, Colors.black87]
                 : [Colors.white, Colors.grey.shade50],
             begin: Alignment.topLeft,
@@ -298,29 +151,23 @@ class _LoginPageState extends State<LoginPage> {
         child: AutofillGroup(
           child: Column(
             children: [
-              // Email alanı
               _buildTextField(
                 controller: _emailController,
-                label: Yazi.get('eposta'),
+                label: Localization.get('eposta'),
                 icon: Icons.email,
                 obscure: false,
-                // E-posta olduğunu belirtiyoruz
                 autofillHints: const [AutofillHints.email],
               ),
               SizedBox(height: 20),
-
-              // Şifre alanı
               _buildTextField(
                 controller: _passwordController,
-                label: Yazi.get('sifre'),
+                label: Localization.get('sifre'),
                 icon: Icons.lock,
                 obscure: true,
-                // Şifre olduğunu belirtiyoruz
                 autofillHints: const [AutofillHints.password],
               ),
               SizedBox(height: 30),
 
-              // Giriş butonu
               if (_isLoading)
                 CircularProgressIndicator()
               else
@@ -328,9 +175,8 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Butona basıldığında şifre kaydetme önerisini tetikle
                       TextInput.finishAutofillContext();
-                      _signIn();
+                      _handleLogin(); // ✅ Yeni oluşturduğumuz fonksiyonu çağırıyoruz
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
@@ -341,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                       elevation: 5,
                     ),
                     child: Text(
-                      Yazi.get('giris'),
+                      Localization.get('giris'),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -357,22 +203,18 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  /// Kayıt ol bölümü
   Widget _buildRegisterSection() {
     return Column(
       children: [
         Text(
-          Yazi.get('loginmesaj1'),
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          Localization.get('loginmesaj1'),
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
         SizedBox(height: 10),
         TextButton.icon(
           onPressed: _openWebAuth,
           icon: Icon(Icons.open_in_browser),
-          label: Text(Yazi.get('loginmesaj2')),
+          label: Text(Localization.get('loginmesaj2')),
           style: TextButton.styleFrom(
             foregroundColor: Colors.blueAccent,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -382,49 +224,35 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  /// TextField bileşeni
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required IconData icon,
     required bool obscure,
-    Iterable<String>? autofillHints, // <-- YENİ EKLENDİ
+    Iterable<String>? autofillHints,
   }) {
     return TextField(
       controller: controller,
       obscureText: obscure,
-      // Email ipucu varsa klavyede @ işaretini öne çıkar
       keyboardType: autofillHints?.contains(AutofillHints.email) == true
           ? TextInputType.emailAddress
           : TextInputType.text,
-      autofillHints: autofillHints, // <-- İŞLETİM SİSTEMİNE BİLDİRİM
-      style: TextStyle(
-        color: darktema ? Colors.white : Colors.black87,
-      ),
+      autofillHints: autofillHints,
+      style: TextStyle(color: AppState.settings.darkTheme ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(
-          icon,
-          color: darktema ? Colors.white70 : Colors.grey[700],
-        ),
-        labelStyle: TextStyle(
-          color: darktema ? Colors.white70 : Colors.grey[700],
-        ),
+        prefixIcon: Icon(icon, color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700]),
+        labelStyle: TextStyle(color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700]),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: darktema ? Colors.white30 : Colors.grey[400]!,
-          ),
+          borderSide: BorderSide(color: AppState.settings.darkTheme ? Colors.white30 : Colors.grey[400]!),
           borderRadius: BorderRadius.circular(15),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blueAccent,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: Colors.blueAccent, width: 2),
           borderRadius: BorderRadius.circular(15),
         ),
         filled: true,
-        fillColor: darktema ? Colors.grey[850] : Colors.grey[100],
+        fillColor: AppState.settings.darkTheme ? Colors.grey[850] : Colors.grey[100],
       ),
     );
   }

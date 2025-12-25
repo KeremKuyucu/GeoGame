@@ -1,6 +1,9 @@
 import 'package:geogame/util.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../data/app_context.dart';
+import '../../data/bottomBar.dart';
+import '../../services/auth_service.dart';
 import '../auth/authpage.dart';
 
 class Profiles extends StatefulWidget {
@@ -20,13 +23,13 @@ class _ProfilesState extends State<Profiles> {
 
   Future<void> _initializeGame() async {
     await fetchUserProfile();
-    await readFromFile((update) => setState(update));
   }
 
-  /// ✅ Kullanıcının kendi profilini Supabase'den çek
   Future<void> fetchUserProfile() async {
-    if (uid.isEmpty) {
-      setState(() => _isLoading = false);
+    final String? currentId = AuthService.currentUserId;
+
+    if (currentId == null) {
+      if (mounted) setState(() => _isLoading = false);
       debugPrint('⚠️ Kullanıcı giriş yapmamış');
       return;
     }
@@ -34,25 +37,16 @@ class _ProfilesState extends State<Profiles> {
     setState(() => _isLoading = true);
 
     try {
-      // 1️⃣ Profiles tablosundan kullanıcı bilgilerini çek
       final profileData = await _supabase
           .from('profiles')
           .select()
-          .eq('uid', uid)
+          .eq('uid', currentId)
           .maybeSingle();
 
-      if (profileData != null) {
-        setState(() {
-          name = profileData['full_name'] ?? 'Anonim Oyuncu';
-          profilurl = profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
-        });
-      }
-
-      // 2️⃣ geogame_stats tablosundan istatistikleri çek
       final statsData = await _supabase
           .from('geogame_stats')
           .select()
-          .eq('user_id', uid)
+          .eq('user_id', currentId)
           .maybeSingle();
 
       if (statsData != null) {
@@ -70,9 +64,6 @@ class _ProfilesState extends State<Profiles> {
           baskentyanlis = (statsData['baskentyanlis'] ?? 0) as int;
         });
       }
-
-      // 3️⃣ Verileri locale kaydet
-      await writeToFile();
 
       debugPrint('✅ Profil başarıyla yüklendi');
 
@@ -94,24 +85,24 @@ class _ProfilesState extends State<Profiles> {
 
   void _selectIndex(int index) async {
     setState(() {
-      selectedIndex = index;
+      AppState.selectedIndex = index;
     });
-    if (selectedIndex == 0) {
+    if (AppState.selectedIndex == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => GeoGameLobi()),
       );
-    } else if (selectedIndex == 1) {
+    } else if (AppState.selectedIndex == 1) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Leadboard()),
       );
-    } else if (selectedIndex == 2) {
+    } else if (AppState.selectedIndex == 2) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Profiles()),
       );
-    } else if (selectedIndex == 3) {
+    } else if (AppState.selectedIndex == 3) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -123,7 +114,7 @@ class _ProfilesState extends State<Profiles> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('navigasyonbar4')),
+        title: Text(Localization.get('navigasyonbar4')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -144,7 +135,7 @@ class _ProfilesState extends State<Profiles> {
       drawer: DrawerWidget(),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : uid.isEmpty
+          : !AuthService.isAuthenticated
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -204,14 +195,14 @@ class _ProfilesState extends State<Profiles> {
                     // Profil Resmi
                     CircleAvatar(
                       radius: 35.0,
-                      backgroundImage: NetworkImage(profilurl),
+                      backgroundImage: NetworkImage(AppState.user.avatarUrl),
                       backgroundColor: Colors.grey,
                     ),
                     SizedBox(width: 16.0),
                     // Kullanıcı adı
                     Expanded(
                       child: Text(
-                        name,
+                        AppState.user.name,
                         style: TextStyle(
                           fontSize: 26.0,
                           fontWeight: FontWeight.bold,
@@ -231,7 +222,7 @@ class _ProfilesState extends State<Profiles> {
 
                 // Kullanıcı puanı
                 Text(
-                  '${Yazi.get('profil1')} $toplampuan',
+                  '${Localization.get('profil1')} $toplampuan',
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.purpleAccent,
@@ -246,7 +237,7 @@ class _ProfilesState extends State<Profiles> {
                   thickness: 1.2,
                 ),
                 Text(
-                  '${Yazi.get('profil2')} $mesafepuan',
+                  '${Localization.get('profil2')} $mesafepuan',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.tealAccent,
@@ -254,7 +245,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Yazi.get('profil3')} $mesafedogru',
+                  '${Localization.get('profil3')} $mesafedogru',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.green,
@@ -262,7 +253,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Yazi.get('profil4')} $mesafeyanlis',
+                  '${Localization.get('profil4')} $mesafeyanlis',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.red,
@@ -276,7 +267,7 @@ class _ProfilesState extends State<Profiles> {
                 ),
                 // Bayrak puan doğru / yanlış
                 Text(
-                  '${Yazi.get('profil5')} $bayrakpuan',
+                  '${Localization.get('profil5')} $bayrakpuan',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.tealAccent,
@@ -284,7 +275,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Yazi.get('profil6')} $bayrakdogru',
+                  '${Localization.get('profil6')} $bayrakdogru',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.green,
@@ -292,7 +283,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Yazi.get('profil7')} $bayrakyanlis',
+                  '${Localization.get('profil7')} $bayrakyanlis',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.red,
@@ -306,7 +297,7 @@ class _ProfilesState extends State<Profiles> {
                 ),
                 // Başkent puan doğru / yanlış
                 Text(
-                  '${Yazi.get('profil8')} $baskentpuan',
+                  '${Localization.get('profil8')} $baskentpuan',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.tealAccent,
@@ -314,7 +305,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Yazi.get('profil9')} $baskentdogru',
+                  '${Localization.get('profil9')} $baskentdogru',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.green,
@@ -322,7 +313,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Yazi.get('profil10')} $baskentyanlis',
+                  '${Localization.get('profil10')} $baskentyanlis',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.red,
@@ -335,14 +326,14 @@ class _ProfilesState extends State<Profiles> {
         ),
       ),
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: selectedIndex,
+        currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) {
           setState(() {
-            selectedIndex = index;
+            AppState.selectedIndex = index;
           });
-          _selectIndex(selectedIndex);
+          _selectIndex(AppState.selectedIndex);
         },
         items: navBarItems,
       ),

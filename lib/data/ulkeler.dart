@@ -1,5 +1,7 @@
 import 'package:geogame/util.dart';
 
+import 'app_context.dart';
+
 class Ulkeler {
   final String url;
   final String bayrak;
@@ -81,11 +83,10 @@ Future<void> yeniulkesec() async {
 
   kalici = secenekler[random.nextInt(4)];
 
-  final bool english = isEnglish;
 
   for (int i = 0; i < 4; i++) {
     butontiklama[i] = true;
-    butonAnahtarlar[i] = english ? secenekler[i].enisim : secenekler[i].isim;
+    butonAnahtarlar[i] = AppState.settings.isEnglish ? secenekler[i].enisim : secenekler[i].isim;
   }
 
   debugPrint("Yeni hedef ülke: ${kalici.isim} olarak belirlendi.");

@@ -11,12 +11,8 @@ class _UserProfileState extends State<Userprofile> {
   @override
   void initState() {
     super.initState();
-    _initializeGame();
   }
 
-  Future<void> _initializeGame() async {
-    await readFromFile((update) => setState(update));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +20,7 @@ class _UserProfileState extends State<Userprofile> {
     if (users.isEmpty || widget.userindex < 0 || widget.userindex >= users.length) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(Yazi.get('navigasyonbar2')),
+          title: Text(Localization.get('navigasyonbar2')),
           centerTitle: true,
         ),
         body: Center(
@@ -53,7 +49,7 @@ class _UserProfileState extends State<Userprofile> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('navigasyonbar2')),
+        title: Text(Localization.get('navigasyonbar2')),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -133,7 +129,7 @@ class _UserProfileState extends State<Userprofile> {
 
                   // Toplam Puan
                   Text(
-                    '${Yazi.get('profil1')} ${user['puan'] ?? 0}',
+                    '${Localization.get('profil1')} ${user['puan'] ?? 0}',
                     style: TextStyle(
                       fontSize: 20.0,
                       color: Colors.purpleAccent,
@@ -148,17 +144,17 @@ class _UserProfileState extends State<Userprofile> {
                     thickness: 1.2,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil2'),
+                    Localization.get('profil2'),
                     '${user['mesafepuan'] ?? 0}',
                     Colors.tealAccent,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil3'),
+                    Localization.get('profil3'),
                     '${user['mesafedogru'] ?? 0}',
                     Colors.green,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil4'),
+                    Localization.get('profil4'),
                     '${user['mesafeyanlis'] ?? 0}',
                     Colors.red,
                   ),
@@ -170,17 +166,17 @@ class _UserProfileState extends State<Userprofile> {
                     thickness: 1.2,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil5'),
+                    Localization.get('profil5'),
                     '${user['bayrakpuan'] ?? 0}',
                     Colors.tealAccent,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil6'),
+                    Localization.get('profil6'),
                     '${user['bayrakdogru'] ?? 0}',
                     Colors.green,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil7'),
+                    Localization.get('profil7'),
                     '${user['bayrakyanlis'] ?? 0}',
                     Colors.red,
                   ),
@@ -192,17 +188,17 @@ class _UserProfileState extends State<Userprofile> {
                     thickness: 1.2,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil8'),
+                    Localization.get('profil8'),
                     '${user['baskentpuan'] ?? 0}',
                     Colors.tealAccent,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil9'),
+                    Localization.get('profil9'),
                     '${user['baskentdogru'] ?? 0}',
                     Colors.green,
                   ),
                   _buildStatRow(
-                    Yazi.get('profil10'),
+                    Localization.get('profil10'),
                     '${user['baskentyanlis'] ?? 0}',
                     Colors.red,
                   ),

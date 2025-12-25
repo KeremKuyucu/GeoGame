@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:geogame/util.dart';
-import 'package:geogame/screens/auth/authpage.dart';
+import 'package:geogame/screens/auth/authpage.dart'; // LoginPage'in olduğu dosya
 import 'package:url_launcher/url_launcher.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../data/app_context.dart';
+import '../../data/bottomBar.dart';
+import '../../services/storage_service.dart';
+import '../../services/auth_service.dart'; // ✅ EKLENDİ
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -11,7 +15,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  // ❌ Supabase instance kaldırıldı. UI veritabanını bilmemeli.
 
   @override
   void initState() {
@@ -19,11 +23,15 @@ class _SettingsPageState extends State<SettingsPage> {
     _initializeSettings();
   }
 
-
   Future<void> _initializeSettings() async {
-    await readFromFile((update) => setState(update));
-    await _checkCurrentUser();
+    // 1. Oturum durumunu Service üzerinden kontrol et
+    // Bu işlem global değişkenleri (uid, name, puanlar) günceller.
+    await AuthService.checkSession();
 
+    // 2. UI'ı güncelle ki yeni veriler görünsün
+    if (mounted) setState(() {});
+
+    // 3. Kıta kontrolü
     if (getFilteredCountries().length < 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _kitaUyari();
@@ -31,69 +39,16 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  // --- SUPABASE İŞLEMLERİ ---
+  // --- AUTH İŞLEMLERİ (Artık Tek Satır) ---
 
-  Future<void> _checkCurrentUser() async {
-    final session = _supabase.auth.currentSession;
-
-    if (session == null) {
-      await _handleLocalReset();
-      return;
-    }
-
-    final authUser = session.user;
-    uid = authUser.id;
-
-    // Yerel veriler zaten varsa gereksiz ağ trafiğini engelle
-    if (name.isNotEmpty && profilurl != 'https://geogame-cdn.keremkk.com.tr/anon.png') {
-      puanguncelle();
-      return;
-    }
-
-    try {
-      final profileData = await _supabase
-          .from('profiles')
-          .select('full_name, avatar_url')
-          .eq('uid', authUser.id)
-          .maybeSingle();
-
-      if (mounted && profileData != null) {
-        setState(() {
-          name = profileData['full_name'] ?? authUser.email?.split('@')[0] ?? 'Oyuncu';
-          profilurl = profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
-        });
-        await writeToFile();
-        puanguncelle();
-      }
-    } catch (e) {
-      debugPrint("Synchronization Error: $e");
-    }
-  }
   Future<void> _signOut() async {
-    try {
-      await _supabase.auth.signOut();
-      await _handleLocalReset(); // Çıkış yapınca merkezi sıfırlama
-      _showSnackBar(Yazi.get('cikisbasarili'), Colors.green);
-    } catch (e) {
-      _showSnackBar(Yazi.get('cikishata'), Colors.red);
+    // Tüm kirli işi Service halleder (Supabase çıkış + Yerel sıfırlama)
+    await AuthService.signOut();
+
+    if (mounted) {
+      setState(() {}); // UI'ı yenile (Misafir moduna döner)
+      _showSnackBar(Localization.get('cikisbasarili'), Colors.green);
     }
-  }
-  Future<void> _handleLocalReset() async {
-    if (!mounted) return;
-
-    setState(() {
-      uid = '';
-      name = '';
-      profilurl = 'https://geogame-cdn.keremkk.com.tr/anon.png';
-      mesafedogru = 0; mesafeyanlis = 0;
-      bayrakdogru = 0; bayrakyanlis = 0;
-      baskentdogru = 0; baskentyanlis = 0;
-      mesafepuan = 0; bayrakpuan = 0; baskentpuan = 0;
-      toplampuan = 0;
-    });
-
-    await writeToFile();
-    puanguncelle(); // UI üzerindeki tüm puan hesaplamalarını sıfırla
   }
 
   // --- YARDIMCI METODLAR ---
@@ -101,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _openWebAuth() async {
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _showSnackBar(Yazi.get('siteuyari'), Colors.red);
+      _showSnackBar(Localization.get('siteuyari'), Colors.red);
     }
   }
 
@@ -119,8 +74,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _selectIndex(int index) {
-    if (index == selectedIndex) return;
-    setState(() => selectedIndex = index);
+    if (index == AppState.selectedIndex) return;
+    setState(() => AppState.selectedIndex = index);
 
     Widget page;
     switch (index) {
@@ -134,19 +89,19 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void restartApp() {
-    selectedIndex = 0;
-    Yazi.loadDil(secilenDil);
+    AppState.selectedIndex = 0;
+    Localization.loadLocalization(AppState.settings.language);
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeoGameLobi()));
   }
 
-  /// Login sayfasına git
   void _navigateToLogin() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => LoginPage(
           onLoginSuccess: () {
-            setState(() {}); // Settings sayfasını yenile
+            // Giriş başarılı olduğunda sayfayı yenile
+            setState(() {});
           },
         ),
       ),
@@ -157,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Yazi.get('ayarlar')),
+        title: Text(Localization.get('ayarlar')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -183,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
       bottomNavigationBar: SalomonBottomBar(
-        currentIndex: selectedIndex,
+        currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
         onTap: (index) {
@@ -201,6 +156,8 @@ class _SettingsPageState extends State<SettingsPage> {
   // --- UI BİLEŞENLERİ ---
 
   Widget _buildAccountCard() {
+    // Burada AppState.user.isLoggedIn kullanmak daha modern olurdu
+    // ama senin mevcut global değişken yapına dokunmuyorum:
     return Card(
       elevation: 12.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
@@ -210,52 +167,49 @@ class _SettingsPageState extends State<SettingsPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30.0),
           gradient: LinearGradient(
-            colors: darktema
+            colors: AppState.settings.darkTheme
                 ? [Colors.grey.shade900, Colors.black87]
                 : [Colors.blue.shade50, Colors.white],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
-        child: uid.isEmpty ? _buildGuestUI() : _buildProfileUI(),
+        child: !AuthService.isAuthenticated ? _buildGuestUI() : _buildProfileUI(),
       ),
     );
   }
 
-  /// Misafir kullanıcı UI (Giriş yap butonu)
   Widget _buildGuestUI() {
     return Column(
       children: [
         Icon(
           Icons.account_circle,
           size: 80,
-          color: darktema ? Colors.white38 : Colors.grey[400],
+          color: AppState.settings.darkTheme ? Colors.white38 : Colors.grey[400],
         ),
         SizedBox(height: 15),
         Text(
-          Yazi.get('misafir'),
+          Localization.get('misafir'),
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: darktema ? Colors.white : Colors.black87,
+            color: AppState.settings.darkTheme ? Colors.white : Colors.black87,
           ),
         ),
         SizedBox(height: 10),
         Text(
-          Yazi.get('girisaciklama'),
+          Localization.get('girisaciklama'),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
-            color: darktema ? Colors.white70 : Colors.grey[700],
+            color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700],
           ),
         ),
         SizedBox(height: 25),
-
-        // Giriş Yap Butonu
         ElevatedButton.icon(
           onPressed: _navigateToLogin,
           icon: Icon(Icons.login),
-          label: Text(Yazi.get('giris')),
+          label: Text(Localization.get('giris')),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,
             foregroundColor: Colors.white,
@@ -267,14 +221,12 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         SizedBox(height: 15),
-
-        // Kayıt ol linki
         TextButton(
           onPressed: _openWebAuth,
           child: Text(
-            Yazi.get('kayitol'),
+            Localization.get('kayitol'),
             style: TextStyle(
-              color: darktema ? Colors.white70 : Colors.blueAccent,
+              color: AppState.settings.darkTheme ? Colors.white70 : Colors.blueAccent,
               decoration: TextDecoration.underline,
             ),
           ),
@@ -283,39 +235,36 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  /// Giriş yapmış kullanıcı UI
   Widget _buildProfileUI() {
     return Column(
       children: [
         CircleAvatar(
           radius: 50,
-          backgroundImage: NetworkImage(profilurl),
+          backgroundImage: NetworkImage(AppState.user.avatarUrl),
           backgroundColor: Colors.white10,
         ),
         SizedBox(height: 12),
         Text(
-          name,
+          AppState.user.name,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: darktema ? Colors.white : Colors.black87,
+            color: AppState.settings.darkTheme ? Colors.white : Colors.black87,
           ),
         ),
         SizedBox(height: 8),
         Text(
-          '${Yazi.get('toplampuan')}: $toplampuan',
+          '${Localization.get('toplampuan')}: $toplampuan',
           style: TextStyle(
             fontSize: 16,
-            color: darktema ? Colors.white70 : Colors.grey[700],
+            color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700],
           ),
         ),
         SizedBox(height: 20),
-
-        // Profil düzenle butonu
         OutlinedButton.icon(
           onPressed: _openWebAuth,
           icon: Icon(Icons.edit, color: Colors.blueAccent),
-          label: Text(Yazi.get('profilduzenleme')),
+          label: Text(Localization.get('profilduzenleme')),
           style: OutlinedButton.styleFrom(
             side: BorderSide(color: Colors.blueAccent),
             foregroundColor: Colors.blueAccent,
@@ -323,12 +272,10 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         SizedBox(height: 10),
-
-        // Çıkış yap butonu
         ElevatedButton.icon(
-          onPressed: _signOut,
+          onPressed: _signOut, // ✅ AuthService kullanan fonksiyon
           icon: Icon(Icons.logout),
-          label: Text(Yazi.get('cikis')),
+          label: Text(Localization.get('cikis')),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
@@ -344,27 +291,27 @@ class _SettingsPageState extends State<SettingsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          Yazi.get('digerayarlar'),
+          Localization.get('digerayarlar'),
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         _switchRow(
-          Yazi.get('siklimod'),
-          yazmamodu,
+          Localization.get('siklimod'),
+          AppState.filter.isButtonMode,
               (v) => setState(() {
-            yazmamodu = v;
-            writeToFile();
+                AppState.filter.isButtonMode = v;
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('tema') + (darktema ? ' Dark' : ' Light'),
-          darktema,
+          Localization.get('tema') + (AppState.settings.darkTheme ? ' Dark' : ' Light'),
+          AppState.settings.darkTheme,
               (v) {
             setState(() {
-              darktema = v;
-              darktema
+              AppState.settings.darkTheme = v;
+              AppState.settings.darkTheme
                   ? ThemeModeBuilderConfig.setDark()
                   : ThemeModeBuilderConfig.setLight();
-              writeToFile();
+              StorageService.saveLocalData();
             });
           },
         ),
@@ -379,16 +326,16 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(Yazi.get('dil'), style: TextStyle(fontSize: 16.0)),
+          Text(Localization.get('dil'), style: TextStyle(fontSize: 16.0)),
           DropdownButton<String>(
-            value: secilenDil,
+            value: AppState.settings.language,
             items: diller
                 .map((dil) => DropdownMenuItem(value: dil, child: Text(dil)))
                 .toList(),
             onChanged: (v) {
               if (v != null) {
-                setState(() => secilenDil = v);
-                writeToFile();
+                setState(() => AppState.settings.language = v);
+                StorageService.saveLocalData();
                 restartApp();
               }
             },
@@ -404,63 +351,63 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         SizedBox(height: 20),
         Text(
-          Yazi.get('kitasecenek'),
+          Localization.get('kitasecenek'),
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         _switchRow(
-          Yazi.get('sadecebm'),
+          Localization.get('sadecebm'),
           sadecebm,
               (v) => setState(() {
             sadecebm = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('amerika'),
+          Localization.get('amerika'),
           amerikakitasi,
               (v) => setState(() {
             amerikakitasi = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('asya'),
+          Localization.get('asya'),
           asyakitasi,
               (v) => setState(() {
             asyakitasi = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('afrika'),
+          Localization.get('afrika'),
           afrikakitasi,
               (v) => setState(() {
             afrikakitasi = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('avrupa'),
+          Localization.get('avrupa'),
           avrupakitasi,
               (v) => setState(() {
             avrupakitasi = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('okyanusya'),
+          Localization.get('okyanusya'),
           okyanusyakitasi,
               (v) => setState(() {
             okyanusyakitasi = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
         _switchRow(
-          Yazi.get('bmuyelik'),
+          Localization.get('bmuyelik'),
           bmuyeligi,
               (v) => setState(() {
             bmuyeligi = v;
-            writeToFile();
+            StorageService.saveLocalData();
           }),
         ),
       ],
@@ -489,12 +436,12 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(Yazi.get('kitayari')),
-        content: Text("${Yazi.get('kitayari1')}\n${Yazi.get('kitayari2')}"),
+        title: Text(Localization.get('kitayari')),
+        content: Text("${Localization.get('kitayari1')}\n${Localization.get('kitayari2')}"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(Yazi.get('tamam')),
+            child: Text(Localization.get('tamam')),
           )
         ],
       ),

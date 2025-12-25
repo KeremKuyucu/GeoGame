@@ -18,7 +18,6 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   http: ^1.5.0
   package_info_plus: ^9.0.0
-  permission_handler: ^12.0.1
   supabase_flutter: ^2.12.0
 
 dev_dependencies:
