@@ -59,7 +59,7 @@ class _LeadboardState extends State<Leadboard> {
           .select()
           .order('puan', ascending: false);
 
-      if (statsResponse == null || statsResponse.isEmpty) {
+      if (statsResponse.isEmpty) {
         debugPrint('Hiç istatistik verisi bulunamadı');
         setState(() {
           users = [];

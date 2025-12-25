@@ -61,10 +61,8 @@ class _BaskentOyunCoopState extends State<BaskentOyunCoop> {
         baskentpuan += puan;
         writeToFile();
         puan = 50;
-        Dogru();
       } else {
         puan -= 10;
-        Yanlis();
         if (puan < 20) puan = 20;
         _controller.clear();
         baskentyanlis++;

@@ -1,4 +1,4 @@
-package com.kk.geogame
+package com.keremkuyucu.geogame
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -17,6 +17,8 @@ export 'dart:math';
 export 'dart:async';
 export 'dart:isolate';
 
+export 'services/language.dart';
+export 'data/ulkeler.dart';
 export 'utilities.dart';
 export 'screens/games/baskentoyun.dart';
 export 'screens/games/bayrakoyun.dart';

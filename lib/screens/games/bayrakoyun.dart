@@ -59,10 +59,8 @@ class _BayrakOyunState extends State<BayrakOyun> {
         bayrakpuan += puan;
         writeToFile();
         puan = 50;
-        Dogru();
       } else {
         puan -= 10;
-        Yanlis();
         if (puan < 20) puan = 20;
         butontiklama[i] = false;
         _controller.clear();
@@ -74,7 +72,6 @@ class _BayrakOyunState extends State<BayrakOyun> {
 
   void _pasButtonPressed() {
     puan = 50;
-    Yanlis();
     String pasulke = (isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
