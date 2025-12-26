@@ -18,21 +18,31 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  // Odak yönetimi için FocusNode'lar eklendi
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+
   bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
-  /// 🌟 GİRİŞ İŞLEMİ VE YÖNLENDİRME MANTIĞI BURADA
+  /// 🌟 GİRİŞ İŞLEMİ VE YÖNLENDİRME MANTIĞI
   Future<void> _handleLogin() async {
+    // 1. Autofill Context'i Kapat (Tarayıcıya "işlem bitti, şifreyi kaydetmeyi teklif et" sinyali)
+    // shouldSave: true parametresi web için kritiktir.
+    TextInput.finishAutofillContext(shouldSave: true);
+
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // 1. Boşluk Kontrolü
     if (email.isEmpty || password.isEmpty) {
       _showSnackBar(Localization.get('boslukuyari'), Colors.orange);
       return;
@@ -40,32 +50,25 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
 
-    // 2. Servise İstek At
-    // AuthService.signIn hata mesajı döner (String?), başarılıysa null döner.
     final String? error = await AuthService.signIn(email, password);
 
     if (!mounted) return;
 
     setState(() => _isLoading = false);
 
-    // 3. Sonucu Kontrol Et
     if (error == null) {
-      // ✅ BAŞARILI
       _showSnackBar(Localization.get('girisbasarili'), Colors.green);
 
-      // Eğer bir callback varsa (Örn: Ayarlar sayfasını yenilemek için) çalıştır
       if (widget.onLoginSuccess != null) {
         widget.onLoginSuccess!();
       }
 
-      AppState.selectedIndex=0;
+      AppState.selectedIndex = 0;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => MainScreen()),
-            (Route<dynamic> route) => false, // Geri dönülemesin diye geçmişi sil
+            (Route<dynamic> route) => false,
       );
-
     } else {
-      // ❌ HATA
       _showSnackBar(error, Colors.red);
     }
   }
@@ -96,39 +99,45 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text(Localization.get('giris')),
         centerTitle: true,
-        leading: Navigator.canPop(context) // Geri gidilecek sayfa var mı?
+        leading: Navigator.canPop(context)
             ? IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         )
             : null,
       ),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 40),
-              Icon(
-                Icons.public,
-                size: 100,
-                color: Theme.of(context).primaryColor,
+      body: Center( // Web'de geniş ekranlarda ortalamak için Center eklendi
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.all(20.0),
+            // Web için maksimum genişlik kısıtlaması (Estetik görünüm için)
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 500),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 40),
+                  Icon(
+                    Icons.public,
+                    size: 100,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'GeoGame',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 50),
+                  _buildLoginCard(),
+                  SizedBox(height: 30),
+                  _buildRegisterSection(),
+                ],
               ),
-              SizedBox(height: 20),
-              Text(
-                'GeoGame',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 50),
-              _buildLoginCard(),
-              SizedBox(height: 30),
-              _buildRegisterSection(),
-            ],
+            ),
           ),
         ),
       ),
@@ -152,22 +161,33 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         child: AutofillGroup(
+          // onDisposeAction: AutofillContextAction.commit, // Bazı durumlarda işe yarar
           child: Column(
             children: [
               _buildTextField(
                 controller: _emailController,
+                focusNode: _emailFocusNode,
                 label: Localization.get('eposta'),
                 icon: Icons.email,
                 obscure: false,
                 autofillHints: const [AutofillHints.email],
+                // E-posta girildikten sonra "İleri" tuşuna basılınca şifreye geç
+                textInputAction: TextInputAction.next,
+                onSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_passwordFocusNode);
+                },
               ),
               SizedBox(height: 20),
               _buildTextField(
                 controller: _passwordController,
+                focusNode: _passwordFocusNode,
                 label: Localization.get('sifre'),
                 icon: Icons.lock,
                 obscure: true,
                 autofillHints: const [AutofillHints.password],
+                // Şifre girildikten sonra "Bitti/Enter" tuşuna basılınca girişi tetikle
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _handleLogin(),
               ),
               SizedBox(height: 30),
 
@@ -177,10 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      TextInput.finishAutofillContext();
-                      _handleLogin();
-                    },
+                    onPressed: _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       padding: EdgeInsets.symmetric(vertical: 15),
@@ -232,15 +249,21 @@ class _LoginPageState extends State<LoginPage> {
     required String label,
     required IconData icon,
     required bool obscure,
+    FocusNode? focusNode,
     Iterable<String>? autofillHints,
+    TextInputAction? textInputAction,
+    Function(String)? onSubmitted,
   }) {
     return TextField(
       controller: controller,
+      focusNode: focusNode,
       obscureText: obscure,
       keyboardType: autofillHints?.contains(AutofillHints.email) == true
           ? TextInputType.emailAddress
           : TextInputType.text,
       autofillHints: autofillHints,
+      textInputAction: textInputAction, // Klavye aksiyonu (İleri/Bitti)
+      onSubmitted: onSubmitted, // Enter tuşu tetikleyicisi
       style: TextStyle(color: AppState.settings.darkTheme ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         labelText: label,
