@@ -94,7 +94,7 @@ class _UserProfileState extends State<Userprofile> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '${Localization.get('toplam_puan')}: ${user['puan'] ?? 0}',
+                      '${Localization.get('toplam_puan')}: ${user['totalScore'] ?? 0}',
                       style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
