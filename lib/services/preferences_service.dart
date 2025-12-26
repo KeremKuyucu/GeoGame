@@ -19,7 +19,6 @@ class PreferencesService {
       }
 
       final Map<String, dynamic> data = jsonDecode(jsonString);
-      print(data);
       // Global State'i güncelle
       AppState.settings = AppSettings.fromMap(data);
       AppState.filter = GameFilter.fromMap(data);
