@@ -83,7 +83,7 @@ class Ulkeler {
   }
 }
 
-Future<void> verileriYukle() async {
+Future<void> loadcountries() async {
   try {
     // 1. Dosyayı string olarak oku
     final String response = await rootBundle.loadString('assets/countries.json');
@@ -141,7 +141,7 @@ List<Ulkeler> getFilteredCountries() {
 }
 Future<void> yeniulkesec() async {
   if (tumUlkeler.isEmpty) {
-    await verileriYukle();
+    await loadcountries();
   }
 
   final List<Ulkeler> uygunUlkeler = getFilteredCountries();

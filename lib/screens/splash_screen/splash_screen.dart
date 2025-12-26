@@ -32,9 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _baslat() async {
     await PreferencesService.loadConfig();
-    await verileriYukle();
+    await loadcountries();
     await AuthService.checkSession();
     await Localization.languageLoad();
+    UpdateService.check(context);
     GameLogService.syncPendingLogs();
     if (mounted) {
       UpdateService.check(context);
@@ -56,8 +57,6 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ✅ LOGO BURAYA EKLENDİ
-            // Logonun etrafına hafif gölge ve yuvarlatma ekledim, daha şık durur.
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20), // Köşeleri yumuşatır
