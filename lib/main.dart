@@ -1,9 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:geogame/util.dart';
 
-import 'data/app_context.dart';
+import 'package:geogame/models/app_context.dart';
+import 'package:theme_mode_builder/theme_mode_builder/theme_mode_builder.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +37,7 @@ class GeoGame extends State<Geogame> {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: "GeoGame",
-          themeMode: themeMode,
+          themeMode: AppState.settings.darkTheme ? ThemeMode.dark : ThemeMode.light,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               brightness: Brightness.light,
@@ -49,7 +50,7 @@ class GeoGame extends State<Geogame> {
               seedColor: Colors.deepPurple,
             ),
           ),
-          home: GeoGameLobi(),
+          home: const SplashScreen(),
         );
       },
     );

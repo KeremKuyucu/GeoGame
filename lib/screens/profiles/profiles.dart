@@ -1,12 +1,19 @@
-import 'package:geogame/util.dart';
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/bottomBar.dart';
 import 'package:geogame/models/drawer_widget.dart';
 
 import 'package:geogame/services/auth_service.dart';
+import 'package:geogame/services/localization_service.dart';
+
 import 'package:geogame/screens/auth/authpage.dart';
+import 'package:geogame/screens/mainscreen/main_screen.dart';
+import 'package:geogame/screens/leadboards-and-profile/leadboard.dart';
+import 'package:geogame/screens/settings/settings.dart';
+
 
 class Profiles extends StatefulWidget {
   @override
@@ -24,6 +31,8 @@ class _ProfilesState extends State<Profiles> {
   }
 
   Future<void> _initializeGame() async {
+    // Önce oturum kontrolü, sonra veri çekme
+    await AuthService.checkSession();
     await fetchUserProfile();
   }
 
@@ -32,7 +41,6 @@ class _ProfilesState extends State<Profiles> {
 
     if (currentId == null) {
       if (mounted) setState(() => _isLoading = false);
-      debugPrint('⚠️ Kullanıcı giriş yapmamış');
       return;
     }
 
@@ -47,291 +55,364 @@ class _ProfilesState extends State<Profiles> {
 
       if (statsData != null) {
         setState(() {
-          AppState.stats.distanceScore  = (statsData['distanceScore'] ?? 0) as int;
-          AppState.stats.flagScore = (statsData['flagScore'] ?? 0) as int;
-          AppState.stats.capitalScore  = (statsData['capitalScore'] ?? 0) as int;
-
-          AppState.stats.distanceCorrectCount  = (statsData['distanceCorrectCount'] ?? 0) as int;
-          AppState.stats.distanceWrongCount  = (statsData['distanceWrongCount'] ?? 0) as int;
-          AppState.stats.flagCorrectCount  = (statsData['flagCorrectCount'] ?? 0) as int;
-          AppState.stats.flagWrongCount  = (statsData['flagWrongCount'] ?? 0) as int;
-          AppState.stats.capitalCorrectCount  = (statsData['capitalCorrectCount'] ?? 0) as int;
-          AppState.stats.capitalWrongCount  = (statsData['capitalWrongCount'] ?? 0) as int;
+          AppState.stats = GameStats.fromMap(statsData);
         });
       }
-
-      debugPrint('✅ Profil başarıyla yüklendi');
+      debugPrint('✅ Profil verileri güncellendi.');
 
     } catch (e) {
       debugPrint('❌ Profil yükleme hatası: $e');
-
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profil yüklenemedi: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red));
       }
     } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  void _selectIndex(int index) async {
-    setState(() {
-      AppState.selectedIndex = index;
-    });
-    if (AppState.selectedIndex == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
-      );
-    } else if (AppState.selectedIndex == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Leadboard()),
-      );
-    } else if (AppState.selectedIndex == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Profiles()),
-      );
-    } else if (AppState.selectedIndex == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SettingsPage()),
-      );
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Giriş yapmamış kullanıcı ekranı
+    if (!AuthService.isAuthenticated && !_isLoading) {
+      return _buildGuestView();
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(Localization.get('navigasyonbar3')),
+        title: Text(Localization.get('navigasyonbar3')), // "Profil"
         centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: fetchUserProfile,
             tooltip: Localization.get("refresh"),
           ),
         ],
       ),
-      drawer: DrawerWidget(),
+      drawer: const DrawerWidget(),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : !AuthService.isAuthenticated
-          ? Center(
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.person_off, size: 80, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
-              Localization.get("giris_yap_mesaj"),
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage(
-                      onLoginSuccess: () {
-                        setState(() {
-                          _initializeGame();
-                        });
-                      },
-                    ),
-                  ),
-                );
-              },
-              child: Text('Giriş Yap'),
-            ),
+            // 1. Kart: Kullanıcı Bilgisi ve Toplam Puan
+            _buildHeaderCard(),
+
+            const SizedBox(height: 20),
+
+            // 2. Kart: Detaylı Oyun İstatistikleri
+            _buildDetailedStatsCard(),
           ],
-        ),
-      )
-          : Card(
-        margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        elevation: 15.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25.0),
-        ),
-        shadowColor: Colors.black.withOpacity(0.3),
-        color: Colors.grey.shade800,
-        child: Container(
-          padding: const EdgeInsets.all(25.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25.0),
-            gradient: LinearGradient(
-              colors: [Colors.black, Colors.grey.shade900],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Profil başlığı ve profil resmi
-                Row(
-                  children: [
-                    // Profil Resmi
-                    CircleAvatar(
-                      radius: 35.0,
-                      backgroundImage: NetworkImage(AppState.user.avatarUrl),
-                      backgroundColor: Colors.grey,
-                    ),
-                    SizedBox(width: 16.0),
-                    // Kullanıcı adı
-                    Expanded(
-                      child: Text(
-                        AppState.user.name,
-                        style: TextStyle(
-                          fontSize: 26.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.0),
-                Divider(
-                  color: Colors.white.withOpacity(0.6),
-                  thickness: 1.2,
-                ),
-                SizedBox(height: 10.0),
-
-                // Kullanıcı puanı
-                Text(
-                  '${Localization.get('profil1')} $AppState.stats.totalScore',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.purpleAccent,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 10.0),
-
-                // Mesafe puan doğru / yanlış
-                Divider(
-                  color: Colors.white.withOpacity(0.6),
-                  thickness: 1.2,
-                ),
-                Text(
-                  '${Localization.get('profil2')} $AppState.stats.distanceScore',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.tealAccent,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  '${Localization.get('profil3')} $AppState.stats.distanceCorrectCount',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  '${Localization.get('profil4')} $AppState.stats.distanceWrongCount',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.red,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                Divider(
-                  color: Colors.white.withOpacity(0.6),
-                  thickness: 1.2,
-                ),
-                // Bayrak puan doğru / yanlış
-                Text(
-                  '${Localization.get('profil5')} $AppState.stats.flagScore',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.tealAccent,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  '${Localization.get('profil6')} $AppState.stats.flagCorrectCount',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  '${Localization.get('profil7')} $AppState.stats.flagWrongCount',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.red,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                SizedBox(height: 10.0),
-                Divider(
-                  color: Colors.white.withOpacity(0.6),
-                  thickness: 1.2,
-                ),
-                // Başkent puan doğru / yanlış
-                Text(
-                  '${Localization.get('profil8')} $AppState.stats.capitalScore',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.tealAccent,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  '${Localization.get('profil9')} $AppState.stats.capitalCorrectCount',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Text(
-                  '${Localization.get('profil10')} $AppState.stats.capitalWrongCount',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: Colors.red,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
       bottomNavigationBar: SalomonBottomBar(
         currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
+        items: navBarItems,
         onTap: (index) {
+          if (AppState.selectedIndex == index) return;
+
           setState(() {
             AppState.selectedIndex = index;
           });
-          _selectIndex(AppState.selectedIndex);
+
+          Widget page;
+          switch (index) {
+            case 0:
+              page = MainScreen();
+              break;
+            case 1:
+              page = Leadboard();
+              break;
+            case 2:
+              page = Profiles();
+              break;
+            case 3:
+              page = SettingsPage();
+              break;
+            default:
+              return;
+          }
+
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => page,
+              transitionDuration: Duration.zero, // Anında geçiş
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         },
-        items: navBarItems,
       ),
+    );
+  }
+
+  /// 👤 Giriş Yapmamış Kullanıcı Görünümü
+  Widget _buildGuestView() {
+    return Scaffold(
+      appBar: AppBar(title: Text(Localization.get('navigasyonbar3'))),
+      drawer: const DrawerWidget(),
+      bottomNavigationBar: SalomonBottomBar(
+        currentIndex: AppState.selectedIndex,
+        selectedItemColor: const Color(0xff6200ee),
+        unselectedItemColor: const Color(0xff757575),
+        items: navBarItems,
+        onTap: (index) {
+          if (AppState.selectedIndex == index) return;
+          setState(() {
+            AppState.selectedIndex = index;
+          });
+
+          Widget page;
+          switch (index) {
+            case 0:
+              page = MainScreen();
+              break;
+            case 1:
+              page = Leadboard();
+              break;
+            case 2:
+              page = Profiles();
+              break;
+            case 3:
+              page = SettingsPage();
+              break;
+            default:
+              return;
+          }
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => page,
+              transitionDuration: Duration.zero, // Anında geçiş
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        },
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.person_off, size: 80, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              Localization.get("giris_yap_mesaj"),
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.login),
+              label: const Text('Giriş Yap / Kayıt Ol'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(
+                      onLoginSuccess: () {
+                        setState(() => _initializeGame());
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 🏆 Üst Kart: Avatar, İsim, Toplam Puan
+  Widget _buildHeaderCard() {
+    return Card(
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade900, Colors.blue.shade600],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 38,
+                backgroundImage: NetworkImage(AppState.user.avatarUrl),
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppState.user.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                        '${Localization.get('toplam_puan')}: ${AppState.stats.totalScore}',
+                      style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 📊 Alt Kart: Detaylı İstatistikler
+  Widget _buildDetailedStatsCard() {
+    final stats = AppState.stats;
+
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: Colors.grey.shade900,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const Text(
+              "Oyun İstatistikleri",
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+
+            // 1. Mesafe Oyunu
+            _buildGameStatSection(
+              title: Localization.get('oyun_mesafe'),
+              icon: Icons.map,
+              color: Colors.tealAccent,
+              score: stats.distanceScore,
+              correct: stats.distanceCorrectCount,
+              wrong: stats.distanceWrongCount,
+            ),
+            const Divider(color: Colors.white24, height: 30),
+
+            // 2. Bayrak Oyunu
+            _buildGameStatSection(
+              title: Localization.get('oyun_bayrak'),
+              icon: Icons.flag,
+              color: Colors.orangeAccent,
+              score: stats.flagScore,
+              correct: stats.flagCorrectCount,
+              wrong: stats.flagWrongCount,
+            ),
+            const Divider(color: Colors.white24, height: 30),
+
+            // 3. Başkent Oyunu
+            _buildGameStatSection(
+              title: Localization.get('oyun_baskent'),
+              icon: Icons.location_city,
+              color: Colors.purpleAccent,
+              score: stats.capitalScore,
+              correct: stats.capitalCorrectCount,
+              wrong: stats.capitalWrongCount,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 🧩 Tekrar Eden İstatistik Satırı Widget'ı
+  Widget _buildGameStatSection({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required int score,
+    required int correct,
+    required int wrong,
+  }) {
+    // Başarı Oranı Hesaplama
+    int total = correct + wrong;
+    double successRate = total > 0 ? (correct / total) : 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Başlık ve Puan
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color, size: 24),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Text(
+              '$score ${Localization.get('puan')}', // "1500 Puan"
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // İlerleme Çubuğu (Başarı Oranı)
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: successRate,
+            backgroundColor: Colors.grey.shade800,
+            color: color,
+            minHeight: 8,
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Detaylar (Doğru / Yanlış / Oran)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${Localization.get('dogru')}: $correct',
+              style: const TextStyle(color: Colors.green, fontSize: 14),
+            ),
+            Text(
+              '${Localization.get('yanlis')}: $wrong',
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+            ),
+            Text(
+              '${Localization.get('basari_orani')}: %${(successRate * 100).toStringAsFixed(1)}',
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

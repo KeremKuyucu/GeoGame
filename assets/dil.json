@@ -7,14 +7,6 @@
       "Türkçe": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
       "English": "You can send your complaints or suggestions by clicking the button above."
     },
-    "uygpaylas": {
-      "Türkçe": "Uygulamayı Paylaş",
-      "English": "Share the App"
-    },
-    "davetpromt": {
-      "Türkçe": "GeoGame'e Katılmak İçin Seni Davet Ediyoruz! Eğlenceli bir yolculuğa başlamak için hemen tıkla: http://keremkk.can.re/geogame",
-      "English": "You're Invited to Join GeoGame! Start your exciting journey now by clicking here: http://keremkk.can.re/geogame"
-    },
     "website": {
       "Türkçe": "GeoGame Website",
       "English": "GeoGame Website"
@@ -139,46 +131,50 @@
       "Türkçe": "Tahminleri Temizle",
       "English": "Clear Guesses"
     },
-    "profil1": {
-      "Türkçe": "Toplam Puan: ",
-      "English": "Total Points: "
-    },
-    "profil2": {
-      "Türkçe": "Mesafe Puan: ",
-      "English": "Distance Points: "
-    },
-    "profil3": {
-      "Türkçe": "Mesafe Doğru: ",
-      "English": "Distance Correct: "
-    },
-    "profil4": {
-      "Türkçe": "Mesafe Yanlış: ",
-      "English": "Distance Incorrect: "
-    },
-    "profil5": {
-      "Türkçe": "Bayrak Puan: ",
-      "English": "Flag Points: "
-    },
-    "profil6": {
-      "Türkçe": "Bayrak Doğru: ",
-      "English": "Flag Correct: "
-    },
-    "profil7": {
-      "Türkçe": "Bayrak Yanlış: ",
-      "English": "Flag Incorrect: "
-    },
-    "profil8": {
-      "Türkçe": "Başkent Puan: ",
-      "English": "Capital Points: "
-    },
-    "profil9": {
-      "Türkçe": "Başkent Doğru: ",
-      "English": "Capital Correct: "
-    },
-    "profil10": {
-      "Türkçe": "Başkent Yanlış: ",
-      "English": "Capital Incorrect: "
-    },
+      "profil_baslik": {
+        "Türkçe": "Profil",
+        "English": "Profile"
+      },
+      "oyun_istatistikleri": {
+        "Türkçe": "Oyun İstatistikleri",
+        "English": "Game Statistics"
+      },
+      "toplam_puan": {
+        "Türkçe": "Toplam Puan",
+        "English": "Total Score"
+      },
+      "basari_orani": {
+        "Türkçe": "Başarı",
+        "English": "Success"
+      },
+      "dogru": {
+        "Türkçe": "Doğru",
+        "English": "Correct"
+      },
+      "yanlis": {
+        "Türkçe": "Yanlış",
+        "English": "Wrong"
+      },
+      "puan": {
+        "Türkçe": "Puan",
+        "English": "Score"
+      },
+      "oyun_mesafe": {
+        "Türkçe": "Mesafe",
+        "English": "Distance"
+      },
+      "oyun_bayrak": {
+        "Türkçe": "Bayrak",
+        "English": "Flags"
+      },
+      "oyun_baskent": {
+        "Türkçe": "Başkent",
+        "English": "Capitals"
+      },
+      "giris_yap_buton": {
+        "Türkçe": "Giriş Yap / Kayıt Ol",
+        "English": "Login / Register"
+      },
     "kitayari": {
       "Türkçe": "Uyarı",
       "English": "Warning"
@@ -215,9 +211,13 @@
       "Türkçe": "Selected Language: ",
       "English": "Selected Language: "
     },
-    "amerika": {
-      "Türkçe": "Amerika Kıtasında Olan Ülkeler",
-      "English": "Countries in America Continent"
+    "SouthAmerica": {
+      "Türkçe": "Güney Amerika Kıtasında Olan Ülkeler",
+      "English": "Countries in South America Continent"
+    },
+    "NorthAmerica": {
+      "Türkçe": "Kuzey Amerika Kıtasında Olan Ülkeler",
+      "English": "Countries in North America Continent"
     },
     "asya": {
       "Türkçe": "Asya Kıtasında Olan Ülkeler",
@@ -242,10 +242,6 @@
     "bmuyelik": {
       "Türkçe": "BM Üyeliği Olmayan Ülkeler",
       "English": "Countries without UN Membership"
-    },
-    "sadecebm": {
-      "Türkçe": "Sadece BM üyesi olmayan ülkeler",
-      "English": "Only without UN membership"
     },
     "navigasyonbar1": {
       "Türkçe": "Oyunlar",
@@ -383,9 +379,9 @@
       "Türkçe": "E-posta",
       "English": "E-mail"
     },
-    "siteuyari": {
-      "Türkçe": "Site açılamadı.",
-      "English": "Site could not be opened."
+    "refresh": {
+      "Türkçe": "Yenile",
+      "English": "Refresh"
     }
   }
 }

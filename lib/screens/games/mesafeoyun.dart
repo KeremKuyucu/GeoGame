@@ -1,7 +1,17 @@
-import 'package:geogame/util.dart';
+import 'package:flutter/material.dart';
+import 'package:searchfield/searchfield.dart';
+import 'dart:math';
 
-import '../../data/app_context.dart';
-import '../../services/storage_service.dart';
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/drawer_widget.dart';
+
+import 'package:geogame/widgets/custom_notification.dart';
+
+import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/game_log_service.dart';
+
+import 'package:geogame/screens/mainscreen/main_screen.dart';
 
 class MesafeOyun extends StatefulWidget {
   @override
@@ -11,7 +21,6 @@ class MesafeOyun extends StatefulWidget {
 class _MesafeOyunState extends State<MesafeOyun> {
   String message = '';
   late TextEditingController _controller = TextEditingController();
-  int puan = 100;
 
   @override
   void initState() {
@@ -20,6 +29,10 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
 
   Future<void> _initializeGame() async {
+    AppState.session.reset(
+      startScore: 300,
+      minScore: 100,
+    );
     yeniulkesec();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       mesafeoyunkurallari();
@@ -56,43 +69,53 @@ class _MesafeOyunState extends State<MesafeOyun> {
   }
 
   void _checkAnswer() {
+    String girilenMetin = _controller.text.trim();
+
+    if (girilenMetin.isEmpty) return;
+
     setState(() {
-      for (int a = 0; a < 250; a++) {
-        if (ulke[a].ks(_controller.text.trim())) {
-          gecici = ulke[a];
-          break;
-        }
+      try {
+        gecici = tumUlkeler.firstWhere(
+              (u) => u.ks(girilenMetin),
+        );
+      } catch (e) {
+        debugPrint("Böyle bir ülke bulunamadı: $girilenMetin");
+        return;
       }
+
       message += Localization.get('tahminmetin') +
           (AppState.settings.isEnglish ? gecici.enisim : gecici.isim) +
           "    ";
+
       message += Localization.get('mesafe') +
           mesafeHesapla(
-                  gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam)
+              gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam)
               .toString() +
           " Km   ";
+
       message += Localization.get('yon') +
           pusula(gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam) +
           "\n";
-      if (kalici.ks(_controller.text.trim())) {
+
+      if (kalici.ks(girilenMetin)) {
         _controller.clear();
         message = '';
+
+        AppState.session.submitCorrect();
+        GameLogService.saveToStorage("distance");
         yeniulkesec();
-        mesafedogru++;
-        mesafepuan += puan;
-        puan = 300;
+
       } else {
-        puan -= 10;
-        if (puan < 100) puan = 100;
+        AppState.session.submitWrong();
         _controller.clear();
-        mesafeyanlis++;
+        AppState.stats.distanceWrongCount++;
+
       }
-      StorageService.saveLocalData();
     });
   }
 
   void _pasButtonPressed() {
-    puan = 300;
+    AppState.session.submitPass();
     String pasulke = (AppState.settings.isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
@@ -176,9 +199,10 @@ class _MesafeOyunState extends State<MesafeOyun> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
+              GameLogService.syncPendingLogs();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => GeoGameLobi()),
+                MaterialPageRoute(builder: (context) => MainScreen()),
               );
             },
           ),
@@ -252,7 +276,7 @@ class _MesafeOyunState extends State<MesafeOyun> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SearchField<Ulkeler>(
-                  suggestions: ulke
+                  suggestions: tumUlkeler
                       .map(
                         (e) => SearchFieldListItem<Ulkeler>(
                           AppState.settings.isEnglish ? e.enisim : e.isim,
