@@ -1,20 +1,28 @@
-import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/util.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:theme_mode_builder/common/theme_mode_builder_config.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/bottomBar.dart';
-import 'package:geogame/services/storage_service.dart';
+import 'package:geogame/models/drawer_widget.dart';
+import 'package:geogame/models/countries.dart';
 
-import '../../models/drawer_widget.dart';
-import '../../models/ulkeler.dart';
+import 'package:geogame/services/localization_service.dart';
 
-class GeoGameLobi extends StatefulWidget {
+import 'package:geogame/screens/settings/settings.dart';
+import 'package:geogame/screens/leadboards-and-profile/leadboard.dart';
+import 'package:geogame/screens/profiles/profiles.dart';
+
+import 'package:geogame/screens/games/baskentoyun.dart';
+import 'package:geogame/screens/games/bayrakoyun.dart';
+import 'package:geogame/screens/games/mesafeoyun.dart';
+
+class MainScreen extends StatefulWidget {
   @override
-  _GeoGameLobiState createState() => _GeoGameLobiState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _GeoGameLobiState extends State<GeoGameLobi> {
+class _MainScreenState extends State<MainScreen> {
   int _selectedOption = 0;
 
   @override
@@ -24,92 +32,8 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
       ThemeModeBuilderConfig.setDark();
     else
       ThemeModeBuilderConfig.setLight();
-    _initializeGame();
-  }
-  Future<void> _initializeGame() async {
-    await StorageService.loadLocalData();
-    if (!mounted) return;
-    setState(() {
-      Localization.languageSwitch();
-    });
-    yeniulkesec();
-    surumKiyasla();
-    if (!mounted) return;
-    if (!AuthService.isAuthenticated) {
-      AppState.selectedIndex = 4;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SettingsPage()),
-      );
-      return;
-    }
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
   }
 
-  Future<void> surumKiyasla() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String localVersion = packageInfo.version;
-    String? remoteVersion;
-    String? updateNotes;
-
-    try {
-      final response = await http.get(Uri.parse(
-          'https://api.github.com/repos/KeremKuyucu/GeoGame/releases/latest'));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        remoteVersion =
-            (data['tag_name'] as String?)?.replaceFirst(RegExp(r'^v'), '');
-        updateNotes = data['body'] ?? 'Yama notları mevcut değil';
-
-        if (remoteVersion != null &&
-            remoteVersion != localVersion) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(Localization.get('surum1')),
-                content: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        updateNotes ?? '',
-                      ),
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text(Localization.get('surum2')),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: Text(Localization.get('surum3')),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame/releases/latest');
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
-      } else {
-        throw Exception('GitHub API hatası: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Hata: $e');
-    }
-  }
   void _selectOption(int index) async {
     setState(() {
       _selectedOption = index;
@@ -130,32 +54,6 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         MaterialPageRoute(builder: (context) => MesafeOyun()),
       );
     } else if (getFilteredCountries().length < 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SettingsPage()),
-      );
-    }
-  }
-  void _selectIndex(int index) async {
-    setState(() {
-      AppState.selectedIndex = index;
-    });
-    if (AppState.selectedIndex == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => GeoGameLobi()),
-      );
-    } else if (AppState.selectedIndex == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Leadboard()),
-      );
-    } else if (AppState.selectedIndex == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Profiles()),
-      );
-    } else if (AppState.selectedIndex == 3 ) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -266,13 +164,46 @@ class _GeoGameLobiState extends State<GeoGameLobi> {
         currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
-        onTap: (index) async {
+        items: navBarItems,
+
+        // ✅ Tüm mantık burada
+        onTap: (index) {
+          // 1. Zaten aynı sayfadaysak HİÇBİR ŞEY YAPMA (Buradan çık)
+          if (AppState.selectedIndex == index) return;
+
+          // 2. Değilsek, seçili indexi güncelle (Rengi değiştirir)
           setState(() {
             AppState.selectedIndex = index;
           });
-          _selectIndex(AppState.selectedIndex);
+
+          // 3. Hangi sayfaya gidileceğini belirle
+          Widget page;
+          switch (index) {
+            case 0:
+              page = MainScreen();
+              break;
+            case 1:
+              page = Leadboard();
+              break;
+            case 2:
+              page = Profiles();
+              break;
+            case 3:
+              page = SettingsPage();
+              break;
+            default:
+              return;
+          }
+
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => page,
+              transitionDuration: Duration.zero, // Anında geçiş
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
         },
-        items: navBarItems,
       ),
     );
   }

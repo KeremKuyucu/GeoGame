@@ -1,91 +1,14 @@
-enum UnFilterStatus {
-  all,        // Hepsini göster (Varsayılan)
-  onlyUN,     // Sadece BM Üyeleri (Eski: bmuyeligi = true)
-  onlyNonUN   // Sadece BM Üyesi Olmayanlar (Eski: sadecebm = true)
+// lib/models/app_context.dart
+
+class AppState {
+  static int selectedIndex = 0;
+  static UserProfile user = UserProfile.anonymous();
+  static GameFilter filter = GameFilter();
+  static AppSettings settings = AppSettings();
+  static GameStats stats = GameStats();
+  static GameSession session = GameSession();
 }
 
-class GameFilter {
-  // Kıtalar
-  bool amerika;
-  bool asya;
-  bool afrika;
-  bool avrupa;
-  bool okyanusya;
-  bool antarktika;
-
-  // Oyun Modu
-  bool isButtonMode; // Eski: yazmamodu
-
-  // BM Filtresi (Enum yapısı çakışmayı önler)
-  UnFilterStatus unFilter;
-
-  GameFilter({
-    this.amerika = true,
-    this.asya = true,
-    this.afrika = true,
-    this.avrupa = true,
-    this.okyanusya = true,
-    this.antarktika = true,
-    this.isButtonMode = true,
-    this.unFilter = UnFilterStatus.all,
-  });
-
-  // Veritabanı için dönüşüm
-  Map<String, dynamic> toMap() {
-    return {
-      'amerika': amerika,
-      'asya': asya,
-      'afrika': afrika,
-      'avrupa': avrupa,
-      'okyanusya': okyanusya,
-      'antarktika': antarktika,
-      'isButtonMode': isButtonMode,
-      'unFilter': unFilter.index, // Enum'ı integer olarak saklarız (0, 1, 2)
-    };
-  }
-}
-class AppSettings {
-  bool darkTheme;
-  String language;
-  String languagePref;
-
-  AppSettings({
-    this.darkTheme = true,
-    this.language = '',
-    this.languagePref = '',
-  });
-
-  bool get isEnglish => language == 'English';
-}
-class GameStats {
-  int mesafeDogru;
-  int mesafeYanlis;
-  int bayrakDogru;
-  int bayrakYanlis;
-  int baskentDogru;
-  int baskentYanlis;
-
-  // Puanlar (Hesaplanabilir değerler olmalı ama veritabanında tutuyorsan kalsın)
-  int mesafePuan;
-  int bayrakPuan;
-  int baskentPuan;
-
-  // Toplam puanı değişkende tutmak yerine getter ile hesaplamak daha güvenlidir
-  // Eski: toplampuan
-  int get totalScore => mesafePuan + bayrakPuan + baskentPuan;
-
-  GameStats({
-    this.mesafeDogru = 0,
-    this.mesafeYanlis = 0,
-    this.bayrakDogru = 0,
-    this.bayrakYanlis = 0,
-    this.baskentDogru = 0,
-    this.baskentYanlis = 0,
-    this.mesafePuan = 0,
-    this.bayrakPuan = 0,
-    this.baskentPuan = 0,
-  });
-}
 class UserProfile {
   String name;
   String avatarUrl;
@@ -117,10 +40,159 @@ class UserProfile {
   }
 }
 
-class AppState {
-  static int selectedIndex = 0;
-  static UserProfile user = UserProfile.anonymous();
-  static GameFilter filter = GameFilter();
-  static AppSettings settings = AppSettings();
-  static GameStats stats = GameStats();
+class GameFilter {
+  bool northAmerica, southAmerica, Asia, Africa, Europe, Oceania, Antarctic;
+  bool includeNonUN;
+  bool isButtonMode;
+
+  GameFilter({
+    this.northAmerica = true,
+    this.southAmerica = true,
+    this.Asia = true,
+    this.Africa = true,
+    this.Europe = true,
+    this.Oceania = true,
+    this.Antarctic = true,
+    this.isButtonMode = true,
+    this.includeNonUN = false,
+  });
+
+  factory GameFilter.fromMap(Map<String, dynamic> map) {
+    return GameFilter(
+      northAmerica: map['northAmerica'] ?? true,
+      southAmerica: map['southAmerica'] ?? true,
+      Asia: map['Asia'] ?? true,
+      Africa: map['Africa'] ?? true,
+      Europe: map['Europe'] ?? true,
+      Oceania: map['Oceania'] ?? true,
+      Antarctic: map['Antarctic'] ?? true,
+      isButtonMode: map['isButtonMode'] ?? true,
+      includeNonUN: map['includeNonUN'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'southAmerica': southAmerica,
+      'northAmerica': northAmerica,
+      'Asia': Asia,
+      'Africa': Africa,
+      'Europe': Europe,
+      'Oceania': Oceania,
+      'Antarctic': Antarctic,
+      'isButtonMode': isButtonMode,
+      'includeNonUN': includeNonUN,
+    };
+  }
+}
+
+class AppSettings {
+  bool darkTheme;
+  String language; // Dil kodu (tr, en)
+  String languagePref; // Cihaz tercihi vs.
+
+  AppSettings({
+    this.darkTheme = true,
+    this.language = '',
+    this.languagePref = '',
+  });
+
+  bool get isEnglish => language == 'en'; // Kod 'en' ise İngilizce
+
+  factory AppSettings.fromMap(Map<String, dynamic> map) {
+    return AppSettings(
+      darkTheme: map['darkTheme'] ?? true,
+      language: map['language'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'darkTheme': darkTheme,
+      'language': language,
+    };
+  }
+}
+
+class GameStats {
+  int distanceCorrectCount, distanceWrongCount;
+  int flagCorrectCount, flagWrongCount;
+  int capitalCorrectCount, capitalWrongCount;
+
+  int distanceScore, flagScore, capitalScore;
+
+  int get totalScore => distanceScore + flagScore + capitalScore;
+
+  GameStats({
+    this.distanceCorrectCount = 0, this.distanceWrongCount = 0,
+    this.flagCorrectCount = 0, this.flagWrongCount = 0,
+    this.capitalCorrectCount = 0, this.capitalWrongCount = 0,
+    this.distanceScore = 0, this.flagScore = 0, this.capitalScore = 0,
+  });
+
+  factory GameStats.fromMap(Map<String, dynamic> map) {
+    return GameStats(
+      distanceCorrectCount: map['distanceCorrectCount'] ?? 0,
+      distanceWrongCount:   map['distanceWrongCount'] ?? 0,
+
+      flagCorrectCount:     map['flagCorrectCount'] ?? 0,
+      flagWrongCount:       map['flagWrongCount'] ?? 0,
+
+      capitalCorrectCount:  map['capitalCorrectCount'] ?? 0,
+      capitalWrongCount:    map['capitalWrongCount'] ?? 0,
+
+      distanceScore:        map['distanceScore'] ?? 0,
+      flagScore:            map['flagScore'] ?? 0,
+      capitalScore:         map['capitalScore'] ?? 0,
+    );
+  }
+}
+class GameSession {
+  // Puanlar
+  int totalScore = 0;
+  int correctCount = 0;
+  int wrongCount = 0;
+  int passCount = 0;
+
+  String sessionId = "";
+
+  int _startScore = 50;
+  int _minScore = 20;
+  int currentQuestionScore = 50;
+
+  void reset({required int startScore, required int minScore}) {
+    totalScore = 0;
+    correctCount = 0;
+    wrongCount = 0;
+    passCount = 0;
+
+    sessionId = "${DateTime.now().millisecondsSinceEpoch}-${(100 + (DateTime.now().microsecond % 900))}";
+
+    _startScore = startScore;
+    _minScore = minScore;
+    currentQuestionScore = _startScore;
+  }
+
+  void nextQuestion() {
+    currentQuestionScore = _startScore;
+  }
+
+  void submitCorrect() {
+    correctCount++;
+    totalScore += currentQuestionScore;
+    nextQuestion();
+  }
+
+  void submitWrong() {
+    wrongCount++;
+    currentQuestionScore -= 10;
+    if (currentQuestionScore < _minScore) {
+      currentQuestionScore = _minScore;
+    }
+  }
+
+  void submitPass() {
+    passCount++;
+    nextQuestion();
+  }
 }

@@ -1,7 +1,10 @@
-import 'package:geogame/util.dart';
-
-import '../data/app_context.dart';
-import '../data/bottomBar.dart';
+import 'dart:convert';
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/bottomBar.dart';
 
 class Localization {
   static Map<String, dynamic>? _localizedStrings;
@@ -29,7 +32,7 @@ class Localization {
 
   static String get(String key) {
     if (_localizedStrings == null) {
-      languageSwitch();
+      languageLoad();
       return '⚠️ Dil dosyası yükleniyor...';
     }
 
@@ -41,7 +44,7 @@ class Localization {
     return '⚠️ $key bulunamadı';
   }
 
-  static Future<void> languageSwitch() async {
+  static Future<void> languageLoad() async {
     if (AppState.settings.language.isEmpty)
       AppState.settings.language = AppState.settings.languagePref == 'tr' ? "Türkçe" : "English";
     await Localization.loadLocalization(AppState.settings.language).then((_) {

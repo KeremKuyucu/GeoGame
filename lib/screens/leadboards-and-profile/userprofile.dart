@@ -1,324 +1,214 @@
-import 'package:geogame/util.dart';
+import 'package:flutter/material.dart';
+import 'package:geogame/models/drawer_widget.dart';
+import 'package:geogame/services/localization_service.dart';
 
 class Userprofile extends StatefulWidget {
-  final int userindex;
-  Userprofile({Key? key, required this.userindex}) : super(key: key);
+  // Leadboard'dan gelen kullanıcı verisi
+  final Map<String, dynamic> user;
+
+  const Userprofile({Key? key, required this.user}) : super(key: key);
+
   @override
   _UserProfileState createState() => _UserProfileState();
 }
 
 class _UserProfileState extends State<Userprofile> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-
-  @override
   Widget build(BuildContext context) {
-    // ✅ Güvenlik kontrolü: users listesi boş veya index geçersizse
-    if (users.isEmpty || widget.userindex < 0 || widget.userindex >= users.length) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(Localization.get('navigasyonbar2')),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 80, color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
-                'Kullanıcı bulunamadı',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Geri Dön'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    final user = widget.user;
 
-    // ✅ Seçili kullanıcının verilerini al
-    final user = users[widget.userindex];
+    // Resim anahtarı bazen 'profilurl' bazen 'avatar_url' gelebilir, kontrol edelim
+    final String avatarUrl = user['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Localization.get('navigasyonbar2')),
+        title: Text(user['name'] ?? 'Profil'),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      drawer: DrawerWidget(),
+      drawer: const DrawerWidget(),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            elevation: 15.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25.0),
-            ),
-            shadowColor: Colors.black.withOpacity(0.3),
-            color: Colors.grey.shade800,
-            child: Container(
-              padding: const EdgeInsets.all(25.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25.0),
-                gradient: LinearGradient(
-                  colors: [Colors.black, Colors.grey.shade900],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // 1. Üst Kart (Avatar + İsim + Toplam Puan)
+            _buildHeaderCard(user, avatarUrl),
+
+            const SizedBox(height: 20),
+
+            // 2. İstatistik Kartı (Detaylı)
+            _buildDetailedStatsCard(user),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 🏆 Üst Kart Tasarımı
+  Widget _buildHeaderCard(Map<String, dynamic> user, String avatarUrl) {
+    return Card(
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade900, Colors.blue.shade600],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.white,
+              child: CircleAvatar(
+                radius: 38,
+                backgroundImage: NetworkImage(avatarUrl),
               ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profil başlığı
-                  Row(
-                    children: [
-                      // Profil Resmi
-                      CircleAvatar(
-                        radius: 35.0,
-                        backgroundImage: NetworkImage(
-                          user['profilurl'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
-                        ),
-                        backgroundColor: Colors.grey,
-                      ),
-                      SizedBox(width: 16.0),
-                      // Kullanıcı adı
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user['name'] ?? 'Anonim Oyuncu',
-                              style: TextStyle(
-                                fontSize: 26.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Sıralama: #${widget.userindex + 1}',
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                color: Colors.amber,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.0),
-                  Divider(
-                    color: Colors.white.withOpacity(0.6),
-                    thickness: 1.2,
-                  ),
-                  SizedBox(height: 10.0),
-
-                  // Toplam Puan
                   Text(
-                    '${Localization.get('profil1')} ${user['puan'] ?? 0}',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.purpleAccent,
-                      fontWeight: FontWeight.w500,
+                    user['name'] ?? 'Anonim',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${Localization.get('toplam_puan')}: ${user['puan'] ?? 0}',
+                      style: const TextStyle(color: Colors.amberAccent, fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
-                  SizedBox(height: 10.0),
-
-                  // Mesafe İstatistikleri
-                  Divider(
-                    color: Colors.white.withOpacity(0.6),
-                    thickness: 1.2,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil2'),
-                    '${user['mesafepuan'] ?? 0}',
-                    Colors.tealAccent,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil3'),
-                    '${user['mesafedogru'] ?? 0}',
-                    Colors.green,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil4'),
-                    '${user['mesafeyanlis'] ?? 0}',
-                    Colors.red,
-                  ),
-                  SizedBox(height: 10.0),
-
-                  // Bayrak İstatistikleri
-                  Divider(
-                    color: Colors.white.withOpacity(0.6),
-                    thickness: 1.2,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil5'),
-                    '${user['bayrakpuan'] ?? 0}',
-                    Colors.tealAccent,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil6'),
-                    '${user['bayrakdogru'] ?? 0}',
-                    Colors.green,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil7'),
-                    '${user['bayrakyanlis'] ?? 0}',
-                    Colors.red,
-                  ),
-                  SizedBox(height: 10.0),
-
-                  // Başkent İstatistikleri
-                  Divider(
-                    color: Colors.white.withOpacity(0.6),
-                    thickness: 1.2,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil8'),
-                    '${user['baskentpuan'] ?? 0}',
-                    Colors.tealAccent,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil9'),
-                    '${user['baskentdogru'] ?? 0}',
-                    Colors.green,
-                  ),
-                  _buildStatRow(
-                    Localization.get('profil10'),
-                    '${user['baskentyanlis'] ?? 0}',
-                    Colors.red,
-                  ),
-
-                  // ✅ Başarı oranları (opsiyonel)
-                  SizedBox(height: 20.0),
-                  Divider(
-                    color: Colors.white.withOpacity(0.6),
-                    thickness: 1.2,
-                  ),
-                  _buildSuccessRates(user),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  /// ✅ İstatistik satırı widget'ı
-  Widget _buildStatRow(String label, String value, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18.0,
-              color: color,
-              fontWeight: FontWeight.w400,
+  /// 📊 Alt Kart: Detaylı İstatistikler
+  Widget _buildDetailedStatsCard(Map<String, dynamic> user) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: Colors.grey.shade900,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            Text(
+              Localization.get('oyun_istatistikleri'), // "Oyun İstatistikleri"
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18.0,
-              color: color,
-              fontWeight: FontWeight.bold,
+            const SizedBox(height: 20),
+
+            // 1. Mesafe
+            _buildGameStatSection(
+              title: Localization.get('oyun_mesafe'),
+              icon: Icons.map,
+              color: Colors.tealAccent,
+              score: user['distanceScore'] ?? 0,
+              correct: user['distanceCorrectCount'] ?? 0,
+              wrong: user['distanceWrongCount'] ?? 0,
             ),
-          ),
-        ],
+            const Divider(color: Colors.white24, height: 30),
+
+            // 2. Bayrak
+            _buildGameStatSection(
+              title: Localization.get('oyun_bayrak'),
+              icon: Icons.flag,
+              color: Colors.orangeAccent,
+              score: user['flagScore'] ?? 0,
+              correct: user['flagCorrectCount'] ?? 0,
+              wrong: user['flagWrongCount'] ?? 0,
+            ),
+            const Divider(color: Colors.white24, height: 30),
+
+            // 3. Başkent
+            _buildGameStatSection(
+              title: Localization.get('oyun_baskent'),
+              icon: Icons.location_city,
+              color: Colors.purpleAccent,
+              score: user['capitalScore'] ?? 0,
+              correct: user['capitalCorrectCount'] ?? 0,
+              wrong: user['capitalWrongCount'] ?? 0,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  /// ✅ Başarı oranlarını hesapla ve göster
-  Widget _buildSuccessRates(Map<String, dynamic> user) {
-    // Mesafe başarı oranı
-    int mesafeTotal = (user['mesafedogru'] ?? 0) + (user['mesafeyanlis'] ?? 0);
-    double mesafeRate = mesafeTotal > 0
-        ? ((user['mesafedogru'] ?? 0) / mesafeTotal * 100)
-        : 0;
+  /// 🧩 Tekrar Eden Bölüm (Progress Bar'lı)
+  Widget _buildGameStatSection({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required int score,
+    required int correct,
+    required int wrong,
+  }) {
+    int total = correct + wrong;
+    double successRate = total > 0 ? (correct / total) : 0.0;
 
-    // Bayrak başarı oranı
-    int bayrakTotal = (user['bayrakdogru'] ?? 0) + (user['bayrakyanlis'] ?? 0);
-    double bayrakRate = bayrakTotal > 0
-        ? ((user['bayrakdogru'] ?? 0) / bayrakTotal * 100)
-        : 0;
-
-    // Başkent başarı oranı
-    int baskentTotal = (user['baskentdogru'] ?? 0) + (user['baskentyanlis'] ?? 0);
-    double baskentRate = baskentTotal > 0
-        ? ((user['baskentdogru'] ?? 0) / baskentTotal * 100)
-        : 0;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Başarı Oranları',
-          style: TextStyle(
-            fontSize: 20.0,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 10),
-        _buildProgressBar('Mesafe', mesafeRate, Colors.tealAccent),
-        SizedBox(height: 8),
-        _buildProgressBar('Bayrak', bayrakRate, Colors.orangeAccent),
-        SizedBox(height: 8),
-        _buildProgressBar('Başkent', baskentRate, Colors.purpleAccent),
-      ],
-    );
-  }
-
-  /// ✅ İlerleme çubuğu
-  Widget _buildProgressBar(String label, double percentage, Color color) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+            Row(
+              children: [
+                Icon(icon, color: color, size: 24),
+                const SizedBox(width: 10),
+                Text(title, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
             ),
             Text(
-              '${percentage.toStringAsFixed(1)}%',
-              style: TextStyle(
-                color: color,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              '$score ${Localization.get('puan')}',
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 10),
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
-            value: percentage / 100,
-            backgroundColor: Colors.grey.shade700,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
+            value: successRate,
+            backgroundColor: Colors.grey.shade800,
+            color: color,
             minHeight: 8,
           ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('${Localization.get('dogru')}: $correct', style: const TextStyle(color: Colors.green, fontSize: 14)),
+            Text('${Localization.get('yanlis')}: $wrong', style: const TextStyle(color: Colors.red, fontSize: 14)),
+            Text('${Localization.get('basari_orani')}: %${(successRate * 100).toStringAsFixed(1)}', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+          ],
         ),
       ],
     );

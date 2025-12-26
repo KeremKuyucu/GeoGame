@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:geogame/data/app_context.dart';
-import 'package:geogame/util.dart';
+import 'package:flutter/services.dart';
+import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/screens/mainscreen/geogamelobi.dart';
+import 'package:geogame/screens/mainscreen/main_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geogame/services/localization_service.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
@@ -59,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
 
       AppState.selectedIndex=0;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => GeoGameLobi()),
+        MaterialPageRoute(builder: (context) => MainScreen()),
             (Route<dynamic> route) => false, // Geri dönülemesin diye geçmişi sil
       );
 
@@ -95,10 +96,12 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text(Localization.get('giris')),
         centerTitle: true,
-        leading: IconButton(
+        leading: Navigator.canPop(context) // Geri gidilecek sayfa var mı?
+            ? IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
-        ),
+        )
+            : null,
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -176,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       TextInput.finishAutofillContext();
-                      _handleLogin(); // ✅ Yeni oluşturduğumuz fonksiyonu çağırıyoruz
+                      _handleLogin();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,

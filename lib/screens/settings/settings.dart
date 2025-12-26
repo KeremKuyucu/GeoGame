@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:geogame/util.dart';
-import 'package:geogame/screens/auth/authpage.dart'; // LoginPage'in olduğu dosya
+import 'package:geogame/screens/auth/authpage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:theme_mode_builder/theme_mode_builder.dart';
+import 'dart:async';
 
+import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/bottomBar.dart';
 import 'package:geogame/models/drawer_widget.dart';
-import 'package:geogame/models/ulkeler.dart';
-import 'package:geogame/services/storage_service.dart';
+import 'package:geogame/models/countries.dart';
+import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/services/auth_service.dart';
+import 'package:geogame/screens/mainscreen/main_screen.dart';
+import 'package:geogame/screens/leadboards-and-profile/leadboard.dart';
+import 'package:geogame/screens/profiles/profiles.dart';
+
+
+
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -25,15 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _initializeSettings() async {
-    // 1. Oturum durumunu Service üzerinden kontrol et
-    // Bu işlem global değişkenleri (uid, name, puanlar) günceller.
-    await AuthService.checkSession();
-
-    // 2. UI'ı güncelle ki yeni veriler görünsün
-    if (mounted) setState(() {});
-
-    // 3. Kıta kontrolü
-    if (getFilteredCountries().length < 1) {
+if (getFilteredCountries().length < 1) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _kitaUyari();
       });
@@ -74,25 +74,10 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void _selectIndex(int index) {
-    if (index == AppState.selectedIndex) return;
-    setState(() => AppState.selectedIndex = index);
-
-    Widget page;
-    switch (index) {
-      case 0: page = GeoGameLobi(); break;
-      case 1: page = Leadboard(); break;
-      case 2: page = Profiles(); break;
-      case 3: return;
-      default: page = GeoGameLobi();
-    }
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => page));
-  }
-
   void restartApp() {
     AppState.selectedIndex = 0;
-    Localization.loadLocalization(AppState.settings.language);
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => GeoGameLobi()));
+    Localization.languageLoad();
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen()));
   }
 
   void _navigateToLogin() {
@@ -142,14 +127,47 @@ class _SettingsPageState extends State<SettingsPage> {
         currentIndex: AppState.selectedIndex,
         selectedItemColor: const Color(0xff6200ee),
         unselectedItemColor: const Color(0xff757575),
-        onTap: (index) {
-          if (getFilteredCountries().length > 0 || index == 3) {
-            _selectIndex(index);
-          } else {
-            _kitaUyari();
-          }
-        },
         items: navBarItems,
+
+        // ✅ Tüm mantık burada
+        onTap: (index) {
+          // 1. Zaten aynı sayfadaysak HİÇBİR ŞEY YAPMA (Buradan çık)
+          if (AppState.selectedIndex == index) return;
+
+          // 2. Değilsek, seçili indexi güncelle (Rengi değiştirir)
+          setState(() {
+            AppState.selectedIndex = index;
+          });
+
+          // 3. Hangi sayfaya gidileceğini belirle
+          Widget page;
+          switch (index) {
+            case 0:
+              page = MainScreen();
+              break;
+            case 1:
+              page = Leadboard();
+              break;
+            case 2:
+              page = Profiles();
+              break;
+            case 3:
+              page = SettingsPage();
+              break;
+            default:
+              return;
+          }
+
+          // 4. Sayfaya git (Animasyonsuz geçiş en iyisidir)
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation1, animation2) => page,
+              transitionDuration: Duration.zero, // Anında geçiş
+              reverseTransitionDuration: Duration.zero,
+            ),
+          );
+        },
       ),
     );
   }
@@ -253,14 +271,6 @@ class _SettingsPageState extends State<SettingsPage> {
             color: AppState.settings.darkTheme ? Colors.white : Colors.black87,
           ),
         ),
-        SizedBox(height: 8),
-        Text(
-          '${Localization.get('toplampuan')}: $toplampuan',
-          style: TextStyle(
-            fontSize: 16,
-            color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700],
-          ),
-        ),
         SizedBox(height: 20),
         OutlinedButton.icon(
           onPressed: _openWebAuth,
@@ -300,7 +310,7 @@ class _SettingsPageState extends State<SettingsPage> {
           AppState.filter.isButtonMode,
               (v) => setState(() {
                 AppState.filter.isButtonMode = v;
-            StorageService.saveLocalData();
+                PreferencesService.saveConfig();
           }),
         ),
         _switchRow(
@@ -312,7 +322,7 @@ class _SettingsPageState extends State<SettingsPage> {
               AppState.settings.darkTheme
                   ? ThemeModeBuilderConfig.setDark()
                   : ThemeModeBuilderConfig.setLight();
-              StorageService.saveLocalData();
+              PreferencesService.saveConfig();
             });
           },
         ),
@@ -336,7 +346,7 @@ class _SettingsPageState extends State<SettingsPage> {
             onChanged: (v) {
               if (v != null) {
                 setState(() => AppState.settings.language = v);
-                StorageService.saveLocalData();
+                PreferencesService.saveConfig();
                 restartApp();
               }
             },
@@ -356,51 +366,67 @@ class _SettingsPageState extends State<SettingsPage> {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         _switchRow(
-          Localization.get('amerika'),
-          amerikakitasi,
+          Localization.get('NorthAmerica'),
+          AppState.filter.northAmerica,
               (v) => setState(() {
-            amerikakitasi = v;
-            StorageService.saveLocalData();
+                AppState.filter.northAmerica = v;
+                PreferencesService.saveConfig();
+          }),
+        ),
+        _switchRow(
+          Localization.get('SouthAmerica'),
+          AppState.filter.southAmerica,
+              (v) => setState(() {
+            AppState.filter.southAmerica = v;
+            PreferencesService.saveConfig();
           }),
         ),
         _switchRow(
           Localization.get('asya'),
-          asyakitasi,
+          AppState.filter.Asia,
               (v) => setState(() {
-            asyakitasi = v;
-            StorageService.saveLocalData();
+                AppState.filter.Asia  = v;
+                PreferencesService.saveConfig();
           }),
         ),
         _switchRow(
           Localization.get('afrika'),
-          afrikakitasi,
+          AppState.filter.Africa,
               (v) => setState(() {
-            afrikakitasi = v;
-            StorageService.saveLocalData();
+                AppState.filter.Africa = v;
+                PreferencesService.saveConfig();
           }),
         ),
         _switchRow(
           Localization.get('avrupa'),
-          avrupakitasi,
+          AppState.filter.Europe,
               (v) => setState(() {
-            avrupakitasi = v;
-            StorageService.saveLocalData();
+                AppState.filter.Europe = v;
+                PreferencesService.saveConfig();
           }),
         ),
         _switchRow(
           Localization.get('okyanusya'),
-          okyanusyakitasi,
+          AppState.filter.Oceania,
               (v) => setState(() {
-            okyanusyakitasi = v;
-            StorageService.saveLocalData();
+                AppState.filter.Oceania = v;
+                PreferencesService.saveConfig();
+          }),
+        ),
+        _switchRow(
+          Localization.get('antartika'),
+          AppState.filter.Antarctic,
+              (v) => setState(() {
+                AppState.filter.Antarctic = v;
+                PreferencesService.saveConfig();
           }),
         ),
         _switchRow(
           Localization.get('bmuyelik'),
-          bmuyeligi,
+          AppState.filter.includeNonUN,
               (v) => setState(() {
-            bmuyeligi = v;
-            StorageService.saveLocalData();
+                AppState.filter.includeNonUN = v;
+                PreferencesService.saveConfig();
           }),
         ),
       ],
@@ -417,7 +443,8 @@ class _SettingsPageState extends State<SettingsPage> {
           Switch(
             value: val,
             onChanged: onChanged,
-            activeColor: Colors.green,
+            activeThumbColor: Colors.green, // Yuvarlağın rengi (Açıkken)
+            activeTrackColor: Colors.green.withValues(alpha: 0.5), // Çubuğun rengi (Açıkken)
           ),
         ],
       ),

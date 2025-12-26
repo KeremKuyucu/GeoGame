@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:geogame/widgets/feedback_dialog.dart';
 import 'package:geogame/services/localization_service.dart';
@@ -38,14 +36,6 @@ class DrawerWidget extends StatelessWidget {
           ),
           const Divider(),
           _buildListTile(
-            icon: Icons.share,
-            iconColor: const Color(0xFF5865F2),
-            title: Localization.get('uygpaylas'),
-            onTap: () async {
-              await Share.share(Localization.get('davetpromt'));
-            },
-          ),
-          _buildListTile(
             icon: Icons.person,
             iconColor: const Color(0xFF5865F2),
             title: Localization.get('yapimcimetin'),
@@ -65,7 +55,7 @@ class DrawerWidget extends StatelessWidget {
             },
           ),
           _buildListTile(
-            icon: FontAwesomeIcons.github,
+            icon: Icons.code,
             iconColor: Colors.black,
             title: Localization.get('github'),
             onTap: () async {
@@ -111,7 +101,7 @@ class DrawerWidget extends StatelessWidget {
                 Shadow(
                   offset: const Offset(2.0, 2.0),
                   blurRadius: 3.0,
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
               ],
             ),

@@ -1,7 +1,18 @@
-import 'package:geogame/util.dart';
+import 'package:flutter/material.dart';
+import 'package:searchfield/searchfield.dart';
 
-import '../../data/app_context.dart';
-import '../../services/storage_service.dart';
+import 'package:geogame/models/app_context.dart';
+
+import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/game_log_service.dart';
+
+import 'package:geogame/models/drawer_widget.dart';
+import 'package:geogame/models/countries.dart';
+
+import 'package:geogame/widgets/custom_notification.dart';
+
+import 'package:geogame/screens/mainscreen/main_screen.dart';
+
 
 class BaskentOyun extends StatefulWidget {
   @override
@@ -10,7 +21,6 @@ class BaskentOyun extends StatefulWidget {
 
 class _BaskentOyunState extends State<BaskentOyun> {
   late TextEditingController _controller = TextEditingController();
-  int puan = 50;
 
   @override
   void initState() {
@@ -19,6 +29,10 @@ class _BaskentOyunState extends State<BaskentOyun> {
   }
 
   Future<void> _initializeGame() async {
+    AppState.session.reset(
+      startScore: 50,
+      minScore: 20,
+    );
     yeniulkesec();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       baskentoyunkurallari();
@@ -59,22 +73,18 @@ class _BaskentOyunState extends State<BaskentOyun> {
       if (kalici.ks(_controller.text.trim())) {
         _controller.clear();
         yeniulkesec();
-        baskentdogru++;
-        baskentpuan += puan;
-        puan = 50;
+        GameLogService.saveToStorage("capital");
+        AppState.session.submitCorrect();
       } else {
-        puan -= 10;
-        if (puan < 20) puan = 20;
         _controller.clear();
-        baskentyanlis++;
+        AppState.session.submitWrong();
         butontiklama[i] = false;
       }
-      StorageService.saveLocalData();
     });
   }
 
   void _pasButtonPressed() {
-    puan = 50;
+    AppState.session.submitPass();
     String pasulke = (AppState.settings.isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
@@ -106,9 +116,10 @@ class _BaskentOyunState extends State<BaskentOyun> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
+              GameLogService.syncPendingLogs();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => GeoGameLobi()),
+                MaterialPageRoute(builder: (context) => MainScreen()),
               );
             },
           ),
@@ -235,7 +246,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SearchField<Ulkeler>(
-                      suggestions: ulke
+                      suggestions: tumUlkeler
                           .map(
                             (e) => SearchFieldListItem<Ulkeler>(
                               AppState.settings.isEnglish ? e.enisim : e.isim,

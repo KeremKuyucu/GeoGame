@@ -1,7 +1,16 @@
-import 'package:geogame/util.dart';
+import 'package:flutter/material.dart';
+import 'package:searchfield/searchfield.dart';
 
-import '../../data/app_context.dart';
-import '../../services/storage_service.dart';
+import 'package:geogame/widgets/custom_notification.dart';
+
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/drawer_widget.dart';
+
+import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/game_log_service.dart';
+
+import 'package:geogame/screens/mainscreen/main_screen.dart';
 
 class BayrakOyun extends StatefulWidget {
   @override
@@ -10,7 +19,6 @@ class BayrakOyun extends StatefulWidget {
 
 class _BayrakOyunState extends State<BayrakOyun> {
   late TextEditingController _controller = TextEditingController();
-  int puan = 50;
 
   @override
   void initState() {
@@ -19,6 +27,10 @@ class _BayrakOyunState extends State<BayrakOyun> {
   }
 
   Future<void> _initializeGame() async {
+    AppState.session.reset(
+      startScore: 50,
+      minScore: 20,
+    );
     yeniulkesec();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       bayrakoyunkurallari();
@@ -59,22 +71,18 @@ class _BayrakOyunState extends State<BayrakOyun> {
       if (kalici.ks(_controller.text.trim())) {
         _controller.clear();
         yeniulkesec();
-        bayrakdogru++;
-        bayrakpuan += puan;
-        puan = 50;
+        AppState.session.submitCorrect();
+        GameLogService.saveToStorage("flag");
       } else {
-        puan -= 10;
-        if (puan < 20) puan = 20;
-        butontiklama[i] = false;
         _controller.clear();
-        bayrakyanlis++;
+        butontiklama[i] = false;
+        AppState.session.submitWrong();
       }
-      StorageService.saveLocalData();
     });
   }
 
   void _pasButtonPressed() {
-    puan = 50;
+    AppState.session.submitPass();
     String pasulke = (AppState.settings.isEnglish ? kalici.enisim : kalici.isim);
     showDialog(
       context: context,
@@ -106,9 +114,10 @@ class _BayrakOyunState extends State<BayrakOyun> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
+              GameLogService.syncPendingLogs();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => GeoGameLobi()),
+                MaterialPageRoute(builder: (context) => MainScreen()),
               );
             },
           ),
@@ -263,7 +272,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SearchField<Ulkeler>(
-                    suggestions: ulke
+                    suggestions: tumUlkeler
                         .map(
                           (e) => SearchFieldListItem<Ulkeler>(
                             AppState.settings.isEnglish ? e.enisim : e.isim,
