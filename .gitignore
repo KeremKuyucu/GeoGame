@@ -1,7 +1,7 @@
 # Do not remove or rename entries in this file, only add new ones
 # See https://github.com/flutter/flutter/issues/128635 for more context.
 
-build.bat
+lib/env.dart
 
 # Miscellaneous
 *.class
@@ -161,3 +161,4 @@ app.*.symbols
 .python-version
 .gclient_previous_custom_vars
 .gclient_previous_sync_commits
+lib/env.dart
