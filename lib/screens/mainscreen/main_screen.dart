@@ -2,9 +2,12 @@ import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/util.dart';
 import 'package:http/http.dart' as http;
 
-import '../../data/app_context.dart';
-import '../../data/bottomBar.dart';
-import '../../services/storage_service.dart';
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/bottomBar.dart';
+import 'package:geogame/services/storage_service.dart';
+
+import '../../models/drawer_widget.dart';
+import '../../models/ulkeler.dart';
 
 class GeoGameLobi extends StatefulWidget {
   @override

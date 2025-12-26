@@ -1,10 +1,12 @@
 import 'package:geogame/util.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../data/app_context.dart';
-import '../../data/bottomBar.dart';
-import '../../services/auth_service.dart';
-import '../auth/authpage.dart';
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/bottomBar.dart';
+import 'package:geogame/models/drawer_widget.dart';
+
+import 'package:geogame/services/auth_service.dart';
+import 'package:geogame/screens/auth/authpage.dart';
 
 class Profiles extends StatefulWidget {
   @override
@@ -37,12 +39,6 @@ class _ProfilesState extends State<Profiles> {
     setState(() => _isLoading = true);
 
     try {
-      final profileData = await _supabase
-          .from('profiles')
-          .select()
-          .eq('uid', currentId)
-          .maybeSingle();
-
       final statsData = await _supabase
           .from('geogame_stats')
           .select()
@@ -51,17 +47,16 @@ class _ProfilesState extends State<Profiles> {
 
       if (statsData != null) {
         setState(() {
-          toplampuan = (statsData['puan'] ?? 0) as int;
-          mesafepuan = (statsData['mesafepuan'] ?? 0) as int;
-          bayrakpuan = (statsData['bayrakpuan'] ?? 0) as int;
-          baskentpuan = (statsData['baskentpuan'] ?? 0) as int;
+          AppState.stats.distanceScore  = (statsData['distanceScore'] ?? 0) as int;
+          AppState.stats.flagScore = (statsData['flagScore'] ?? 0) as int;
+          AppState.stats.capitalScore  = (statsData['capitalScore'] ?? 0) as int;
 
-          mesafedogru = (statsData['mesafedogru'] ?? 0) as int;
-          mesafeyanlis = (statsData['mesafeyanlis'] ?? 0) as int;
-          bayrakdogru = (statsData['bayrakdogru'] ?? 0) as int;
-          bayrakyanlis = (statsData['bayrakyanlis'] ?? 0) as int;
-          baskentdogru = (statsData['baskentdogru'] ?? 0) as int;
-          baskentyanlis = (statsData['baskentyanlis'] ?? 0) as int;
+          AppState.stats.distanceCorrectCount  = (statsData['distanceCorrectCount'] ?? 0) as int;
+          AppState.stats.distanceWrongCount  = (statsData['distanceWrongCount'] ?? 0) as int;
+          AppState.stats.flagCorrectCount  = (statsData['flagCorrectCount'] ?? 0) as int;
+          AppState.stats.flagWrongCount  = (statsData['flagWrongCount'] ?? 0) as int;
+          AppState.stats.capitalCorrectCount  = (statsData['capitalCorrectCount'] ?? 0) as int;
+          AppState.stats.capitalWrongCount  = (statsData['capitalWrongCount'] ?? 0) as int;
         });
       }
 
@@ -90,7 +85,7 @@ class _ProfilesState extends State<Profiles> {
     if (AppState.selectedIndex == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => GeoGameLobi()),
+        MaterialPageRoute(builder: (context) => MainScreen()),
       );
     } else if (AppState.selectedIndex == 1) {
       Navigator.pushReplacement(
@@ -114,7 +109,7 @@ class _ProfilesState extends State<Profiles> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Localization.get('navigasyonbar4')),
+        title: Text(Localization.get('navigasyonbar3')),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -128,7 +123,7 @@ class _ProfilesState extends State<Profiles> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: fetchUserProfile,
-            tooltip: 'Yenile',
+            tooltip: Localization.get("refresh"),
           ),
         ],
       ),
@@ -143,7 +138,7 @@ class _ProfilesState extends State<Profiles> {
             Icon(Icons.person_off, size: 80, color: Colors.grey),
             SizedBox(height: 16),
             Text(
-              'Giriş yapmanız gerekiyor',
+              Localization.get("giris_yap_mesaj"),
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             SizedBox(height: 16),
@@ -222,7 +217,7 @@ class _ProfilesState extends State<Profiles> {
 
                 // Kullanıcı puanı
                 Text(
-                  '${Localization.get('profil1')} $toplampuan',
+                  '${Localization.get('profil1')} $AppState.stats.totalScore',
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.purpleAccent,
@@ -237,7 +232,7 @@ class _ProfilesState extends State<Profiles> {
                   thickness: 1.2,
                 ),
                 Text(
-                  '${Localization.get('profil2')} $mesafepuan',
+                  '${Localization.get('profil2')} $AppState.stats.distanceScore',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.tealAccent,
@@ -245,7 +240,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Localization.get('profil3')} $mesafedogru',
+                  '${Localization.get('profil3')} $AppState.stats.distanceCorrectCount',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.green,
@@ -253,7 +248,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Localization.get('profil4')} $mesafeyanlis',
+                  '${Localization.get('profil4')} $AppState.stats.distanceWrongCount',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.red,
@@ -267,7 +262,7 @@ class _ProfilesState extends State<Profiles> {
                 ),
                 // Bayrak puan doğru / yanlış
                 Text(
-                  '${Localization.get('profil5')} $bayrakpuan',
+                  '${Localization.get('profil5')} $AppState.stats.flagScore',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.tealAccent,
@@ -275,7 +270,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Localization.get('profil6')} $bayrakdogru',
+                  '${Localization.get('profil6')} $AppState.stats.flagCorrectCount',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.green,
@@ -283,7 +278,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Localization.get('profil7')} $bayrakyanlis',
+                  '${Localization.get('profil7')} $AppState.stats.flagWrongCount',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.red,
@@ -297,7 +292,7 @@ class _ProfilesState extends State<Profiles> {
                 ),
                 // Başkent puan doğru / yanlış
                 Text(
-                  '${Localization.get('profil8')} $baskentpuan',
+                  '${Localization.get('profil8')} $AppState.stats.capitalScore',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.tealAccent,
@@ -305,7 +300,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Localization.get('profil9')} $baskentdogru',
+                  '${Localization.get('profil9')} $AppState.stats.capitalCorrectCount',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.green,
@@ -313,7 +308,7 @@ class _ProfilesState extends State<Profiles> {
                   ),
                 ),
                 Text(
-                  '${Localization.get('profil10')} $baskentyanlis',
+                  '${Localization.get('profil10')} $AppState.stats.capitalWrongCount',
                   style: TextStyle(
                     fontSize: 18.0,
                     color: Colors.red,

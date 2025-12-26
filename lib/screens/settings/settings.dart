@@ -4,10 +4,12 @@ import 'package:geogame/screens/auth/authpage.dart'; // LoginPage'in olduğu dos
 import 'package:url_launcher/url_launcher.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-import '../../data/app_context.dart';
-import '../../data/bottomBar.dart';
-import '../../services/storage_service.dart';
-import '../../services/auth_service.dart'; // ✅ EKLENDİ
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/bottomBar.dart';
+import 'package:geogame/models/drawer_widget.dart';
+import 'package:geogame/models/ulkeler.dart';
+import 'package:geogame/services/storage_service.dart';
+import 'package:geogame/services/auth_service.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -15,7 +17,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // ❌ Supabase instance kaldırıldı. UI veritabanını bilmemeli.
 
   @override
   void initState() {
@@ -353,14 +354,6 @@ class _SettingsPageState extends State<SettingsPage> {
         Text(
           Localization.get('kitasecenek'),
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        _switchRow(
-          Localization.get('sadecebm'),
-          sadecebm,
-              (v) => setState(() {
-            sadecebm = v;
-            StorageService.saveLocalData();
-          }),
         ),
         _switchRow(
           Localization.get('amerika'),
