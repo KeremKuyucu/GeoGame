@@ -58,3 +58,12 @@ class GeoGame extends State<Geogame> {
     );
   }
 }
+
+/*
+flutter pub run flutter_launcher_icons:main
+
+flutter build web
+flutter build apk --release --split-per-abi
+flutter build windows
+
+*/
