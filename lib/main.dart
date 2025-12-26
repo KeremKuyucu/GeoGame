@@ -6,11 +6,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:theme_mode_builder/theme_mode_builder/theme_mode_builder.dart';
 
+import 'env.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url: 'https://brgwnlbgasameiuuoxte.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyZ3dubGJnYXNhbWVpdXVveHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxNzE3NDEsImV4cCI6MjA4MTc0Nzc0MX0.G3vFjkWthJZ7h7N_K3yNPrr_ney9pSXdTko4cYdwR0k',
+    url: Env.supabaseUrl,
+    anonKey: Env.supabaseAnonKey,
   );
 
   Locale deviceLocale = PlatformDispatcher.instance.locale;
