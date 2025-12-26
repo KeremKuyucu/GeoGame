@@ -1,4 +1,5 @@
-import 'package:geogame/util.dart';
+import 'dart:math';
+import 'package:flutter/material.dart';
 
 import 'app_context.dart';
 
@@ -37,59 +38,83 @@ final List<Color> buttonColors = [
 List<bool> butontiklama = [true, true, true, true];
 List<String> butonAnahtarlar = ['', '', '', ''];
 final random = Random();
+// ... diğer importlar
+import 'models/ulkeler.dart'; // tumUlkeler listesinin olduğu dosya
+
+// ... (Ulkeler sınıfı ve diğer değişkenler aynı kalabilir)
+
 List<Ulkeler> getFilteredCountries() {
-  if (!amerikakitasi &&
-      !asyakitasi &&
-      !afrikakitasi &&
-      !avrupakitasi &&
-      !okyanusyakitasi &&
-      !antartikakitasi) {
+  // Eğer hiçbir filtre seçili değilse boş dön
+  if (!AppState.filter.NorthAmerica &&
+      !AppState.filter.SouthAmerica &&
+      !AppState.filter.Asia &&
+      !AppState.filter.Africa &&
+      !AppState.filter.Europe &&
+      !AppState.filter.Oceania &&
+      !AppState.filter.Antarctic) {
     return [];
   }
 
+  // DİKKAT: Artık 'ulke' değil, JSON'dan dolan 'tumUlkeler' listesini kullanıyoruz
+  // Eğer liste boşsa (henüz yüklenmediyse) boş dön
+  if (tumUlkeler.isEmpty) return [];
+
   List<Ulkeler> filteredList = [];
-  for (var u in ulke) {
-    // Kıta kontrolü
-    bool kitaUygun = (amerikakitasi && u.kita == "Americas") ||
-        (asyakitasi && u.kita == "Asia") ||
-        (afrikakitasi && u.kita == "Africa") ||
-        (avrupakitasi && u.kita == "Europe") ||
-        (okyanusyakitasi && u.kita == "Oceania") ||
-        (antartikakitasi && u.kita == "Antarctic");
 
-    if (!kitaUygun) {
-      continue;
-    }
+  for (var u in tumUlkeler) {
+    // Kıta kontrolü (JSON verisine tam uyumlu hale getirildi)
+    bool kitaSuitable = false;
 
-    bool bmUygun = bmuyeligi || u.bm;
+    // JSON'da kıtalar bir liste içinde gelebilir, contains ile kontrol etmek en garantisidir.
+    // Örn: "North America" stringi u.kita içinde geçiyor mu?
 
-    if (!bmUygun) {
-      continue;
-    }
+    if (AppState.filter.Europe && u.kita.contains("Europe")) kitaSuitable = true;
+    else if (AppState.filter.Asia && u.kita.contains("Asia")) kitaSuitable = true;
+    else if (AppState.filter.Africa && u.kita.contains("Africa")) kitaSuitable = true;
+    else if (AppState.filter.Oceania && u.kita.contains("Oceania")) kitaSuitable = true;
+    else if (AppState.filter.Antarctic && u.kita.contains("Antarctic")) kitaSuitable = true;
+
+    // DÜZELTME: JSON'da boşluklu yazılır "North America"
+    else if (AppState.filter.NorthAmerica && u.kita.contains("North America")) kitaSuitable = true;
+
+    // DÜZELTME: JSON'da boşluklu yazılır "South America"
+    else if (AppState.filter.SouthAmerica && u.kita.contains("South America")) kitaSuitable = true;
+
+    if (!kitaSuitable) continue;
+
+    // BM Üyeliği
+    bool bmSuitable = AppState.filter.includeNonUN || u.bm;
+    if (!bmSuitable) continue;
 
     filteredList.add(u);
   }
 
   return filteredList;
 }
+
 Future<void> yeniulkesec() async {
+  if (tumUlkeler.isEmpty) {
+    await verileriYukle();
+  }
+
   final List<Ulkeler> uygunUlkeler = getFilteredCountries();
 
   if (uygunUlkeler.length < 4) {
     debugPrint("HATA: Yeterli ülke yok! Mevcut: ${uygunUlkeler.length}");
     return;
   }
+
+  // Listeyi karıştır ve 4 tane al
   final List<Ulkeler> secenekler = (List<Ulkeler>.from(uygunUlkeler)..shuffle()).take(4).toList();
 
   kalici = secenekler[random.nextInt(4)];
-
 
   for (int i = 0; i < 4; i++) {
     butontiklama[i] = true;
     butonAnahtarlar[i] = AppState.settings.isEnglish ? secenekler[i].enisim : secenekler[i].isim;
   }
 
-  debugPrint("Yeni hedef ülke: ${kalici.isim} olarak belirlendi.");
+  debugPrint("Yeni hedef ülke: ${kalici.isim} (${kalici.kita})");
 }
 
 Ulkeler gecici = Ulkeler(
