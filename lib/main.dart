@@ -1,37 +1,51 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:geogame/models/app_context.dart';
 import 'package:theme_mode_builder/theme_mode_builder/theme_mode_builder.dart';
 
+// Kendi proje dosyaların
+import 'package:geogame/screens/splash_screen/splash_screen.dart';
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/preferences_service.dart';
+import 'package:geogame/widgets/restart_widget.dart';
 import 'env.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+// 1. Supabase Başlat
   await Supabase.initialize(
     url: Env.supabaseUrl,
     anonKey: Env.supabaseAnonKey,
   );
 
-  Locale deviceLocale = PlatformDispatcher.instance.locale;
-  AppState.settings.languagePref = deviceLocale.languageCode;
+  // 2. Ayarları Yükle (Theme ve Language için şart)
+  await PreferencesService.loadConfig();
 
-  runApp(Geogame());
+  // 3. Localization Servisini Başlat
+  Locale deviceLocale = PlatformDispatcher.instance.locale;
+  await Localization.init(
+      deviceLocale: deviceLocale.languageCode,
+      userPref: AppState.settings.language
+  );
+
+  // 4. Uygulamayı Başlat
+  runApp(
+    const RestartWidget(
+      child: Geogame(),
+    ),
+  );
 }
 
 class Geogame extends StatefulWidget {
+  const Geogame({super.key});
+
   @override
-  State<Geogame> createState() => GeoGame();
+  State<Geogame> createState() => _GeogameState();
 }
 
-class GeoGame extends State<Geogame> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _GeogameState extends State<Geogame> {
   @override
   Widget build(BuildContext context) {
     return ThemeModeBuilder(
@@ -39,18 +53,20 @@ class GeoGame extends State<Geogame> {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: "GeoGame",
-          themeMode: AppState.settings.darkTheme ? ThemeMode.dark : ThemeMode.light,
+          themeMode: themeMode,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               brightness: Brightness.light,
               seedColor: Colors.red,
             ),
+            useMaterial3: true,
           ),
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               brightness: Brightness.dark,
               seedColor: Colors.deepPurple,
             ),
+            useMaterial3: true,
           ),
           home: const SplashScreen(),
         );
@@ -58,8 +74,9 @@ class GeoGame extends State<Geogame> {
     );
   }
 }
-
 /*
+Notlar:
+Build Komutları:
 flutter pub run flutter_launcher_icons:main
 
 flutter build web

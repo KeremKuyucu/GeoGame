@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 // Modeller ve Servisler
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/app_context.dart';
+
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/update_checker_service.dart';
-import 'package:geogame/services/preferences_service.dart';
-import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 
-// Sayfalar
-import 'package:geogame/screens/mainscreen/main_screen.dart';
-import 'package:geogame/screens/auth/authpage.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
+
+
 
 
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -31,22 +31,30 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _baslat() async {
-    await PreferencesService.loadConfig();
-    await loadcountries();
+    // 1. Veri yükleme ve Oturum kontrolleri (Context gerektirmez)
+    await loadCountries();
     await AuthService.checkSession();
-    await Localization.languageLoad();
-    UpdateService.check(context);
-    GameLogService.syncPendingLogs();
-    if (mounted) {
-      UpdateService.check(context);
-    }
 
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthGate()),
-      );
-    }
+    // Logları senkronize et (Burada await kullanmak istersen kullanabilirsin,
+    // ama arkaplanda çalışması UI'ı bloklamaz, bu hali de uygundur)
+    GameLogService.syncPendingLogs();
+
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    AppState.version = packageInfo.version;
+
+    // 2. KRİTİK KONTROL: Widget hala hayatta mı?
+    // Asenkron işlemler bitene kadar kullanıcı uygulamadan çıkmış olabilir.
+    // Eğer widget yoksa (unmounted), aşağıdaki context işlemlerini yapma ve dur.
+    if (!mounted) return;
+
+    // 3. Güncelleme Kontrolü (Sadece tek bir kere ve güvenli context ile)
+    UpdateService.check(context);
+
+    // 4. Yönlendirme (Yine mounted kontrolü sayesinde güvenli)
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const AuthGate()),
+    );
   }
 
   @override
@@ -106,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
 // ... AuthGate sınıfı aynı kalabilir ...
 class AuthGate extends StatelessWidget {
-  const AuthGate({Key? key}) : super(key: key);
+  const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -116,14 +124,7 @@ class AuthGate extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
-        final session = snapshot.data?.session;
-
-        if (session != null) {
-          return MainScreen();
-        } else {
-          AppState.selectedIndex = 4;
-          return LoginPage(onLoginSuccess: () {});
-        }
+        return const MainScaffold();
       },
     );
   }

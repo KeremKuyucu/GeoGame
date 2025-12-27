@@ -2,6 +2,7 @@
 
 class AppState {
   static int selectedIndex = 0;
+  static String version = "";
   static UserProfile user = UserProfile.anonymous();
   static GameFilter filter = GameFilter();
   static AppSettings settings = AppSettings();
@@ -41,18 +42,18 @@ class UserProfile {
 }
 
 class GameFilter {
-  bool northAmerica, southAmerica, Asia, Africa, Europe, Oceania, Antarctic;
+  bool northAmerica, southAmerica, asia, africa, europe, oceania, antarctic;
   bool includeNonUN;
   bool isButtonMode;
 
   GameFilter({
     this.northAmerica = true,
     this.southAmerica = true,
-    this.Asia = true,
-    this.Africa = true,
-    this.Europe = true,
-    this.Oceania = true,
-    this.Antarctic = true,
+    this.asia = true,
+    this.africa = true,
+    this.europe = true,
+    this.oceania = true,
+    this.antarctic = true,
     this.isButtonMode = true,
     this.includeNonUN = false,
   });
@@ -61,11 +62,11 @@ class GameFilter {
     return GameFilter(
       northAmerica: map['northAmerica'] ?? true,
       southAmerica: map['southAmerica'] ?? true,
-      Asia: map['Asia'] ?? true,
-      Africa: map['Africa'] ?? true,
-      Europe: map['Europe'] ?? true,
-      Oceania: map['Oceania'] ?? true,
-      Antarctic: map['Antarctic'] ?? true,
+      asia: map['asia'] ?? true,
+      africa: map['africa'] ?? true,
+      europe: map['europe'] ?? true,
+      oceania: map['oceania'] ?? true,
+      antarctic: map['antarctic'] ?? true,
       isButtonMode: map['isButtonMode'] ?? true,
       includeNonUN: map['includeNonUN'] ?? false,
     );
@@ -75,34 +76,36 @@ class GameFilter {
     return {
       'southAmerica': southAmerica,
       'northAmerica': northAmerica,
-      'Asia': Asia,
-      'Africa': Africa,
-      'Europe': Europe,
-      'Oceania': Oceania,
-      'Antarctic': Antarctic,
+      'asia': asia,
+      'africa': africa,
+      'europe': europe,
+      'oceania': oceania,
+      'antarctic': antarctic,
       'isButtonMode': isButtonMode,
       'includeNonUN': includeNonUN,
     };
   }
 }
 
+
 class AppSettings {
   bool darkTheme;
-  String language; // Dil kodu (tr, en)
-  String languagePref; // Cihaz tercihi vs.
+  String language; // "Türkçe" veya "English"
 
   AppSettings({
     this.darkTheme = true,
-    this.language = '',
-    this.languagePref = '',
+    this.language = 'English', // Varsayılan değer boş olmamalı
   });
 
-  bool get isEnglish => language == 'en'; // Kod 'en' ise İngilizce
+  bool get isEnglish => language == 'English';
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
       darkTheme: map['darkTheme'] ?? true,
-      language: map['language'] ?? "",
+      // Eğer map'ten gelen dil boşsa varsayılanı koru
+      language: (map['language'] != null && map['language'].toString().isNotEmpty)
+          ? map['language']
+          : 'English',
     );
   }
 

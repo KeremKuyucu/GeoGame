@@ -1,63 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:geogame/screens/auth/authpage.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:theme_mode_builder/theme_mode_builder.dart';
 import 'dart:async';
 
-import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/models/app_context.dart';
-import 'package:geogame/models/bottomBar.dart';
-import 'package:geogame/models/drawer_widget.dart';
+import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/models/countries.dart';
+
 import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/screens/mainscreen/main_screen.dart';
-import 'package:geogame/screens/leadboards-and-profile/leadboard.dart';
-import 'package:geogame/screens/profiles/profiles.dart';
+import 'package:geogame/services/localization_service.dart';
 
-
-
+import 'package:geogame/widgets/restart_widget.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-
   @override
   void initState() {
     super.initState();
-    _initializeSettings();
+    _checkContinents();
   }
 
-  Future<void> _initializeSettings() async {
-if (getFilteredCountries().length < 1) {
+  Future<void> _checkContinents() async {
+    if (getFilteredCountries().isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _kitaUyari();
+        _showContinentWarning();
       });
     }
   }
 
-  // --- AUTH İŞLEMLERİ (Artık Tek Satır) ---
+  // --- ACTIONS ---
 
   Future<void> _signOut() async {
-    // Tüm kirli işi Service halleder (Supabase çıkış + Yerel sıfırlama)
     await AuthService.signOut();
-
     if (mounted) {
-      setState(() {}); // UI'ı yenile (Misafir moduna döner)
-      _showSnackBar(Localization.get('cikisbasarili'), Colors.green);
+      setState(() {});
+      _showSnackBar(Localization.t('auth.logout_success'), Colors.green);
     }
   }
-
-  // --- YARDIMCI METODLAR ---
 
   Future<void> _openWebAuth() async {
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _showSnackBar(Localization.get('siteuyari'), Colors.red);
+      _showSnackBar(Localization.t('site_error', args: ["auth.keremkk.com.tr"]), Colors.red);
     }
   }
 
@@ -65,403 +57,463 @@ if (getFilteredCountries().length < 1) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text(message, style: const TextStyle(color: Colors.white)),
           backgroundColor: color,
           behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 3),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          margin: const EdgeInsets.all(10),
         ),
       );
     }
   }
 
-  void restartApp() {
+  void restartApp(BuildContext context) async {
     AppState.selectedIndex = 0;
-    Localization.languageLoad();
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen()));
-  }
-
-  void _navigateToLogin() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LoginPage(
-          onLoginSuccess: () {
-            // Giriş başarılı olduğunda sayfayı yenile
-            setState(() {});
-          },
-        ),
-      ),
-    );
+    await Localization.init(userPref: AppState.settings.language);
+    if (context.mounted) {
+      RestartWidget.restartApp(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF2F2F7), // iOS tarzı gri arka plan
       appBar: AppBar(
-        title: Text(Localization.get('ayarlar')),
+        title: Text(
+          Localization.t('settings.title').toUpperCase(),
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+            color: isDark ? Colors.orangeAccent : Colors.deepOrange,
+          ),
+        ),
         centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(Icons.menu),
+            icon: Icon(Icons.menu_rounded, color: isDark ? Colors.white : Colors.black87),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
       ),
-      drawer: DrawerWidget(),
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
+      drawer: const DrawerWidget(),
+      body: ListView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+        children: [
+          _buildAccountSection(isDark),
+          const SizedBox(height: 20),
+          _buildSectionHeader(Localization.t('settings.general_title')), // "Genel Ayarlar"
+          _buildGeneralSettings(isDark),
+          const SizedBox(height: 20),
+          _buildSectionHeader(Localization.t('settings.continent_title')), // "Kıtalar"
+          _buildContinentSettings(isDark),
+          const SizedBox(height: 40),
+          _buildVersionInfo(isDark),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // --- BÖLÜM 1: HESAP KARTI ---
+
+  Widget _buildAccountSection(bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [Colors.grey.shade900, Colors.black87]
+              : [Colors.blue.shade600, Colors.blue.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: !AuthService.isAuthenticated ? _buildGuestUI(isDark) : _buildProfileUI(isDark),
+    );
+  }
+
+  Widget _buildGuestUI(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+          const Icon(Icons.account_circle_outlined, size: 60, color: Colors.white),
+          const SizedBox(height: 10),
+          Text(
+            Localization.t('settings.guest'),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            Localization.t('auth.login_description'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 13, color: Colors.white70),
+          ),
+          const SizedBox(height: 15),
+          Row(
             children: [
-              _buildAccountCard(),
-              SizedBox(height: 20),
-              _buildGeneralSettings(),
-              _buildContinentSettings(),
-              SizedBox(height: 40),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage(onLoginSuccess: () => setState(() {}))),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue.shade700,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(Localization.t('auth.login')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _openWebAuth,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(Localization.t('auth.signup')),
+                ),
+              ),
             ],
           ),
-        ),
+        ],
       ),
-      bottomNavigationBar: SalomonBottomBar(
-        currentIndex: AppState.selectedIndex,
-        selectedItemColor: const Color(0xff6200ee),
-        unselectedItemColor: const Color(0xff757575),
-        items: navBarItems,
+    );
+  }
 
-        // ✅ Tüm mantık burada
-        onTap: (index) {
-          // 1. Zaten aynı sayfadaysak HİÇBİR ŞEY YAPMA (Buradan çık)
-          if (AppState.selectedIndex == index) return;
-
-          // 2. Değilsek, seçili indexi güncelle (Rengi değiştirir)
-          setState(() {
-            AppState.selectedIndex = index;
-          });
-
-          // 3. Hangi sayfaya gidileceğini belirle
-          Widget page;
-          switch (index) {
-            case 0:
-              page = MainScreen();
-              break;
-            case 1:
-              page = Leadboard();
-              break;
-            case 2:
-              page = Profiles();
-              break;
-            case 3:
-              page = SettingsPage();
-              break;
-            default:
-              return;
-          }
-
-          // 4. Sayfaya git (Animasyonsuz geçiş en iyisidir)
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation1, animation2) => page,
-              transitionDuration: Duration.zero, // Anında geçiş
-              reverseTransitionDuration: Duration.zero,
+  Widget _buildProfileUI(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
             ),
-          );
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(AppState.user.avatarUrl),
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppState.user.name,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                GestureDetector(
+                  onTap: _openWebAuth,
+                  child: Text(
+                    Localization.t('settings.edit_profile'),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13, decoration: TextDecoration.underline),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: _signOut,
+            icon: const Icon(Icons.logout_rounded, color: Colors.white),
+            tooltip: Localization.t('auth.logout'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- BÖLÜM 2: GENEL AYARLAR ---
+
+  Widget _buildGeneralSettings(bool isDark) {
+    return _buildSettingsContainer(isDark, [
+      _buildSwitchTile(
+        title: Localization.t('settings.multiple_choice_mode'),
+        icon: Icons.gamepad,
+        iconColor: Colors.purple,
+        value: AppState.filter.isButtonMode,
+        onChanged: (v) => setState(() {
+          AppState.filter.isButtonMode = v;
+          PreferencesService.saveConfig();
+        }),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t(
+          'settings.selected_theme',
+          args: [AppState.settings.darkTheme ? 'Dark' : 'Light'],
+        ),
+        icon: isDark ? Icons.dark_mode : Icons.light_mode,
+        iconColor: isDark ? Colors.amber : Colors.orange,
+        value: AppState.settings.darkTheme,
+        onChanged: (v) {
+          setState(() {
+            AppState.settings.darkTheme = v;
+            v ? ThemeModeBuilderConfig.setDark() : ThemeModeBuilderConfig.setLight();
+            PreferencesService.saveConfig();
+          });
         },
       ),
-    );
+      _buildDivider(isDark),
+      _buildLanguageTile(isDark),
+    ]);
   }
 
-  // --- UI BİLEŞENLERİ ---
+  Widget _buildLanguageTile(bool isDark) {
+    // --- MIGRATION (ESKİ VERİYİ KURTARMA) ---
+    // Eğer kayıtlı dil listede yoksa (örn: "Türkçe" geldiyse), onu koda ('tr') çevir.
+    String currentValue = AppState.settings.language;
 
-  Widget _buildAccountCard() {
-    // Burada AppState.user.isLoggedIn kullanmak daha modern olurdu
-    // ama senin mevcut global değişken yapına dokunmuyorum:
-    return Card(
-      elevation: 12.0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(25.0),
+    if (!Localization.supportedLanguages.contains(currentValue)) {
+      if (currentValue == 'Türkçe') {
+        currentValue = 'tr';
+      } else {
+        currentValue = 'en';
+      }
+
+      // Hatayı düzelttik, bunu hemen hafızaya da kaydedelim ki bir daha sormasın
+      AppState.settings.language = currentValue;
+      PreferencesService.saveConfig();
+    }
+    // ----------------------------------------
+
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
-          gradient: LinearGradient(
-            colors: AppState.settings.darkTheme
-                ? [Colors.grey.shade900, Colors.black87]
-                : [Colors.blue.shade50, Colors.white],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.blue.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
         ),
-        child: !AuthService.isAuthenticated ? _buildGuestUI() : _buildProfileUI(),
+        child: const Icon(Icons.language, color: Colors.blue),
       ),
-    );
-  }
-
-  Widget _buildGuestUI() {
-    return Column(
-      children: [
-        Icon(
-          Icons.account_circle,
-          size: 80,
-          color: AppState.settings.darkTheme ? Colors.white38 : Colors.grey[400],
-        ),
-        SizedBox(height: 15),
-        Text(
-          Localization.get('misafir'),
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: AppState.settings.darkTheme ? Colors.white : Colors.black87,
-          ),
-        ),
-        SizedBox(height: 10),
-        Text(
-          Localization.get('girisaciklama'),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700],
-          ),
-        ),
-        SizedBox(height: 25),
-        ElevatedButton.icon(
-          onPressed: _navigateToLogin,
-          icon: Icon(Icons.login),
-          label: Text(Localization.get('giris')),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blueAccent,
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+      title: Text(
+        Localization.t('settings.lang'),
+        style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black87),
+      ),
+      trailing: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: currentValue, // Artık güvenli değeri kullanıyoruz
+          icon: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+          dropdownColor: isDark ? Colors.grey[850] : Colors.white,
+          items: Localization.supportedLanguages
+              .map((String code) => DropdownMenuItem(
+            value: code,
+            child: Text(
+              Localization.getDisplayName(code),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black),
             ),
-            elevation: 5,
-          ),
-        ),
-        SizedBox(height: 15),
-        TextButton(
-          onPressed: _openWebAuth,
-          child: Text(
-            Localization.get('kayitol'),
-            style: TextStyle(
-              color: AppState.settings.darkTheme ? Colors.white70 : Colors.blueAccent,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProfileUI() {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 50,
-          backgroundImage: NetworkImage(AppState.user.avatarUrl),
-          backgroundColor: Colors.white10,
-        ),
-        SizedBox(height: 12),
-        Text(
-          AppState.user.name,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: AppState.settings.darkTheme ? Colors.white : Colors.black87,
-          ),
-        ),
-        SizedBox(height: 20),
-        OutlinedButton.icon(
-          onPressed: _openWebAuth,
-          icon: Icon(Icons.edit, color: Colors.blueAccent),
-          label: Text(Localization.get('profilduzenleme')),
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(color: Colors.blueAccent),
-            foregroundColor: Colors.blueAccent,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          ),
-        ),
-        SizedBox(height: 10),
-        ElevatedButton.icon(
-          onPressed: _signOut, // ✅ AuthService kullanan fonksiyon
-          icon: Icon(Icons.logout),
-          label: Text(Localization.get('cikis')),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGeneralSettings() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          Localization.get('digerayarlar'),
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        _switchRow(
-          Localization.get('siklimod'),
-          AppState.filter.isButtonMode,
-              (v) => setState(() {
-                AppState.filter.isButtonMode = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('tema') + (AppState.settings.darkTheme ? ' Dark' : ' Light'),
-          AppState.settings.darkTheme,
-              (v) {
-            setState(() {
-              AppState.settings.darkTheme = v;
-              AppState.settings.darkTheme
-                  ? ThemeModeBuilderConfig.setDark()
-                  : ThemeModeBuilderConfig.setLight();
+          ))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) {
+              setState(() => AppState.settings.language = v);
               PreferencesService.saveConfig();
-            });
+
+              // Dil değişince uygulamayı yeniden başlatmak veya UI'ı yenilemek iyi fikirdir
+              restartApp(context);
+            }
           },
         ),
-        _buildLanguageSelector(),
-      ],
-    );
-  }
-
-  Widget _buildLanguageSelector() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(Localization.get('dil'), style: TextStyle(fontSize: 16.0)),
-          DropdownButton<String>(
-            value: AppState.settings.language,
-            items: diller
-                .map((dil) => DropdownMenuItem(value: dil, child: Text(dil)))
-                .toList(),
-            onChanged: (v) {
-              if (v != null) {
-                setState(() => AppState.settings.language = v);
-                PreferencesService.saveConfig();
-                restartApp();
-              }
-            },
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildContinentSettings() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 20),
-        Text(
-          Localization.get('kitasecenek'),
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        _switchRow(
-          Localization.get('NorthAmerica'),
-          AppState.filter.northAmerica,
-              (v) => setState(() {
-                AppState.filter.northAmerica = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('SouthAmerica'),
-          AppState.filter.southAmerica,
-              (v) => setState(() {
-            AppState.filter.southAmerica = v;
-            PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('asya'),
-          AppState.filter.Asia,
-              (v) => setState(() {
-                AppState.filter.Asia  = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('afrika'),
-          AppState.filter.Africa,
-              (v) => setState(() {
-                AppState.filter.Africa = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('avrupa'),
-          AppState.filter.Europe,
-              (v) => setState(() {
-                AppState.filter.Europe = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('okyanusya'),
-          AppState.filter.Oceania,
-              (v) => setState(() {
-                AppState.filter.Oceania = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('antartika'),
-          AppState.filter.Antarctic,
-              (v) => setState(() {
-                AppState.filter.Antarctic = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-        _switchRow(
-          Localization.get('bmuyelik'),
-          AppState.filter.includeNonUN,
-              (v) => setState(() {
-                AppState.filter.includeNonUN = v;
-                PreferencesService.saveConfig();
-          }),
-        ),
-      ],
-    );
+  // --- BÖLÜM 3: KITALAR ---
+
+  Widget _buildContinentSettings(bool isDark) {
+    return _buildSettingsContainer(isDark, [
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.europe'),
+        icon: Icons.public,
+        iconColor: Colors.blue,
+        value: AppState.filter.europe,
+        onChanged: (v) => _updateContinent(() => AppState.filter.europe = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.asia'),
+        icon: Icons.temple_buddhist, // Asya için temsili
+        iconColor: Colors.red,
+        value: AppState.filter.asia,
+        onChanged: (v) => _updateContinent(() => AppState.filter.asia = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.africa'),
+        icon: Icons.landscape,
+        iconColor: Colors.orange,
+        value: AppState.filter.africa,
+        onChanged: (v) => _updateContinent(() => AppState.filter.africa = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.north_america'),
+        icon: Icons.location_city,
+        iconColor: Colors.green,
+        value: AppState.filter.northAmerica,
+        onChanged: (v) => _updateContinent(() => AppState.filter.northAmerica = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.south_america'),
+        icon: Icons.forest, // Amazon ormanları temsili
+        iconColor: Colors.green.shade800,
+        value: AppState.filter.southAmerica,
+        onChanged: (v) => _updateContinent(() => AppState.filter.southAmerica = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.oceania'),
+        icon: Icons.surfing,
+        iconColor: Colors.cyan,
+        value: AppState.filter.oceania,
+        onChanged: (v) => _updateContinent(() => AppState.filter.oceania = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.continents.antarctica'),
+        icon: Icons.ac_unit,
+        iconColor: Colors.lightBlueAccent,
+        value: AppState.filter.antarctic,
+        onChanged: (v) => _updateContinent(() => AppState.filter.antarctic = v),
+      ),
+      _buildDivider(isDark),
+      _buildSwitchTile(
+        title: Localization.t('settings.un_members'),
+        icon: Icons.flag_circle,
+        iconColor: Colors.indigo,
+        value: AppState.filter.includeNonUN,
+        onChanged: (v) => _updateContinent(() => AppState.filter.includeNonUN = v),
+      ),
+    ]);
   }
 
-  Widget _switchRow(String title, bool val, ValueChanged<bool> onChanged) {
+  void _updateContinent(VoidCallback action) {
+    setState(() {
+      action();
+      PreferencesService.saveConfig();
+    });
+  }
+
+  // --- YARDIMCI WIDGETLAR (Reusable Components) ---
+
+  Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: TextStyle(fontSize: 16.0)),
-          Switch(
-            value: val,
-            onChanged: onChanged,
-            activeThumbColor: Colors.green, // Yuvarlağın rengi (Açıkken)
-            activeTrackColor: Colors.green.withValues(alpha: 0.5), // Çubuğun rengi (Açıkken)
-          ),
-        ],
+      padding: const EdgeInsets.only(left: 10, bottom: 8),
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
 
-  Future<void> _kitaUyari() async {
+  Widget _buildSettingsContainer(bool isDark, List<Widget> children) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[900] : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+        ],
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildSwitchTile({
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile(
+      value: value,
+      onChanged: onChanged,
+      activeColor: Colors.green,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+      ),
+      secondary: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: iconColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: iconColor),
+      ),
+    );
+  }
+
+  Widget _buildDivider(bool isDark) {
+    return Divider(
+      height: 1,
+      thickness: 0.5,
+      indent: 60, // İkonun hizasından başlasın
+      color: isDark ? Colors.grey[800] : Colors.grey[200],
+    );
+  }
+
+  Widget _buildVersionInfo(bool isDark) {
+    return Center(
+      child: Text(
+        AppState.version,
+        style: TextStyle(color: isDark ? Colors.grey[600] : Colors.grey[400], fontSize: 12),
+      ),
+    );
+  }
+
+  Future<void> _showContinentWarning() async {
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(Localization.get('kitayari')),
-        content: Text("${Localization.get('kitayari1')}\n${Localization.get('kitayari2')}"),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            const SizedBox(width: 10),
+            Text(Localization.t('settings.continent_warning_title')),
+          ],
+        ),
+        content: Text(
+          "${Localization.t('settings.no_continent_active')}\n\n${Localization.t('settings.activate_continent_prompt')}",
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(Localization.get('tamam')),
+            child: Text(Localization.t('common.ok'), style: const TextStyle(fontWeight: FontWeight.bold)),
           )
         ],
       ),

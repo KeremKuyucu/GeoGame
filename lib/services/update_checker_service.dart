@@ -63,8 +63,12 @@ class UpdateService {
       List<int> rParts = remote.split('.').map(int.parse).toList();
 
       // Parça sayısı eşit değilse eşitle (örn: 1.0 vs 1.0.1)
-      while (lParts.length < rParts.length) lParts.add(0);
-      while (rParts.length < lParts.length) rParts.add(0);
+      while (lParts.length < rParts.length) {
+        lParts.add(0);
+      }
+      while (rParts.length < lParts.length) {
+        rParts.add(0);
+      }
 
       for (int i = 0; i < lParts.length; i++) {
         if (rParts[i] > lParts[i]) return true; // Uzaktaki daha büyük
@@ -83,7 +87,7 @@ class UpdateService {
       barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(Localization.get('surum1')),
+          title: Text(Localization.t('version.new_available')),
           content: SizedBox(
             width: double.maxFinite,
             child: SingleChildScrollView(
@@ -111,18 +115,18 @@ class UpdateService {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Localization.get('surum2'), style: TextStyle(color: Colors.grey)),
+              child: Text(Localization.t('version.not_now'), style: TextStyle(color: Colors.grey)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
-              child: Text(Localization.get('surum3')),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
               onPressed: () {
                 Navigator.of(context).pop();
                 EasyLauncher.url(url: url);
               },
+              child: Text(Localization.t('version.update')),
             ),
           ],
         );

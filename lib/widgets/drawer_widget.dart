@@ -3,108 +3,161 @@ import 'package:easy_url_launcher/easy_url_launcher.dart';
 import 'package:geogame/widgets/feedback_dialog.dart';
 import 'package:geogame/services/localization_service.dart';
 
+import 'package:geogame/models/app_context.dart';
+
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          _buildDrawerHeader(),
-          ListTile(
-            leading: const Icon(Icons.report, color: Colors.blueAccent),
-            title: Text(
-              Localization.t('drawer.report_bug'), // Yeni Yapı
-              style: const TextStyle(fontWeight: FontWeight.bold),
+      backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          _buildDrawerHeader(isDark),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: <Widget>[
+                const SizedBox(height: 10),
+                _buildActionSection(context),
+                const Divider(height: 30),
+                _buildSocialSection(),
+                const Divider(height: 30),
+              ],
             ),
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => const FeedbackDialog(),
-              );
-            },
           ),
-          ListTile(
-            title: Text(
-              Localization.t('drawer.feedback_note'), // Yeni Yapı
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            dense: true,
-          ),
-          const Divider(),
-          _buildListTile(
-            icon: Icons.person,
-            iconColor: const Color(0xFF5865F2),
-            title: Localization.t('drawer.my_website'), // Yeni Yapı
-            onTap: () async {
-              await EasyLauncher.url(
-                url: 'https://keremkk.com.tr',
-                mode: Mode.platformDefault,
-              );
-            },
-          ),
-          _buildListTile(
-            icon: Icons.public,
-            iconColor: Colors.red,
-            title: Localization.t('drawer.geogame_website'), // Yeni Yapı
-            onTap: () async {
-              await EasyLauncher.url(url: 'https://geogame.keremkk.com.tr');
-            },
-          ),
-          _buildListTile(
-            icon: Icons.code,
-            iconColor: Colors.black,
-            title: Localization.t('drawer.geogame_github'), // Yeni Yapı
-            onTap: () async {
-              await EasyLauncher.url(
-                url: 'https://github.com/KeremKuyucu/GeoGame',
-              );
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(
-              Localization.t('drawer.creator'), // Yeni Yapı
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            dense: true,
-          ),
-          const SizedBox(height: 20),
+          _buildFooter(),
         ],
       ),
     );
   }
 
-  Widget _buildDrawerHeader() {
-    return DrawerHeader(
-      decoration: const BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+  Widget _buildDrawerHeader(bool isDark) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade700, Colors.purple.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(25)),
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 30,
-            backgroundImage: AssetImage('assets/logo.png'),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            'GeoGame',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              shadows: [
-                Shadow(
-                  offset: const Offset(2.0, 2.0),
-                  blurRadius: 3.0,
-                  color: Colors.black.withValues(alpha: 0.5),
-                ),
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: [
+                BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
               ],
             ),
+            child: const CircleAvatar(
+              radius: 35,
+              backgroundColor: Colors.white,
+              backgroundImage: AssetImage('assets/logo.png'),
+            ),
           ),
+          const SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'GeoGame',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              Text(
+                Localization.t('drawer.version_text', args: [AppState.version]),
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildListTile(
+          icon: Icons.bug_report_rounded,
+          iconColor: Colors.amber.shade700,
+          title: Localization.t('drawer.report_bug'),
+          onTap: () {
+            Navigator.pop(context);
+            showDialog(
+              context: context,
+              builder: (BuildContext context) => const FeedbackDialog(),
+            );
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 16, top: 8, right: 16),
+          child: Text(
+            Localization.t('drawer.feedback_note'),
+            style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontStyle: FontStyle.italic),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialSection() {
+    return Column(
+      children: [
+        _buildListTile(
+          icon: Icons.language_rounded,
+          iconColor: const Color(0xFF5865F2),
+          title: Localization.t('drawer.my_website'),
+          onTap: () async => await EasyLauncher.url(url: 'https://keremkk.com.tr'),
+        ),
+        _buildListTile(
+          icon: Icons.language_rounded,
+          iconColor: Colors.redAccent,
+          title: Localization.t('drawer.geogame_website'),
+          onTap: () async => await EasyLauncher.url(url: 'https://geogame.keremkk.com.tr'),
+        ),
+        _buildListTile(
+          icon: Icons.terminal_rounded,
+          iconColor: Colors.black87,
+          title: Localization.t('drawer.geogame_github'),
+          onTap: () async => await EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        children: [
+          Text(
+            Localization.t('drawer.creator'),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey),
+          ),
+          const SizedBox(height: 5),
+          const Text("© 2025 All Rights Reserved", style: TextStyle(fontSize: 10, color: Colors.grey)),
         ],
       ),
     );
@@ -116,10 +169,22 @@ class DrawerWidget extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: iconColor),
-      title: Text(title),
-      onTap: onTap,
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: iconColor.withOpacity(0.05),
+      ),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        leading: Icon(icon, color: iconColor, size: 28),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+        trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
+        onTap: onTap,
+      ),
     );
   }
 }

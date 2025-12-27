@@ -1,387 +1,148 @@
 {
-  "Diller": {
-    "diller": ["Türkçe", "English"]
+  "common": {
+    "ok": { "tr": "Tamam", "en": "Okay" },
+    "cancel": { "tr": "İptal", "en": "Cancel" },
+    "yes": { "tr": "Evet", "en": "Yes" },
+    "no": { "tr": "Hayır", "en": "No" },
+    "pass": { "tr": "Pas", "en": "Pass" },
+    "success": { "tr": "Başarılı", "en": "Successful" },
+    "refresh": { "tr": "Yenile", "en": "Refresh" },
+    "loading": { "tr": "Yükleniyor...", "en": "Loading..." },
+    "error": { "tr": "Hata", "en": "Error" },
+    "send": { "tr": "Gönder", "en": "Send" },
+    "field_required": { "tr": "Lütfen tüm alanları doldurun.", "en": "Please fill in all fields." },
+    "site_error": { "tr": "Site açılamadı. {0}", "en": "Site could not be opened. {0}" }
   },
-  "Veriler": {
-    "sikayet": {
-      "Türkçe": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
-      "English": "You can send your complaints or suggestions by clicking the button above."
-    },
-    "website": {
-      "Türkçe": "GeoGame Website",
-      "English": "GeoGame Website"
-    },
-    "github": {
-      "Türkçe": "GeoGame Github",
-      "English": "GeoGame Github"
-    },
-    "hatabildir": {
-      "Türkçe": "Hata Bildir",
-      "English": "Report a Bug"
-    },
-    "hatabaslik": {
-      "Türkçe": "Lütfen Hata Başlığını Girin",
-      "English": "Please Enter the Bug Title"
-    },
-    "hatametin": {
-      "Türkçe": "Hata hakkında detaylı bilgi verin",
-      "English": "Provide detailed information about the bug"
-    },
-    "yapimcimetin": {
-      "Türkçe": "Benim Websitem",
-      "English": "My Website"
-    },
-    "yapimci": {
-      "Türkçe": "Yapımcı: Kerem Kuyucu",
-      "English": "Creator: Kerem Kuyucu"
-    },
-    "yanliscevap": {
-      "Türkçe": "Yanlış cevap. Tekrar deneyin. Sorudan Gelecek Puan: ",
-      "English": "Wrong answer. Try again. Points for the question: "
-    },
-    "dogrucevap": {
-      "Türkçe": "Doğru Cevap",
-      "English": "Correct Answer"
-    },
-    "gecilenulke": {
-      "Türkçe": "Geçilen Ülke: ",
-      "English": "Passed Country: "
-    },
-    "pas": {
-      "Türkçe": "Pas",
-      "English": "Pass"
-    },
-    "evet": {
-      "Türkçe": "Evet",
-      "English": "Yes"
-    },
-    "hayir": {
-      "Türkçe": "Hayır",
-      "English": "No"
-    },
-    "tamam": {
-      "Türkçe": "Tamam",
-      "English": "Okay"
-    },
-    "sikgizle": {
-      "Türkçe": "İsterseniz ayarlardan şıkları\n 'Yazarak Bilme Modu' ile değiştirebilirsiniz.",
-      "English": "If you want, you can change the options\nfrom the settings to 'Typing Mode'."
-    },
-    "kurallar": {
-      "Türkçe": "Kurallar",
-      "English": "Rules"
-    },
-    "kural1": {
-      "Türkçe": "Puanlarınızın kayıt edilmesi için ana menüye dönün.",
-      "English": "Return to the main menu to save your points."
-    },
-    "baskentkural2": {
-      "Türkçe": "Baskent Bilme Oyununa hos geldiniz.\nAmaciniz 250 ulkeden rastgele secilen bir ulkenin baskentini bilmek.",
-      "English": "Welcome to the Capital City Quiz.\nYour goal is to guess the capital of a randomly selected country from 250 countries."
-    },
-    "baskentkural3": {
-      "Türkçe": "Puan Sistemi: Her turda puaniniz 50 den baslar her yanlis tahminde 10 puan azalir.\n3 Tahminden sonra kazanilan puan 20'e sabitlenir tur bitince tekrar 50'den baslar.",
-      "English": "Scoring System: Each round starts with 50 points. With each wrong guess, 10 points are deducted.\nAfter 3 guesses, the score is fixed at 20 and the round restarts from 50."
-    },
-    "baskentbaslik": {
-      "Türkçe": "Baskent Oyun",
-      "English": "Capital City Game"
-    },
-    "baskenticerik": {
-      "Türkçe": "Tahmin Edilecek Ülkenin\n Başkenti: ",
-      "English": "Capital of the country to guess: "
-    },
-    "bayrakkural2": {
-      "Türkçe": "Bayrak Bilme Oyununa hos geldiniz.\nAmaciniz, 250 ulkeden rastgele secilen bir ulkenin bayragini bilmek.",
-      "English": "Welcome to the Flag Quiz.\nYour goal is to guess the flag of a randomly selected country from 250 countries."
-    },
-    "bayrakkural3": {
-      "Türkçe": "Puan Sistemi: Her turda puaniniz 50 den baslar her yanlis tahminde 10 puan azalir.\n3 Tahminden sonra kazanilan puan 20'e sabitlenir tur bitince tekrar 50'den baslar.",
-      "English": "Scoring System: Each round starts with 50 points. With each wrong guess, 10 points are deducted.\nAfter 3 guesses, the score is fixed at 20 and the round restarts from 50."
-    },
-    "bayrakbaslik": {
-      "Türkçe": "Bayrak Oyun",
-      "English": "Flag Game"
-    },
-    "mesafekural2": {
-      "Türkçe": "Mesafeden ulke bilme oyununa hos geldiniz.\nAmaciniz, 250 ülkeden rastgele secilen bir ulkeyi bilmek.\nMesafeler +-100 Km fark olabilir.\nKonum olarak ülkelerin tam ortalari baz alinmistir.",
-      "English": "Welcome to the Distance Country Quiz.\nYour goal is to guess a randomly selected country from 250 countries.\nDistances may vary by +-100 km.\nThe center positions of countries are used as references."
-    },
-    "mesafekural3": {
-      "Türkçe": "Puan Sistemi: Her turda puaniniz 300 den baslar her yanlis tahminde 10 puan azalir.\n15 Tahminden sonra kazanilan puan 100'e sabitlenir tur bitince tekrar 300'den baslar.",
-      "English": "Scoring System: Each round starts with 300 points. With each wrong guess, 10 points are deducted.\nAfter 15 guesses, the score is fixed at 100 and the round restarts from 300."
-    },
-    "mesafebaslik": {
-      "Türkçe": "Mesafe Oyun",
-      "English": "Distance Game"
-    },
-    "tahminmetin": {
-      "Türkçe": "Tahmin: ",
-      "English": "Guess: "
-    },
-    "mesafe": {
-      "Türkçe": "Mesafe: ",
-      "English": "Distance: "
-    },
-    "yon": {
-      "Türkçe": "Yön: ",
-      "English": "Direction: "
-    },
-    "tahmintemizle": {
-      "Türkçe": "Tahminleri Temizle",
-      "English": "Clear Guesses"
-    },
-      "profil_baslik": {
-        "Türkçe": "Profil",
-        "English": "Profile"
-      },
-      "oyun_istatistikleri": {
-        "Türkçe": "Oyun İstatistikleri",
-        "English": "Game Statistics"
-      },
-      "toplam_puan": {
-        "Türkçe": "Toplam Puan",
-        "English": "Total Score"
-      },
-      "basari_orani": {
-        "Türkçe": "Başarı",
-        "English": "Success"
-      },
-      "dogru": {
-        "Türkçe": "Doğru",
-        "English": "Correct"
-      },
-      "yanlis": {
-        "Türkçe": "Yanlış",
-        "English": "Wrong"
-      },
-      "puan": {
-        "Türkçe": "Puan",
-        "English": "Score"
-      },
-      "oyun_mesafe": {
-        "Türkçe": "Mesafe",
-        "English": "Distance"
-      },
-      "oyun_bayrak": {
-        "Türkçe": "Bayrak",
-        "English": "Flags"
-      },
-      "oyun_baskent": {
-        "Türkçe": "Başkent",
-        "English": "Capitals"
-      },
-      "giris_yap_buton": {
-        "Türkçe": "Giriş Yap / Kayıt Ol",
-        "English": "Login / Register"
-      },
-    "kitayari": {
-      "Türkçe": "Uyarı",
-      "English": "Warning"
-    },
-    "kitayari1": {
-      "Türkçe": "Hiçbir kıta aktif değil.",
-      "English": "No continent is active."
-    },
-    "kitayari2": {
-      "Türkçe": "Lütfen en az bir kıta aktif edin.",
-      "English": "Please activate at least one continent."
-    },
-    "ayarlar": {
-      "Türkçe": "Ayarlar",
-      "English": "Settings"
-    },
-    "digerayarlar": {
-      "Türkçe": "Diğer Ayarlar",
-      "English": "Other Settings"
-    },
-    "kitasecenek": {
-      "Türkçe": "Kıta Seçenekleri",
-      "English": "Continent Options"
-    },
-    "siklimod": {
-      "Türkçe": "Çoktan Seçmeli Mod",
-      "English": "Multiple Choice Mode"
-    },
-    "tema": {
-      "Türkçe": "Seçilen Tema: ",
-      "English": "Selected Theme: "
-    },
-    "dil": {
-      "Türkçe": "Selected Language: ",
-      "English": "Selected Language: "
-    },
-    "SouthAmerica": {
-      "Türkçe": "Güney Amerika Kıtasında Olan Ülkeler",
-      "English": "Countries in South America Continent"
-    },
-    "NorthAmerica": {
-      "Türkçe": "Kuzey Amerika Kıtasında Olan Ülkeler",
-      "English": "Countries in North America Continent"
-    },
-    "asya": {
-      "Türkçe": "Asya Kıtasında Olan Ülkeler",
-      "English": "Countries in Asia Continent"
-    },
-    "afrika": {
-      "Türkçe": "Afrika Kıtasında Olan Ülkeler",
-      "English": "Countries in Africa Continent"
-    },
-    "avrupa": {
-      "Türkçe": "Avrupa Kıtasında Olan Ülkeler",
-      "English": "Countries in Europe Continent"
-    },
-    "okyanusya": {
-      "Türkçe": "Okyanusya Kıtasında Olan Ülkeler",
-      "English": "Countries in Oceania Continent"
-    },
-    "antartika": {
-      "Türkçe": "Antartika Kıtasında Olan Ülkeler",
-      "English": "Countries in Antarctica Continent"
-    },
-    "bmuyelik": {
-      "Türkçe": "BM Üyeliği Olmayan Ülkeler",
-      "English": "Countries without UN Membership"
-    },
-    "navigasyonbar1": {
-      "Türkçe": "Oyunlar",
-      "English": "Games"
-    },
-    "navigasyonbar2": {
-      "Türkçe": "Sıralama",
-      "English": "Leadboard"
-    },
-    "navigasyonbar3": {
-      "Türkçe": "Profil",
-      "English": "Profile"
-    },
-    "navigasyonbar4": {
-      "Türkçe": "Ayarlar",
-      "English": "Settings"
-    },
-    "surum1": {
-      "Türkçe": "Yeni Sürüm Var",
-      "English": "New Version Available"
-    },
-    "surum2": {
-      "Türkçe": "Şimdi Değil",
-      "English": "Not Now"
-    },
-    "surum3": {
-      "Türkçe": "Güncelle",
-      "English": "Update"
-    },
-    "baskenttitle": {
-      "Türkçe": "Başkentten Ülke Bilme",
-      "English": "Guess Country from Capital"
-    },
-    "baskentdescription": {
-      "Türkçe": "Başkentten ülkeyi tanıyın",
-      "English": "Guess the country from its capital."
-    },
-    "bayraktitle": {
-      "Türkçe": "Bayraktan Ülke Bilme",
-      "English": "Guess Country from Flag"
-    },
-    "bayrakdescription": {
-      "Türkçe": "Bayraktan ülkeyi tanıyın",
-      "English": "Guess the country from its flag."
-    },
-    "mesafetitle": {
-      "Türkçe": "Mesafeden Ülke Bilme",
-      "English": "Guess Country by Distance"
-    },
-    "mesafedescription": {
-      "Türkçe": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
-      "English": "Guess countries based on distance and direction."
-    },
-    "giris": {
-      "Türkçe": "Giriş Yap",
-      "English": "Log In"
-    },
-    "cikis": {
-      "Türkçe": "Çıkış Yap",
-      "English": "Log Out"
-    },
-    "oturummesaj": {
-      "Türkçe": "Google hesabı ile giriş yaparak puanlarınızı kaydedebilirsiniz.",
-      "English": "You can save your scores by logging in with your Google account."
-    },
-    "pascevap": {
-      "Türkçe": "Geçilen ülke",
-      "English": "Country crossed"
-    },
-    "misafir": {
-      "Türkçe": "Misafir",
-      "English": "Guest"
-    },
-    "girisaciklama": {
-      "Türkçe": "GeoGame'a giriş yapmak için aşağıdaki düğmeye tıklayabilirsiniz.",
-      "English": "You can log in to GeoGame by clicking the button below."
-    },
-    "kayitol": {
-      "Türkçe": "Kayıt Ol",
-      "English": "Sign Up"
-    },
-    "loginmesaj1": {
-      "Türkçe": "Hesabınız yok mu?",
-      "English": "Don't have an account?"
-    },
-    "loginmesaj2": {
-      "Türkçe": "Web sitesinden kayıt olun",
-      "English": "Sign up with web"
-    },
-    "profilduzenleme": {
-      "Türkçe": "Profil Düzenle",
-      "English": "Edit Profile"
-    },
-    "toplampuan": {
-      "Türkçe": "Toplam Puan: ",
-      "English": "Total Points: "
-    },
-    "cikisbasarili": {
-      "Türkçe": "Çıkış Yapıldı",
-      "English": "Log Out Successful"
-    },
-    "hata_baslik": {
-      "Türkçe": "Hata",
-      "English": "Error"
-    },
-    "giris_yap_mesaj": {
-      "Türkçe": "Lütfen önce giriş yapın.",
-      "English": "Please log in first."
-    },
-    "basarili_baslik": {
-      "Türkçe": "Başarılı",
-      "English": "Successful"
-    },
-    "feedback_gonderildi": {
-      "Türkçe": "Geri bildiriminiz iletildi.",
-      "English": "Your feedback has been sent."
-    },
-    "siteuyari": {
-      "Türkçe": "Site açılamadı.",
-      "English": "Site could not be opened."
-    },
-    "boslukuyari": {
-      "Türkçe": "Lütfen tüm alanları doldurun.",
-      "English": "Please fill in all fields."
-    },
-    "girisbasarili": {
-      "Türkçe": "Giriş Başarılı",
-      "English": "Login Successful"
-    },
-    "sifre": {
-      "Türkçe": "Şifre",
-      "English": "Password"
-    },
-    "eposta": {
-      "Türkçe": "E-posta",
-      "English": "E-mail"
-    },
-    "refresh": {
-      "Türkçe": "Yenile",
-      "English": "Refresh"
+  "nav": {
+    "games": { "tr": "Oyunlar", "en": "Games" },
+    "rank": { "tr": "Sıralama", "en": "Leaderboard" },
+    "profile": { "tr": "Profil", "en": "Profile" },
+    "settings": { "tr": "Ayarlar", "en": "Settings" }
+  },
+  "feedback": {
+    "title": { "tr": "Hata Bildir", "en": "Report a Bug" },
+    "subject_hint": { "tr": "Lütfen Hata Başlığını Girin", "en": "Please Enter the Bug Title" },
+    "message_hint": { "tr": "Hata hakkında detaylı bilgi verin", "en": "Provide detailed information about the bug" },
+    "sent_success": { "tr": "Geri bildiriminiz iletildi.", "en": "Your feedback has been sent." }
+  },
+  "auth": {
+    "login_required": { "tr": "Lütfen önce giriş yapın.", "en": "Please log in first." },
+    "login": { "tr": "Giriş Yap", "en": "Log In" },
+    "signup": { "tr": "Kayıt Ol", "en": "Sign Up" },
+    "logout": { "tr": "Çıkış Yap", "en": "Log Out" },
+    "logout_success": { "tr": "Çıkış Yapıldı", "en": "Log Out Successful" },
+    "login_success": { "tr": "Giriş Başarılı", "en": "Login Successful" },
+    "login_subtitle": { "tr": "Lütfen giriş yaparak devam edin", "en": "Please sign in to continue" },
+    "guest": { "tr": "Misafir", "en": "Guest" },
+    "email": { "tr": "E-posta", "en": "E-mail" },
+    "password": { "tr": "Şifre", "en": "Password" },
+    "login_prompt": { "tr": "Google hesabı ile giriş yaparak puanlarınızı kaydedebilirsiniz.", "en": "Login with Google to save your scores." },
+    "login_description": { "tr": "GeoGame'a giriş yapmak için aşağıdaki düğmeye tıklayabilirsiniz.", "en": "You can log in to GeoGame by clicking the button below." },
+    "no_account": { "tr": "Hesabınız yok mu?", "en": "Don't have an account?" },
+    "web_signup": { "tr": "Web sitesinden kayıt olun", "en": "Sign up with web" }
+  },
+  "game_common": {
+    "input_hint": { "tr": "Ülke ismini yazın...", "en": "Type country name..." },
+    "rules": { "tr": "Kurallar", "en": "Rules" },
+    "save_points_warning": { "tr": "Puanlarınızın kayıt edilmesi için ana menüye dönün.", "en": "Return to the main menu to save your points." },
+    "congratulations": { "tr": "Tebrikler! 🎉", "en": "Congratulations! 🎉" },
+    "correct_msg": { "tr": "{0} doğru cevaptı!", "en": "{0} was the correct answer!" },
+    "wrong_try_again": { "tr": "Yanlış cevap. Tekrar deneyin. Sorudan Gelecek Puan: ", "en": "Wrong answer. Try again. Points for the question: " },
+    "passed_msg": { "tr": "Geçilen Ülke: {0}", "en": "Passed Country: {0}" },
+    "clear_guesses": { "tr": "Tahminleri Temizle", "en": "Clear Guesses" },
+    "options_hint": { "tr": "İsterseniz ayarlardan şıkları\n 'Yazarak Bilme Modu' ile değiştirebilirsiniz.", "en": "You can change choices to 'Typing Mode' from settings." },
+    "not_found": { "tr": "Ülke bulunamadı, lütfen listeden seçin.", "en": "Country not found, please select from the list." },
+    "first_guess": { "tr": "İlk tahmininizi yapın!", "en": "Make your first guess!" },
+    "score_system_generic": { "tr": "Puan Sistemi: Her turda puaniniz 50 den baslar her yanlis tahminde 10 puan azalir.", "en": "Scoring System: Each round starts with 50 points. Each wrong guess deducts 10 points." }
+  },
+  "game_capital": {
+    "title": { "tr": "Başkent Oyun", "en": "Capital Game" },
+    "description": { "tr": "Başkentten ülkeyi tanıyın", "en": "Guess the country from its capital." },
+    "content": { "tr": "Tahmin Edilecek Ülkenin Başkenti:", "en": "Capital of the country to guess:" },
+    "input_hint": { "tr": "Hangi ülkenin başkenti?", "en": "Which country is this the capital of?" },
+    "rule_welcome": { "tr": "Baskent Bilme Oyununa hos geldiniz.\nAmaciniz 250 ulkeden rastgele secilen bir ulkenin baskentini bilmek.", "en": "Welcome to the Capital City Quiz.\nYour goal is to guess the capital of a randomly selected country." }
+  },
+  "game_flag": {
+    "title": { "tr": "Bayrak Oyun", "en": "Flag Game" },
+    "description": { "tr": "Bayraktan ülkeyi tanıyın", "en": "Guess the country from its flag." },
+    "rule_welcome": { "tr": "Bayrak Bilme Oyununa hos geldiniz.\nAmaciniz, 250 ulkeden rastgele secilen bir ulkenin bayragini bilmek.", "en": "Welcome to the Flag Quiz.\nYour goal is to guess the flag of a randomly selected country." }
+  },
+  "game_distance": {
+    "title": { "tr": "Mesafe Oyun", "en": "Distance Game" },
+    "description": { "tr": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.", "en": "Guess countries based on distance and direction." },
+    "guess": { "tr": "Tahmin: ", "en": "Guess: " },
+    "distance": { "tr": "Mesafe: ", "en": "Distance: " },
+    "direction": { "tr": "Yön: ", "en": "Direction: " },
+    "rule_welcome": { "tr": "Mesafeden ulke bilme oyununa hos geldiniz.\nAmaciniz, 250 ülkeden rastgele secilen bir ulkeyi bilmek.\nMesafeler +-100 Km fark olabilir.\nKonum olarak ülkelerin tam ortalari baz alinmistir.", "en": "Welcome to the Distance Country Quiz.\nDistances may vary by +-100 km. Center positions are used." },
+    "rule_score": { "tr": "Puan Sistemi: Her turda puaniniz 300 den baslar her yanlis tahminde 10 puan azalir.\n15 Tahminden sonra kazanilan puan 100'e sabitlenir.", "en": "Scoring System: Starts with 300 points. 10 points deducted per wrong guess. Fixed at 100 after 15 guesses." }
+  },
+  "directions": {
+    "north": { "tr": "Kuzey", "en": "North" },
+    "north_east": { "tr": "Kuzeydoğu", "en": "Northeast" },
+    "east": { "tr": "Doğu", "en": "East" },
+    "south_east": { "tr": "Güneydoğu", "en": "Southeast" },
+    "south": { "tr": "Güney", "en": "South" },
+    "south_west": { "tr": "Güneybatı", "en": "Southwest" },
+    "west": { "tr": "Batı", "en": "West" },
+    "north_west": { "tr": "Kuzeybatı", "en": "Northwest" }
+  },
+  "settings": {
+    "title": { "tr": "Ayarlar", "en": "Settings" },
+    "general_title": { "tr": "Genel Ayarlar", "en": "General Settings" },
+    "selected_theme": { "tr": "Seçilen Tema: {0}", "en": "Selected Theme: {0}" },
+    "lang": { "tr": "Seçilen Dil: ", "en": "Selected Language: " },
+    "multiple_choice_mode": { "tr": "Çoktan Seçmeli Mod", "en": "Multiple Choice Mode" },
+    "continent_title": { "tr": "Kıta Seçenekleri", "en": "Continent Options" },
+    "un_members": { "tr": "BM Üyeliği Olmayan Ülkeler", "en": "Countries without UN Membership" },
+    "continent_warning_title": { "tr": "Uyarı", "en": "Warning" },
+    "no_continent_active": { "tr": "Hiçbir kıta aktif değil.", "en": "No continent is active." },
+    "activate_continent_prompt": { "tr": "Lütfen en az bir kıta aktif edin.", "en": "Please activate at least one continent." },
+    "continents": {
+      "south_america": { "tr": "Güney Amerika Kıtasında Olan Ülkeler", "en": "Countries in South America" },
+      "north_america": { "tr": "Kuzey Amerika Kıtasında Olan Ülkeler", "en": "Countries in North America" },
+      "asia": { "tr": "Asya Kıtasında Olan Ülkeler", "en": "Countries in Asia" },
+      "africa": { "tr": "Afrika Kıtasında Olan Ülkeler", "en": "Countries in Africa" },
+      "europe": { "tr": "Avrupa Kıtasında Olan Ülkeler", "en": "Countries in Europe" },
+      "oceania": { "tr": "Okyanusya Kıtasında Olan Ülkeler", "en": "Countries in Oceania" },
+      "antarctica": { "tr": "Antartika Kıtasında Olan Ülkeler", "en": "Countries in Antarctica" }
+    },
+    "guest": { "tr": "Misafir", "en": "Guest" },
+    "edit_profile": { "tr": "Profili Düzenle", "en": "Edit Profile" }
+  },
+  "profile": {
+    "title": { "tr": "Profil", "en": "Profile" },
+    "edit_profile": { "tr": "Profil Düzenle", "en": "Edit Profile" },
+    "stats_title": { "tr": "Oyun İstatistikleri", "en": "Game Statistics" },
+    "total_score": { "tr": "Toplam Puan", "en": "Total Score" },
+    "score_display": { "tr": "{0} Puan", "en": "{0} Points" },
+    "correct_label": { "tr": "Doğru: {0}", "en": "Correct: {0}" },
+    "wrong_label": { "tr": "Yanlış: {0}", "en": "Wrong: {0}" },
+    "success_label": { "tr": "Başarı: {0}%", "en": "Success: {0}%" },
+    "distance": { "tr": "Mesafe", "en": "Distance"},
+    "flag": { "tr": "Bayrak", "en": "Flag" },
+    "capital": { "tr": "Başkent", "en": "Capital" }
+  },
+  "leaderboard": {
+    "title": { "tr": "Sıralama", "en": "Leaderboard" },
+    "no_data": { "tr": "Henüz sıralama verisi yok.", "en": "No leaderboard data yet." },
+    "score": { "tr": "Puan", "en": "Score" },
+    "load_error": {
+      "tr": "Sıralama yüklenemedi. Lütfen internetinizi kontrol edin.",
+      "en": "Leaderboard could not be loaded. Please check your internet connection."
     }
+  },
+  "version": {
+    "new_available": { "tr": "Yeni Sürüm Var", "en": "New Version Available" },
+    "not_now": { "tr": "Şimdi Değil", "en": "Not Now" },
+    "update": { "tr": "Güncelle", "en": "Update" }
+  },
+  "drawer": {
+    "report_bug": { "tr": "Hata Bildir", "en": "Report a Bug" },
+    "feedback_note": { "tr": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.", "en": "You can send your complaints or suggestions by clicking the button above." },
+    "my_website": { "tr": "Benim Websitem", "en": "My Website" },
+    "geogame_website": { "tr": "GeoGame Website", "en": "GeoGame Website" },
+    "geogame_github": { "tr": "GeoGame Github", "en": "GeoGame Github" },
+    "creator": { "tr": "Yapımcı: Kerem Kuyucu", "en": "Creator: Kerem Kuyucu" },
+    "version_text": { "tr": "Sürüm: {0}", "en": "Version: {0}" }
   }
 }
