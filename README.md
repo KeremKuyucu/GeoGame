@@ -32,12 +32,12 @@
 ### Gameplay Experience
 | Capital Quiz | Flag Quiz | Distance Game |
 | :---: | :---: | :---: |
-| <img src="Resimler/baskentoyun.png" width="180"/> | <img src="Resimler/bayrakoyun.png" width="180"/> | <img src="Resimler/mesafeoyun.png" width="180"/> |
+| <img src="Resimler/capital_game.png" width="180"/> | <img src="Resimler/flag_game.png" width="180"/> | <img src="Resimler/distance_game.png" width="180"/> |
 
 ### Interface & Social
 | Main Lobby | Leaderboard | Profile & Settings |
 | :---: | :---: | :---: |
-| <img src="Resimler/mainlobi.png" width="180"/> | <img src="Resimler/leadboard.png" width="180"/> | <img src="Resimler/profiles.png" width="180"/> |
+| <img src="Resimler/mainlobi.png" width="180"/> | <img src="Resimler/leaderboard.png" width="180"/> | <img src="Resimler/profile.png" width="180"/> |
 
 ---
 
