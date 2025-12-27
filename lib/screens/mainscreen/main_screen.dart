@@ -26,19 +26,19 @@ class _MainScreenState extends State<MainScreen> {
         {
           'title': Localization.t('game_capital.title'),
           'desc': Localization.t('game_capital.description'),
-          'img': 'assets/baskent.jpg',
+          'img': 'assets/capital.webp',
           'color': '0xFF6A1B9A', // Mor tonu
         },
         {
           'title': Localization.t('game_flag.title'),
           'desc': Localization.t('game_flag.description'),
-          'img': 'assets/bayrak.jpg',
+          'img': 'assets/flag.webp',
           'color': '0xFF2E7D32', // Yeşil tonu
         },
         {
           'title': Localization.t('game_distance.title'),
           'desc': Localization.t('game_distance.description'),
-          'img': 'assets/mesafe.jpg',
+          'img': 'assets/distance.webp',
           'color': '0xFF1565C0', // Mavi tonu
         },
       ];
@@ -105,126 +105,198 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final data = _gameData;
+    // Tema kontrolü (Dark/Light)
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true, // AppBar'ı saydamlaştırıp içeriği arkasına iter
       appBar: AppBar(
-        title: Text(
-          'GeoGame',
+        title: const Text(
+          'GEOGAME',
           style: TextStyle(
             fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-            color: const Color(0xff6200ee),
+            letterSpacing: 3,
+            color: Colors.white, // Koyu arka planda beyaz yazı
+            fontSize: 24,
+            shadows: [
+              Shadow(blurRadius: 10, color: Colors.black, offset: Offset(0, 2))
+            ],
           ),
         ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent, // Saydam AppBar
         centerTitle: true,
       ),
       drawer: const DrawerWidget(),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          final item = data[index];
-          final Color categoryColor = Color(int.parse(item['color']!));
+      body: Container(
+        // Arka plana hafif bir desen veya gradient ekleyebiliriz
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [const Color(0xFF1A1A1A), const Color(0xFF000000)]
+                : [const Color(0xFFF5F7FA), const Color(0xFFC3CFE2)],
+          ),
+        ),
+        child: ListView.builder(
+          padding: const EdgeInsets.fromLTRB(20, 100, 20, 20), // Üstten boşluk (AppBar için)
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            final item = data[index];
+            final Color themeColor = Color(int.parse(item['color']!));
 
-          return Container(
-            margin: const EdgeInsets.only(bottom: 25),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: categoryColor.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Material(
-                color: isDark ? Colors.grey[900] : Colors.white,
-                child: InkWell(
-                  onTap: () => _startGame(index),
-                  splashColor: categoryColor.withOpacity(0.2),
-                  child: Stack(
-                    children: [
-                      // Arka Plan Dekoru (Hafif bir renk dokunuşu)
-                      Positioned(
-                        right: -20,
-                        top: -20,
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundColor: categoryColor.withOpacity(0.1),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            // Oyun Görseli
-                            Hero(
-                              tag: 'game_img_$index',
-                              child: Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15),
-                                  image: DecorationImage(
-                                    image: AssetImage(item['img']!),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  border: Border.all(
-                                    color: categoryColor.withOpacity(0.5),
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            // Metin Alanı
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item['title']!.toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900,
-                                      color: categoryColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    item['desc']!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      height: 1.3,
-                                      color: isDark
-                                          ? Colors.grey[400]
-                                          : Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 18,
-                              color: categoryColor.withOpacity(0.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+            return GestureDetector(
+              onTap: () => _startGame(index),
+              child: Container(
+                height: 200, // Daha büyük, poster gibi kartlar
+                margin: const EdgeInsets.only(bottom: 25),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeColor.withOpacity(0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                  image: DecorationImage(
+                    image: AssetImage(item['img']!), // Görsel arka plan oldu
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.2), // Görseli hafif karart
+                      BlendMode.darken,
+                    ),
                   ),
                 ),
+                child: Stack(
+                  children: [
+                    // 1. Gradient Katmanı (Yazıların okunması için)
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.1),
+                            Colors.black.withOpacity(0.8), // Alt kısım koyu
+                          ],
+                          stops: const [0.4, 0.7, 1.0],
+                        ),
+                      ),
+                    ),
+
+                    // 2. İçerik (Yazılar ve Buton)
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // Başlık ve Açıklama
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: themeColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        item['title']!.toUpperCase(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      item['title']!,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w800,
+                                        shadows: [
+                                          Shadow(
+                                            blurRadius: 4,
+                                            color: Colors.black,
+                                            offset: Offset(0, 2),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      item['desc']!,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.grey[300],
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // "Oyna" Butonu (Play Icon)
+                              const SizedBox(width: 10),
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.play_arrow_rounded,
+                                  color: themeColor,
+                                  size: 30,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 3. Sağ Üst Köşe Dekoratif İkon (Opaklığı düşük)
+                    Positioned(
+                      top: 15,
+                      right: 15,
+                      child: Icon(
+                        Icons.gamepad, // Veya oyuna özel ikon
+                        color: Colors.white.withOpacity(0.2),
+                        size: 40,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
