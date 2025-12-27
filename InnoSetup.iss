@@ -4,7 +4,7 @@
 
 [Setup]
 AppName=GeoGame
-AppVersion=1.5.0
+AppVersion=1.5.1
 AppPublisher=Kerem Kuyucu
 DefaultDirName={localappdata}\GeoGame
 DefaultGroupName=GeoGame

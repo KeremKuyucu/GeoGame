@@ -99,7 +99,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = AppState.settings.darkTheme;
-    final Color textColor = isDark ? Colors.white : Colors.black87;
 
     return Dialog(
       backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,

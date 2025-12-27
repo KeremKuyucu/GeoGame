@@ -14,6 +14,8 @@ import 'package:geogame/services/localization_service.dart';
 
 import 'package:geogame/widgets/restart_widget.dart';
 
+import '../edit_profile/edit_profile.dart';
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -47,10 +49,16 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _openWebAuth() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const EditProfilePage()), // <-- Parantezler eklendi
+    );
+    /*
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       _showSnackBar(Localization.t('site_error', args: ["auth.keremkk.com.tr"]), Colors.red);
     }
+    */
   }
 
   void _showSnackBar(String message, Color color) {
