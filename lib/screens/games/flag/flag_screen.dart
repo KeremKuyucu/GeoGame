@@ -24,26 +24,39 @@ class FlagGame extends StatefulWidget {
   State<FlagGame> createState() => _FlagGameState();
 }
 
-class _FlagGameState extends State<FlagGame> {
+class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin {
   // Logic sınıfını çağırıyoruz
   final FlagGameService _gameService = FlagGameService();
-
   final TextEditingController _controller = TextEditingController();
+
+  // Animasyon Kontrolcüleri
+  late AnimationController _animController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Animasyon tanımları
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(parent: _animController, curve: Curves.easeOutBack);
+
     _initializeGame();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _animController.dispose();
     super.dispose();
   }
 
   Future<void> _initializeGame() async {
     _gameService.initializeGame();
+    _animController.forward(from: 0.0); // İlk animasyonu başlat
 
     // UI kuralları gösterir
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -57,28 +70,38 @@ class _FlagGameState extends State<FlagGame> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(Localization.t('game_common.rules')),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(Localization.t('game_common.save_points_warning')),
-                const SizedBox(height: 8),
-                Text(Localization.t('game_flag.rule_welcome')),
-                const SizedBox(height: 8),
-                Text(Localization.t('game_common.score_system_generic')),
+                _buildRuleItem(Icons.save, Localization.t('game_common.save_points_warning')),
+                const SizedBox(height: 10),
+                _buildRuleItem(Icons.flag, Localization.t('game_flag.rule_welcome')),
+                const SizedBox(height: 10),
+                _buildRuleItem(Icons.star_border, Localization.t('game_common.score_system_generic')),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Localization.t('common.ok')),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              child: Text(Localization.t('common.ok'), style: const TextStyle(fontWeight: FontWeight.bold)),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildRuleItem(IconData icon, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: Colors.teal),
+        const SizedBox(width: 10),
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+      ],
     );
   }
 
@@ -93,10 +116,9 @@ class _FlagGameState extends State<FlagGame> {
     setState(() {
       if (isCorrect) {
         _controller.clear();
-        // Doğru bildiyse görsel bir geri bildirim eklenebilir (SnackBar vs.)
+        _animController.forward(from: 0.0); // Yeni soru için animasyonu sıfırla
       } else {
         _controller.clear();
-        // Yanlış bildiyse buton pasifleşir (Logic serviste halledildi)
       }
     });
   }
@@ -116,6 +138,7 @@ class _FlagGameState extends State<FlagGame> {
 
     setState(() {
       _controller.clear();
+      _animController.forward(from: 0.0);
     });
   }
 
@@ -123,25 +146,44 @@ class _FlagGameState extends State<FlagGame> {
   Widget build(BuildContext context) {
     // --- TEMA VE RENK AYARLARI ---
     final bool isDark = AppState.settings.darkTheme;
-    final Color scaffoldBg = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
-    final Color cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    // Yeşil/Teal Gradient (Bayrak teması için)
+    final List<Color> bgColors = isDark
+        ? [const Color(0xFF004D40), const Color(0xFF00251A)] // Koyu Yeşil
+        : [const Color(0xFFE0F2F1), const Color(0xFF80CBC4)]; // Açık Yeşil
+
+    final Color cardBg = isDark ? const Color(0xFF263238) : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black87;
-    final Color inputFill = isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade50;
+    final Color accentColor = const Color(0xFF009688); // Teal Accent
 
     return Scaffold(
-      backgroundColor: scaffoldBg,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(Localization.t('game_flag.title')),
+        title: Text(
+          Localization.t('game_flag.title'),
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+        ),
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
+            icon: const Icon(Icons.menu, color: Colors.white),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.home),
+            icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               GameLogService.syncPendingLogs();
               Navigator.pushReplacement(
@@ -153,217 +195,246 @@ class _FlagGameState extends State<FlagGame> {
         ],
       ),
       drawer: const DrawerWidget(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: bgColors,
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
 
-              // 1. BAYRAK KARTI (Modern Görünüm)
-              Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxHeight: 250), // Çok uzamasın
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: targetCountry.flagUrl,
-                    fit: BoxFit.contain,
-                    // Yüklenirken
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    // Hata çıkarsa
-                    errorWidget: (context, url, error) => Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.broken_image, size: 50, color: Colors.red.shade300),
-                        const Text('Hata', style: TextStyle(color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 2. PAS BUTONU
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _pasButtonPressed,
-                  icon: const Icon(Icons.skip_next, color: Colors.white),
-                  label: Text(Localization.t('common.pass'), style: const TextStyle(fontSize: 16)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrangeAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 3,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 3. OYUN ALANI (Buton veya Klavye Modu)
-
-              if (AppState.filter.isButtonMode)
-              // --- BUTON MODU ---
-                Column(
-                  children: [
-                    // Grid yapısı yerine Row/Column kombini ile daha kontrollü yerleşim
-                    Row(
-                      children: [
-                        Expanded(child: _buildOptionButton(0, context)),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildOptionButton(1, context)),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(child: _buildOptionButton(2, context)),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildOptionButton(3, context)),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      Localization.t('game_common.options_hint'),
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                    ),
-                  ],
-                )
-              else
-              // --- KLAVYE MODU (AUTOCOMPLETE - KÜTÜPHANESİZ) ---
-                Autocomplete<Country>(
-                  // 1. Ekranda görünecek metin (Seçili dile göre otomatik)
-                  displayStringForOption: (Country option) =>
-                      option.getLocalizedName(Localization.currentLanguage),
-
-                  // 2. Arama Mantığı
-                  optionsBuilder: (TextEditingValue textEditingValue) {
-                    if (textEditingValue.text.isEmpty) {
-                      return const Iterable<Country>.empty();
-                    }
-                    return allCountries.where((Country ulke) {
-                      // Aramayı o anki dildeki ismine göre yap
-                      final String isim = ulke.getLocalizedName(Localization.currentLanguage);
-                      return isim.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                    });
-                  },
-
-                  // 3. Seçim Yapılınca
-                  onSelected: (Country secilenUlke) {
-                    _controller.text = secilenUlke.getLocalizedName(Localization.currentLanguage);
-                    FocusScope.of(context).unfocus();
-                    _checkAnswer(4); // Senin kodundaki checkAnswer çağrısı
-                  },
-
-                  // 4. TextField Tasarımı
-                  fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
-                    // Controller senkronizasyonu
-                    if (_controller.text.isEmpty && fieldTextEditingController.text.isNotEmpty) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        fieldTextEditingController.clear();
-                      });
-                    }
-
-                    return TextField(
-                      controller: fieldTextEditingController,
-                      focusNode: fieldFocusNode,
-                      style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w500),
-                      cursorColor: Colors.blue,
-                      decoration: InputDecoration(
-                        // Hint text'i de yerelleştirmek istersen Localization.t kullanabilirsin
-                        // Şimdilik eski kodundaki gibi statik bırakıyorsan değiştirebilirsin
-                        hintText: Localization.t('game_common.input_hint'),
-                        hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade600),
-                        prefixIcon: Icon(Icons.flag, color: isDark ? Colors.white70 : Colors.grey),
-                        filled: true,
-                        fillColor: inputFill,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      ),
-                    );
-                  },
-
-                  // 5. Liste Tasarımı (BAYRAKSIZ)
-                  optionsViewBuilder: (context, onSelected, options) {
-                    return Align(
-                      alignment: Alignment.topLeft,
-                      child: Material(
-                        elevation: 4.0,
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width - 32, // Padding payı
-                          constraints: const BoxConstraints(maxHeight: 250),
-                          child: ListView.separated(
-                            padding: EdgeInsets.zero,
-                            itemCount: options.length,
-                            separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
-                            itemBuilder: (BuildContext context, int index) {
-                              final Country option = options.elementAt(index);
-                              return ListTile(
-                                dense: true,
-                                // Leading (Resim/Bayrak) alanı YOK
-                                title: Text(
-                                  // Listede görünen isim
-                                  option.getLocalizedName(Localization.currentLanguage),
-                                  style: TextStyle(color: textColor),
-                                ),
-                                onTap: () => onSelected(option),
-                              );
-                            },
+                  // 1. BAYRAK KARTI (Modern Görünüm & Animasyonlu)
+                  ScaleTransition(
+                    scale: _fadeAnimation,
+                    child: Container(
+                      width: double.infinity,
+                      // Bayrağın ekranda kaplayacağı maksimum yüksekliği belirliyoruz.
+                      // Bayrak bu yükseklik içinde kendini ortalayarak sığacak.
+                      height: 250,
+                      alignment: Alignment.center, // Bayrağı bu alanda ortala
+                      // decoration ve padding kaldırıldı, böylece arka plan şeffaf oldu.
+                      child: ClipRRect(
+                        // Köşeleri çok hafif yumuşatmak modern gösterir,
+                        // ama istemezsen bu ClipRRect widget'ını tamamen kaldırabilirsin.
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: targetCountry.flagUrl,
+                          // --- KRİTİK NOKTA BURASI ---
+                          // contain: Resmi ASLA kesmez, ASLA sıkıştırmaz (oranı bozmaz).
+                          // Verilen alana (width: infinity, height: 250) sığabilecek en büyük şekilde yerleştirir.
+                          fit: BoxFit.contain,
+                          // ---------------------------
+                          placeholder: (context, url) => Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              // Yüklenirken temanın vurgu rengini kullansın
+                              color: isDark ? Colors.tealAccent : Colors.teal,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image_outlined,
+                                  size: 50,
+                                  color: isDark ? Colors.white54 : Colors.grey.shade600),
+                              const SizedBox(height: 8),
+                              Text("Bayrak Yüklenemedi",
+                                  style: TextStyle(color: isDark ? Colors.white54 : Colors.grey.shade600))
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
-            ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // 2. OYUN ALANI
+                  if (AppState.filter.isButtonMode)
+                    _buildButtonModeUI(context)
+                  else
+                    _buildKeyboardModeUI(context, cardBg, textColor, accentColor),
+
+                  const SizedBox(height: 20),
+
+                  // 3. PAS BUTONU
+                  TextButton.icon(
+                    onPressed: _pasButtonPressed,
+                    icon: Icon(Icons.skip_next, color: isDark ? Colors.white70 : Colors.teal.shade900),
+                    label: Text(
+                        Localization.t('common.pass'),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: isDark ? Colors.white70 : Colors.teal.shade900,
+                            fontWeight: FontWeight.bold
+                        )
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  /// Buton modundaki şık butonları oluşturan yardımcı metod
+  // --- WIDGET PARÇALARI ---
+
+  Widget _buildButtonModeUI(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: _buildOptionButton(0, context)),
+            const SizedBox(width: 15),
+            Expanded(child: _buildOptionButton(1, context)),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Row(
+          children: [
+            Expanded(child: _buildOptionButton(2, context)),
+            const SizedBox(width: 15),
+            Expanded(child: _buildOptionButton(3, context)),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Text(
+          Localization.t('game_common.options_hint'),
+          style: TextStyle(color: Colors.white70, fontSize: 12, shadows: [Shadow(blurRadius: 2, color: Colors.black45)]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKeyboardModeUI(BuildContext context, Color cardBg, Color textColor, Color accentColor) {
+    final bool isDark = AppState.settings.darkTheme;
+
+    return LayoutBuilder(
+        builder: (context, constraints) {
+          return Autocomplete<Country>(
+            displayStringForOption: (Country option) =>
+                option.getLocalizedName(Localization.currentLanguage),
+
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              if (textEditingValue.text.isEmpty) {
+                return const Iterable<Country>.empty();
+              }
+              return allCountries.where((Country ulke) {
+                final String isim = ulke.getLocalizedName(Localization.currentLanguage);
+                return isim.toLowerCase().contains(textEditingValue.text.toLowerCase());
+              });
+            },
+
+            onSelected: (Country secilenUlke) {
+              _controller.text = secilenUlke.getLocalizedName(Localization.currentLanguage);
+              FocusScope.of(context).unfocus();
+              _checkAnswer(4);
+            },
+
+            fieldViewBuilder: (context, fieldTextEditingController, fieldFocusNode, onFieldSubmitted) {
+              if (_controller.text.isEmpty && fieldTextEditingController.text.isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  fieldTextEditingController.clear();
+                });
+              }
+              return Container(
+                decoration: BoxDecoration(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: fieldTextEditingController,
+                  focusNode: fieldFocusNode,
+                  style: TextStyle(color: textColor, fontSize: 18, fontWeight: FontWeight.w500),
+                  cursorColor: accentColor,
+                  decoration: InputDecoration(
+                    hintText: Localization.t('game_common.input_hint'),
+                    hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade400),
+                    prefixIcon: Icon(Icons.flag, color: accentColor),
+                    filled: true,
+                    fillColor: Colors.transparent, // Container rengini kullan
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                ),
+              );
+            },
+
+            optionsViewBuilder: (context, onSelected, options) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 8.0,
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(15),
+                  child: Container(
+                    width: constraints.maxWidth,
+                    constraints: const BoxConstraints(maxHeight: 250),
+                    child: ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemCount: options.length,
+                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withOpacity(0.1)),
+                      itemBuilder: (BuildContext context, int index) {
+                        final Country option = options.elementAt(index);
+                        return ListTile(
+                          dense: true,
+                          // İstediğin gibi: Listede bayrak YOK
+                          title: Text(
+                            option.getLocalizedName(Localization.currentLanguage),
+                            style: TextStyle(color: textColor, fontWeight: FontWeight.w500),
+                          ),
+                          onTap: () => onSelected(option),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+    );
+  }
+
   Widget _buildOptionButton(int index, BuildContext context) {
     return SizedBox(
-      height: 60, // Buton yüksekliğini sabitledik
+      height: 65,
       child: ElevatedButton(
         onPressed: isButtonActive[index]
             ? () {
           _controller.text = buttonLabels[index];
           _checkAnswer(index);
         }
-            : null, // Tıklanamaz ise (yanlışsa) disabled olur
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: buttonColors[index],
+          foregroundColor: Colors.white, // Yazılar beyaz
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(15),
           ),
-          elevation: isButtonActive[index] ? 2 : 0,
+          elevation: isButtonActive[index] ? 5 : 0,
+          shadowColor: buttonColors[index].withOpacity(0.4),
+          padding: const EdgeInsets.symmetric(horizontal: 5),
         ),
         child: Text(
           buttonLabels[index],
@@ -371,8 +442,8 @@ class _FlagGameState extends State<FlagGame> {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: Colors.black87, // Buton rengine göre okunabilir renk
             fontWeight: FontWeight.bold,
+            fontSize: 15,
           ),
         ),
       ),
