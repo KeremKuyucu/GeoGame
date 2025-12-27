@@ -1,164 +1,203 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Dosya okuma (rootBundle) için şart
+import 'package:flutter/services.dart'; // rootBundle için
 
 import 'app_context.dart';
 
-List<Ulkeler> tumUlkeler = [];
-
+// --- GLOBAL VARIABLES (Clean Naming) ---
+List<Country> allCountries = [];
 final Random random = Random();
 
-List<bool> butontiklama = [true, true, true, true];
-List<String> butonAnahtarlar = ['', '', '', ''];
+// UI State Variables
+List<bool> isButtonActive = [true, true, true, true];
+List<String> buttonLabels = ['', '', '', ''];
 final List<Color> buttonColors = [Colors.green, Colors.yellow, Colors.blue, Colors.red];
 
-Ulkeler kalici = Ulkeler.bos();
-Ulkeler gecici = Ulkeler.bos();
+// Game State
+Country targetCountry = Country.empty(); // Sorulan Ülke (Eski: kalici)
+Country tempCountry = Country.empty(); // Gerekirse kullanılır (Eski: gecici)
 
-class Ulkeler {
-  final String url;      // İnternet Bayrak URL
-  final String bayrak;   // Yerel Bayrak Yolu (assets/...)
-  final String enisim;   // İngilizce İsim
-  final String isim;     // Türkçe İsim
-  final String baskent;
-  final String kita;     // Kıta Bilgisi
-  final bool bm;         // Birleşmiş Milletler Üyesi mi?
-  final double enlem;
-  final double boylam;
+class Country {
+  final String flagUrl;          // API'den gelen PNG URL
+  final String englishName;      // Fallback için İngilizce isim
+  final Map<String, dynamic> translations; // Tüm dillerin listesi
+  final String capital;
+  final String continent;
+  final bool isUNMember;         // BM Üyesi mi?
+  final double latitude;
+  final double longitude;
 
-  Ulkeler({
-    required this.bayrak,
-    required this.enisim,
-    required this.isim,
-    required this.baskent,
-    required this.kita,
-    required this.url,
-    required this.bm,
-    required this.enlem,
-    required this.boylam,
+  Country({
+    required this.flagUrl,
+    required this.englishName,
+    required this.translations,
+    required this.capital,
+    required this.continent,
+    required this.isUNMember,
+    required this.latitude,
+    required this.longitude,
   });
 
-  factory Ulkeler.bos() {
-    return Ulkeler(
-        bayrak: '', enisim: '', isim: '', baskent: '',
-        kita: '', url: '', bm: false, enlem: 0, boylam: 0
+  // Boş başlatıcı (Null safety için)
+  factory Country.empty() {
+    return Country(
+      flagUrl: '',
+      englishName: '',
+      translations: {},
+      capital: '',
+      continent: '',
+      isUNMember: false,
+      latitude: 0,
+      longitude: 0,
     );
   }
 
-  factory Ulkeler.fromJson(Map<String, dynamic> json) {
-    List<dynamic> latlng = json['latlng'] ?? [0.0, 0.0];
+  factory Country.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> latlng = json['latlng'] ?? [0.0, 0.0];
 
-    // Kıta verisi JSON'da liste olarak gelir: ["Europe"]
-    String kitaVerisi = (json['continents'] != null && json['continents'].isNotEmpty)
+    // Kıta verisi güvenli çekim
+    String continentData = (json['continents'] != null && json['continents'].isNotEmpty)
         ? json['continents'][0]
         : 'Unknown';
 
-    // Başkent verisi JSON'da liste olarak gelir: ["Ankara"]
-    String baskentVerisi = (json['capital'] != null && json['capital'].isNotEmpty)
+    // Başkent verisi güvenli çekim
+    String capitalData = (json['capital'] != null && json['capital'].isNotEmpty)
         ? json['capital'][0]
-        : 'Yok';
+        : 'Unknown';
 
-    // Türkçe isim kontrolü
-    String trIsim = json['name']['common'];
-    if (json['translations'] != null && json['translations']['tur'] != null) {
-      trIsim = json['translations']['tur']['common'];
-    }
-
-    return Ulkeler(
-      url: json['flags']['png'] ?? '',
-      bayrak: "assets/bayraklar/${json['name']['common'].toString().toLowerCase().replaceAll(' ', '')}.png",
-      enisim: json['name']['common'] ?? '',
-      isim: trIsim,
-      baskent: baskentVerisi,
-      kita: kitaVerisi,
-      bm: json['unMember'] ?? false,
-      enlem: latlng.isNotEmpty ? (latlng[0] as num).toDouble() : 0.0,
-      boylam: latlng.length > 1 ? (latlng[1] as num).toDouble() : 0.0,
+    return Country(
+      flagUrl: json['flags']['png'] ?? '',
+      englishName: json['name']['common'] ?? 'Unknown',
+      translations: json['translations'] ?? {},
+      capital: capitalData,
+      continent: continentData,
+      isUNMember: json['unMember'] ?? false,
+      latitude: latlng.isNotEmpty ? (latlng[0] as num).toDouble() : 0.0,
+      longitude: latlng.length > 1 ? (latlng[1] as num).toDouble() : 0.0,
     );
   }
 
-  bool ks(String yapilantahmin) {
-    return yapilantahmin == isim || yapilantahmin == enisim;
+  /// 🌍 Dinamik Dil Çevirisi
+  /// [langCode]: 'tr', 'en', 'de', 'fr' gibi uygulama dili.
+  /// JSON'daki karşılıkları: 'tur', 'eng', 'deu', 'fra' vb.
+  String getLocalizedName(String langCode) {
+    // 1. Dil kodunu JSON formatına (ISO 639-3) çevir
+    String jsonKey = _mapLangCodeToIso3(langCode);
+
+    // 2. Eğer o dilde çeviri varsa döndür
+    if (translations.containsKey(jsonKey) && translations[jsonKey]['common'] != null) {
+      return translations[jsonKey]['common'];
+    }
+
+    // 3. Bulunamazsa varsayılan olarak İngilizce ismini döndür
+    return englishName;
+  }
+
+  /// 'tr' -> 'tur' dönüşümü yapan yardımcı metod
+  String _mapLangCodeToIso3(String code) {
+    switch (code.toLowerCase()) {
+      case 'tr': return 'tur';
+      case 'de': return 'deu';
+      case 'fr': return 'fra';
+      case 'es': return 'spa';
+      case 'it': return 'ita';
+      case 'ru': return 'rus';
+      case 'ja': return 'jpn';
+      case 'zh': return 'zho';
+      case 'ar': return 'ara';
+      case 'pt': return 'por';
+    // Diğer diller eklenebilir
+      default: return 'eng'; // Varsayılan İngilizce
+    }
+  }
+
+  /// Cevap Kontrolü
+  /// Hem seçili dildeki ismini hem de İngilizce ismini kabul eder.
+  bool checkAnswer(String guess, String currentLangCode) {
+    final String localizedName = getLocalizedName(currentLangCode);
+    return guess == localizedName || guess == englishName;
   }
 }
 
-Future<void> loadcountries() async {
-  try {
-    // 1. Dosyayı string olarak oku
-    final String response = await rootBundle.loadString('assets/countries.json');
+// --- DATA LOADING & LOGIC ---
 
-    // 2. JSON olarak decode et (List<dynamic> döner)
+Future<void> loadCountries() async {
+  try {
+    final String response = await rootBundle.loadString('assets/countries.json');
     final List<dynamic> data = json.decode(response);
 
-    // 3. Her bir elemanı Ulkeler nesnesine çevirip listeye at
-    tumUlkeler = data.map((item) => Ulkeler.fromJson(item)).toList();
+    allCountries = data.map((item) => Country.fromJson(item)).toList();
 
-    debugPrint("✅ Veriler Başarıyla Yüklendi: ${tumUlkeler.length} ülke.");
+    debugPrint("✅ Countries Loaded Successfully: ${allCountries.length}");
   } catch (e) {
-    debugPrint("❌ KRİTİK HATA: Veriler yüklenemedi! Hata: $e");
-    // Hata durumunda listeyi boş bırakmayalım ki app çökmesin
-    tumUlkeler = [];
+    debugPrint("❌ CRITICAL ERROR: Could not load countries! $e");
+    allCountries = [];
   }
 }
 
-List<Ulkeler> getFilteredCountries() {
+List<Country> getFilteredCountries() {
+  // Hiçbir filtre seçili değilse boş dön
   if (!AppState.filter.northAmerica &&
       !AppState.filter.southAmerica &&
-      !AppState.filter.Asia &&
-      !AppState.filter.Africa &&
-      !AppState.filter.Europe &&
-      !AppState.filter.Oceania &&
-      !AppState.filter.Antarctic) {
+      !AppState.filter.asia &&
+      !AppState.filter.africa &&
+      !AppState.filter.europe &&
+      !AppState.filter.oceania &&
+      !AppState.filter.antarctic) {
     return [];
   }
 
-  if (tumUlkeler.isEmpty) return [];
+  if (allCountries.isEmpty) return [];
 
-  List<Ulkeler> filteredList = [];
+  return allCountries.where((c) {
+    bool isContinentMatch = false;
 
-  for (var u in tumUlkeler) {
-    bool kitaSuitable = false;
+    // Kıta kontrolü (String içeriyor mu?)
+    if (AppState.filter.europe && c.continent.contains("Europe")) isContinentMatch = true;
+    else if (AppState.filter.asia && c.continent.contains("Asia")) isContinentMatch = true;
+    else if (AppState.filter.africa && c.continent.contains("Africa")) isContinentMatch = true;
+    else if (AppState.filter.oceania && c.continent.contains("Oceania")) isContinentMatch = true;
+    else if (AppState.filter.antarctic && c.continent.contains("Antarctic")) isContinentMatch = true;
+    else if (AppState.filter.northAmerica && c.continent.contains("North America")) isContinentMatch = true;
+    else if (AppState.filter.southAmerica && c.continent.contains("South America")) isContinentMatch = true;
 
-    if (AppState.filter.Europe && u.kita.contains("Europe")) kitaSuitable = true;
-    else if (AppState.filter.Asia && u.kita.contains("Asia")) kitaSuitable = true;
-    else if (AppState.filter.Africa && u.kita.contains("Africa")) kitaSuitable = true;
-    else if (AppState.filter.Oceania && u.kita.contains("Oceania")) kitaSuitable = true;
-    else if (AppState.filter.Antarctic && u.kita.contains("Antarctic")) kitaSuitable = true;
-    else if (AppState.filter.northAmerica && u.kita.contains("North America")) kitaSuitable = true;
-    else if (AppState.filter.southAmerica && u.kita.contains("South America")) kitaSuitable = true;
-
-    if (!kitaSuitable) continue;
+    if (!isContinentMatch) return false;
 
     // BM Üyeliği Kontrolü
-    bool bmSuitable = AppState.filter.includeNonUN || u.bm;
-    if (!bmSuitable) continue;
+    if (!AppState.filter.includeNonUN && !c.isUNMember) return false;
 
-    filteredList.add(u);
-  }
-
-  return filteredList;
+    return true;
+  }).toList();
 }
-Future<void> yeniulkesec() async {
-  if (tumUlkeler.isEmpty) {
-    await loadcountries();
+
+Future<void> selectNewCountry() async {
+  if (allCountries.isEmpty) {
+    await loadCountries();
   }
 
-  final List<Ulkeler> uygunUlkeler = getFilteredCountries();
+  final List<Country> availableCountries = getFilteredCountries();
 
-  if (uygunUlkeler.length < 4) {
-    debugPrint("⚠️ UYARI: Filtrelere uygun yeterli ülke yok! (${uygunUlkeler.length})");
+  if (availableCountries.length < 4) {
+    debugPrint("⚠️ WARNING: Not enough countries for current filters! (${availableCountries.length})");
     return;
   }
 
-  final List<Ulkeler> secenekler = (List<Ulkeler>.from(uygunUlkeler)..shuffle()).take(4).toList();
+  // Listeyi karıştır ve ilk 4 tanesini al
+  final List<Country> options = (List<Country>.from(availableCountries)..shuffle()).take(4).toList();
 
-  kalici = secenekler[random.nextInt(4)];
+  // Rastgele birini doğru cevap olarak seç (0-3 arası index)
+  targetCountry = options[random.nextInt(4)];
+
+  // Butonları güncelle
+  // AppState.settings.language: 'tr', 'en', 'de' vb. döndürdüğünü varsayıyoruz.
+  String currentLang = AppState.settings.language ?? 'en';
 
   for (int i = 0; i < 4; i++) {
-    butontiklama[i] = true;
-    butonAnahtarlar[i] = AppState.settings.isEnglish ? secenekler[i].enisim : secenekler[i].isim;
+    isButtonActive[i] = true;
+    // Buton metinlerini seçili dile göre ayarla
+    buttonLabels[i] = options[i].getLocalizedName(currentLang);
   }
 
-  debugPrint("🎯 Yeni Hedef: ${kalici.isim}");
+  debugPrint("🎯 New Target: ${targetCountry.englishName} (Local: ${targetCountry.getLocalizedName(currentLang)})");
 }

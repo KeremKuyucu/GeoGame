@@ -1,12 +1,13 @@
+// lib/widgets/feedback_dialog.dart
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/localization_service.dart';
-
 import 'package:geogame/widgets/custom_notification.dart';
 
 class FeedbackDialog extends StatefulWidget {
-  const FeedbackDialog({Key? key}) : super(key: key);
+  const FeedbackDialog({super.key});
 
   @override
   State<FeedbackDialog> createState() => _FeedbackDialogState();
@@ -37,7 +38,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
     if (sebep.isEmpty || message.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(Localization.get('boslukuyari'))),
+        SnackBar(content: Text(Localization.t('common.field_required'))),
       );
       return;
     }
@@ -48,8 +49,8 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
       if (!mounted) return;
       Navigator.pop(context);
       _showCustomNotification(
-        Localization.get('hata_baslik'),
-        Localization.get('giris_yap_mesaj'),
+        Localization.t('common.error'),
+        Localization.t('auth.login_required'),
       );
       return;
     }
@@ -66,19 +67,18 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
       });
 
       if (!mounted) return;
-      Navigator.pop(context); // Başarılı olunca input diyaloğunu kapat
+      Navigator.pop(context);
 
       _showCustomNotification(
-        Localization.get('basarili_baslik'),
-        Localization.get('feedback_gonderildi'),
+        Localization.t('common.success'),
+        Localization.t('feedback.sent_success'),
       );
     } catch (e) {
       if (!mounted) return;
-      // Hata durumunda diyaloğu kapatma, kullanıcı tekrar deneyebilsin
       setState(() => _isLoading = false);
 
       _showCustomNotification(
-        Localization.get('hata_baslik'),
+        Localization.t('common.error'),
         "Error: $e",
       );
     }
@@ -98,20 +98,21 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = AppState.settings.darkTheme;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      elevation: 5,
+      backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView( // Klavye açılınca taşmayı önler
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                Localization.get('hatabildir'),
+                Localization.t('feedback.title'),
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -121,46 +122,40 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
               const SizedBox(height: 20),
               _buildTextField(
                 _sebepController,
-                Localization.get('hatabaslik'),
+                Localization.t('feedback.subject_hint'),
+                isDark,
               ),
               const SizedBox(height: 10),
               _buildTextField(
                 _messageController,
-                Localization.get('hatametin'),
-                maxLines: 3, // Mesaj kutusu biraz daha büyük olmalı
+                Localization.t('feedback.message_hint'),
+                isDark,
+                maxLines: 3,
               ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // İptal Butonu
                   TextButton(
                     onPressed: _isLoading ? null : () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      backgroundColor: Colors.redAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('İptal'),
+                    child: Text(Localization.t('common.cancel')),
                   ),
                   const SizedBox(width: 10),
-                  // Gönder Butonu
                   ElevatedButton(
                     onPressed: _isLoading ? null : _sendMessage,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: _isLoading
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text('Gönder'),
+                        : Text(Localization.t('common.send')),
                   ),
                 ],
               ),
@@ -171,17 +166,18 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          hintText: hint,
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-        ),
+  Widget _buildTextField(TextEditingController controller, String hint, bool isDark, {int maxLines = 1}) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade600),
+        filled: true,
+        fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
       ),
     );
   }

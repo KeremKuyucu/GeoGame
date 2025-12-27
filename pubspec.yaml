@@ -19,9 +19,11 @@ dependencies:
   markdown: ^7.3.0
   flutter_html: ^3.0.0
   shared_preferences: ^2.5.4
+  cached_network_image: ^3.3.0
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
 
@@ -41,4 +43,3 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    - assets/bayraklar/

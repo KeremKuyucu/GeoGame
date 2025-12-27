@@ -14,6 +14,11 @@ class GameLogService {
   static Future<void> saveToStorage(String gameType) async {
     if (AppState.session.totalScore == 0 && AppState.session.wrongCount == 0) return;
 
+    if (!AuthService.isAuthenticated) {
+      debugPrint("🚫 Misafir kullanıcı: Skor kaydedilmedi ve kuyruğa alınmadı.");
+      return;
+    }
+
     await GameLogService.queueSessionLocal(
       sessionId: AppState.session.sessionId,
       gameType: gameType,
@@ -63,8 +68,11 @@ class GameLogService {
   }
 
   static Future<void> syncPendingLogs() async {
-    final uid = AuthService.currentUserId;
-    if (uid == null) return;
+    // Auth kontrolü: Kullanıcı yoksa gönderme
+    if (!AuthService.isAuthenticated) return;
+
+    // Senin mantığına göre ID kesin var
+    final uid = AuthService.currentUserId!;
 
     final prefs = await SharedPreferences.getInstance();
     List<String> unsentList = prefs.getStringList(_unsentLogsKey) ?? [];

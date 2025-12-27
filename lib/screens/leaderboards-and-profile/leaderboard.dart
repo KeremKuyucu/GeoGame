@@ -4,16 +4,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/screens/leadboards-and-profile/userprofile.dart';
+import 'package:geogame/screens/leaderboards-and-profile/userprofile.dart';
 
-class Leadboard extends StatefulWidget {
-  const Leadboard({super.key});
+class Leaderboard extends StatefulWidget {
+  const Leaderboard({super.key});
 
   @override
-  _LeadboardState createState() => _LeadboardState();
+  _LeaderboardState createState() => _LeaderboardState();
 }
 
-class _LeadboardState extends State<Leadboard> {
+class _LeaderboardState extends State<Leaderboard> {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   List<Map<String, dynamic>> _users = [];
@@ -97,7 +97,7 @@ class _LeadboardState extends State<Leadboard> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(Localization.t('leadboard.load_error'))),
+          SnackBar(content: Text(Localization.t('leaderboard.load_error'))),
         );
       }
     }
@@ -122,7 +122,7 @@ class _LeadboardState extends State<Leadboard> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          Localization.t('leadboard.title').toUpperCase(),
+          Localization.t('leaderboard.title').toUpperCase(),
           style: TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 2,
@@ -273,7 +273,7 @@ class _LeadboardState extends State<Leadboard> {
           children: [
             const Icon(Icons.star, size: 14, color: Colors.amber),
             const SizedBox(width: 4),
-            Text('${user['totalScore']} ${Localization.t('leadboard.score')}', style: const TextStyle(fontSize: 12)),
+            Text('${user['totalScore']} ${Localization.t('leaderboard.score')}', style: const TextStyle(fontSize: 12)),
           ],
         ),
         trailing: const Icon(Icons.chevron_right_rounded),

@@ -1,124 +1,148 @@
 // lib/services/games/distance_game_manager.dart
 
-import 'dart:math';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:geogame/models/app_context.dart';
-import 'package:geogame/models/countries.dart'; // tumUlkeler, kalici, gecici, yeniulkesec buradan geliyor varsayiyoruz
+import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/localization_service.dart';
 
-class DistanceGameResult {
-  final bool isCorrect;
-  final String? messagePart;
-  final bool countryFound;
 
-  DistanceGameResult({
+
+class GuessResultModel {
+  final String countryName;
+  final double distanceKm;
+  final String directionText;
+  final double bearing;
+  final bool isCorrect;
+
+  GuessResultModel({
+    required this.countryName,
+    required this.distanceKm,
+    required this.directionText,
+    required this.bearing,
     required this.isCorrect,
-    this.messagePart,
-    required this.countryFound,
   });
 }
 
-class DistanceGameManager {
+class DistanceGameService {
 
-  /// Oyunu başlatır ve ayarları sıfırlar
   void initializeGame() {
     AppState.session.reset(
       startScore: 300,
       minScore: 100,
     );
-    yeniulkesec(); // countries.dart'tan gelen global fonksiyon
+    selectNewCountry();
   }
 
-  /// Tahmini kontrol eder, hesaplamaları yapar ve skoru günceller
-  DistanceGameResult processGuess(String girilenMetin) {
-    if (girilenMetin.isEmpty) {
-      return DistanceGameResult(isCorrect: false, countryFound: false);
-    }
+  /// Tahmini işler ve sonucu döndürür
+  GuessResultModel? processGuess(String inputText) {
+    if (inputText.isEmpty) return null;
+
+    Country guessedCountry;
 
     try {
-      // Global 'gecici' değişkenini güncelliyoruz
-      gecici = tumUlkeler.firstWhere((u) => u.ks(girilenMetin));
+      // 1. Kullanıcının girdiği metne göre ülkeyi bul
+      guessedCountry = allCountries.firstWhere(
+              (u) => u.checkAnswer(inputText, Localization.currentLanguage)
+      );
     } catch (e) {
-      debugPrint("Böyle bir ülke bulunamadı: $girilenMetin");
-      return DistanceGameResult(isCorrect: false, countryFound: false);
+      debugPrint("Böyle bir ülke bulunamadı: $inputText");
+      return null;
     }
 
-    // Matematiksel hesaplamalar
-    double distance = _mesafeHesapla(
-        gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam);
-    String direction = _pusula(
-        gecici.enlem, gecici.boylam, kalici.enlem, kalici.boylam);
+    // 2. DÜZELTME: Mesafe (Tahmin Edilen -> Hedef Ülke)
+    double distance = _calculateDistance(
+        guessedCountry.latitude, guessedCountry.longitude,
+        targetCountry.latitude, targetCountry.longitude
+    );
 
-    // Mesaj parçasını oluştur
-    String ulkeIsmi = AppState.settings.isEnglish ? gecici.enisim : gecici.isim;
+    // 3. DÜZELTME: Yön (Tahmin Edilen -> Hedef Ülke)
+    var directionData = _pusula(
+        guessedCountry.latitude, guessedCountry.longitude,
+        targetCountry.latitude, targetCountry.longitude
+    );
 
-    String resultString = "";
-    resultString += "${Localization.get('tahminmetin')}$ulkeIsmi    ";
-    resultString += "${Localization.get('mesafe')}$distance Km   ";
-    resultString += "${Localization.get('yon')}$direction\n";
+    // 4. DÜZELTME: Kazanma Kontrolü (Tahmin == Hedef mi?)
+    // Eşsiz bir alan üzerinden kontrol etmek en iyisidir (örn: englishName)
+    bool isCorrect = guessedCountry.englishName == targetCountry.englishName;
 
-    // Doğru cevap kontrolü
-    if (kalici.ks(girilenMetin)) {
+    // 5. YENİ YAPI: İsmi dile göre dinamik al
+    String countryName = guessedCountry.getLocalizedName(Localization.currentLanguage);
+
+    if (isCorrect) {
       AppState.session.submitCorrect();
       GameLogService.saveToStorage("distance");
-      yeniulkesec(); // Yeni soruya geç
-      return DistanceGameResult(
-          isCorrect: true, messagePart: resultString, countryFound: true);
+      selectNewCountry();
     } else {
       AppState.session.submitWrong();
       AppState.stats.distanceWrongCount++;
-      return DistanceGameResult(
-          isCorrect: false, messagePart: resultString, countryFound: true);
     }
+
+    return GuessResultModel(
+      countryName: countryName,
+      distanceKm: distance,
+      directionText: directionData['text'] as String,
+      bearing: directionData['bearing'] as double,
+      isCorrect: isCorrect,
+    );
   }
 
-  /// Pas geçme işlemlerini yürütür
   String handlePass() {
     AppState.session.submitPass();
-    String pasUlkeIsmi = (AppState.settings.isEnglish ? kalici.enisim : kalici.isim);
-    yeniulkesec(); // Yeni soruya geç
-    return pasUlkeIsmi;
+
+    // YENİ YAPI: Pas geçilen ülkenin ismini dinamik al
+    String pasCountryName = targetCountry.getLocalizedName(Localization.currentLanguage);
+
+    selectNewCountry();
+    return pasCountryName;
   }
 
-  // --- Matematiksel Fonksiyonlar (Private) ---
+  // --- Matematiksel Fonksiyonlar ---
 
-  double _mesafeHesapla(double latitude1, double longitude1, double latitude2,
-      double longitude2) {
-    const double PI = 3.14159265358979323846264338327950288;
-    double theta = longitude1 - longitude2;
-    double distance = acos(
-        sin(latitude1 * PI / 180.0) * sin(latitude2 * PI / 180.0) +
-            cos(latitude1 * PI / 180.0) *
-                cos(latitude2 * PI / 180.0) *
-                cos(theta * PI / 180.0)) *
-        180.0 /
-        PI;
-    distance *= 60 * 1.1515 * 1.609344;
-    return distance.roundToDouble();
+  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const double R = 6371.0;
+    double toRad(double degree) => degree * math.pi / 180.0;
+
+    double dLat = toRad(lat2 - lat1);
+    double dLon = toRad(lon2 - lon1);
+
+    double a = math.pow(math.sin(dLat / 2), 2) +
+        math.cos(toRad(lat1)) * math.cos(toRad(lat2)) *
+            math.pow(math.sin(dLon / 2), 2);
+
+    double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return (R * c).roundToDouble();
   }
 
-  String _pusula(double lat1, double lon1, double lat2, double lon2) {
-    const double PI = 3.14159265358979323846264338327950288;
-    lat1 *= PI / 180.0;
-    lon1 *= PI / 180.0;
-    lat2 *= PI / 180.0;
-    lon2 *= PI / 180.0;
-    double brng = atan2(sin(lon2 - lon1) * cos(lat2),
-        cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)) *
-        180 /
-        PI;
-    brng = (brng + 360) % 360;
+  Map<String, dynamic> _pusula(double lat1, double lon1, double lat2, double lon2) {
+    double toRad(double deg) => deg * math.pi / 180.0;
+    double toDeg(double rad) => rad * 180.0 / math.pi;
 
-    const List<String> yonlerTR = [
-      "Kuzey", "Kuzeydoğu", "Doğu", "Güneydoğu",
-      "Güney", "Güneybatı", "Batı", "Kuzeybatı"
+    final double phi1 = toRad(lat1);
+    final double phi2 = toRad(lat2);
+    final double dLon = toRad(lon2 - lon1);
+
+    final double y = math.sin(dLon) * math.cos(phi2);
+    final double x = math.cos(phi1) * math.sin(phi2) -
+        math.sin(phi1) * math.cos(phi2) * math.cos(dLon);
+
+    double bearing = toDeg(math.atan2(y, x));
+    bearing = (bearing + 360) % 360;
+
+    const List<String> directionKeys = [
+      "north", "north_east", "east", "south_east",
+      "south", "south_west", "west", "north_west"
     ];
-    const List<String> yonlerEN = [
-      "North", "Northeast", "East", "Southeast",
-      "South", "Southwest", "West", "Northwest"
-    ];
-    List<String> yonler = AppState.settings.isEnglish ? yonlerEN : yonlerTR;
-    return yonler[((brng + 22.5) / 45.0).floor() % 8];
+
+    int index = ((bearing + 22.5) / 45.0).floor() % 8;
+
+    // Yön metnini Localization servisinden al
+    String localizedDirection = Localization.t("directions.${directionKeys[index]}");
+
+    return {
+      'text': localizedDirection,
+      'bearing': bearing,
+    };
   }
 }

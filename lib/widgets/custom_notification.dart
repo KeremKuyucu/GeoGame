@@ -6,10 +6,10 @@ class CustomNotification extends StatelessWidget {
   final String metin;
 
   const CustomNotification({
-    Key? key,
+    super.key,
     required this.baslik,
     required this.metin,
-  }) : super(key: key);
+  });
 
   // --- STATIC HELPER METHOD ---
   // Bu metot sayesinde uygulamanın herhangi bir yerinden tek satırda çağırabilirsin.
@@ -65,7 +65,7 @@ class CustomNotification extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: Text(
-                  Localization.get('tamam'),
+                  Localization.t('common.ok'),
                   style: const TextStyle(color: Colors.black),
                 ),
               ),

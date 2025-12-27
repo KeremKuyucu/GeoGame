@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+// Kendi proje yollarını kontrol et
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/screens/mainscreen/main_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
 
-  const LoginPage({Key? key, this.onLoginSuccess}) : super(key: key);
+  const LoginPage({super.key, this.onLoginSuccess});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-  // Odak yönetimi için FocusNode'lar eklendi
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+  late final FocusNode _emailFocusNode;
+  late final FocusNode _passwordFocusNode;
 
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _emailFocusNode = FocusNode();
+    _passwordFocusNode = FocusNode();
+  }
 
   @override
   void dispose() {
@@ -34,19 +43,19 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  /// 🌟 GİRİŞ İŞLEMİ VE YÖNLENDİRME MANTIĞI
-  Future<void> _handleLogin() async {
-    // 1. Autofill Context'i Kapat (Tarayıcıya "işlem bitti, şifreyi kaydetmeyi teklif et" sinyali)
-    // shouldSave: true parametresi web için kritiktir.
-    TextInput.finishAutofillContext(shouldSave: true);
+  // --- LOGIC ---
 
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      _showSnackBar(Localization.get('boslukuyari'), Colors.orange);
+      _showSnackBar(Localization.t('common.field_required'), Colors.orange);
       return;
     }
+
+    FocusScope.of(context).unfocus();
+    TextInput.finishAutofillContext(shouldSave: true);
 
     setState(() => _isLoading = true);
 
@@ -57,84 +66,110 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = false);
 
     if (error == null) {
-      _showSnackBar(Localization.get('girisbasarili'), Colors.green);
+      _showSnackBar(Localization.t('auth.login_success'), Colors.green);
+      widget.onLoginSuccess?.call();
 
-      if (widget.onLoginSuccess != null) {
-        widget.onLoginSuccess!();
-      }
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      if (!mounted) return;
 
       AppState.selectedIndex = 0;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => MainScreen()),
+        MaterialPageRoute(builder: (context) => const MainScaffold()),
             (Route<dynamic> route) => false,
       );
     } else {
-      _showSnackBar(error, Colors.red);
+      _showSnackBar(error, Theme.of(context).colorScheme.error);
     }
   }
 
   Future<void> _openWebAuth() async {
     final Uri url = Uri.parse('https://auth.keremkk.com.tr');
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      _showSnackBar(Localization.get('siteuyari'), Colors.red);
+    try {
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar(Localization.t('common.site_error', args: [url.toString()]), Theme.of(context).colorScheme.error);
+      }
     }
   }
 
   void _showSnackBar(String message, Color color) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: color,
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 3),
-        ),
-      );
-    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
+
+  // --- UI ---
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(Localization.get('giris')),
-        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: Navigator.canPop(context)
             ? IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         )
             : null,
       ),
-      body: Center( // Web'de geniş ekranlarda ortalamak için Center eklendi
-        child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.all(20.0),
-            // Web için maksimum genişlik kısıtlaması (Estetik görünüm için)
+      extendBodyBehindAppBar: true,
+      body: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 500),
+              constraints: const BoxConstraints(maxWidth: 450),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 40),
-                  Icon(
-                    Icons.public,
-                    size: 100,
-                    color: Theme.of(context).primaryColor,
+                  const SizedBox(height: 20),
+
+                  Image.asset(
+                    'assets/logo.png',
+                    height: 120, // 1018px resmi 120px yüksekliğe indirir, oran korunur
+                    fit: BoxFit.contain,
                   ),
-                  SizedBox(height: 20),
+
+                  const SizedBox(height: 16),
                   Text(
                     'GeoGame',
-                    style: TextStyle(
-                      fontSize: 32,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  SizedBox(height: 50),
-                  _buildLoginCard(),
-                  SizedBox(height: 30),
-                  _buildRegisterSection(),
+                  const SizedBox(height: 8),
+                  Text(
+                    Localization.t('auth.login_subtitle'),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  _buildLoginCard(theme, isDark),
+                  const SizedBox(height: 30),
+                  _buildRegisterSection(theme),
                 ],
               ),
             ),
@@ -144,78 +179,83 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginCard() {
+  Widget _buildLoginCard(ThemeData theme, bool isDark) {
     return Card(
-      elevation: 8.0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      child: Container(
-        padding: EdgeInsets.all(30.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          gradient: LinearGradient(
-            colors: AppState.settings.darkTheme
-                ? [Colors.grey.shade900, Colors.black87]
-                : [Colors.white, Colors.grey.shade50],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+      elevation: 4,
+      shadowColor: Colors.black26,
+      color: theme.colorScheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24.0),
+        side: BorderSide(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          width: 1,
         ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
         child: AutofillGroup(
-          // onDisposeAction: AutofillContextAction.commit, // Bazı durumlarda işe yarar
+          key: const ValueKey('login_form_group'),
+          onDisposeAction: AutofillContextAction.commit,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                Localization.t('auth.login'),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
               _buildTextField(
+                theme: theme,
                 controller: _emailController,
                 focusNode: _emailFocusNode,
-                label: Localization.get('eposta'),
-                icon: Icons.email,
+                label: Localization.t('auth.email'),
+                icon: Icons.email_outlined,
                 obscure: false,
                 autofillHints: const [AutofillHints.email],
-                // E-posta girildikten sonra "İleri" tuşuna basılınca şifreye geç
                 textInputAction: TextInputAction.next,
-                onSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_passwordFocusNode);
-                },
+                onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildTextField(
+                theme: theme,
                 controller: _passwordController,
                 focusNode: _passwordFocusNode,
-                label: Localization.get('sifre'),
-                icon: Icons.lock,
+                label: Localization.t('auth.password'),
+                icon: Icons.lock_outline,
                 obscure: true,
                 autofillHints: const [AutofillHints.password],
-                // Şifre girildikten sonra "Bitti/Enter" tuşuna basılınca girişi tetikle
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _handleLogin(),
               ),
-              SizedBox(height: 30),
-
-              if (_isLoading)
-                CircularProgressIndicator()
-              else
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: Text(
-                      Localization.get('giris'),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              const SizedBox(height: 30),
+              FilledButton(
+                onPressed: _isLoading ? null : _handleLogin,
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
+                child: _isLoading
+                    ? SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                )
+                    : Text(
+                  Localization.t('auth.login'),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -223,21 +263,34 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildRegisterSection() {
+  Widget _buildRegisterSection(ThemeData theme) {
     return Column(
       children: [
         Text(
-          Localization.get('loginmesaj1'),
-          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          Localization.t('auth.no_account'),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-        SizedBox(height: 10),
-        TextButton.icon(
+        TextButton(
           onPressed: _openWebAuth,
-          icon: Icon(Icons.open_in_browser),
-          label: Text(Localization.get('loginmesaj2')),
           style: TextButton.styleFrom(
-            foregroundColor: Colors.blueAccent,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                Localization.t('auth.web_signup'),
+                style: TextStyle(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.open_in_new_rounded, size: 18, color: theme.colorScheme.primary),
+            ],
           ),
         ),
       ],
@@ -245,6 +298,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildTextField({
+    required ThemeData theme,
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -254,6 +308,9 @@ class _LoginPageState extends State<LoginPage> {
     TextInputAction? textInputAction,
     Function(String)? onSubmitted,
   }) {
+    final isDark = theme.brightness == Brightness.dark;
+    final fillColor = isDark ? theme.colorScheme.surfaceContainerHighest : theme.colorScheme.surface;
+
     return TextField(
       controller: controller,
       focusNode: focusNode,
@@ -262,23 +319,31 @@ class _LoginPageState extends State<LoginPage> {
           ? TextInputType.emailAddress
           : TextInputType.text,
       autofillHints: autofillHints,
-      textInputAction: textInputAction, // Klavye aksiyonu (İleri/Bitti)
-      onSubmitted: onSubmitted, // Enter tuşu tetikleyicisi
-      style: TextStyle(color: AppState.settings.darkTheme ? Colors.white : Colors.black87),
+      textInputAction: textInputAction,
+      onSubmitted: onSubmitted,
+      style: theme.textTheme.bodyLarge,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700]),
-        labelStyle: TextStyle(color: AppState.settings.darkTheme ? Colors.white70 : Colors.grey[700]),
+        prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
+        labelStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+        floatingLabelStyle: TextStyle(color: theme.colorScheme.primary),
+        filled: true,
+        fillColor: fillColor,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppState.settings.darkTheme ? Colors.white30 : Colors.grey[400]!),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: theme.colorScheme.outline.withOpacity(0.2),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueAccent, width: 2),
-          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+          borderRadius: BorderRadius.circular(16),
         ),
-        filled: true,
-        fillColor: AppState.settings.darkTheme ? Colors.grey[850] : Colors.grey[100],
       ),
     );
   }
