@@ -11,7 +11,7 @@ import 'package:geogame/models/countries.dart';
 
 import 'package:geogame/widgets/custom_notification.dart';
 
-import 'package:geogame/screens/mainscreen/main_screen.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
 
 class BaskentOyun extends StatefulWidget {
@@ -119,7 +119,7 @@ class _BaskentOyunState extends State<BaskentOyun> {
               GameLogService.syncPendingLogs();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => MainScreen()),
+                MaterialPageRoute(builder: (context) => MainScaffold()),
               );
             },
           ),

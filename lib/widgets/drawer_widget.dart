@@ -4,7 +4,7 @@ import 'package:geogame/widgets/feedback_dialog.dart';
 import 'package:geogame/services/localization_service.dart';
 
 class DrawerWidget extends StatelessWidget {
-  const DrawerWidget({Key? key}) : super(key: key);
+  const DrawerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +16,10 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.report, color: Colors.blueAccent),
             title: Text(
-              Localization.get('hatabildir'),
+              Localization.t('drawer.report_bug'), // Yeni Yapı
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             onTap: () {
-              // Diyalog mantığı ayrı bir widget'a taşındı
               showDialog(
                 context: context,
                 builder: (BuildContext context) => const FeedbackDialog(),
@@ -29,7 +28,7 @@ class DrawerWidget extends StatelessWidget {
           ),
           ListTile(
             title: Text(
-              Localization.get('sikayet'),
+              Localization.t('drawer.feedback_note'), // Yeni Yapı
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             dense: true,
@@ -38,7 +37,7 @@ class DrawerWidget extends StatelessWidget {
           _buildListTile(
             icon: Icons.person,
             iconColor: const Color(0xFF5865F2),
-            title: Localization.get('yapimcimetin'),
+            title: Localization.t('drawer.my_website'), // Yeni Yapı
             onTap: () async {
               await EasyLauncher.url(
                 url: 'https://keremkk.com.tr',
@@ -49,15 +48,15 @@ class DrawerWidget extends StatelessWidget {
           _buildListTile(
             icon: Icons.public,
             iconColor: Colors.red,
-            title: Localization.get('website'),
+            title: Localization.t('drawer.geogame_website'), // Yeni Yapı
             onTap: () async {
-              await EasyLauncher.url(url: 'https://keremkk.com.tr/geogame');
+              await EasyLauncher.url(url: 'https://geogame.keremkk.com.tr');
             },
           ),
           _buildListTile(
             icon: Icons.code,
             iconColor: Colors.black,
-            title: Localization.get('github'),
+            title: Localization.t('drawer.geogame_github'), // Yeni Yapı
             onTap: () async {
               await EasyLauncher.url(
                 url: 'https://github.com/KeremKuyucu/GeoGame',
@@ -67,7 +66,7 @@ class DrawerWidget extends StatelessWidget {
           const Divider(),
           ListTile(
             title: Text(
-              Localization.get('yapimci'),
+              Localization.t('drawer.creator'), // Yeni Yapı
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             dense: true,

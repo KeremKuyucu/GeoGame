@@ -10,7 +10,7 @@ import 'package:geogame/models/drawer_widget.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 
-import 'package:geogame/screens/mainscreen/main_screen.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
 class BayrakOyun extends StatefulWidget {
   @override
@@ -117,7 +117,7 @@ class _BayrakOyunState extends State<BayrakOyun> {
               GameLogService.syncPendingLogs();
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => MainScreen()),
+                MaterialPageRoute(builder: (context) => MainScaffold()),
               );
             },
           ),
