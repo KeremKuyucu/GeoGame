@@ -1,6 +1,7 @@
 {
   "common": {
     "ok": { "tr": "Tamam", "en": "Okay" },
+    "save": { "tr": "Kaydet", "en": "Save" },
     "cancel": { "tr": "İptal", "en": "Cancel" },
     "yes": { "tr": "Evet", "en": "Yes" },
     "no": { "tr": "Hayır", "en": "No" },
@@ -10,7 +11,7 @@
     "loading": { "tr": "Yükleniyor...", "en": "Loading..." },
     "error": { "tr": "Hata", "en": "Error" },
     "send": { "tr": "Gönder", "en": "Send" },
-    "field_required": { "tr": "Lütfen tüm alanları doldurun.", "en": "Please fill in all fields." },
+    "field_required": {"tr": "Bu alan zorunludur", "en": "This field is required"},
     "site_error": { "tr": "Site açılamadı. {0}", "en": "Site could not be opened. {0}" }
   },
   "nav": {
@@ -39,7 +40,11 @@
     "login_prompt": { "tr": "Google hesabı ile giriş yaparak puanlarınızı kaydedebilirsiniz.", "en": "Login with Google to save your scores." },
     "login_description": { "tr": "GeoGame'a giriş yapmak için aşağıdaki düğmeye tıklayabilirsiniz.", "en": "You can log in to GeoGame by clicking the button below." },
     "no_account": { "tr": "Hesabınız yok mu?", "en": "Don't have an account?" },
-    "web_signup": { "tr": "Web sitesinden kayıt olun", "en": "Sign up with web" }
+    "web_signup": { "tr": "Web sitesinden kayıt olun", "en": "Sign up with web" },
+    "password_changed": {"tr": "Şifre başarıyla değiştirildi", "en": "Password changed successfully"},
+    "security": { "tr": "Güvenlik", "en": "Security" },
+    "new_password": { "tr": "Yeni Şifre", "en": "New Password" },
+    "update_password": { "tr": "Şifreyi Güncelle", "en": "Update Password" }
   },
   "game_common": {
     "input_hint": { "tr": "Ülke ismini yazın...", "en": "Type country name..." },
@@ -48,7 +53,7 @@
     "congratulations": { "tr": "Tebrikler! 🎉", "en": "Congratulations! 🎉" },
     "correct_msg": { "tr": "{0} doğru cevaptı!", "en": "{0} was the correct answer!" },
     "wrong_try_again": { "tr": "Yanlış cevap. Tekrar deneyin. Sorudan Gelecek Puan: ", "en": "Wrong answer. Try again. Points for the question: " },
-    "passed_msg": { "tr": "Geçilen Ülke: {0}", "en": "Passed Country: {0}" },
+    "passed_msg": { "tr": "Geçilen Ülke:", "en": "Passed Country:" },
     "clear_guesses": { "tr": "Tahminleri Temizle", "en": "Clear Guesses" },
     "options_hint": { "tr": "İsterseniz ayarlardan şıkları\n 'Yazarak Bilme Modu' ile değiştirebilirsiniz.", "en": "You can change choices to 'Typing Mode' from settings." },
     "not_found": { "tr": "Ülke bulunamadı, lütfen listeden seçin.", "en": "Country not found, please select from the list." },
@@ -111,7 +116,6 @@
   },
   "profile": {
     "title": { "tr": "Profil", "en": "Profile" },
-    "edit_profile": { "tr": "Profil Düzenle", "en": "Edit Profile" },
     "stats_title": { "tr": "Oyun İstatistikleri", "en": "Game Statistics" },
     "total_score": { "tr": "Toplam Puan", "en": "Total Score" },
     "score_display": { "tr": "{0} Puan", "en": "{0} Points" },
@@ -121,6 +125,13 @@
     "distance": { "tr": "Mesafe", "en": "Distance"},
     "flag": { "tr": "Bayrak", "en": "Flag" },
     "capital": { "tr": "Başkent", "en": "Capital" }
+  },
+  "edit_profile": {
+    "edit_title": { "tr": "Profili Düzenle", "en": "Edit Profile" },
+    "personal_info": { "tr": "Kişisel Bilgiler", "en": "Personal Information" },
+    "display_name": { "tr": "Görünen İsim", "en": "Display Name" },
+    "avatar_url": { "tr": "Avatar URL", "en": "Avatar URL" },
+    "update_success": { "tr": "Profil başarıyla güncellendi", "en": "Profile updated successfully" }
   },
   "leaderboard": {
     "title": { "tr": "Sıralama", "en": "Leaderboard" },

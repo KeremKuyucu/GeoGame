@@ -191,7 +191,7 @@ Future<void> selectNewCountry() async {
 
   // Butonları güncelle
   // AppState.settings.language: 'tr', 'en', 'de' vb. döndürdüğünü varsayıyoruz.
-  String currentLang = AppState.settings.language ?? 'en';
+  String currentLang = AppState.settings.language;
 
   for (int i = 0; i < 4; i++) {
     isButtonActive[i] = true;

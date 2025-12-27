@@ -1,7 +1,7 @@
 name: geogame
 description: "A location guessing game based on maps, available on both mobile, PC and web"
 publish_to: 'Github:KeremKuyucu'
-version: 1.5.0
+version: 1.5.1
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
