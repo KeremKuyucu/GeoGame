@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:geogame/widgets/drawer_widget.dart';
-
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/screens/leaderboards-and-profile/userprofile.dart';
+// Userprofile importunu kaldırdık
+import 'package:geogame/widgets/profile_view_widget.dart'; // Bunu eklemeyi unutma
 
 class Leaderboard extends StatefulWidget {
   const Leaderboard({super.key});
 
   @override
-  _LeaderboardState createState() => _LeaderboardState();
+  State<Leaderboard> createState() => _LeaderboardState();
 }
 
 class _LeaderboardState extends State<Leaderboard> {
@@ -30,58 +30,48 @@ class _LeaderboardState extends State<Leaderboard> {
     setState(() => _isLoading = true);
 
     try {
-      // 1️⃣ İstatistikleri Puan Sırasına Göre Çek
-      // DB sütunu 'puan' olduğu için sıralamayı buna göre yapıyoruz.
-      final statsResponse = await _supabase
-          .from('geogame_stats')
+      final response = await _supabase
+          .from('leaderboard_view')
           .select()
-          .order('totalScore', ascending: false)
-          .limit(100); // Performans için ilk 100 kişiyi çekmek mantıklıdır
+          .limit(100);
 
-      if (statsResponse.isEmpty) {
-        setState(() {
-          _users = [];
-          _isLoading = false;
-        });
+      if (response.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _users = [];
+            _isLoading = false;
+          });
+        }
         return;
       }
 
-      // 2️⃣ İlgili Kullanıcıların Profillerini Çek
-      final userIds = statsResponse.map((stat) => stat['user_id'] as String).toList();
-
-      final profilesResponse = await _supabase
-          .from('profiles')
-          .select()
-          .inFilter('uid', userIds);
-
-      // Profilleri hızlı erişim için Map'e çevir
-      final profilesMap = {
-        for (var profile in profilesResponse) profile['uid']: profile
-      };
-
-      // 3️⃣ Verileri Birleştir ve Formatla
-      List<Map<String, dynamic>> leaderboardData = statsResponse.map<Map<String, dynamic>>((stat) {
-        final userId = stat['user_id'] as String;
-        final profile = profilesMap[userId];
-
+      final List<Map<String, dynamic>> leaderboardData = (response as List).map<Map<String, dynamic>>((row) {
         return {
-          'uid': userId,
-          'name': profile?['full_name'] ?? 'Guest',
-          'avatar_url': profile?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+          'uid': row['uid'] ?? '',
+          'name': row['full_name'] ?? 'Guest',
+          'avatar_url': row['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
 
-          'totalScore': (stat['totalScore'] ?? 0) as int,
+          // Genel Skorlar
+          'total_score': (row['total_score'] ?? 0) as int, // DİKKAT: Anahtar ismi total_score
+          'total_correct': (row['total_correct'] ?? 0) as int,
+          'total_wrong': (row['total_wrong'] ?? 0) as int,
 
-          'distanceScore': (stat['distanceScore'] ?? 0) as int,
-          'distanceCorrectCount': (stat['distanceCorrectCount'] ?? 0) as int,
-          'distanceWrongCount': (stat['distanceWrongCount'] ?? 0) as int,
+          // Mod Verileri
+          'score_flag': (row['score_flag'] ?? 0) as int,
+          'flag_correct': (row['flag_correct'] ?? 0) as int,
+          'flag_wrong': (row['flag_wrong'] ?? 0) as int,
 
-          'flagScore': (stat['flagScore'] ?? 0) as int,
-          'flagCorrectCount': (stat['flagCorrectCount'] ?? 0) as int,
-          'flagWrongCount': (stat['flagWrongCount'] ?? 0) as int,
+          'score_capital': (row['score_capital'] ?? 0) as int,
+          'capital_correct': (row['capital_correct'] ?? 0) as int,
+          'capital_wrong': (row['capital_wrong'] ?? 0) as int,
 
-          'capitalScore': (stat['capitalScore'] ?? 0) as int,
-          'capitalCorrectCount': (stat['capitalCorrectCount'] ?? 0) as int,
-          'capitalWrongCount': (stat['capitalWrongCount'] ?? 0) as int,
+          'score_distance': (row['score_distance'] ?? 0) as int,
+          'distance_correct': (row['distance_correct'] ?? 0) as int,
+          'distance_wrong': (row['distance_wrong'] ?? 0) as int,
+
+          'score_borderline': (row['score_borderline'] ?? 0) as int,
+          'borderline_correct': (row['borderline_correct'] ?? 0) as int,
+          'borderline_wrong': (row['borderline_wrong'] ?? 0) as int,
         };
       }).toList();
 
@@ -105,9 +95,9 @@ class _LeaderboardState extends State<Leaderboard> {
 
   Color _getRankColor(int index) {
     switch (index) {
-      case 0: return const Color(0xFFFFD700); // Altın
-      case 1: return const Color(0xFFC0C0C0); // Gümüş
-      case 2: return const Color(0xFFCD7F32); // Bronz
+      case 0: return const Color(0xFFFFD700);
+      case 1: return const Color(0xFFC0C0C0);
+      case 2: return const Color(0xFFCD7F32);
       default: return Colors.blueAccent.withValues(alpha: 0.1);
     }
   }
@@ -117,13 +107,36 @@ class _LeaderboardState extends State<Leaderboard> {
     return Colors.blueAccent;
   }
 
+  // --- YENİ FONKSİYON: Profile Git ---
+  // Tekrarlanan kodu engellemek için navigasyonu buraya aldık
+  void _navigateToProfile(Map<String, dynamic> user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(user['name'] ?? ''),
+            centerTitle: true,
+          ),
+          // DrawerWidget'ı burada kullanmıyoruz çünkü geri butonu olmalı
+          body: ProfileViewWidget(
+            name: user['name'] ?? Localization.t('settings.guest'),
+            avatarUrl: user['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+            totalScore: user['total_score'] ?? 0,
+            stats: user,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           Localization.t('leaderboard.title').toUpperCase(),
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 2,
             color: Colors.pink,
@@ -144,7 +157,7 @@ class _LeaderboardState extends State<Leaderboard> {
         onRefresh: _fetchLeaderboard,
         child: _users.isEmpty
             ? _buildEmptyState()
-            : CustomScrollView( // Podium + Listeyi birleştirmek için en iyisi
+            : CustomScrollView(
           slivers: [
             if (_users.length >= 3)
               SliverToBoxAdapter(child: _buildPodium()),
@@ -153,7 +166,6 @@ class _LeaderboardState extends State<Leaderboard> {
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                    // Eğer podyum varsa, listeden ilk 3'ü atla
                     final listIndex = _users.length >= 3 ? index + 3 : index;
                     if (listIndex >= _users.length) return null;
                     return _buildUserCard(listIndex);
@@ -172,7 +184,7 @@ class _LeaderboardState extends State<Leaderboard> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 30),
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(0.05),
+        color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
       child: Row(
@@ -180,7 +192,7 @@ class _LeaderboardState extends State<Leaderboard> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _podiumItem(1, 100), // 2. Sıra
-          _podiumItem(0, 130), // 1. Sıra (En büyük)
+          _podiumItem(0, 130), // 1. Sıra
           _podiumItem(2, 90),  // 3. Sıra
         ],
       ),
@@ -191,17 +203,8 @@ class _LeaderboardState extends State<Leaderboard> {
     final user = _users[index];
     final color = _getRankColor(index);
 
-    // ✅ DÜZELTME: GestureDetector ile sarmaladık
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Userprofile(user: user),
-          ),
-        );
-      },
-      // Tıklama efektinin daha belirgin olması için 'Behavior' ekleyebilirsin
+      onTap: () => _navigateToProfile(user), // YENİ YÖNLENDİRME
       behavior: HitTestBehavior.opaque,
       child: Column(
         children: [
@@ -213,10 +216,9 @@ class _LeaderboardState extends State<Leaderboard> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: color, width: 3),
-                  // Avatarın arkasına gölge ekleyerek tıklanabilir hissi verelim
                   boxShadow: [
                     BoxShadow(
-                      color: color.withOpacity(0.4),
+                      color: color.withValues(alpha: 0.4),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     )
@@ -237,10 +239,10 @@ class _LeaderboardState extends State<Leaderboard> {
           Text(
             user['name'],
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-            overflow: TextOverflow.ellipsis, // İsim uzunsa taşmasın
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
-            '${user['totalScore']} P',
+            '${user['total_score']} P', // DÜZELTİLDİ: totalScore -> total_score
             style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14),
           ),
         ],
@@ -248,7 +250,6 @@ class _LeaderboardState extends State<Leaderboard> {
     );
   }
 
-  // Normal Liste Kartı
   Widget _buildUserCard(int index) {
     final user = _users[index];
     return Container(
@@ -256,10 +257,10 @@ class _LeaderboardState extends State<Leaderboard> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
       ),
       child: ListTile(
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Userprofile(user: user))),
+        onTap: () => _navigateToProfile(user), // YENİ YÖNLENDİRME
         leading: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -273,7 +274,8 @@ class _LeaderboardState extends State<Leaderboard> {
           children: [
             const Icon(Icons.star, size: 14, color: Colors.amber),
             const SizedBox(width: 4),
-            Text('${user['totalScore']} ${Localization.t('leaderboard.score')}', style: const TextStyle(fontSize: 12)),
+            // DÜZELTİLDİ: totalScore -> total_score
+            Text('${user['total_score']} ${Localization.t('leaderboard.score')}', style: const TextStyle(fontSize: 12)),
           ],
         ),
         trailing: const Icon(Icons.chevron_right_rounded),

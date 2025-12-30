@@ -1,0 +1,168 @@
+{
+  "common": {
+    "ok": "Tamam",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "yes": "Evet",
+    "no": "Hayır",
+    "pass": "Pas",
+    "success": "Başarılı",
+    "refresh": "Yenile",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "send": "Gönder",
+    "field_required": "Bu alan zorunludur",
+    "site_error": "Site açılamadı. {0}"
+  },
+  "nav": {
+    "games": "Oyunlar",
+    "rank": "Sıralama",
+    "profile": "Profil",
+    "settings": "Ayarlar"
+  },
+  "feedback": {
+    "title": "Hata Bildir",
+    "subject_hint": "Lütfen Hata Başlığını Girin",
+    "message_hint": "Hata hakkında detaylı bilgi verin",
+    "sent_success": "Geri bildiriminiz iletildi."
+  },
+  "auth": {
+    "login_required": "Lütfen önce giriş yapın.",
+    "login": "Giriş Yap",
+    "signup": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "logout_success": "Çıkış Yapıldı",
+    "login_success": "Giriş Başarılı",
+    "login_subtitle": "Lütfen giriş yaparak devam edin",
+    "guest": "Misafir",
+    "email": "E-posta",
+    "password": "Şifre",
+    "login_prompt": "Google hesabı ile giriş yaparak puanlarınızı kaydedebilirsiniz.",
+    "login_description": "GeoGame'a giriş yapmak için aşağıdaki düğmeye tıklayabilirsiniz.",
+    "no_account": "Hesabınız yok mu?",
+    "have_account": "Zaten hesabınız var mı?",
+    "password_changed": "Şifre başarıyla değiştirildi",
+    "security": "Güvenlik",
+    "new_password": "Yeni Şifre",
+    "update_password": "Şifreyi Güncelle",
+    "register": "Kayıt Ol",
+    "register_subtitle": "Maceraya katıl",
+    "name": "İsim",
+    "confirm_password": "Şifre Onayı",
+    "password_mismatch": "Şifreler uyuşmuyor",
+    "password_too_short": "Şifre en az 6 karakter olmalı",
+    "register_success": "Kayıt başarılı!",
+    "forgot_password": "Şifremi Unuttum?",
+    "reset_password_title": "Şifre Sıfırlama",
+    "reset_password_desc": "E-posta adresinizi girin, size sıfırlama bağlantısı gönderelim.",
+    "send_link": "Bağlantı Gönder",
+    "link_sent": "Sıfırlama bağlantısı gönderildi!"
+  },
+  "game_common": {
+    "input_hint": "Ülke ismini yazın...",
+    "rules": "Kurallar",
+    "save_points_warning": "Puanlarınızın kaydedilmesi için ana menüye dönün.",
+    "congratulations": "Tebrikler! 🎉",
+    "correct_msg": "{0} doğru cevaptı!",
+    "wrong_try_again": "Yanlış cevap. Tekrar deneyin. Sorudan gelecek puan: ",
+    "passed_msg": "Geçilen Ülke:",
+    "clear_guesses": "Tahminleri Temizle",
+    "options_hint": "İsterseniz ayarlardan şıkları 'Yazarak Bilme Modu' ile değiştirebilirsiniz.",
+    "not_found": "Ülke bulunamadı, lütfen listeden seçin.",
+    "first_guess": "İlk tahmininizi yapın!",
+    "score_system_generic": "Puan Sistemi: Her turda puanınız 50'den başlar, her yanlış tahminde 10 puan azalır."
+  },
+  "game_capital": {
+    "title": "Başkent Oyunu",
+    "description": "Başkentten ülkeyi tanıyın.",
+    "content": "Tahmin edilecek ülkenin başkenti:",
+    "input_hint": "Hangi ülkenin başkenti?",
+    "rule_welcome": "Başkent Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkenin başkentini bilmektir."
+  },
+  "game_flag": {
+    "title": "Bayrak Oyunu",
+    "description": "Bayraktan ülkeyi tanıyın.",
+    "rule_welcome": "Bayrak Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkenin bayrağını bilmektir."
+  },
+  "game_distance": {
+    "title": "Mesafe Oyunu",
+    "description": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
+    "guess": "Tahmin: ",
+    "distance": "Mesafe: ",
+    "direction": "Yön: ",
+    "rule_welcome": "Mesafeden Ülke Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkeyi bilmektir.\nMesafelerde ±100 km fark olabilir.\nKonum olarak ülkelerin coğrafi merkezleri baz alınmıştır.",
+    "rule_score": "Puan Sistemi: Her turda puanınız 300'den başlar, her yanlış tahminde 10 puan azalır.\n15 tahminden sonra kazanılan puan 100'e sabitlenir."
+  },
+  "directions": {
+    "north": "Kuzey",
+    "north_east": "Kuzeydoğu",
+    "east": "Doğu",
+    "south_east": "Güneydoğu",
+    "south": "Güney",
+    "south_west": "Güneybatı",
+    "west": "Batı",
+    "north_west": "Kuzeybatı"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "general_title": "Genel Ayarlar",
+    "selected_theme": "Seçilen Tema: {0}",
+    "lang": "Seçilen Dil: ",
+    "multiple_choice_mode": "Çoktan Seçmeli Mod",
+    "continent_title": "Kıta Seçenekleri",
+    "un_members": "BM Üyeliği Olmayan Ülkeler",
+    "continent_warning_title": "Uyarı",
+    "no_continent_active": "Hiçbir kıta aktif değil.",
+    "activate_continent_prompt": "Lütfen en az bir kıta aktif edin.",
+    "continents": {
+      "south_america": "Güney Amerika Kıtasında Olan Ülkeler",
+      "north_america": "Kuzey Amerika Kıtasında Olan Ülkeler",
+      "asia": "Asya Kıtasında Olan Ülkeler",
+      "africa": "Afrika Kıtasında Olan Ülkeler",
+      "europe": "Avrupa Kıtasında Olan Ülkeler",
+      "oceania": "Okyanusya Kıtasında Olan Ülkeler",
+      "antarctica": "Antartika Kıtasında Olan Ülkeler"
+    },
+    "guest": "Misafir",
+    "edit_profile": "Profili Düzenle"
+  },
+  "profile": {
+    "title": "Profil",
+    "stats_title": "Oyun İstatistikleri",
+    "total_score": "Toplam Puan",
+    "score_display": "{0} Puan",
+    "correct_label": "Doğru: {0}",
+    "wrong_label": "Yanlış: {0}",
+    "success_label": "Başarı: {0}%",
+    "distance": "Mesafe",
+    "flag": "Bayrak",
+    "capital": "Başkent"
+  },
+  "edit_profile": {
+    "edit_title": "Profili Düzenle",
+    "personal_info": "Kişisel Bilgiler",
+    "display_name": "Görünen İsim",
+    "avatar_url": "Avatar URL",
+    "update_success": "Profil başarıyla güncellendi"
+  },
+  "leaderboard": {
+    "title": "Sıralama",
+    "no_data": "Henüz sıralama verisi yok.",
+    "score": "Puan",
+    "load_error": "Sıralama yüklenemedi. Lütfen internetinizi kontrol edin."
+  },
+  "version": {
+    "new_available": "Yeni Sürüm Var",
+    "not_now": "Şimdi Değil",
+    "update": "Güncelle"
+  },
+  "drawer": {
+    "report_bug": "Hata Bildir",
+    "feedback_note": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
+    "my_website": "Benim Websitem",
+    "geogame_website": "GeoGame Website",
+    "geogame_github": "GeoGame Github",
+    "creator": "Yapımcı: Kerem Kuyucu",
+    "version_text": "Sürüm: {0}"
+  }
+}
