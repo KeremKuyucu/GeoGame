@@ -20,10 +20,8 @@ void main() async {
     anonKey: Env.supabaseAnonKey,
   );
 
-  // 2. Ayarları Yükle (Theme ve Language için şart)
   await PreferencesService.loadConfig();
 
-  // 3. Localization Servisini Başlat
   Locale deviceLocale = PlatformDispatcher.instance.locale;
   await Localization.init(
       deviceLocale: deviceLocale.languageCode,

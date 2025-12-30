@@ -93,6 +93,12 @@
     "rule_welcome": "Mesafeden Ülke Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkeyi bilmektir.\nMesafelerde ±100 km fark olabilir.\nKonum olarak ülkelerin coğrafi merkezleri baz alınmıştır.",
     "rule_score": "Puan Sistemi: Her turda puanınız 300'den başlar, her yanlış tahminde 10 puan azalır.\n15 tahminden sonra kazanılan puan 100'e sabitlenir."
   },
+  "game_borderline": {
+    "title": "Sınır hattı",
+    "description": "Şekilden ülkeyi tanıyın.",
+    "hint_scale": "Ülke boyutları ekrana sığacak şekilde ölçeklendirilmiştir.",
+    "rule_welcome": "Şekil bilme oyununa hoş geldiniz.\nAmanınız, 250 ülke arasından rastgele seçilen bir ülkeyi şeklinden tanımaktır."
+  },
   "directions": {
     "north": "Kuzey",
     "north_east": "Kuzeydoğu",
@@ -136,7 +142,8 @@
     "success_label": "Başarı: {0}%",
     "distance": "Mesafe",
     "flag": "Bayrak",
-    "capital": "Başkent"
+    "capital": "Başkent",
+    "borderline": "Sınır hattı"
   },
   "edit_profile": {
     "edit_title": "Profili Düzenle",

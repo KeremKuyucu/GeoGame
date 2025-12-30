@@ -1,7 +1,6 @@
 import 'dart:ui'; // Glassmorphism için gerekli
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 // Projenizdeki yolları kontrol edin
 import 'package:geogame/services/localization_service.dart';
@@ -161,7 +160,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
             Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.bold))),
           ],
         ),
-        backgroundColor: color.withOpacity(0.9),
+        backgroundColor: color.withValues(alpha: 0.9),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -215,9 +214,9 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: Colors.blueAccent.withOpacity(0.3),
+                color: Colors.blueAccent.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(blurRadius: 50, color: Colors.blueAccent.withOpacity(0.3))],
+                boxShadow: [BoxShadow(blurRadius: 50, color: Colors.blueAccent.withValues(alpha: 0.3))],
               ),
             ),
           ),
@@ -246,7 +245,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                                 gradient: const LinearGradient(colors: [Colors.cyanAccent, Colors.purpleAccent]),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.4),
+                                    color: Colors.black.withValues(alpha: 0.4),
                                     blurRadius: 20,
                                     offset: const Offset(0, 10),
                                   ),
@@ -255,7 +254,21 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                               child: CircleAvatar(
                                 radius: 65,
                                 backgroundColor: Colors.grey[900],
-                                backgroundImage: CachedNetworkImageProvider(previewUrl),
+                                child: ClipOval(
+                                  child: Image.network(
+                                    previewUrl,
+                                    width: 130,
+                                    height: 130,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.image,
+                                        size: 40,
+                                        color: Colors.white54,
+                                      );
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
                             Positioned(
@@ -268,7 +281,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                       blurRadius: 5,
                                     )
                                   ],
@@ -357,9 +370,9 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
         child: Container(
           padding: const EdgeInsets.all(25),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,7 +386,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -400,9 +413,9 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: TextField(
         controller: controller,
@@ -412,8 +425,8 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
         cursorColor: Colors.cyanAccent,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
-          prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.6), size: 20),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+          prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.6), size: 20),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         ),
@@ -435,7 +448,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: colors.last.withOpacity(0.4),
+            color: colors.last.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

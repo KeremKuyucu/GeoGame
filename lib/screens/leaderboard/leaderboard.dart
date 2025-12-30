@@ -274,7 +274,6 @@ class _LeaderboardState extends State<Leaderboard> {
           children: [
             const Icon(Icons.star, size: 14, color: Colors.amber),
             const SizedBox(width: 4),
-            // DÜZELTİLDİ: totalScore -> total_score
             Text('${user['total_score']} ${Localization.t('leaderboard.score')}', style: const TextStyle(fontSize: 12)),
           ],
         ),

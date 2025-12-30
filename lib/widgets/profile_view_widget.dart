@@ -100,6 +100,8 @@ class ProfileViewWidget extends StatelessWidget {
             _buildSection('flag', Icons.flag, Colors.orangeAccent),
             const Divider(color: Colors.white24, height: 30),
             _buildSection('capital', Icons.location_city, Colors.purpleAccent),
+            const Divider(color: Colors.white24, height: 30),
+            _buildSection('borderline', Icons.border_all, Colors.pinkAccent),
           ],
         ),
       ),
@@ -107,9 +109,9 @@ class ProfileViewWidget extends StatelessWidget {
   }
 
   Widget _buildSection(String prefix, IconData icon, Color color) {
-    int score = stats['${prefix}Score'] ?? 0;
-    int correct = stats['${prefix}CorrectCount'] ?? 0;
-    int wrong = stats['${prefix}WrongCount'] ?? 0;
+    int score = stats['score_${prefix}'] ?? 0;
+    int correct = stats['${prefix}_correct'] ?? 0;
+    int wrong = stats['${prefix}_wrong'] ?? 0;
     int total = correct + wrong;
     double successRate = total > 0 ? (correct / total) : 0.0;
 

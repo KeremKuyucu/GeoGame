@@ -1,7 +1,7 @@
 // lib/screens/games/baskentoyun.dart
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
@@ -11,7 +11,7 @@ import 'package:geogame/models/countries.dart';
 // Servisler
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
-import 'package:geogame/services/games/capital_service.dart';
+import 'package:geogame/services/game_service.dart';
 
 // Widgetlar ve Sayfalar
 import 'package:geogame/widgets/custom_notification.dart';
@@ -25,8 +25,6 @@ class CapitalGame extends StatefulWidget {
 }
 
 class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStateMixin {
-  // Logic sınıfını çağırıyoruz
-  final CapitalGameService _gameService = CapitalGameService();
   final TextEditingController _controller = TextEditingController();
 
   // Soru değiştiğinde animasyon için
@@ -55,7 +53,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
   }
 
   Future<void> _initializeGame() async {
-    _gameService.initializeGame();
+    await GameService.initializeGame(GameType.capital);
     _animController.forward(from: 0.0); // İlk animasyonu tetikle
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -104,13 +102,13 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
     );
   }
 
-  void _checkAnswer(int index) {
-    String answerText = _controller.text;
+  Future<void> _checkAnswer(int index) async {
+    String answer = _controller.text;
     if (AppState.filter.isButtonMode && index < 4) {
-      answerText = buttonLabels[index];
+      answer = AppState.buttons[index].label;
     }
 
-    bool isCorrect = _gameService.processAnswer(answerText, index);
+    bool isCorrect = await GameService.checkStandardAnswer(answer, GameType.flag, index);
 
     setState(() {
       if (isCorrect) {
@@ -122,14 +120,15 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
     });
   }
 
-  void _pasButtonPressed() {
-    String pasUlke = _gameService.handlePass();
+  Future<void> _pasButtonPressed() async {
+    String passCountry = await GameService.handlePass();
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) {
         return CustomNotification(
             baslik: Localization.t('game_common.passed_msg'),
-            metin: pasUlke
+            metin: passCountry
         );
       },
     );
@@ -166,7 +165,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+              colors: [Colors.black.withValues(alpha: 0.7), Colors.transparent],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -219,13 +218,13 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: accentColor.withOpacity(0.2),
+                            color: accentColor.withValues(alpha: 0.2),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
                         ],
                         border: Border.all(
-                          color: accentColor.withOpacity(0.1),
+                          color: accentColor.withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
@@ -234,7 +233,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: accentColor.withOpacity(0.1),
+                              color: accentColor.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(Icons.location_city, size: 40, color: accentColor),
@@ -252,7 +251,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            targetCountry.capital, // Sorulan Başkent
+                            AppState.targetCountry.capital, // Sorulan Başkent
                             style: TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.w900,
@@ -343,7 +342,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
               if (textEditingValue.text.isEmpty) {
                 return const Iterable<Country>.empty();
               }
-              return allCountries.where((Country ulke) {
+              return AppState.allCountries.where((Country ulke) {
                 final String currentName = ulke.getLocalizedName(Localization.currentLanguage);
                 return currentName.toLowerCase().contains(textEditingValue.text.toLowerCase());
               });
@@ -367,7 +366,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -402,7 +401,7 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
                     child: ListView.separated(
                       padding: EdgeInsets.zero,
                       itemCount: options.length,
-                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withOpacity(0.1)),
+                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
                       itemBuilder: (BuildContext context, int index) {
                         final Country option = options.elementAt(index);
                         return ListTile(
@@ -410,14 +409,27 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [BoxShadow(blurRadius: 2, color: Colors.black.withOpacity(0.1))]
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 2,
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                ),
+                              ],
                             ),
                             child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: option.flagUrl,
+                              child: SvgPicture.asset(
+                                'assets/data/${option.iso3}.svg',
                                 fit: BoxFit.cover,
-                                errorWidget: (context, url, error) => const Icon(Icons.flag),
+                                placeholderBuilder: (_) => const SizedBox.shrink(),
+                                // SVG yoksa veya okunamazsa buraya düşer
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.network(
+                                    option.flagUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Icon(Icons.flag),
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -442,24 +454,24 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
     return SizedBox(
       height: 70, // Biraz daha yüksek
       child: ElevatedButton(
-        onPressed: isButtonActive[index]
+        onPressed: AppState.buttons[index].isActive
             ? () {
-          _controller.text = buttonLabels[index];
+          _controller.text = AppState.buttons[index].label;
           _checkAnswer(index);
         }
             : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColors[index],
+          backgroundColor: AppState.buttons[index].color,
           foregroundColor: Colors.white, // Yazı rengi her zaman beyaz (okunurluk için)
-          elevation: isButtonActive[index] ? 4 : 0,
-          shadowColor: buttonColors[index].withOpacity(0.4),
+          elevation: AppState.buttons[index].isActive ? 4 : 0,
+          shadowColor: AppState.buttons[index].color.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         ),
         child: Text(
-          buttonLabels[index],
+          AppState.buttons[index].label,
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,

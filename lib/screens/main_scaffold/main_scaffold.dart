@@ -6,7 +6,7 @@ import 'package:geogame/models/app_context.dart';
 import 'package:geogame/widgets/custom_navbar.dart';
 
 import 'package:geogame/screens/mainscreen/main_screen.dart';
-import 'package:geogame/screens/leaderboards-and-profile/leaderboard.dart';
+import 'package:geogame/screens/leaderboard/leaderboard.dart';
 import 'package:geogame/screens/profiles/profiles.dart';
 import 'package:geogame/screens/settings/settings.dart';
 

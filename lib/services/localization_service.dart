@@ -1,115 +1,139 @@
-// lib/services/localization_service.dart
-
 import 'dart:convert';
-import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 class Localization {
-  // ARTIK DEĞİŞTİ: Listeyi kod olarak tutuyoruz.
-  static const List<String> supportedLanguages = ['en', 'tr'];
 
-  // UI'da göstermek istersen diye kod -> isim eşleşmesi (Opsiyonel)
-  static const Map<String, String> _languageNames = {
-    'en': 'English',
-    'tr': 'Türkçe',
+  static const Map<String, String> languages = {
+    'eng': 'English',
+    'tur': 'Türkçe',
+    /* Eklenecek dil listesi:
+    'fin': 'Suomi',
+    'jpn': '日本語',
+    'ara': 'العربية',
+    'bre': 'Brezhoneg',
+    'ces': 'Čeština',
+    'deu': 'Deutsch',
+    'est': 'Eesti',
+    'fra': 'Français',
+    'hrv': 'Hrvatski',
+    'hun': 'Magyar',
+    'ita': 'Italiano',
+    'kor': '한국어',
+    'nld': 'Nederlands',
+    'per': 'فارسی',
+    'pol': 'Polski',
+    'por': 'Português',
+    'rus': 'Русский',
+    'slk': 'Slovenčina',
+    'spa': 'Español',
+    'srp': 'Srpski',
+    'swe': 'Svenska',
+    'urd': 'اردو',
+    'zho': '中文',
+     */
+  };
+  static const Map<String, String> _deviceIsoMap = {
+    'en': 'eng',
+    'tr': 'tur',
+    /* Cihaz eşleme listesi:
+    'ar': 'ara',
+    'cs': 'ces',
+    'de': 'deu',
+    'et': 'est',
+    'fi': 'fin',
+    'fr': 'fra',
+    'hr': 'hrv',
+    'hu': 'hun',
+    'it': 'ita',
+    'ja': 'jpn',
+    'ko': 'kor',
+    'nl': 'nld',
+    'fa': 'per',
+    'pl': 'pol',
+    'pt': 'por',
+    'ru': 'rus',
+    'sk': 'slk',
+    'es': 'spa',
+    'sr': 'srp',
+    'sv': 'swe',
+    'ur': 'urd',
+    'zh': 'zho',
+    */
   };
 
   static Map<String, dynamic>? _localizedStrings;
-
-  // Varsayılan dil kodu artık 'en'
-  static String _currentLanguage = 'en';
-
+  static String _currentLanguage = 'eng';
+  static List<String> get supportedLanguages => languages.keys.toList();
   static String get currentLanguage => _currentLanguage;
-
-  // UI'da şu anki dilin görünen adını almak istersen:
-  static String get currentLanguageName => _languageNames[_currentLanguage] ?? 'English';
+  static String get currentLanguageName => languages[_currentLanguage] ?? 'English';
 
   static Future<void> init({String? userPref, String? deviceLocale}) async {
-    String targetLang;
+    String target;
 
-    // 1. Kullanıcı tercihi varsa (artık 'tr' veya 'en' olarak gelmeli)
-    if (userPref != null && supportedLanguages.contains(userPref)) {
-      targetLang = userPref;
-    }
-    // 2. Cihaz dili (genelde 'tr_TR' gelir, biz başındaki 'tr'ye bakarız)
-    else if (deviceLocale != null && deviceLocale.startsWith('tr')) {
-      targetLang = 'tr';
-    }
-    // 3. Varsayılan
-    else {
-      targetLang = 'en';
+    if (userPref != null && languages.containsKey(userPref)) {
+      target = userPref;
+    } else if (deviceLocale != null && _deviceIsoMap.containsKey(deviceLocale)) {
+      target = _deviceIsoMap[deviceLocale]!;
+    } else {
+      target = 'eng';
     }
 
-    await changeLanguage(targetLang);
+    await changeLanguage(target);
   }
 
-  static Future<void> changeLanguage(String languageCode) async {
-    // Eğer dil zaten buysa ve veri yüklüyse tekrar işlem yapma
-    if (_localizedStrings != null && _currentLanguage == languageCode) {
-      return;
-    }
-
-    // Desteklenmeyen bir kod gelirse varsayılana dön
-    if (!supportedLanguages.contains(languageCode)) {
-      languageCode = 'en';
-    }
+  /// Çalışma anında dil değiştirme
+  static Future<void> changeLanguage(String iso3Code) async {
+    if (!languages.containsKey(iso3Code)) iso3Code = 'eng';
 
     try {
-      // JSON dosyasını her dil değişiminde tekrar okumaya gerek olmayabilir
-      // ama yapıyı bozmamak için senin mantığı koruyorum:
-      String jsonString = await rootBundle.loadString('assets/dil.json');
+      // DİKKAT: Dosyaların 'assets/lang/tur.json' formatında olduğundan emin olun.
+      final String jsonString = await rootBundle.loadString('assets/lang/$iso3Code.json');
       _localizedStrings = json.decode(jsonString);
-
-      _currentLanguage = languageCode; // Artık kodu atıyoruz (tr, en)
-
-      debugPrint('Dil kodu yüklendi: $_currentLanguage');
+      _currentLanguage = iso3Code;
+      debugPrint("🌍 Dil Yüklendi: $_currentLanguage (assets/lang/$iso3Code.json)");
     } catch (e) {
-      debugPrint('Localization Hatası: $e');
-      _localizedStrings = {};
+      debugPrint("❌ Dil Dosyası Yüklenemedi ($iso3Code): $e");
+
+      // Hata durumunda (örneğin dosya yoksa) İngilizceyi yüklemeyi dene
+      if (iso3Code != 'eng') {
+        debugPrint("⚠️ İngilizceye (fallback) geçiliyor...");
+        await changeLanguage('eng');
+      } else {
+        _localizedStrings = {}; // Hiçbir şey yoksa boş map ata
+      }
     }
   }
-
+  /// Çeviri motoru
   static String t(String key, {List<dynamic>? args}) {
     if (_localizedStrings == null) return key;
 
     List<String> keys = key.split('.');
     dynamic current = _localizedStrings;
 
-    // Hiyerarşide ilerle
+    // JSON içinde ilerle (Map -> Map -> String)
     for (String k in keys) {
       if (current is Map && current.containsKey(k)) {
         current = current[k];
       } else {
+        // Anahtar bulunamazsa key'in kendisini döndür (Development için)
         return key;
       }
     }
 
-    String metin = "";
+    // Artık 'current' direkt olarak String değeridir.
+    // Eski yapıdaki ['tur'] seçimine gerek kalmadı çünkü dosya zaten Türkçe.
+    String text = current.toString();
 
-    // BURASI DEĞİŞTİ: Artık dönüşüm yapmıyoruz, direkt _currentLanguage kullanıyoruz.
-    if (current is Map) {
-      // Önce şu anki dil kodu (tr), yoksa (en), o da yoksa ilk değer
-      metin = current[_currentLanguage]?.toString() ??
-          current['en']?.toString() ??
-          current.values.first.toString();
-    } else if (current is String) {
-      metin = current;
-    } else {
-      return key;
-    }
-
-    // Parametreleri işle ({0}, {1} vb.)
-    if (args != null && args.isNotEmpty) {
+    // Argümanları yerleştir ({0}, {1} vb.)
+    if (args != null) {
       for (int i = 0; i < args.length; i++) {
-        metin = metin.replaceAll('{$i}', args[i].toString());
+        text = text.replaceAll('{$i}', args[i].toString());
       }
     }
 
-    return metin.replaceAll('\\n', '\n');
+    return text.replaceAll('\\n', '\n');
   }
 
-  static String getDisplayName(String code) {
-    return _languageNames[code] ?? code;
-  }
+  static String getDisplayName(String iso3Code) => languages[iso3Code] ?? iso3Code;
 }

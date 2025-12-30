@@ -1,9 +1,6 @@
-import 'dart:ui'; // Glassmorphism için gerekli
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-// Kendi proje yollarını kontrol et
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
@@ -11,7 +8,6 @@ import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
-
   const LoginPage({super.key, this.onLoginSuccess});
 
   @override
@@ -21,38 +17,44 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final TextEditingController _nameController;
+  late final TextEditingController _confirmPasswordController;
+
   late final FocusNode _emailFocusNode;
   late final FocusNode _passwordFocusNode;
+  late final FocusNode _nameFocusNode;
+  late final FocusNode _confirmPasswordFocusNode;
 
-  // Animasyon için (Girişte hafif yukarı kayma efekti)
   late AnimationController _animController;
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
 
   bool _isLoading = false;
+  bool _isLoginMode = true; // true: Login, false: Register
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _nameController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+
     _emailFocusNode = FocusNode();
     _passwordFocusNode = FocusNode();
+    _nameFocusNode = FocusNode();
+    _confirmPasswordFocusNode = FocusNode();
 
-    // Giriş Animasyonu
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOut),
     );
-
     _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutQuart),
     );
-
     _animController.forward();
   }
 
@@ -60,13 +62,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
+    _confirmPasswordController.dispose();
     _emailFocusNode.dispose();
     _passwordFocusNode.dispose();
+    _nameFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     _animController.dispose();
     super.dispose();
   }
-
-  // --- LOGIC ---
 
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
@@ -83,19 +87,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     setState(() => _isLoading = true);
 
     final String? error = await AuthService.signIn(email, password);
-
     if (!mounted) return;
 
     setState(() => _isLoading = false);
 
     if (error == null) {
-      // Başarılı giriş
       _showSnackBar(Localization.t('auth.login_success'), Colors.greenAccent);
       widget.onLoginSuccess?.call();
-
       await Future.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
-
       AppState.selectedIndex = 0;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const MainScaffold()),
@@ -106,17 +106,115 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     }
   }
 
-  Future<void> _openWebAuth() async {
-    final Uri url = Uri.parse('https://auth.keremkk.com.tr');
-    try {
-      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-        throw 'Could not launch $url';
-      }
-    } catch (e) {
-      if (mounted) {
-        _showSnackBar(Localization.t('common.site_error', args: [url.toString()]), Colors.red);
-      }
+  Future<void> _handleRegister() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final name = _nameController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || name.isEmpty || confirmPassword.isEmpty) {
+      _showSnackBar(Localization.t('common.field_required'), Colors.orangeAccent);
+      return;
     }
+
+    if (password != confirmPassword) {
+      _showSnackBar(Localization.t('auth.password_mismatch'), Colors.orangeAccent);
+      return;
+    }
+
+    if (password.length < 6) {
+      _showSnackBar(Localization.t('auth.password_too_short'), Colors.orangeAccent);
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    setState(() => _isLoading = true);
+
+    final String? error = await AuthService.signUp(email, password, name);
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (error == null) {
+      _showSnackBar(Localization.t('auth.register_success'), Colors.greenAccent);
+      widget.onLoginSuccess?.call();
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!mounted) return;
+      AppState.selectedIndex = 0;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const MainScaffold()),
+            (Route<dynamic> route) => false,
+      );
+    } else {
+      _showSnackBar(error, Colors.redAccent);
+    }
+  }
+
+  void _showForgotPasswordDialog() {
+    final TextEditingController resetEmailController = TextEditingController();
+    // Eğer ana ekranda e-posta yazılıysa, onu buraya otomatik taşıyalım
+    resetEmailController.text = _emailController.text;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF203A43), // Temaya uygun koyu renk
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          Localization.t('auth.reset_password_title'),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              Localization.t('auth.reset_password_desc'),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
+            ),
+            const SizedBox(height: 20),
+            _buildGlassTextField(
+              controller: resetEmailController,
+              focusNode: FocusNode(), // Geçici focus node
+              icon: Icons.email_outlined,
+              hintText: Localization.t('auth.email'),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(Localization.t('common.cancel'), style: const TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0072FF),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () async {
+              final email = resetEmailController.text.trim();
+              if (email.isEmpty) return;
+
+              Navigator.pop(context); // Diyaloğu kapat
+              setState(() => _isLoading = true); // Yükleniyor göster
+
+              final error = await AuthService.sendPasswordResetEmail(email);
+
+              if (!mounted) return;
+              setState(() => _isLoading = false);
+
+              if (error == null) {
+                _showSnackBar(Localization.t('auth.link_sent'), Colors.greenAccent);
+              } else {
+                _showSnackBar(error, Colors.redAccent);
+              }
+            },
+            child: Text(Localization.t('auth.send_link'), style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showSnackBar(String message, Color color) {
@@ -132,7 +230,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             Expanded(child: Text(message, style: const TextStyle(fontWeight: FontWeight.w600))),
           ],
         ),
-        backgroundColor: color.withOpacity(0.9),
+        backgroundColor: color.withValues(alpha: 0.9),
         behavior: SnackBarBehavior.floating,
         elevation: 0,
         margin: const EdgeInsets.all(20),
@@ -141,13 +239,23 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     );
   }
 
-  // --- UI ---
+  void _toggleMode() {
+    setState(() {
+      _isLoginMode = !_isLoginMode;
+      // Clear fields when switching
+      /*
+      _emailController.clear();
+      _passwordController.clear();
+      _nameController.clear();
+      _confirmPasswordController.clear();
+       */
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Koyu tema veya harita teması renkleri
-    const Color primaryColor = Color(0xFF4A00E0); // Morumsu
-    const Color secondaryColor = Color(0xFF8E2DE2); // Pembeleşen Mor
+    const Color primaryColor = Color(0xFF4A00E0);
+    const Color secondaryColor = Color(0xFF8E2DE2);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -164,19 +272,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       ),
       body: Stack(
         children: [
-          // 1. KATMAN: ARKA PLAN (Gradient)
+          // Background Gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
-                // Alternatif Mor Tema: [Color(0xFF4A00E0), Color(0xFF8E2DE2)]
               ),
             ),
           ),
-
-          // Dekoratif Arka Plan Daireleri (Blur efektini güçlendirmek için)
+          // Decorative Circles
           Positioned(
             top: -100,
             left: -100,
@@ -184,7 +290,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.4),
+                color: primaryColor.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
               ),
             ),
@@ -196,13 +302,12 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                color: secondaryColor.withOpacity(0.4),
+                color: secondaryColor.withValues(alpha: 0.4),
                 shape: BoxShape.circle,
               ),
             ),
           ),
-
-          // 2. KATMAN: İÇERİK
+          // Content
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -214,7 +319,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // LOGO
+                      // Logo
                       Hero(
                         tag: 'app_logo',
                         child: Container(
@@ -222,7 +327,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               )
@@ -235,32 +340,29 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
-
                       const Text(
                         'GEOGAME',
                         style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 3,
-                            shadows: [Shadow(blurRadius: 10, color: Colors.black45, offset: Offset(0, 2))]
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 3,
+                          shadows: [Shadow(blurRadius: 10, color: Colors.black45, offset: Offset(0, 2))],
                         ),
                       ),
-
                       Text(
-                        Localization.t('auth.login_subtitle'),
+                        _isLoginMode
+                            ? Localization.t('auth.login_subtitle')
+                            : Localization.t('auth.register_subtitle'),
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                       ),
-
                       const SizedBox(height: 40),
-
-                      // GLASSMORPHISM LOGIN CARD
+                      // Glassmorphism Card
                       ClipRRect(
                         borderRadius: BorderRadius.circular(30),
                         child: BackdropFilter(
@@ -268,15 +370,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           child: Container(
                             padding: const EdgeInsets.all(30),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 width: 1.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 20,
                                   offset: const Offset(0, 10),
                                 ),
@@ -286,7 +388,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               child: Column(
                                 children: [
                                   Text(
-                                    Localization.t('auth.login'),
+                                    _isLoginMode
+                                        ? Localization.t('auth.login')
+                                        : Localization.t('auth.signup'),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 22,
@@ -295,7 +399,21 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   ),
                                   const SizedBox(height: 30),
 
-                                  // Email Input
+                                  // Name field (only for register)
+                                  if (!_isLoginMode) ...[
+                                    _buildGlassTextField(
+                                      controller: _nameController,
+                                      focusNode: _nameFocusNode,
+                                      icon: Icons.person_rounded,
+                                      hintText: Localization.t('auth.name'),
+                                      autofillHints: [AutofillHints.name],
+                                      textInputAction: TextInputAction.next,
+                                      onSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocusNode),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+
+                                  // Email
                                   _buildGlassTextField(
                                     controller: _emailController,
                                     focusNode: _emailFocusNode,
@@ -306,10 +424,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     textInputAction: TextInputAction.next,
                                     onSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
                                   ),
-
                                   const SizedBox(height: 20),
 
-                                  // Password Input
+                                  // Password
                                   _buildGlassTextField(
                                     controller: _passwordController,
                                     focusNode: _passwordFocusNode,
@@ -317,18 +434,62 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     hintText: Localization.t('auth.password'),
                                     obscureText: true,
                                     autofillHints: [AutofillHints.password],
-                                    textInputAction: TextInputAction.done,
-                                    onSubmitted: (_) => _handleLogin(),
+                                    textInputAction: _isLoginMode ? TextInputAction.done : TextInputAction.next,
+                                    onSubmitted: (_) {
+                                      if (_isLoginMode) {
+                                        _handleLogin();
+                                      } else {
+                                        FocusScope.of(context).requestFocus(_confirmPasswordFocusNode);
+                                      }
+                                    },
                                   ),
+
+                                  if (_isLoginMode)
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: _showForgotPasswordDialog,
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                                          minimumSize: const Size(0, 30),
+                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        child: Text(
+                                          Localization.t('auth.forgot_password'),
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.7),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                  // Confirm Password (only for register)
+                                  if (!_isLoginMode) ...[
+                                    const SizedBox(height: 20),
+                                    _buildGlassTextField(
+                                      controller: _confirmPasswordController,
+                                      focusNode: _confirmPasswordFocusNode,
+                                      icon: Icons.lock_outline_rounded,
+                                      hintText: Localization.t('auth.confirm_password'),
+                                      obscureText: true,
+                                      autofillHints: [AutofillHints.password],
+                                      textInputAction: TextInputAction.done,
+                                      onSubmitted: (_) => _handleRegister(),
+                                    ),
+                                  ],
 
                                   const SizedBox(height: 30),
 
-                                  // Login Button
+                                  // Login/Register Button
                                   SizedBox(
                                     width: double.infinity,
                                     height: 55,
                                     child: ElevatedButton(
-                                      onPressed: _isLoading ? null : _handleLogin,
+                                      onPressed: _isLoading
+                                          ? null
+                                          : (_isLoginMode ? _handleLogin : _handleRegister),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.transparent,
                                         padding: EdgeInsets.zero,
@@ -339,17 +500,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                       ),
                                       child: Ink(
                                         decoration: BoxDecoration(
-                                            gradient: const LinearGradient(
-                                              colors: [Color(0xFF00C6FF), Color(0xFF0072FF)], // Canlı Mavi Gradient
-                                            ),
-                                            borderRadius: BorderRadius.circular(20),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: const Color(0xFF0072FF).withOpacity(0.4),
-                                                blurRadius: 10,
-                                                offset: const Offset(0, 5),
-                                              )
-                                            ]
+                                          gradient: const LinearGradient(
+                                            colors: [Color(0xFF00C6FF), Color(0xFF0072FF)],
+                                          ),
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(0xFF0072FF).withValues(alpha: 0.4),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 5),
+                                            )
+                                          ],
                                         ),
                                         child: Container(
                                           alignment: Alignment.center,
@@ -363,7 +524,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                             ),
                                           )
                                               : Text(
-                                            Localization.t('auth.login').toUpperCase(),
+                                            (_isLoginMode
+                                                ? Localization.t('auth.login')
+                                                : Localization.t('auth.register')
+                                            ).toUpperCase(),
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -381,34 +545,37 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 30),
 
-                      // Register / Sign Up Section
+                      // Toggle between Login/Register
                       Column(
                         children: [
                           Text(
-                            Localization.t('auth.no_account'),
+                            _isLoginMode
+                                ? Localization.t('auth.no_account')
+                                : Localization.t('auth.have_account'),
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 14,
                             ),
                           ),
                           const SizedBox(height: 5),
                           GestureDetector(
-                            onTap: _openWebAuth,
+                            onTap: _toggleMode,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                                 borderRadius: BorderRadius.circular(30),
-                                color: Colors.white.withOpacity(0.05),
+                                color: Colors.white.withValues(alpha: 0.05),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    Localization.t('auth.web_signup'),
+                                    _isLoginMode
+                                        ? Localization.t('auth.signup')
+                                        : Localization.t('auth.login'),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -434,7 +601,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     );
   }
 
-  // Özel Tasarım Input Widget'ı
   Widget _buildGlassTextField({
     required TextEditingController controller,
     required FocusNode focusNode,
@@ -448,9 +614,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2), // Hafif koyu zemin, beyaz yazı için
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: TextField(
         controller: controller,
@@ -464,8 +630,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         cursorColor: Colors.white,
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-          prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+          prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.7)),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         ),

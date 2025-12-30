@@ -25,12 +25,37 @@ class AuthService {
     }
   }
 
+  /// 📝 Kayıt Ol (YENİ EKLENDİ)
+  static Future<String?> signUp(String email, String password, String name) async {
+    try {
+      final AuthResponse res = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {
+          'full_name': name,
+          'avatar_url': 'https://geogame-cdn.keremkk.com.tr/anon.png',
+        },
+      );
+
+      if (res.user != null) {
+        await syncUserData(res.user!);
+        return null;
+      }
+
+      return "The registration process failed.";
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return "Unknown error: $e";
+    }
+  }
+
   /// 🚪 Çıkış Yap
   static Future<void> signOut() async {
     try {
       await _supabase.auth.signOut();
     } catch (e) {
-      debugPrint("Supabase çıkış hatası: $e");
+      debugPrint("Supabase exit error: $e");
     }
     AppState.user = UserProfile.anonymous();
   }
@@ -50,6 +75,7 @@ class AuthService {
   /// 👤 Profil Bilgilerini Çek ve RAM'e (AppState) Yaz
   static Future<void> syncUserData(User authUser) async {
     try {
+      // Önce veritabanında profil var mı diye bak
       final profileData = await _supabase
           .from('profiles')
           .select('full_name, avatar_url')
@@ -57,6 +83,7 @@ class AuthService {
           .maybeSingle();
 
       if (profileData != null) {
+        // Varsa onu yükle
         AppState.user = UserProfile(
             name: profileData['full_name'] ?? 'Oyuncu',
             avatarUrl: profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png'
@@ -65,15 +92,17 @@ class AuthService {
         final newName = authUser.userMetadata?['full_name'] ?? 'Oyuncu';
         final newUrl = authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
 
+        // RAM'i güncelle
         AppState.user = UserProfile(name: newName, avatarUrl: newUrl);
 
+        // Veritabanında profili oluştur
         await _createUserProfile(authUser, newName, newUrl);
       }
 
-      debugPrint('✅ Profil verisi yüklendi: ${AppState.user.name}');
+      debugPrint('✅ Profile data loaded: ${AppState.user.name}');
 
     } catch (e) {
-      debugPrint('❌ Profil Yükleme Hatası: $e');
+      debugPrint('❌ Profile Upload Error: $e');
     }
   }
 
@@ -86,7 +115,17 @@ class AuthService {
         'avatar_url': initialUrl,
       }, onConflict: 'uid');
     } catch (e) {
-      debugPrint("Profil DB oluşturma hatası: $e");
+      debugPrint("Profile DB creation error: $e");
+    }
+  }
+  static Future<String?> sendPasswordResetEmail(String email) async {
+    try {
+      await _supabase.auth.resetPasswordForEmail(email);
+      return null; // Başarılı
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return "Unexpected error: $e";
     }
   }
 }

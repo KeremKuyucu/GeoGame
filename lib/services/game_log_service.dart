@@ -1,111 +1,105 @@
-// lib/services/game_log_service.dart
-
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:geogame/models/app_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 
 class GameLogService {
   static final _supabase = Supabase.instance.client;
-  static const String _unsentLogsKey = 'unsent_game_logs';
+  static const String _unsentLogsKey = 'game_logs';
+  static const _uuid = Uuid();
 
-  static Future<void> saveToStorage(String gameType) async {
-    if (AppState.session.totalScore == 0 && AppState.session.wrongCount == 0) return;
-
-    if (!AuthService.isAuthenticated) {
-      debugPrint("🚫 Misafir kullanıcı: Skor kaydedilmedi ve kuyruğa alınmadı.");
-      return;
-    }
-
-    await GameLogService.queueSessionLocal(
-      sessionId: AppState.session.sessionId,
-      gameType: gameType,
-      correctCount: AppState.session.correctCount,
-      wrongCount: AppState.session.wrongCount,
-      scoreEarned: AppState.session.totalScore,
-    );
+  /// 🎮 Oyun başladığında ÇAĞRILACAK
+  /// Tek bir oyun için tek bir log id üretir
+  static String startNewSession() {
+    return _uuid.v4();
   }
 
-
-  /// 📝 Oyunu yerel kuyruğa ekler veya günceller
-  static Future<void> queueSessionLocal({
-    required String sessionId,
-    required String gameType,
-    required int correctCount,
-    required int wrongCount,
-    required int scoreEarned,
-  }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      List<String> unsentList = prefs.getStringList(_unsentLogsKey) ?? [];
-
-      unsentList.removeWhere((item) {
-        try {
-          final map = jsonDecode(item);
-          return map['id'] == sessionId;
-        } catch (e) {
-          return false;
-        }
-      });
-
-      Map<String, dynamic> sessionLog = {
-        'id': sessionId,
-        'gameType': gameType,
-        'correctCount': correctCount,
-        'wrongCount': wrongCount,
-        'scoreEarned': scoreEarned,
-        'played_at': DateTime.now().toIso8601String(),
-      };
-
-      unsentList.add(jsonEncode(sessionLog));
-      await prefs.setStringList(_unsentLogsKey, unsentList);
-
-    } catch (e) {
-      debugPrint('❌ Log Kuyruklama Hatası: $e');
-    }
-  }
-
-  static Future<void> syncPendingLogs() async {
-    // Auth kontrolü: Kullanıcı yoksa gönderme
+  /// ❓ Her sorudan sonra çağrılır
+  /// Aynı sessionId ile yerelde GÜNCELLER
+  static Future<void> saveProgress(String gameType) async {
     if (!AuthService.isAuthenticated) return;
 
-    // Senin mantığına göre ID kesin var
-    final uid = AuthService.currentUserId!;
+    final session = AppState.session;
+
+    if (session.sessionId.isEmpty) return;
 
     final prefs = await SharedPreferences.getInstance();
-    List<String> unsentList = prefs.getStringList(_unsentLogsKey) ?? [];
+    final List<String> rawList =
+        prefs.getStringList(_unsentLogsKey) ?? [];
 
-    if (unsentList.isEmpty) return;
+    Map<String, dynamic>? existing;
 
-    debugPrint("🔄 Sync Başlatıldı: ${unsentList.length} oyun gönderiliyor...");
+    rawList.removeWhere((item) {
+      final map = jsonDecode(item);
+      if (map['id'] == session.sessionId) {
+        existing = map;
+        return true;
+      }
+      return false;
+    });
+
+    final log = {
+      'id': session.sessionId, // UUID
+      'gameType': gameType,
+      'correctCount': session.correctCount,
+      'wrongCount': session.wrongCount,
+      'scoreEarned': session.totalScore,
+      'played_at': existing?['played_at'] ??
+          DateTime.now().toUtc().toIso8601String(),
+    };
+
+    rawList.add(jsonEncode(log));
+    await prefs.setStringList(_unsentLogsKey, rawList);
+  }
+
+
+  /// 🏁 Ana menüye dönünce / oyun bitince çağrılır
+  /// Kuyruktaki tüm logları server’a yollar
+  static Future<void> syncPendingLogs() async {
+    if (!AuthService.isAuthenticated) return;
+
+    final uid = AuthService.currentUserId!;
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> rawList =
+        prefs.getStringList(_unsentLogsKey) ?? [];
+
+    if (rawList.isEmpty) return;
+
+    debugPrint("🔄 Sync: ${rawList.length} log gönderiliyor");
+
+    final List<Map<String, dynamic>> payload = [];
+
+    for (final item in rawList) {
+      final log = jsonDecode(item);
+      payload.add({
+        'user_id': uid,
+        'client_log_id': log['id'], // UUID
+        'game_type': log['gameType'],
+        'correctCount': log['correctCount'],
+        'wrongCount': log['wrongCount'],
+        'scoreEarned': log['scoreEarned'],
+        'played_at': log['played_at'],
+      });
+    }
 
     try {
-      List<Map<String, dynamic>> bulkInsertData = [];
+      await _supabase.from('game_logs').upsert(
+        payload,
+        onConflict: 'user_id,client_log_id',
+        ignoreDuplicates: true,
+      );
 
-      for (String jsonLog in unsentList) {
-        final logData = jsonDecode(jsonLog);
-        bulkInsertData.add({
-          'user_id': uid,
-          'game_type': logData['gameType'],
-          'correctCount': logData['correctCount'],
-          'wrongCount': logData['wrongCount'],
-          'scoreEarned': logData['scoreEarned'],
-          'played_at': logData['played_at'],
-        });
-      }
-
-      // Supabase toplu insert
-      await _supabase.from('game_logs').insert(bulkInsertData);
-
-      // Başarılıysa kuyruğu temizle
-      await prefs.setStringList(_unsentLogsKey, []);
-      debugPrint("✅ Sync Başarılı: Kuyruk temizlendi.");
+      // ❗ başarılıysa kuyruk temizlenir
+      await prefs.remove(_unsentLogsKey);
+      debugPrint("✅ Sync tamamlandı");
 
     } catch (e) {
-      debugPrint("❌ Sync Hatası: $e");
-      // Hata durumunda kuyruk silinmez, sonraki denemede tekrar gönderilir.
+      // ❗ duplicate varsa DB reddeder ama kuyruk KALIR
+      debugPrint("❌ Sync hatası (tekrar denenecek): $e");
     }
   }
 }

@@ -1,7 +1,7 @@
 name: geogame
 description: "A location guessing game based on maps, available on both mobile, PC and web"
 publish_to: 'Github:KeremKuyucu'
-version: 1.5.1
+version: 1.5.2
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -9,16 +9,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  easy_url_launcher: ^0.0.7
   theme_mode_builder: ^2.0.0
   salomon_bottom_bar: ^3.3.2
   http: ^1.5.0
   package_info_plus: ^9.0.0
   supabase_flutter: ^2.12.0
-  markdown: ^7.3.0
-  flutter_html: ^3.0.0
   shared_preferences: ^2.5.4
-  cached_network_image: ^3.3.0
+  url_launcher: ^6.3.2
+  flutter_svg: ^2.2.3
+  uuid: ^4.5.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
@@ -36,9 +35,12 @@ flutter_icons:
   windows: {
     "generate": true
   }
-  image_path: "assets/logo.png"
+  image_path: "assets/images/logo.png"
 
 flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/images/
+    - assets/data/
+    - assets/lang/
