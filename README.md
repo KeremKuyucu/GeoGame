@@ -1,7 +1,7 @@
 # 🌍 GeoGame
 
 <p align="center">
-  <img src="assets/logo.png" alt="GeoGame Logo" width="200"/>
+  <img src="assets/images/logo.png" alt="GeoGame Logo" width="200"/>
 </p>
 
 <p align="center">
