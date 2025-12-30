@@ -1,0 +1,174 @@
+{
+  "common": {
+    "ok": "Okay",
+    "save": "Save",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "pass": "Pass",
+    "success": "Successful",
+    "refresh": "Refresh",
+    "loading": "Loading...",
+    "error": "Error",
+    "send": "Send",
+    "field_required": "This field is required",
+    "site_error": "Site could not be opened. {0}"
+  },
+  "nav": {
+    "games": "Games",
+    "rank": "Leaderboard",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "feedback": {
+    "title": "Report a Bug",
+    "subject_hint": "Please Enter the Bug Title",
+    "message_hint": "Provide detailed information about the bug",
+    "sent_success": "Your feedback has been sent."
+  },
+  "auth": {
+    "login_required": "Please log in first.",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "logout": "Log Out",
+    "logout_success": "Log Out Successful",
+    "login_success": "Login Successful",
+    "login_subtitle": "Please sign in to continue",
+    "guest": "Guest",
+    "email": "E-mail",
+    "password": "Password",
+    "login_prompt": "Login with Google to save your scores.",
+    "login_description": "You can log in to GeoGame by clicking the button below.",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "password_changed": "Password changed successfully",
+    "security": "Security",
+    "new_password": "New Password",
+    "update_password": "Update Password",
+    "register": "Register",
+    "register_subtitle": "Join the adventure",
+    "name": "Name",
+    "confirm_password": "Confirm Password",
+    "password_mismatch": "Passwords do not match",
+    "password_too_short": "Password must be at least 6 characters",
+    "register_success": "Registration successful!",
+    "forgot_password": "Forgot Password?",
+    "reset_password_title": "Reset Password",
+    "reset_password_desc": "Enter your email to receive a reset link.",
+    "send_link": "Send Link",
+    "link_sent": "Reset link sent!"
+  },
+  "game_common": {
+    "input_hint": "Type country name...",
+    "rules": "Rules",
+    "save_points_warning": "Return to the main menu to save your points.",
+    "congratulations": "Congratulations! 🎉",
+    "correct_msg": "{0} was the correct answer!",
+    "wrong_try_again": "Wrong answer. Try again. Points for the question: ",
+    "passed_msg": "Passed Country:",
+    "clear_guesses": "Clear Guesses",
+    "options_hint": "You can change choices to 'Typing Mode' from settings.",
+    "not_found": "Country not found, please select from the list.",
+    "first_guess": "Make your first guess!",
+    "score_system_generic": "Scoring System: Each round starts with 50 points. Each wrong guess deducts 10 points."
+  },
+  "game_capital": {
+    "title": "Capital Game",
+    "description": "Guess the country from its capital.",
+    "content": "Capital of the country to guess:",
+    "input_hint": "Which country is this the capital of?",
+    "rule_welcome": "Welcome to the Capital City Quiz.\nYour goal is to guess the capital of a randomly selected country."
+  },
+  "game_flag": {
+    "title": "Flag Game",
+    "description": "Guess the country from its flag.",
+    "rule_welcome": "Welcome to the Flag Quiz.\nYour goal is to guess the flag of a randomly selected country."
+  },
+  "game_distance": {
+    "title": "Distance Game",
+    "description": "Guess countries based on distance and direction.",
+    "guess": "Guess: ",
+    "distance": "Distance: ",
+    "direction": "Direction: ",
+    "rule_welcome": "Welcome to the Distance Country Quiz.\nDistances may vary by ±100 km. Center positions are used.",
+    "rule_score": "Scoring System: Starts with 300 points. 10 points deducted per wrong guess. Fixed at 100 after 15 guesses."
+  },
+  "game_borderline": {
+    "title": "Borderline",
+    "rule_welcome": "Guess which country it is based on the country borders appearing on the screen..",
+    "hint_scale": "Country sizes have been scaled to fit on the screen."
+  },
+  "directions": {
+    "north": "North",
+    "north_east": "Northeast",
+    "east": "East",
+    "south_east": "Southeast",
+    "south": "South",
+    "south_west": "Southwest",
+    "west": "West",
+    "north_west": "Northwest"
+  },
+  "settings": {
+    "title": "Settings",
+    "general_title": "General Settings",
+    "selected_theme": "Selected Theme: {0}",
+    "lang": "Selected Language: ",
+    "multiple_choice_mode": "Multiple Choice Mode",
+    "continent_title": "Continent Options",
+    "un_members": "Countries without UN Membership",
+    "continent_warning_title": "Warning",
+    "no_continent_active": "No continent is active.",
+    "activate_continent_prompt": "Please activate at least one continent.",
+    "continents": {
+      "south_america": "Countries in South America",
+      "north_america": "Countries in North America",
+      "asia": "Countries in Asia",
+      "africa": "Countries in Africa",
+      "europe": "Countries in Europe",
+      "oceania": "Countries in Oceania",
+      "antarctica": "Countries in Antarctica"
+    },
+    "guest": "Guest",
+    "edit_profile": "Edit Profile"
+  },
+  "profile": {
+    "title": "Profile",
+    "stats_title": "Game Statistics",
+    "total_score": "Total Score",
+    "score_display": "{0} Points",
+    "correct_label": "Correct: {0}",
+    "wrong_label": "Wrong: {0}",
+    "success_label": "Success: {0}%",
+    "distance": "Distance",
+    "flag": "Flag",
+    "capital": "Capital",
+    "borderline": "Borderline"
+  },
+  "edit_profile": {
+    "edit_title": "Edit Profile",
+    "personal_info": "Personal Information",
+    "display_name": "Display Name",
+    "avatar_url": "Avatar URL",
+    "update_success": "Profile updated successfully"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "no_data": "No leaderboard data yet.",
+    "score": "Score",
+    "load_error": "Leaderboard could not be loaded. Please check your internet connection."
+  },
+  "version": {
+    "new_available": "New Version Available",
+    "not_now": "Not Now",
+    "update": "Update"
+  },
+  "drawer": {
+    "report_bug": "Report a Bug",
+    "feedback_note": "You can send your complaints or suggestions by clicking the button above.",
+    "my_website": "My Website",
+    "geogame_website": "GeoGame Website",
+    "geogame_github": "GeoGame Github",
+    "creator": "Creator: Kerem Kuyucu",
+    "version_text": "Version: {0}"
+  }
+}

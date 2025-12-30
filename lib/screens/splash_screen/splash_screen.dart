@@ -7,13 +7,9 @@ import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/app_context.dart';
 
 import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/services/update_checker_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 
 import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
-
-
-
 
 
 class SplashScreen extends StatefulWidget {
@@ -33,24 +29,17 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _baslat() async {
     // 1. Veri yükleme ve Oturum kontrolleri (Context gerektirmez)
     await loadCountries();
+    AppState.activePool = AppState.filteredCountries;
     await AuthService.checkSession();
 
-    // Logları senkronize et (Burada await kullanmak istersen kullanabilirsin,
     // ama arkaplanda çalışması UI'ı bloklamaz, bu hali de uygundur)
     GameLogService.syncPendingLogs();
 
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     AppState.version = packageInfo.version;
 
-    // 2. KRİTİK KONTROL: Widget hala hayatta mı?
-    // Asenkron işlemler bitene kadar kullanıcı uygulamadan çıkmış olabilir.
-    // Eğer widget yoksa (unmounted), aşağıdaki context işlemlerini yapma ve dur.
     if (!mounted) return;
 
-    // 3. Güncelleme Kontrolü (Sadece tek bir kere ve güvenli context ile)
-    UpdateService.check(context);
-
-    // 4. Yönlendirme (Yine mounted kontrolü sayesinde güvenli)
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const AuthGate()),
@@ -79,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
-                  'assets/logo.png', // Dosya yolunun doğru olduğundan emin ol
+                  'assets/images/logo.png', // Dosya yolunun doğru olduğundan emin ol
                   width: 150,        // Logonun genişliği
                   height: 150,       // Logonun yüksekliği
                   fit: BoxFit.cover,

@@ -8,7 +8,7 @@ import 'package:geogame/services/localization_service.dart';
 
 // Widgetlar
 import 'package:geogame/widgets/drawer_widget.dart';
-import 'package:geogame/widgets/profile_view_widget.dart'; // ✅ Yeni widget'ı import ettik
+import 'package:geogame/widgets/profile_view_widget.dart';
 
 // Ekranlar
 import 'package:geogame/screens/auth/authpage.dart';
@@ -17,12 +17,15 @@ class Profiles extends StatefulWidget {
   const Profiles({super.key});
 
   @override
-  _ProfilesState createState() => _ProfilesState();
+  State<Profiles> createState() => _ProfilesState();
 }
 
 class _ProfilesState extends State<Profiles> {
   final SupabaseClient _supabase = Supabase.instance.client;
   bool _isLoading = true;
+
+  // Supabase'den gelen ham veriyi tutacak değişken
+  Map<String, dynamic>? _userStats;
 
   @override
   void initState() {
@@ -30,7 +33,6 @@ class _ProfilesState extends State<Profiles> {
     fetchUserProfile();
   }
 
-  // Profil verilerini çekme fonksiyonu (Aynen kalıyor)
   Future<void> fetchUserProfile() async {
     final String? currentId = AuthService.currentUserId;
 
@@ -42,24 +44,24 @@ class _ProfilesState extends State<Profiles> {
     setState(() => _isLoading = true);
 
     try {
-      final statsData = await _supabase
-          .from('geogame_stats')
+      // Veriyi Supabase'den çekiyoruz
+      final data = await _supabase
+          .from('leaderboard_view')
           .select()
-          .eq('user_id', currentId)
+          .eq('uid', currentId)
           .maybeSingle();
 
-      if (statsData != null) {
+      if (mounted) {
         setState(() {
-          AppState.stats = GameStats.fromMap(statsData);
+          _userStats = data;
         });
       }
-      debugPrint('✅ Profil verileri güncellendi.');
-
     } catch (e) {
       debugPrint('❌ Profil yükleme hatası: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red));
+          SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -68,16 +70,22 @@ class _ProfilesState extends State<Profiles> {
 
   @override
   Widget build(BuildContext context) {
-    // Giriş yapmamışsa misafir ekranı göster
+    // Giriş kontrolü
     if (!AuthService.isAuthenticated && !_isLoading) {
       return _buildGuestView();
     }
+
+    // İsim ve Avatar'ı AppState'den (Auth), diğerlerini DB'den alıyoruz
+    // Eğer DB verisi henüz gelmediyse varsayılan değerler kullanıyoruz
+    final String name = AppState.user.name.isNotEmpty ? AppState.user.name : Localization.t('settings.guest');
+    final String avatarUrl = AppState.user.avatarUrl; // Auth'dan gelen güncel avatar
+    final int totalScore = _userStats != null ? (_userStats!['total_score'] ?? 0) : 0;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           Localization.t('profile.title').toUpperCase(),
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 2,
             color: Colors.teal,
@@ -85,36 +93,24 @@ class _ProfilesState extends State<Profiles> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(icon: const Icon(Icons.refresh_rounded),
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: fetchUserProfile,
           ),
         ],
       ),
       drawer: const DrawerWidget(),
 
-      // ✅ İŞTE SİHİR BURADA:
-      // Tüm o karmaşık Column ve Card yapılarını sildik.
-      // Yerine sadece tek bir satır widget koyduk.
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ProfileViewWidget(
-        name: AppState.user.name,
-        avatarUrl: AppState.user.avatarUrl,
-        totalScore: AppState.stats.totalScore,
-        // AppState verilerini Widget'ın istediği Map formatına çeviriyoruz:
-        stats: {
-          'distanceScore': AppState.stats.distanceScore,
-          'distanceCorrectCount': AppState.stats.distanceCorrectCount,
-          'distanceWrongCount': AppState.stats.distanceWrongCount,
-
-          'flagScore': AppState.stats.flagScore,
-          'flagCorrectCount': AppState.stats.flagCorrectCount,
-          'flagWrongCount': AppState.stats.flagWrongCount,
-
-          'capitalScore': AppState.stats.capitalScore,
-          'capitalCorrectCount': AppState.stats.capitalCorrectCount,
-          'capitalWrongCount': AppState.stats.capitalWrongCount,
-        },
+        name: name,
+        avatarUrl: avatarUrl,
+        totalScore: totalScore,
+        // EN ÖNEMLİ KISIM:
+        // Veriyi parçalamadan, doğrudan Supabase Map'ini veriyoruz.
+        // Eğer veri yoksa boş bir map {} gönderiyoruz.
+        stats: _userStats ?? {},
       ),
     );
   }
@@ -166,5 +162,4 @@ class _ProfilesState extends State<Profiles> {
       ),
     );
   }
-
 }

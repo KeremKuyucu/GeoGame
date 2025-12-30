@@ -1,23 +1,96 @@
-// lib/models/app_context.dart
+import 'package:flutter/material.dart';
+import 'package:geogame/models/countries.dart'; // Country modelinin burada olduğundan emin ol
+import 'package:uuid/uuid.dart';
 
+// --- 1. ANA DURUM YÖNETİCİSİ (AppState) ---
 class AppState {
   static int selectedIndex = 0;
   static String version = "";
+
+  // Modeller
   static UserProfile user = UserProfile.anonymous();
   static GameFilter filter = GameFilter();
   static AppSettings settings = AppSettings();
-  static GameStats stats = GameStats();
   static GameSession session = GameSession();
+
+  // Oyun Verileri
+  static Country targetCountry = Country.empty();
+  static Country tempCountry = Country.empty();
+
+  static List<Country> allCountries = [];
+  static List<Country> activePool = [];
+
+  static List<GameButton> buttons = [];
+
+  static List<Country> get filteredCountries {
+    final f = AppState.filter;
+
+    // Hiçbir veri yoksa boş dön
+    if (allCountries.isEmpty) return [];
+
+    // Hiçbir kıta seçili değilse boş dön (Hızlı çıkış)
+    if (!f.northAmerica && !f.southAmerica && !f.asia && !f.africa &&
+        !f.europe && !f.oceania && !f.antarctic) {
+      return [];
+    }
+
+    return allCountries.where((c) {
+      // 1. BM Üyeliği Filtresi (En hızlı eleme yöntemi, başa koydum)
+      if (!f.includeNonUN && !c.isUNMember) return false;
+
+      // 2. Kıta Filtresi
+      // contains metodu string karşılaştırması yaptığı için maliyetlidir.
+      // Ancak 250 eleman için bu maliyet mikrosaniyeler sürer.
+      if (f.europe && c.continents.contains("Europe")) return true;
+      if (f.asia && c.continents.contains("Asia")) return true;
+      if (f.africa && c.continents.contains("Africa")) return true;
+      if (f.oceania && c.continents.contains("Oceania")) return true;
+      if (f.northAmerica && c.continents.contains("North America")) return true;
+      if (f.southAmerica && c.continents.contains("South America")) return true;
+      if (f.antarctic && c.continents.contains("Antarctic")) return true;
+
+      return false;
+    }).toList();
+  }
+}
+
+class GameButton {
+  final Country country;
+  bool isActive;
+  Color color;
+
+  GameButton({
+    required this.country,
+    this.isActive = true,
+    required this.color,
+  });
+
+  // Sabit renk paleti
+  static const List<Color> _palette = [
+    Colors.green,
+    Colors.orange,
+    Colors.blue,
+    Colors.red,
+  ];
+
+  // Buton oluşturucu fabrika metodu
+  static List<GameButton> createButtons(List<Country> options) {
+    return List.generate(options.length, (i) => GameButton(
+      country: options[i],
+      color: _palette[i % _palette.length],
+      isActive: true,
+    ));
+  }
+
+  // UI etiketi
+  String get label => country.getLocalizedName(AppState.settings.language);
 }
 
 class UserProfile {
   String name;
   String avatarUrl;
 
-  UserProfile({
-    required this.name,
-    required this.avatarUrl,
-  });
+  UserProfile({required this.name, required this.avatarUrl});
 
   factory UserProfile.anonymous() {
     return UserProfile(
@@ -26,12 +99,7 @@ class UserProfile {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'avatarUrl': avatarUrl,
-    };
-  }
+  Map<String, dynamic> toMap() => {'name': name, 'avatarUrl': avatarUrl};
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
@@ -47,15 +115,9 @@ class GameFilter {
   bool isButtonMode;
 
   GameFilter({
-    this.northAmerica = true,
-    this.southAmerica = true,
-    this.asia = true,
-    this.africa = true,
-    this.europe = true,
-    this.oceania = true,
-    this.antarctic = true,
-    this.isButtonMode = true,
-    this.includeNonUN = false,
+    this.northAmerica = true, this.southAmerica = true, this.asia = true,
+    this.africa = true, this.europe = true, this.oceania = true,
+    this.antarctic = true, this.isButtonMode = true, this.includeNonUN = false,
   });
 
   factory GameFilter.fromMap(Map<String, dynamic> map) {
@@ -74,89 +136,36 @@ class GameFilter {
 
   Map<String, dynamic> toMap() {
     return {
-      'southAmerica': southAmerica,
-      'northAmerica': northAmerica,
-      'asia': asia,
-      'africa': africa,
-      'europe': europe,
-      'oceania': oceania,
-      'antarctic': antarctic,
-      'isButtonMode': isButtonMode,
-      'includeNonUN': includeNonUN,
+      'northAmerica': northAmerica, 'southAmerica': southAmerica, 'asia': asia,
+      'africa': africa, 'europe': europe, 'oceania': oceania,
+      'antarctic': antarctic, 'isButtonMode': isButtonMode, 'includeNonUN': includeNonUN,
     };
   }
 }
 
-
 class AppSettings {
   bool darkTheme;
-  String language; // "Türkçe" veya "English"
+  String language;
 
-  AppSettings({
-    this.darkTheme = true,
-    this.language = 'English', // Varsayılan değer boş olmamalı
-  });
-
-  bool get isEnglish => language == 'English';
+  AppSettings({this.darkTheme = true, this.language = 'eng'});
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
       darkTheme: map['darkTheme'] ?? true,
-      // Eğer map'ten gelen dil boşsa varsayılanı koru
       language: (map['language'] != null && map['language'].toString().isNotEmpty)
-          ? map['language']
-          : 'English',
+          ? map['language'] : 'eng',
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'darkTheme': darkTheme,
-      'language': language,
-    };
-  }
+  Map<String, dynamic> toMap() => {'darkTheme': darkTheme, 'language': language};
 }
 
-class GameStats {
-  int distanceCorrectCount, distanceWrongCount;
-  int flagCorrectCount, flagWrongCount;
-  int capitalCorrectCount, capitalWrongCount;
-
-  int distanceScore, flagScore, capitalScore;
-
-  int get totalScore => distanceScore + flagScore + capitalScore;
-
-  GameStats({
-    this.distanceCorrectCount = 0, this.distanceWrongCount = 0,
-    this.flagCorrectCount = 0, this.flagWrongCount = 0,
-    this.capitalCorrectCount = 0, this.capitalWrongCount = 0,
-    this.distanceScore = 0, this.flagScore = 0, this.capitalScore = 0,
-  });
-
-  factory GameStats.fromMap(Map<String, dynamic> map) {
-    return GameStats(
-      distanceCorrectCount: map['distanceCorrectCount'] ?? 0,
-      distanceWrongCount:   map['distanceWrongCount'] ?? 0,
-
-      flagCorrectCount:     map['flagCorrectCount'] ?? 0,
-      flagWrongCount:       map['flagWrongCount'] ?? 0,
-
-      capitalCorrectCount:  map['capitalCorrectCount'] ?? 0,
-      capitalWrongCount:    map['capitalWrongCount'] ?? 0,
-
-      distanceScore:        map['distanceScore'] ?? 0,
-      flagScore:            map['flagScore'] ?? 0,
-      capitalScore:         map['capitalScore'] ?? 0,
-    );
-  }
-}
 class GameSession {
-  // Puanlar
+  static const _uuid = Uuid();
   int totalScore = 0;
   int correctCount = 0;
   int wrongCount = 0;
   int passCount = 0;
-
   String sessionId = "";
 
   int _startScore = 50;
@@ -164,21 +173,12 @@ class GameSession {
   int currentQuestionScore = 50;
 
   void reset({required int startScore, required int minScore}) {
-    totalScore = 0;
-    correctCount = 0;
-    wrongCount = 0;
-    passCount = 0;
-
-    sessionId = "${DateTime.now().millisecondsSinceEpoch}-${(100 + (DateTime.now().microsecond % 900))}";
-
-    _startScore = startScore;
-    _minScore = minScore;
-    currentQuestionScore = _startScore;
+    totalScore = 0; correctCount = 0; wrongCount = 0; passCount = 0;
+    sessionId = _uuid.v4();
+    _startScore = startScore; _minScore = minScore; currentQuestionScore = _startScore;
   }
 
-  void nextQuestion() {
-    currentQuestionScore = _startScore;
-  }
+  void nextQuestion() => currentQuestionScore = _startScore;
 
   void submitCorrect() {
     correctCount++;
@@ -189,9 +189,7 @@ class GameSession {
   void submitWrong() {
     wrongCount++;
     currentQuestionScore -= 10;
-    if (currentQuestionScore < _minScore) {
-      currentQuestionScore = _minScore;
-    }
+    if (currentQuestionScore < _minScore) currentQuestionScore = _minScore;
   }
 
   void submitPass() {

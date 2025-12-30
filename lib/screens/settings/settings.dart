@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geogame/screens/auth/authpage.dart';
-// import 'package:url_launcher/url_launcher.dart'; // Şimdilik kapalı olduğu için yorum satırı
 import 'package:theme_mode_builder/theme_mode_builder.dart';
 import 'dart:async';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
-import 'package:geogame/models/countries.dart';
 
 import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/services/auth_service.dart';
@@ -14,13 +12,13 @@ import 'package:geogame/services/localization_service.dart';
 
 import 'package:geogame/widgets/restart_widget.dart';
 
-import '../edit_profile/edit_profile.dart';
+import 'package:geogame/screens/edit_profile/edit_profile.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -31,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _checkContinents() async {
-    if (getFilteredCountries().isEmpty) {
+    if (AppState.filteredCountries.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showContinentWarning();
       });
@@ -148,7 +146,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -166,7 +164,7 @@ class _SettingsPageState extends State<SettingsPage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.blueAccent.withOpacity(0.1),
+              color: Colors.blueAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.person_outline_rounded, size: 48, color: Colors.blueAccent),
@@ -202,20 +200,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text(Localization.t('auth.login'), style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _openWebAuth,
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
-                    foregroundColor: isDark ? Colors.white : Colors.black87,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(Localization.t('auth.signup')),
+                  child: Text("${Localization.t('auth.login')} / ${Localization.t('auth.signup')}", style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -236,7 +221,7 @@ class _SettingsPageState extends State<SettingsPage> {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: Colors.blue.withValues(alpha: 0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -290,7 +275,7 @@ class _SettingsPageState extends State<SettingsPage> {
           // Çıkış Butonu
           Container(
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
+              color: Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -340,13 +325,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildLanguageTile(bool isDark) {
-    // Migration Logic
-    String currentValue = AppState.settings.language;
-    if (!Localization.supportedLanguages.contains(currentValue)) {
-      currentValue = (currentValue == 'Türkçe') ? 'tr' : 'en';
-      AppState.settings.language = currentValue;
-      PreferencesService.saveConfig();
-    }
+    final String currentValue = AppState.settings.language;
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -359,32 +338,47 @@ class _SettingsPageState extends State<SettingsPage> {
             color: isDark ? Colors.white : Colors.black87
         ),
       ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.grey[800] : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: currentValue,
-            icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
-            dropdownColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-            style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-                fontWeight: FontWeight.w500
+      trailing: ConstrainedBox(
+        // KRİTİK DÜZELTME: Maksimum genişlik sınırı koyuyoruz.
+        // Böylece Dropdown sonsuza kadar uzamaya çalışıp hata vermiyor.
+        constraints: const BoxConstraints(maxWidth: 120),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[800] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true, // Konteynırın içine tam sığması için
+              value: Localization.supportedLanguages.contains(currentValue)
+                  ? currentValue
+                  : 'eng',
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+              dropdownColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+              style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.w500
+              ),
+              // Metin taşarsa "..." koysun diye Text'e overflow ekledik
+              items: Localization.supportedLanguages.map((String code) => DropdownMenuItem(
+                value: code,
+                child: Text(
+                  Localization.getDisplayName(code),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              )).toList(),
+              onChanged: (String? newValue) async {
+                if (newValue != null && newValue != AppState.settings.language) {
+                  AppState.settings.language = newValue;
+                  await PreferencesService.saveConfig();
+                  await Localization.changeLanguage(newValue);
+                  if (mounted) {
+                    restartApp(context);
+                  }
+                }
+              },
             ),
-            items: Localization.supportedLanguages.map((String code) => DropdownMenuItem(
-              value: code,
-              child: Text(Localization.getDisplayName(code)),
-            )).toList(),
-            onChanged: (v) {
-              if (v != null) {
-                setState(() => AppState.settings.language = v);
-                PreferencesService.saveConfig();
-                restartApp(context);
-              }
-            },
           ),
         ),
       ),
@@ -472,6 +466,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void _updateContinent(VoidCallback action) {
     setState(() {
       action();
+      AppState.activePool = AppState.filteredCountries;
       PreferencesService.saveConfig();
     });
   }
@@ -529,7 +524,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ? Switch.adaptive(
         value: switchValue,
         onChanged: onSwitchChanged,
-        activeColor: Colors.green,
+        activeThumbColor: Colors.green,
       )
           : const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
     );

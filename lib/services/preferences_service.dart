@@ -23,9 +23,9 @@ class PreferencesService {
       AppState.settings = AppSettings.fromMap(data);
       AppState.filter = GameFilter.fromMap(data);
 
-      debugPrint("✅ Ayarlar ve tercihler yüklendi.");
+      debugPrint("✅ Settings and preferences loaded.");
     } catch (e) {
-      debugPrint('❌ Config Yükleme Hatası: $e');
+      debugPrint("❌ Config Loading Error: $e");
       // Hata durumunda varsayılan değerlerle devam edilir (AppState zaten varsayılanla başlar)
     }
   }
@@ -44,7 +44,7 @@ class PreferencesService {
       await prefs.setString(_storageKey, jsonEncode(data));
       // debugPrint("💾 Ayarlar diske yazıldı.");
     } catch (e) {
-      debugPrint('❌ Ayar Kayıt Hatası: $e');
+      debugPrint('❌ Settings Save Error: $e');
     }
   }
 }

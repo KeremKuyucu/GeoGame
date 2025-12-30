@@ -1,18 +1,21 @@
 // lib/screens/games/mesafeoyun.dart
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'dart:math' as math;
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/custom_notification.dart';
+
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
+import 'package:geogame/services/game_service.dart';
 
-import 'package:geogame/services/games/distance_service.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
+
 
 class DistanceGame extends StatefulWidget {
   const DistanceGame({super.key});
@@ -22,7 +25,6 @@ class DistanceGame extends StatefulWidget {
 }
 
 class _DistanceGameState extends State<DistanceGame> {
-  final DistanceGameService _gameService = DistanceGameService();
   final TextEditingController _controller = TextEditingController();
   final List<GuessResultModel> _guesses = [];
   final ScrollController _scrollController = ScrollController();
@@ -41,7 +43,7 @@ class _DistanceGameState extends State<DistanceGame> {
   }
 
   Future<void> _initializeGame() async {
-    _gameService.initializeGame();
+    await GameService.initializeGame(GameType.distance);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showRulesDialog();
     });
@@ -88,12 +90,12 @@ class _DistanceGameState extends State<DistanceGame> {
     );
   }
 
-  void _checkAnswer() {
-    String girilenMetin = _controller.text.trim();
-    if (girilenMetin.isEmpty) return;
+  Future<void> _checkAnswer() async {
+    String inputText = _controller.text.trim();
+    if (inputText.isEmpty) return;
 
-    GuessResultModel? result = _gameService.processGuess(girilenMetin);
-
+    GuessResultModel? result = await GameService.processDistanceGuess(inputText);
+    if (!mounted) return;
     if (result == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -139,13 +141,14 @@ class _DistanceGameState extends State<DistanceGame> {
     );
   }
 
-  void _pasButtonPressed() {
-    String pasUlke = _gameService.handlePass();
+  Future<void> _pasButtonPressed() async {
+    String passCountry = await GameService.handlePass();
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) => CustomNotification(
           baslik: Localization.t('game_common.passed_msg', args: [""]),
-          metin: pasUlke
+          metin: passCountry
       ),
     );
     setState(() {
@@ -186,7 +189,7 @@ class _DistanceGameState extends State<DistanceGame> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+              colors: [Colors.black.withValues(alpha: 0.7), Colors.transparent],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -259,7 +262,7 @@ class _DistanceGameState extends State<DistanceGame> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -276,7 +279,7 @@ class _DistanceGameState extends State<DistanceGame> {
               if (textEditingValue.text.isEmpty) {
                 return const Iterable<Country>.empty();
               }
-              return allCountries.where((Country ulke) {
+              return AppState.allCountries.where((Country ulke) {
                 final String currentName = ulke.getLocalizedName(Localization.currentLanguage);
                 return currentName.toLowerCase().contains(textEditingValue.text.toLowerCase());
               });
@@ -328,18 +331,35 @@ class _DistanceGameState extends State<DistanceGame> {
                     child: ListView.separated(
                       padding: EdgeInsets.zero,
                       itemCount: options.length,
-                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withOpacity(0.1)),
+                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
                       itemBuilder: (BuildContext context, int index) {
                         final Country option = options.elementAt(index);
                         return ListTile(
-                          leading: SizedBox(
-                            width: 28,
-                            height: 28,
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 2,
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                ),
+                              ],
+                            ),
                             child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: option.flagUrl,
+                              child: SvgPicture.asset(
+                                'assets/data/${option.iso3}.svg',
                                 fit: BoxFit.cover,
-                                errorWidget: (context, url, error) => const Icon(Icons.flag),
+                                placeholderBuilder: (_) => const SizedBox.shrink(),
+                                // SVG yoksa veya okunamazsa buraya düşer
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.network(
+                                    option.flagUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Icon(Icons.flag),
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -432,10 +452,10 @@ class _DistanceGameState extends State<DistanceGame> {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(15),
-        border: isFirst ? Border.all(color: distanceColor.withOpacity(0.5), width: 2) : null,
+        border: isFirst ? Border.all(color: distanceColor.withValues(alpha: 0.5), width: 2) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -466,7 +486,7 @@ class _DistanceGameState extends State<DistanceGame> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: distanceColor.withOpacity(0.1),
+                          color: distanceColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:easy_url_launcher/easy_url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:geogame/widgets/feedback_dialog.dart';
+
 import 'package:geogame/services/localization_service.dart';
 
 import 'package:geogame/models/app_context.dart';
+
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -63,7 +66,7 @@ class DrawerWidget extends StatelessWidget {
             child: const CircleAvatar(
               radius: 35,
               backgroundColor: Colors.white,
-              backgroundImage: AssetImage('assets/logo.png'),
+              backgroundImage: AssetImage('assets/images/logo.png'),
             ),
           ),
           const SizedBox(width: 15),
@@ -83,7 +86,7 @@ class DrawerWidget extends StatelessWidget {
               Text(
                 Localization.t('drawer.version_text', args: [AppState.version]),
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -121,6 +124,13 @@ class DrawerWidget extends StatelessWidget {
       ],
     );
   }
+  Future<void> _launchURL(String urlString) async {
+    final Uri uri = Uri.parse(urlString);
+    // mode: LaunchMode.externalApplication -> Uygulama içi webview değil, Chrome/Safari açar.
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint("Link açılamadı: $urlString");
+    }
+  }
 
   Widget _buildSocialSection() {
     return Column(
@@ -129,19 +139,19 @@ class DrawerWidget extends StatelessWidget {
           icon: Icons.language_rounded,
           iconColor: const Color(0xFF5865F2),
           title: Localization.t('drawer.my_website'),
-          onTap: () async => await EasyLauncher.url(url: 'https://keremkk.com.tr'),
+          onTap: () => _launchURL('https://keremkk.com.tr'),
         ),
         _buildListTile(
           icon: Icons.language_rounded,
           iconColor: Colors.redAccent,
           title: Localization.t('drawer.geogame_website'),
-          onTap: () async => await EasyLauncher.url(url: 'https://geogame.keremkk.com.tr'),
+          onTap: () => _launchURL('https://geogame.keremkk.com.tr'),
         ),
         _buildListTile(
           icon: Icons.terminal_rounded,
-          iconColor: Colors.black87,
+          iconColor: Colors.black87, // GitHub için siyah daha uygun
           title: Localization.t('drawer.geogame_github'),
-          onTap: () async => await EasyLauncher.url(url: 'https://github.com/KeremKuyucu/GeoGame'),
+          onTap: () => _launchURL('https://github.com/KeremKuyucu/GeoGame'),
         ),
       ],
     );
@@ -173,7 +183,7 @@ class DrawerWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: iconColor.withOpacity(0.05),
+        color: iconColor.withValues(alpha: 0.05),
       ),
       child: ListTile(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

@@ -1,7 +1,6 @@
-// lib/screens/games/shape/shape_screen.dart
+// lib/screens/games/borderline/borderline_screen.dart
 
 import 'dart:convert';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -19,14 +18,14 @@ import 'package:geogame/services/game_service.dart';
 import 'package:geogame/widgets/custom_notification.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
-class ShapeGame extends StatefulWidget {
-  const ShapeGame({super.key});
+class BorderLineGame extends StatefulWidget {
+  const BorderLineGame({super.key});
 
   @override
-  State<ShapeGame> createState() => _ShapeGameState();
+  State<BorderLineGame> createState() => _BorderLineGameState();
 }
 
-class _ShapeGameState extends State<ShapeGame> with SingleTickerProviderStateMixin {
+class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
 
   // Animasyon
@@ -57,7 +56,7 @@ class _ShapeGameState extends State<ShapeGame> with SingleTickerProviderStateMix
 
   Future<void> _initializeGame() async {
     // Oyun mantığını başlat (Ülkeyi seçer)
-    await GameService.initializeGame(GameType.shape); // GameType.shape enum'ına eklediğini varsayıyorum
+    await GameService.initializeGame(GameType.borderline); // GameType.borderline enum'ına eklediğini varsayıyorum
 
     // Seçilen ülkeye göre path oluşturma işlemini başlat
     setState(() {
@@ -143,9 +142,11 @@ class _ShapeGameState extends State<ShapeGame> with SingleTickerProviderStateMix
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                _buildRuleItem(Icons.public, Localization.t('game_shape.rule_welcome')), // "Şekilden ülkeyi tanı"
+                _buildRuleItem(Icons.public, Localization.t('game_borderline.rule_welcome')), // "Şekilden ülkeyi tanı"
                 const SizedBox(height: 10),
-                _buildRuleItem(Icons.zoom_in, Localization.t('game_shape.hint_scale')), // "Şekiller ölçeklidir"
+                _buildRuleItem(Icons.zoom_in, Localization.t('game_borderline.hint_scale')), // "Şekiller ölçeklidir"
+                const SizedBox(height: 10),
+                _buildRuleItem(Icons.star_border, Localization.t('game_common.score_system_generic')),
               ],
             ),
           ),
@@ -177,8 +178,8 @@ class _ShapeGameState extends State<ShapeGame> with SingleTickerProviderStateMix
       answer = AppState.buttons[index].label;
     }
 
-    // Enum GameType.shape olmalı
-    bool isCorrect = await GameService.checkStandardAnswer(answer, GameType.shape, index);
+    // Enum GameType.borderline olmalı
+    bool isCorrect = await GameService.checkStandardAnswer(answer, GameType.borderline, index);
 
     setState(() {
       if (isCorrect) {
@@ -228,7 +229,7 @@ class _ShapeGameState extends State<ShapeGame> with SingleTickerProviderStateMix
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
-          Localization.t('game_shape.title'), // "Harita Oyunu"
+          Localization.t('game_borderline.title'), // "Harita Oyunu"
           style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
         ),
         centerTitle: true,

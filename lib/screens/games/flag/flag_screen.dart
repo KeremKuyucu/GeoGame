@@ -1,7 +1,7 @@
 // lib/screens/games/flag/flag_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_svg/svg.dart';
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
@@ -11,7 +11,7 @@ import 'package:geogame/widgets/drawer_widget.dart';
 // Servisler
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
-import 'package:geogame/services/games/flag_service.dart';
+import 'package:geogame/services/game_service.dart';
 
 // Widgetlar
 import 'package:geogame/widgets/custom_notification.dart';
@@ -26,7 +26,6 @@ class FlagGame extends StatefulWidget {
 
 class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin {
   // Logic sınıfını çağırıyoruz
-  final FlagGameService _gameService = FlagGameService();
   final TextEditingController _controller = TextEditingController();
 
   // Animasyon Kontrolcüleri
@@ -55,7 +54,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
   }
 
   Future<void> _initializeGame() async {
-    _gameService.initializeGame();
+    await GameService.initializeGame(GameType.flag);
     _animController.forward(from: 0.0); // İlk animasyonu başlat
 
     // UI kuralları gösterir
@@ -105,33 +104,33 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
     );
   }
 
-  void _checkAnswer(int index) {
-    String answerText = _controller.text;
+  Future<void> _checkAnswer(int index) async {
+    String answer = _controller.text;
     if (AppState.filter.isButtonMode && index < 4) {
-      answerText = buttonLabels[index];
+      answer = AppState.buttons[index].label;
     }
 
-    bool isCorrect = _gameService.processAnswer(answerText, index);
+    bool isCorrect = await GameService.checkStandardAnswer(answer, GameType.flag, index);
 
     setState(() {
       if (isCorrect) {
         _controller.clear();
-        _animController.forward(from: 0.0); // Yeni soru için animasyonu sıfırla
+        _animController.forward(from: 0.0);
       } else {
         _controller.clear();
       }
     });
   }
 
-  void _pasButtonPressed() {
-    String pasUlke = _gameService.handlePass();
-
+  Future<void> _pasButtonPressed() async {
+    String passCountry = await GameService.handlePass();
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) {
         return CustomNotification(
             baslik: Localization.t('game_common.passed_msg'),
-            metin: pasUlke
+            metin: passCountry
         );
       },
     );
@@ -169,7 +168,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+              colors: [Colors.black.withValues(alpha: 0.6), Colors.transparent],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -212,48 +211,69 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                 children: <Widget>[
 
                   // 1. BAYRAK KARTI (Modern Görünüm & Animasyonlu)
-                  ScaleTransition(
-                    scale: _fadeAnimation,
-                    child: Container(
-                      width: double.infinity,
-                      // Bayrağın ekranda kaplayacağı maksimum yüksekliği belirliyoruz.
-                      // Bayrak bu yükseklik içinde kendini ortalayarak sığacak.
-                      height: 250,
-                      alignment: Alignment.center, // Bayrağı bu alanda ortala
-                      // decoration ve padding kaldırıldı, böylece arka plan şeffaf oldu.
-                      child: ClipRRect(
-                        // Köşeleri çok hafif yumuşatmak modern gösterir,
-                        // ama istemezsen bu ClipRRect widget'ını tamamen kaldırabilirsin.
-                        borderRadius: BorderRadius.circular(8),
-                        child: CachedNetworkImage(
-                          imageUrl: targetCountry.flagUrl,
-                          // --- KRİTİK NOKTA BURASI ---
-                          // contain: Resmi ASLA kesmez, ASLA sıkıştırmaz (oranı bozmaz).
-                          // Verilen alana (width: infinity, height: 250) sığabilecek en büyük şekilde yerleştirir.
-                          fit: BoxFit.contain,
-                          // ---------------------------
-                          placeholder: (context, url) => Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 3,
-                              // Yüklenirken temanın vurgu rengini kullansın
-                              color: isDark ? Colors.tealAccent : Colors.teal,
+                ScaleTransition(
+                scale: _fadeAnimation,
+                child: Container(
+                  width: double.infinity,
+                  height: 250,
+                  // alignment: Alignment.center, // BU SATIRI KALDIRDIM/YORUMA ALDIM. (Çocuğun büyümesini engelliyordu)
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: FutureBuilder(
+                      // Asset varlığını kontrol etmek için yüklemeyi deniyoruz
+                      future: DefaultAssetBundle.of(context).load('assets/data/${AppState.targetCountry.iso3}.svg'),
+                      builder: (context, snapshot) {
+
+                        // 1. DURUM: Asset başarıyla bulundu (Yüklendi)
+                        if (snapshot.connectionState == ConnectionState.done && !snapshot.hasError) {
+                          return SvgPicture.asset(
+                            'assets/data/${AppState.targetCountry.iso3}.svg',
+                            // DÜZELTME: Boyutları burada açıkça belirtiyoruz
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.contain, // Alanın içine sığdır (Kesilme olmaz)
+                            placeholderBuilder: (context) => Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: isDark ? Colors.tealAccent : Colors.teal,
+                              ),
                             ),
+                          );
+                        }
+
+                        // 2. DURUM: Asset bulunamadı (Hata verdi) -> NETWORK'E DÜŞ
+                        if (snapshot.connectionState == ConnectionState.done && snapshot.hasError) {
+                          // Buraya kendi URL yapını girmelisin. Örnek olarak bir yapı koydum.
+                          final networkUrl = AppState.targetCountry.flagUrl;
+
+                          return SvgPicture.network(
+                            networkUrl,
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.contain,
+                            placeholderBuilder: (context) => Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: isDark ? Colors.tealAccent : Colors.teal,
+                              ),
+                            ),
+                            // Network de hata verirse gösterilecek widget (Opsiyonel)
+                            // errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                          );
+                        }
+
+                        // 3. DURUM: Henüz asset varlığı kontrol ediliyor (Waiting)
+                        return Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            color: isDark ? Colors.tealAccent : Colors.teal,
                           ),
-                          errorWidget: (context, url, error) => Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.broken_image_outlined,
-                                  size: 50,
-                                  color: isDark ? Colors.white54 : Colors.grey.shade600),
-                              const SizedBox(height: 8),
-                              Text("Bayrak Yüklenemedi",
-                                  style: TextStyle(color: isDark ? Colors.white54 : Colors.grey.shade600))
-                            ],
-                          ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ),
+                ),
+                 ),
 
                   const SizedBox(height: 25),
 
@@ -332,7 +352,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
               if (textEditingValue.text.isEmpty) {
                 return const Iterable<Country>.empty();
               }
-              return allCountries.where((Country ulke) {
+              return AppState.allCountries.where((Country ulke) {
                 final String isim = ulke.getLocalizedName(Localization.currentLanguage);
                 return isim.toLowerCase().contains(textEditingValue.text.toLowerCase());
               });
@@ -356,7 +376,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -393,7 +413,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                     child: ListView.separated(
                       padding: EdgeInsets.zero,
                       itemCount: options.length,
-                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withOpacity(0.1)),
+                      separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.withValues(alpha: 0.1)),
                       itemBuilder: (BuildContext context, int index) {
                         final Country option = options.elementAt(index);
                         return ListTile(
@@ -420,24 +440,24 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
     return SizedBox(
       height: 65,
       child: ElevatedButton(
-        onPressed: isButtonActive[index]
+        onPressed: AppState.buttons[index].isActive
             ? () {
-          _controller.text = buttonLabels[index];
+          _controller.text = AppState.buttons[index].label;
           _checkAnswer(index);
         }
             : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColors[index],
+          backgroundColor: AppState.buttons[index].color,
           foregroundColor: Colors.white, // Yazılar beyaz
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          elevation: isButtonActive[index] ? 5 : 0,
-          shadowColor: buttonColors[index].withOpacity(0.4),
+          elevation: AppState.buttons[index].isActive ? 5 : 0,
+          shadowColor: AppState.buttons[index].color.withValues(alpha: 0.4),
           padding: const EdgeInsets.symmetric(horizontal: 5),
         ),
         child: Text(
-          buttonLabels[index],
+          AppState.buttons[index].label,
           textAlign: TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
