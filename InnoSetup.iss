@@ -4,7 +4,8 @@
 
 [Setup]
 AppName=GeoGame
-AppVersion=1.5.1
+AppVersion=1.5.3
+
 AppPublisher=Kerem Kuyucu
 DefaultDirName={localappdata}\GeoGame
 DefaultGroupName=GeoGame
@@ -22,7 +23,7 @@ ArchitecturesInstallIn64BitMode=x64
 
 [Files]
 ; Uygulama ikonu
-Source: "C:\Users\Kerem\Projects\Flutter\geogame\assets\logo.ico"; \
+Source: "C:\Users\Kerem\Projects\Flutter\geogame\assets\images\logo.ico"; \
 DestDir: "{app}"; Flags: ignoreversion
 
 ; Flutter Windows Release çıktısının TAMAMI

@@ -45,6 +45,9 @@
     "security": "Security",
     "new_password": "New Password",
     "update_password": "Update Password",
+    "update_email": "Update E-mail",
+    "invalid_email": "Invalid e-mail address",
+    "check_email_confirmation": "Check your e-mail to confirm the change",
     "register": "Register",
     "register_subtitle": "Join the adventure",
     "name": "Name",
@@ -61,42 +64,70 @@
   "game_common": {
     "input_hint": "Type country name...",
     "rules": "Rules",
-    "save_points_warning": "Return to the main menu to save your points.",
-    "congratulations": "Congratulations! 🎉",
+    "save_points_warning": "Return to the main menu to save your score.",
+    "congratulations": "Congratulations!",
     "correct_msg": "{0} was the correct answer!",
-    "wrong_try_again": "Wrong answer. Try again. Points for the question: ",
+    "wrong_try_again": "Wrong answer. Try again. Potential points: ",
     "passed_msg": "Passed Country:",
     "clear_guesses": "Clear Guesses",
-    "options_hint": "You can change choices to 'Typing Mode' from settings.",
+    "options_hint": "You can switch to 'Typing Mode' in the settings if you prefer.",
     "not_found": "Country not found, please select from the list.",
     "first_guess": "Make your first guess!",
-    "score_system_generic": "Scoring System: Each round starts with 50 points. Each wrong guess deducts 10 points."
+    "score_system_generic": "Scoring System: Your score starts at 50 each round; 10 points are deducted for every wrong guess.",
+    "new_game": "New Game",
+    "main_menu": "Main Menu",
+    "score": "Score"
   },
   "game_capital": {
-    "title": "Capital Game",
-    "description": "Guess the country from its capital.",
+    "title": "Capital Hunt",
+    "description": "Identify the country by its capital.",
     "content": "Capital of the country to guess:",
     "input_hint": "Which country is this the capital of?",
-    "rule_welcome": "Welcome to the Capital City Quiz.\nYour goal is to guess the capital of a randomly selected country."
+    "rule_welcome": "Welcome to the Capital City Quiz.\nYour goal is to identify the country associated with a randomly selected capital from 250 countries."
   },
   "game_flag": {
-    "title": "Flag Game",
-    "description": "Guess the country from its flag.",
-    "rule_welcome": "Welcome to the Flag Quiz.\nYour goal is to guess the flag of a randomly selected country."
+    "title": "Flag Hunt",
+    "description": "Identify the country by its flag.",
+    "rule_welcome": "Welcome to the Flag Quiz.\nYour goal is to identify the country associated with a randomly selected flag from 250 countries."
   },
   "game_distance": {
-    "title": "Distance Game",
-    "description": "Guess countries based on distance and direction.",
+    "title": "Distance Hunt",
+    "description": "Guess the country based on distance and direction.",
     "guess": "Guess: ",
     "distance": "Distance: ",
     "direction": "Direction: ",
-    "rule_welcome": "Welcome to the Distance Country Quiz.\nDistances may vary by ±100 km. Center positions are used.",
-    "rule_score": "Scoring System: Starts with 300 points. 10 points deducted per wrong guess. Fixed at 100 after 15 guesses."
+    "rule_welcome": "Welcome to the Distance Quiz.\nYour goal is to find the randomly selected country from 250 options.\nDistances may vary by ±100 km.\nLocations are based on the geographic centers of the countries.",
+    "rule_score": "Scoring System: Each round starts with 300 points. 10 points are deducted for every wrong guess.\nAfter 15 guesses, the points earned are fixed at 100."
   },
   "game_borderline": {
     "title": "Borderline",
-    "rule_welcome": "Guess which country it is based on the country borders appearing on the screen..",
-    "hint_scale": "Country sizes have been scaled to fit on the screen."
+    "description": "Identify the country by its shape.",
+    "hint_scale": "Country sizes have been scaled to fit the screen.",
+    "rule_welcome": "Welcome to the Shape Quiz.\nYour goal is to identify a randomly selected country from 250 options by its shape."
+  },
+  "game_borderpath": {
+    "title": "Border Path",
+    "description": "Reach the target by following border neighbors.",
+    "rule_1": "Go from the starting country to the target country",
+    "rule_2": "You can only cross through neighboring countries",
+    "rule_3": "Fewer moves mean a higher score!",
+    "rule_4": "Follow your path on the map",
+    "victory_msg": "Target reached!",
+    "stat_moves": "Move Count",
+    "stat_optimal": "Optimal Path",
+    "perf_perfect": "🌟 Perfect! Optimal path!",
+    "perf_great": "⭐ Great!",
+    "perf_good": "👍 Good job!",
+    "perf_try_harder": "💪 You can do better!",
+    "undo_move": "Undo Last Move",
+    "loading_map": "Loading map...",
+    "label_start": "START",
+    "label_target": "TARGET",
+    "label_moves": "Moves",
+    "label_optimal": "Optimal",
+    "current_path": "Current Path",
+    "neighbors_label": "Neighboring Countries",
+    "no_neighbors_left": "No neighboring countries left to move to!"
   },
   "directions": {
     "north": "North",
@@ -142,7 +173,8 @@
     "distance": "Distance",
     "flag": "Flag",
     "capital": "Capital",
-    "borderline": "Borderline"
+    "borderline": "Borderline",
+    "borderpath": "Border Path"
   },
   "edit_profile": {
     "edit_title": "Edit Profile",

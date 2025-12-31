@@ -45,6 +45,9 @@
     "security": "Güvenlik",
     "new_password": "Yeni Şifre",
     "update_password": "Şifreyi Güncelle",
+    "update_email": "E-posta Adresini Güncelle",
+    "invalid_email": "Geçersiz e-posta adresi",
+    "check_email_confirmation": "Değişikliği onaylamak için e-postanızı kontrol edin.",
     "register": "Kayıt Ol",
     "register_subtitle": "Maceraya katıl",
     "name": "İsim",
@@ -62,7 +65,7 @@
     "input_hint": "Ülke ismini yazın...",
     "rules": "Kurallar",
     "save_points_warning": "Puanlarınızın kaydedilmesi için ana menüye dönün.",
-    "congratulations": "Tebrikler! 🎉",
+    "congratulations": "Tebrikler!",
     "correct_msg": "{0} doğru cevaptı!",
     "wrong_try_again": "Yanlış cevap. Tekrar deneyin. Sorudan gelecek puan: ",
     "passed_msg": "Geçilen Ülke:",
@@ -70,22 +73,25 @@
     "options_hint": "İsterseniz ayarlardan şıkları 'Yazarak Bilme Modu' ile değiştirebilirsiniz.",
     "not_found": "Ülke bulunamadı, lütfen listeden seçin.",
     "first_guess": "İlk tahmininizi yapın!",
-    "score_system_generic": "Puan Sistemi: Her turda puanınız 50'den başlar, her yanlış tahminde 10 puan azalır."
+    "score_system_generic": "Puan Sistemi: Her turda puanınız 50'den başlar, her yanlış tahminde 10 puan azalır.",
+    "new_game": "Yeni Oyun",
+    "main_menu": "Ana Menü",
+    "score": "Puan"
   },
   "game_capital": {
-    "title": "Başkent Oyunu",
+    "title": "Başşehir",
     "description": "Başkentten ülkeyi tanıyın.",
     "content": "Tahmin edilecek ülkenin başkenti:",
     "input_hint": "Hangi ülkenin başkenti?",
     "rule_welcome": "Başkent Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkenin başkentini bilmektir."
   },
   "game_flag": {
-    "title": "Bayrak Oyunu",
+    "title": "Bayrak Avı",
     "description": "Bayraktan ülkeyi tanıyın.",
     "rule_welcome": "Bayrak Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkenin bayrağını bilmektir."
   },
   "game_distance": {
-    "title": "Mesafe Oyunu",
+    "title": "Mesafe Avı",
     "description": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
     "guess": "Tahmin: ",
     "distance": "Mesafe: ",
@@ -98,6 +104,30 @@
     "description": "Şekilden ülkeyi tanıyın.",
     "hint_scale": "Ülke boyutları ekrana sığacak şekilde ölçeklendirilmiştir.",
     "rule_welcome": "Şekil bilme oyununa hoş geldiniz.\nAmanınız, 250 ülke arasından rastgele seçilen bir ülkeyi şeklinden tanımaktır."
+  },
+  "game_borderpath": {
+    "title": "Sınır Yolu",
+    "description": "Sınır komşularını takip ederek hedefe ulaşın.",
+    "rule_1": "Başlangıç ülkesinden hedef ülkeye gidin",
+    "rule_2": "Sadece sınır komşusu ülkelerden geçebilirsiniz",
+    "rule_3": "Daha az hamle daha yüksek puan!",
+    "rule_4": "Haritada yolunuzu takip edin",
+    "victory_msg": "Hedefe ulaştınız!",
+    "stat_moves": "Hamle Sayısı",
+    "stat_optimal": "Optimal Yol",
+    "perf_perfect": "🌟 Mükemmel! Optimal yol!",
+    "perf_great": "⭐ Harika!",
+    "perf_good": "👍 İyi iş!",
+    "perf_try_harder": "💪 Daha iyisini yapabilirsin!",
+    "undo_move": "Son Hamleyi Geri Al",
+    "loading_map": "Harita yükleniyor...",
+    "label_start": "BAŞLANGIÇ",
+    "label_target": "HEDEF",
+    "label_moves": "Hamle",
+    "label_optimal": "Optimal",
+    "current_path": "Mevcut Yol",
+    "neighbors_label": "Komşu Ülkeler",
+    "no_neighbors_left": "Gidebileceğiniz komşu ülke kalmadı!"
   },
   "directions": {
     "north": "Kuzey",
@@ -142,8 +172,9 @@
     "success_label": "Başarı: {0}%",
     "distance": "Mesafe",
     "flag": "Bayrak",
-    "capital": "Başkent",
-    "borderline": "Sınır hattı"
+    "capital": "Başşehir",
+    "borderline": "Sınır hattı",
+    "borderpath": "Sınır yolu"
   },
   "edit_profile": {
     "edit_title": "Profili Düzenle",

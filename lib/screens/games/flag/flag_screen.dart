@@ -1,7 +1,9 @@
 // lib/screens/games/flag/flag_screen.dart
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/services.dart';
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
@@ -143,16 +145,14 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    // --- TEMA VE RENK AYARLARI ---
-    final bool isDark = AppState.settings.darkTheme;
 
     // Yeşil/Teal Gradient (Bayrak teması için)
-    final List<Color> bgColors = isDark
+    final List<Color> bgColors = AppState.settings.darkTheme
         ? [const Color(0xFF004D40), const Color(0xFF00251A)] // Koyu Yeşil
         : [const Color(0xFFE0F2F1), const Color(0xFF80CBC4)]; // Açık Yeşil
 
-    final Color cardBg = isDark ? const Color(0xFF263238) : Colors.white;
-    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color cardBg = AppState.settings.darkTheme ? const Color(0xFF263238) : Colors.white;
+    final Color textColor = AppState.settings.darkTheme ? Colors.white : Colors.black87;
     final Color accentColor = const Color(0xFF009688); // Teal Accent
 
     return Scaffold(
@@ -211,69 +211,31 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                 children: <Widget>[
 
                   // 1. BAYRAK KARTI (Modern Görünüm & Animasyonlu)
-                ScaleTransition(
-                scale: _fadeAnimation,
-                child: Container(
-                  width: double.infinity,
-                  height: 250,
-                  // alignment: Alignment.center, // BU SATIRI KALDIRDIM/YORUMA ALDIM. (Çocuğun büyümesini engelliyordu)
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: FutureBuilder(
-                      // Asset varlığını kontrol etmek için yüklemeyi deniyoruz
-                      future: DefaultAssetBundle.of(context).load('assets/data/${AppState.targetCountry.iso3}.svg'),
-                      builder: (context, snapshot) {
+                  ScaleTransition(
+                    scale: _fadeAnimation,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 250,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: FutureBuilder<bool>(
+                          future: _checkFlagAsset(AppState.targetCountry.iso2),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const SizedBox(
+                                height: 250,
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
 
-                        // 1. DURUM: Asset başarıyla bulundu (Yüklendi)
-                        if (snapshot.connectionState == ConnectionState.done && !snapshot.hasError) {
-                          return SvgPicture.asset(
-                            'assets/data/${AppState.targetCountry.iso3}.svg',
-                            // DÜZELTME: Boyutları burada açıkça belirtiyoruz
-                            width: double.infinity,
-                            height: 250,
-                            fit: BoxFit.contain, // Alanın içine sığdır (Kesilme olmaz)
-                            placeholderBuilder: (context) => Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                color: isDark ? Colors.tealAccent : Colors.teal,
-                              ),
-                            ),
-                          );
-                        }
+                            final bool exists = snapshot.data ?? false;
 
-                        // 2. DURUM: Asset bulunamadı (Hata verdi) -> NETWORK'E DÜŞ
-                        if (snapshot.connectionState == ConnectionState.done && snapshot.hasError) {
-                          // Buraya kendi URL yapını girmelisin. Örnek olarak bir yapı koydum.
-                          final networkUrl = AppState.targetCountry.flagUrl;
-
-                          return SvgPicture.network(
-                            networkUrl,
-                            width: double.infinity,
-                            height: 250,
-                            fit: BoxFit.contain,
-                            placeholderBuilder: (context) => Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                color: isDark ? Colors.tealAccent : Colors.teal,
-                              ),
-                            ),
-                            // Network de hata verirse gösterilecek widget (Opsiyonel)
-                            // errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
-                          );
-                        }
-
-                        // 3. DURUM: Henüz asset varlığı kontrol ediliyor (Waiting)
-                        return Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            color: isDark ? Colors.tealAccent : Colors.teal,
-                          ),
-                        );
-                      },
+                            return _buildFlagImage(exists, AppState.targetCountry.iso2, AppState.targetCountry.flagUrl);
+                          },
+                        )
+                      ),
                     ),
                   ),
-                ),
-                 ),
 
                   const SizedBox(height: 25),
 
@@ -288,12 +250,12 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                   // 3. PAS BUTONU
                   TextButton.icon(
                     onPressed: _pasButtonPressed,
-                    icon: Icon(Icons.skip_next, color: isDark ? Colors.white70 : Colors.teal.shade900),
+                    icon: Icon(Icons.skip_next, color: AppState.settings.darkTheme ? Colors.white70 : Colors.teal.shade900),
                     label: Text(
                         Localization.t('common.pass'),
                         style: TextStyle(
                             fontSize: 16,
-                            color: isDark ? Colors.white70 : Colors.teal.shade900,
+                            color: AppState.settings.darkTheme ? Colors.white70 : Colors.teal.shade900,
                             fontWeight: FontWeight.bold
                         )
                     ),
@@ -311,6 +273,46 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
   }
 
   // --- WIDGET PARÇALARI ---
+
+  /// SADECE KONTROL: Asset'in varlığını kontrol eder.
+  /// FutureBuilder'ın 'future:' kısmına bunu vereceğiz.
+  Future<bool> _checkFlagAsset(String iso2) async {
+    final String assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
+    try {
+      final manifestContent = await rootBundle.loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+      return manifestMap.containsKey(assetPath);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// SADECE ÇİZİM: Kontrol sonucuna göre uygun Widget'ı döner.
+  Widget _buildFlagImage(bool exists, String iso2, String url) {
+    if (exists) {
+      return Image.asset(
+        'assets/flags/${iso2.toLowerCase()}.webp',
+        width: double.infinity,
+        height: 250,
+        fit: BoxFit.contain,
+      );
+    } else {
+      return Image.network(
+        url,
+        width: double.infinity,
+        height: 250,
+        fit: BoxFit.contain,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const SizedBox(
+            height: 250,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.flag, size: 100),
+      );
+    }
+  }
 
   Widget _buildButtonModeUI(BuildContext context) {
     return Column(
@@ -340,7 +342,6 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
   }
 
   Widget _buildKeyboardModeUI(BuildContext context, Color cardBg, Color textColor, Color accentColor) {
-    final bool isDark = AppState.settings.darkTheme;
 
     return LayoutBuilder(
         builder: (context, constraints) {
@@ -389,7 +390,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                   cursorColor: accentColor,
                   decoration: InputDecoration(
                     hintText: Localization.t('game_common.input_hint'),
-                    hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade400),
+                    hintStyle: TextStyle(color: AppState.settings.darkTheme ? Colors.grey : Colors.grey.shade400),
                     prefixIcon: Icon(Icons.flag, color: accentColor),
                     filled: true,
                     fillColor: Colors.transparent, // Container rengini kullan
