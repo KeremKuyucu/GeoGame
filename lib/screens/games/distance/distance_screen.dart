@@ -1,7 +1,9 @@
 // lib/screens/games/mesafeoyun.dart
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 
 import 'package:geogame/models/app_context.dart';
@@ -347,25 +349,26 @@ class _DistanceGameState extends State<DistanceGame> {
                                 ),
                               ],
                             ),
-                            child: ClipOval(
-                              child: SvgPicture.asset(
-                                'assets/data/${option.iso3}.svg',
-                                fit: BoxFit.cover,
-                                placeholderBuilder: (_) => const SizedBox.shrink(),
-                                // SVG yoksa veya okunamazsa buraya düşer
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Image.network(
-                                    option.flagUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const Icon(Icons.flag),
+                            child: FutureBuilder<Widget>(
+                              future: _loadOptionFlag(option.iso2, option.flagUrl),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
                                   );
-                                },
-                              ),
+                                } else if (snapshot.hasData) {
+                                  return snapshot.data!;
+                                } else {
+                                  return const Icon(Icons.flag);
+                                }
+                              },
                             ),
                           ),
                           title: Text(
                             option.getLocalizedName(Localization.currentLanguage),
-                            style: TextStyle(color: textColor),
+                            style: TextStyle(color: textColor, fontWeight: FontWeight.w500),
                           ),
                           onTap: () => onSelected(option),
                         );
@@ -415,6 +418,50 @@ class _DistanceGameState extends State<DistanceGame> {
       ),
     );
   }
+
+  Future<Widget> _loadOptionFlag(String iso2, String url) async {
+    final assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
+    bool exists = false;
+
+    try {
+      // WebP bir resim olduğu için loadString değil, doğrudan load (ByteData) kullanılır.
+      // Ancak en hızlı kontrol yolu AssetManifest'tir.
+      final manifestContent = await rootBundle.loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+      exists = manifestMap.containsKey(assetPath);
+    } catch (_) {
+      exists = false;
+    }
+
+    if (exists) {
+      return ClipOval(
+        child: Image.asset(
+          assetPath,
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+          // Beklenmedik bir durumda asset yüklenemezse network'e düş
+          errorBuilder: (context, error, stackTrace) => _networkImage(url),
+        ),
+      );
+    } else {
+      return _networkImage(url);
+    }
+  }
+
+  // Kod tekrarını önlemek için yardımcı fonksiyon
+  Widget _networkImage(String url) {
+    return ClipOval(
+      child: Image.network(
+        url,
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.flag, size: 24),
+      ),
+    );
+  }
+
 
   Widget _buildEmptyState(bool isDark) {
     return Center(

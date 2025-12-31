@@ -8,6 +8,7 @@ import 'app_context.dart';
 
 class Country {
   final String iso3;
+  final String iso2;
   final String englishName;
   final Map<String, dynamic> translations;
   final String flagEmoji;
@@ -22,6 +23,7 @@ class Country {
 
   Country({
     required this.iso3,
+    required this.iso2,
     required this.englishName,
     required this.translations,
     required this.flagEmoji,
@@ -36,7 +38,7 @@ class Country {
   });
 
   factory Country.empty() => Country(
-    iso3: '',
+    iso3: '', iso2: '',
     englishName: '', translations: {}, flagEmoji: '', flagUrl: '',
     capital: '', continents: [], isUNMember: false, latitude: 0.0,
     longitude: 0.0, borders: [], area: 0.0,
@@ -51,6 +53,7 @@ class Country {
     }
 
     return Country(
+      iso2: json['cca2'] ?? '',
       iso3: json['cca3'] ?? '',
       englishName: json['name']?['common'] ?? 'Unknown',
       translations: json['translations'] ?? {},

@@ -87,17 +87,16 @@ class Localization {
     if (!languages.containsKey(iso3Code)) iso3Code = 'eng';
 
     try {
-      // DİKKAT: Dosyaların 'assets/lang/tur.json' formatında olduğundan emin olun.
       final String jsonString = await rootBundle.loadString('assets/lang/$iso3Code.json');
       _localizedStrings = json.decode(jsonString);
       _currentLanguage = iso3Code;
-      debugPrint("🌍 Dil Yüklendi: $_currentLanguage (assets/lang/$iso3Code.json)");
+      debugPrint("🌍 Language Loaded: $_currentLanguage (assets/lang/$iso3Code.json)");
     } catch (e) {
-      debugPrint("❌ Dil Dosyası Yüklenemedi ($iso3Code): $e");
+      debugPrint("❌ Language File Could Not Be Loaded ($iso3Code): $e");
 
       // Hata durumunda (örneğin dosya yoksa) İngilizceyi yüklemeyi dene
       if (iso3Code != 'eng') {
-        debugPrint("⚠️ İngilizceye (fallback) geçiliyor...");
+        debugPrint("⚠️ Switching to English (fallback)...");
         await changeLanguage('eng');
       } else {
         _localizedStrings = {}; // Hiçbir şey yoksa boş map ata

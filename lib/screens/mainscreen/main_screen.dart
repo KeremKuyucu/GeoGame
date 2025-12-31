@@ -9,10 +9,13 @@ import 'package:geogame/screens/games/capital/capital_screen.dart';
 import 'package:geogame/screens/games/flag/flag_screen.dart';
 import 'package:geogame/screens/games/distance/distance_screen.dart';
 import 'package:geogame/screens/games/borderline/borderline_screen.dart';
+import 'package:geogame/screens/games/borderpath/borderpath_screen.dart';
 
 import 'package:geogame/screens/settings/settings.dart';
 
 import 'package:geogame/models/app_context.dart';
+
+
 
 
 class MainScreen extends StatefulWidget {
@@ -51,6 +54,12 @@ class _MainScreenState extends State<MainScreen> {
           'img': 'assets/images/borderline.webp',
           'color': '0xFF283593',
         },
+        {
+          'title': Localization.t('game_borderpath.title'),
+          'desc': Localization.t('game_borderpath.description'),
+          'img': 'assets/images/borderpath.webp',
+          'color': '0xFFD84315',
+        }
   ];
 
   @override
@@ -73,6 +82,7 @@ class _MainScreenState extends State<MainScreen> {
       1: const FlagGame(),
       2: const DistanceGame(),
       3: const BorderLineGame(),
+      4: const BorderPathGame(),
     };
 
     final Widget? selectedPage = gamePages[index];

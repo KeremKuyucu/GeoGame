@@ -334,7 +334,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                             ],
                           ),
                           child: Image.asset(
-                            'assets/logo.png',
+                            'assets/images/logo.png',
                             height: 100,
                             fit: BoxFit.contain,
                           ),
@@ -601,12 +601,16 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     );
   }
 
+  // State içine değişkeni ekle
+  // State sınıfının içinde bu değişkeni tanımla
+  bool _obscurePassword = true;
+
   Widget _buildGlassTextField({
     required TextEditingController controller,
     required FocusNode focusNode,
     required IconData icon,
     required String hintText,
-    bool obscureText = false,
+    bool obscureText = false, // Obscure kontrolü için yeni parametre
     List<String>? autofillHints,
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
@@ -621,7 +625,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       child: TextField(
         controller: controller,
         focusNode: focusNode,
-        obscureText: obscureText,
+        // Eğer şifre alanıysa _obscurePassword durumuna bak, değilse false
+        obscureText: obscureText ? _obscurePassword : false,
         keyboardType: keyboardType,
         autofillHints: autofillHints,
         textInputAction: textInputAction,
@@ -632,6 +637,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
           prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.7)),
+          // Şifre alanları için dinamik suffixIcon
+          suffixIcon: obscureText
+              ? IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+              color: Colors.white.withValues(alpha: 0.5),
+              size: 20,
+            ),
+            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+          )
+              : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         ),

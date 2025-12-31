@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/models/countries.dart'; // Country modelinin burada olduğundan emin ol
 import 'package:uuid/uuid.dart';
 
+enum GameType { flag, capital, distance, borderline, borderpath }
 // --- 1. ANA DURUM YÖNETİCİSİ (AppState) ---
 class AppState {
   static int selectedIndex = 0;
@@ -21,6 +22,16 @@ class AppState {
   static List<Country> activePool = [];
 
   static List<GameButton> buttons = [];
+
+  static String getGameModeKey(GameType type) {
+    return switch (type) {
+      GameType.flag => "flag",
+      GameType.capital => "capital",
+      GameType.distance => "distance",
+      GameType.borderline => "borderline",
+      GameType.borderpath => "borderpath",
+    };
+  }
 
   static List<Country> get filteredCountries {
     final f = AppState.filter;

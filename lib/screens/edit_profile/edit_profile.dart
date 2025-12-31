@@ -1,8 +1,6 @@
-import 'dart:ui'; // Glassmorphism için gerekli
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-// Projenizdeki yolları kontrol edin
 import 'package:geogame/services/localization_service.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -18,6 +16,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
   // Controller'lar
   late final TextEditingController _nameController;
   late final TextEditingController _avatarUrlController;
+  late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
 
   // Animasyon
@@ -27,16 +26,15 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
 
   bool _isLoading = false;
   String? _uid;
-  String? _email;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
     _avatarUrlController = TextEditingController();
+    _emailController = TextEditingController();
     _passwordController = TextEditingController();
 
-    // Animasyon Kurulumu
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -54,29 +52,28 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
   void dispose() {
     _nameController.dispose();
     _avatarUrlController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _animController.dispose();
     super.dispose();
   }
 
-  /// Mevcut kullanıcı verilerini yükle
   Future<void> _loadUserProfile() async {
     final user = _supabase.auth.currentUser;
     if (user != null) {
       setState(() {
         _uid = user.id;
-        _email = user.email;
+        _emailController.text = user.email ?? '';
         _nameController.text = user.userMetadata?['full_name'] ?? '';
         _avatarUrlController.text = user.userMetadata?['avatar_url'] ?? '';
       });
     }
   }
 
-  /// Profil Bilgilerini Güncelle
+  /// İsim ve Avatar Güncelleme
   Future<void> _updateProfile() async {
     if (_uid == null) return;
     FocusScope.of(context).unfocus();
-
     setState(() => _isLoading = true);
 
     final name = _nameController.text.trim();
@@ -87,43 +84,54 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     }
 
     try {
-      final UserResponse res = await _supabase.auth.updateUser(
-        UserAttributes(
-          data: {
-            'full_name': name,
-            'avatar_url': finalAvatarUrl,
-          },
-        ),
+      await _supabase.auth.updateUser(
+        UserAttributes(data: {'full_name': name, 'avatar_url': finalAvatarUrl}),
       );
-
-      if (res.user == null) throw "Kullanıcı güncellenemedi.";
 
       await _supabase.from('profiles').upsert({
         'uid': _uid,
-        'email': _email,
+        'email': _emailController.text,
         'full_name': name,
         'avatar_url': finalAvatarUrl,
       }, onConflict: 'uid');
 
       if (mounted) {
         _showSnackBar(Localization.t('edit_profile.update_success'), Colors.greenAccent);
-        setState(() {
-          _avatarUrlController.text = finalAvatarUrl;
-        });
+        setState(() => _avatarUrlController.text = finalAvatarUrl);
       }
     } catch (e) {
-      if (mounted) {
-        _showSnackBar(e.toString(), Colors.redAccent);
-      }
+      if (mounted) _showSnackBar(e.toString(), Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  /// Şifre Değiştirme
+  /// E-posta Güncelleme (Supabase her iki adrese onay gönderir)
+  Future<void> _changeEmail() async {
+    final newEmail = _emailController.text.trim();
+    if (newEmail.isEmpty || !newEmail.contains('@')) {
+      _showSnackBar(Localization.t('auth.invalid_email'), Colors.orangeAccent);
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    setState(() => _isLoading = true);
+
+    try {
+      await _supabase.auth.updateUser(UserAttributes(email: newEmail));
+      if (mounted) {
+        _showSnackBar(Localization.t('auth.check_email_confirmation'), Colors.blueAccent);
+      }
+    } catch (e) {
+      if (mounted) _showSnackBar(e.toString(), Colors.redAccent);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  /// Şifre Güncelleme
   Future<void> _changePassword() async {
     final newPassword = _passwordController.text.trim();
-
     if (newPassword.isEmpty) {
       _showSnackBar(Localization.t('common.field_required'), Colors.orangeAccent);
       return;
@@ -133,18 +141,13 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     setState(() => _isLoading = true);
 
     try {
-      await _supabase.auth.updateUser(
-        UserAttributes(password: newPassword),
-      );
-
+      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
       if (mounted) {
         _showSnackBar(Localization.t('auth.password_changed'), Colors.greenAccent);
         _passwordController.clear();
       }
     } catch (e) {
-      if (mounted) {
-        _showSnackBar(e.toString(), Colors.redAccent);
-      }
+      if (mounted) _showSnackBar(e.toString(), Colors.redAccent);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -168,11 +171,8 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     );
   }
 
-  // --- UI ---
-
   @override
   Widget build(BuildContext context) {
-    // Canlı Önizleme URL'i
     final previewUrl = _avatarUrlController.text.isNotEmpty
         ? _avatarUrlController.text
         : "https://api.dicebear.com/8.x/initials/png?seed=${_nameController.text}";
@@ -187,41 +187,20 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: Navigator.canPop(context)
-            ? IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        )
-            : null,
       ),
       body: Stack(
         children: [
-          // 1. ARKA PLAN (Gradient & Blobs)
+          // Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                // Login sayfasıyla uyumlu koyu tema
                 colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
               ),
             ),
           ),
-          Positioned(
-            top: -50,
-            right: -50,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.blueAccent.withValues(alpha: 0.3),
-                shape: BoxShape.circle,
-                boxShadow: [BoxShadow(blurRadius: 50, color: Colors.blueAccent.withValues(alpha: 0.3))],
-              ),
-            ),
-          ),
-
-          // 2. İÇERİK
+          // Content
           Center(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -232,70 +211,11 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                   position: _slideAnimation,
                   child: Column(
                     children: [
-                      // --- AVATAR ÖNİZLEME ---
-                      Hero(
-                        tag: 'profile_avatar',
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: const LinearGradient(colors: [Colors.cyanAccent, Colors.purpleAccent]),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.4),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: CircleAvatar(
-                                radius: 65,
-                                backgroundColor: Colors.grey[900],
-                                child: ClipOval(
-                                  child: Image.network(
-                                    previewUrl,
-                                    width: 130,
-                                    height: 130,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(
-                                        Icons.image,
-                                        size: 40,
-                                        color: Colors.white54,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.2),
-                                      blurRadius: 5,
-                                    )
-                                  ],
-                                ),
-                                child: const Icon(Icons.edit, color: Colors.purpleAccent, size: 20),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
+                      // Avatar
+                      _buildAvatarHeader(previewUrl),
                       const SizedBox(height: 40),
 
-                      // --- KİŞİSEL BİLGİLER KARTI (Glass) ---
+                      // KİŞİSEL BİLGİLER
                       _buildGlassSection(
                         title: Localization.t('edit_profile.personal_info'),
                         icon: Icons.person_pin_circle_outlined,
@@ -304,7 +224,6 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                             controller: _nameController,
                             hintText: Localization.t('edit_profile.display_name'),
                             icon: Icons.person_outline_rounded,
-                            onChanged: (val) => setState(() {}),
                           ),
                           const SizedBox(height: 15),
                           _buildGlassTextField(
@@ -325,18 +244,36 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
 
                       const SizedBox(height: 30),
 
-                      // --- GÜVENLİK KARTI (Glass) ---
+                      // HESAP GÜVENLİĞİ (Email & Şifre Burada)
                       _buildGlassSection(
                         title: Localization.t('auth.security'),
                         icon: Icons.security_rounded,
                         children: [
+                          // EMAIL DEĞİŞTİRME BÖLÜMÜ
+                          _buildGlassTextField(
+                            controller: _emailController,
+                            hintText: Localization.t('auth.email'),
+                            icon: Icons.email_outlined,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildGradientButton(
+                            label: Localization.t('auth.update_email'),
+                            onPressed: _changeEmail,
+                            isLoading: _isLoading,
+                            colors: [Colors.blueGrey, Colors.indigo],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            child: Divider(color: Colors.white10),
+                          ),
+                          // ŞİFRE DEĞİŞTİRME BÖLÜMÜ
                           _buildGlassTextField(
                             controller: _passwordController,
                             hintText: Localization.t('auth.new_password'),
                             icon: Icons.lock_outline_rounded,
                             obscureText: true,
                           ),
-                          const SizedBox(height: 25),
+                          const SizedBox(height: 15),
                           _buildGradientButton(
                             label: Localization.t('auth.update_password'),
                             onPressed: _changePassword,
@@ -356,13 +293,31 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     );
   }
 
-  // --- REUSABLE WIDGETS ---
+  Widget _buildAvatarHeader(String previewUrl) {
+    return Hero(
+      tag: 'profile_avatar',
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(colors: [Colors.cyanAccent, Colors.purpleAccent]),
+        ),
+        child: CircleAvatar(
+          radius: 65,
+          backgroundColor: Colors.grey[900],
+          child: ClipOval(
+            child: Image.network(
+              previewUrl,
+              width: 130, height: 130, fit: BoxFit.cover,
+              errorBuilder: (c, e, s) => const Icon(Icons.person, size: 60, color: Colors.white54),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-  Widget _buildGlassSection({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
+  Widget _buildGlassSection({required String title, required IconData icon, required List<Widget> children}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(25),
       child: BackdropFilter(
@@ -381,21 +336,10 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
                 children: [
                   Icon(icon, color: Colors.white70, size: 20),
                   const SizedBox(width: 10),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withValues(alpha: 0.9),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ],
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 15),
-                child: Divider(color: Colors.white10, height: 1),
-              ),
+              const Divider(color: Colors.white10, height: 30),
               ...children,
             ],
           ),
@@ -404,13 +348,7 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     );
   }
 
-  Widget _buildGlassTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    bool obscureText = false,
-    Function(String)? onChanged,
-  }) {
+  Widget _buildGlassTextField({required TextEditingController controller, required String hintText, required IconData icon, bool obscureText = false, Function(String)? onChanged}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.2),
@@ -422,7 +360,6 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
         obscureText: obscureText,
         onChanged: onChanged,
         style: const TextStyle(color: Colors.white),
-        cursorColor: Colors.cyanAccent,
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
@@ -434,48 +371,19 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     );
   }
 
-  Widget _buildGradientButton({
-    required String label,
-    required VoidCallback onPressed,
-    required bool isLoading,
-    required List<Color> colors,
-  }) {
+  Widget _buildGradientButton({required String label, required VoidCallback onPressed, required bool isLoading, required List<Color> colors}) {
     return Container(
-      width: double.infinity,
-      height: 50,
+      width: double.infinity, height: 50,
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: colors),
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: colors.last.withValues(alpha: 0.4),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        ),
+        style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent),
         child: isLoading
-            ? const SizedBox(
-          height: 20,
-          width: 20,
-          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-        )
-            : Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            letterSpacing: 1,
-          ),
-        ),
+            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+            : Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }

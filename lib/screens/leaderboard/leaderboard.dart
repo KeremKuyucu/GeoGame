@@ -4,7 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/services/localization_service.dart';
 // Userprofile importunu kaldırdık
-import 'package:geogame/widgets/profile_view_widget.dart'; // Bunu eklemeyi unutma
+import 'package:geogame/widgets/profile_view_widget.dart';
+
+import 'package:geogame/models/app_context.dart'; // Bunu eklemeyi unutma
 
 class Leaderboard extends StatefulWidget {
   const Leaderboard({super.key});
@@ -35,7 +37,8 @@ class _LeaderboardState extends State<Leaderboard> {
           .select()
           .limit(100);
 
-      if (response.isEmpty) {
+      // Tip güvenli kontrol
+      if ((response as List).isEmpty) {
         if (mounted) {
           setState(() {
             _users = [];
@@ -45,34 +48,35 @@ class _LeaderboardState extends State<Leaderboard> {
         return;
       }
 
-      final List<Map<String, dynamic>> leaderboardData = (response as List).map<Map<String, dynamic>>((row) {
-        return {
-          'uid': row['uid'] ?? '',
-          'name': row['full_name'] ?? 'Guest',
-          'avatar_url': row['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+      final List<dynamic> rawList = response as List;
 
-          // Genel Skorlar
-          'total_score': (row['total_score'] ?? 0) as int, // DİKKAT: Anahtar ismi total_score
-          'total_correct': (row['total_correct'] ?? 0) as int,
-          'total_wrong': (row['total_wrong'] ?? 0) as int,
+      final List<Map<String, dynamic>> leaderboardData = rawList.map((row) {
+        // Yardımcı parse fonksiyonu
+        int toInt(dynamic value) => (value is num)
+            ? value.toInt()
+            : (int.tryParse(value?.toString() ?? '0') ?? 0);
 
-          // Mod Verileri
-          'score_flag': (row['score_flag'] ?? 0) as int,
-          'flag_correct': (row['flag_correct'] ?? 0) as int,
-          'flag_wrong': (row['flag_wrong'] ?? 0) as int,
-
-          'score_capital': (row['score_capital'] ?? 0) as int,
-          'capital_correct': (row['capital_correct'] ?? 0) as int,
-          'capital_wrong': (row['capital_wrong'] ?? 0) as int,
-
-          'score_distance': (row['score_distance'] ?? 0) as int,
-          'distance_correct': (row['distance_correct'] ?? 0) as int,
-          'distance_wrong': (row['distance_wrong'] ?? 0) as int,
-
-          'score_borderline': (row['score_borderline'] ?? 0) as int,
-          'borderline_correct': (row['borderline_correct'] ?? 0) as int,
-          'borderline_wrong': (row['borderline_wrong'] ?? 0) as int,
+        // Ana verileri hazırla
+        final Map<String, dynamic> userMap = {
+          'rank': toInt(row['rank']),
+          'uid': row['uid']?.toString() ?? '',
+          'name': row['full_name']?.toString() ?? 'Guest',
+          'avatar_url': row['avatar_url']?.toString() ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+          'total_score': toInt(row['total_score']),
+          'total_correct': toInt(row['total_correct']),
+          'total_wrong': toInt(row['total_wrong']),
         };
+
+        // OYUN MODLARINI DİNAMİK EKLE
+        // GameType.values listesini kullanarak kolon isimlerini otomatik oluşturuyoruz
+        for (var type in GameType.values) {
+          final String mode = AppState.getGameModeKey(type); // flag, capital, vb.
+          userMap['score_$mode'] = toInt(row['score_$mode']);
+          userMap['${mode}_correct'] = toInt(row['${mode}_correct']);
+          userMap['${mode}_wrong'] = toInt(row['${mode}_wrong']);
+        }
+
+        return userMap;
       }).toList();
 
       if (mounted) {
