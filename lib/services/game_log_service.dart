@@ -79,9 +79,9 @@ class GameLogService {
         'user_id': uid,
         'client_log_id': log['id'], // UUID
         'game_type': log['gameType'],
-        'correctCount': log['correctCount'],
-        'wrongCount': log['wrongCount'],
-        'scoreEarned': log['scoreEarned'],
+        'correct_count': log['correctCount'],
+        'wrong_count': log['wrongCount'],
+        'score_earned': log['scoreEarned'],
         'played_at': log['played_at'],
       });
     }

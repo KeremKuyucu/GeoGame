@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/services/localization_service.dart';
+
+import 'package:geogame/services/auth_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -11,8 +12,6 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProviderStateMixin {
-  final _supabase = Supabase.instance.client;
-
   // Controller'lar
   late final TextEditingController _nameController;
   late final TextEditingController _avatarUrlController;
@@ -59,14 +58,23 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
   }
 
   Future<void> _loadUserProfile() async {
-    final user = _supabase.auth.currentUser;
+    final user = AuthService.currentUser;
     if (user != null) {
       setState(() {
         _uid = user.id;
         _emailController.text = user.email ?? '';
-        _nameController.text = user.userMetadata?['full_name'] ?? '';
-        _avatarUrlController.text = user.userMetadata?['avatar_url'] ?? '';
+
+        // Metadata bilgilerini çek
+        final metadata = user.userMetadata;
+        if (metadata != null) {
+          _nameController.text = metadata['full_name'] ?? '';
+          _avatarUrlController.text = metadata['avatar_url'] ?? '';
+        }
       });
+      debugPrint("✅ Kullanıcı bilgileri cache'den başarıyla okundu.");
+    } else {
+      debugPrint("❌ Kullanıcı bulunamadı, giriş sayfasına yönlendiriliyor...");
+      Navigator.pop(context);
     }
   }
 
@@ -83,32 +91,27 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
       finalAvatarUrl = "https://api.dicebear.com/8.x/initials/png?seed=$name";
     }
 
-    try {
-      await _supabase.auth.updateUser(
-        UserAttributes(data: {'full_name': name, 'avatar_url': finalAvatarUrl}),
-      );
+    final String? error = await AuthService.updateProfileMetadata(
+        name: name,
+        avatarUrl: finalAvatarUrl
+    );
 
-      await _supabase.from('profiles').upsert({
-        'uid': _uid,
-        'email': _emailController.text,
-        'full_name': name,
-        'avatar_url': finalAvatarUrl,
-      }, onConflict: 'uid');
-
-      if (mounted) {
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (error == null) {
+        await AuthService.syncUserData(AuthService.currentUser!);
         _showSnackBar(Localization.t('edit_profile.update_success'), Colors.greenAccent);
         setState(() => _avatarUrlController.text = finalAvatarUrl);
+      } else {
+        _showSnackBar(error, Colors.redAccent);
       }
-    } catch (e) {
-      if (mounted) _showSnackBar(e.toString(), Colors.redAccent);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   /// E-posta Güncelleme (Supabase her iki adrese onay gönderir)
   Future<void> _changeEmail() async {
     final newEmail = _emailController.text.trim();
+
     if (newEmail.isEmpty || !newEmail.contains('@')) {
       _showSnackBar(Localization.t('auth.invalid_email'), Colors.orangeAccent);
       return;
@@ -117,15 +120,19 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     FocusScope.of(context).unfocus();
     setState(() => _isLoading = true);
 
-    try {
-      await _supabase.auth.updateUser(UserAttributes(email: newEmail));
-      if (mounted) {
-        _showSnackBar(Localization.t('auth.check_email_confirmation'), Colors.blueAccent);
+    final String? error = await AuthService.updateEmail(newEmail);
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+
+      if (error == null) {
+        _showSnackBar(
+            Localization.t('auth.check_email_confirmation'),
+            Colors.blueAccent
+        );
+      } else {
+        _showSnackBar(error, Colors.redAccent);
       }
-    } catch (e) {
-      if (mounted) _showSnackBar(e.toString(), Colors.redAccent);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -140,16 +147,16 @@ class _EditProfilePageState extends State<EditProfilePage> with SingleTickerProv
     FocusScope.of(context).unfocus();
     setState(() => _isLoading = true);
 
-    try {
-      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
-      if (mounted) {
+    final String? error = await AuthService.updatePassword(newPassword);
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+      if (error == null) {
         _showSnackBar(Localization.t('auth.password_changed'), Colors.greenAccent);
         _passwordController.clear();
+      } else {
+        _showSnackBar(error, Colors.redAccent);
       }
-    } catch (e) {
-      if (mounted) _showSnackBar(e.toString(), Colors.redAccent);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
     }
   }
 
