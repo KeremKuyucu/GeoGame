@@ -5,7 +5,6 @@ import 'package:geogame/models/app_context.dart';
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
-  /// 🔐 Giriş Yap
   static Future<String?> signIn(String email, String password) async {
     try {
       final AuthResponse res = await _supabase.auth.signInWithPassword(
@@ -25,7 +24,6 @@ class AuthService {
     }
   }
 
-  /// 📝 Kayıt Ol (YENİ EKLENDİ)
   static Future<String?> signUp(String email, String password, String name) async {
     try {
       final AuthResponse res = await _supabase.auth.signUp(
@@ -41,16 +39,53 @@ class AuthService {
         await syncUserData(res.user!);
         return null;
       }
-
-      return "The registration process failed.";
+      return "Kayıt işlemi başarısız.";
     } on AuthException catch (e) {
+      debugPrint("Auth Error: ${e.message}");
+      if (e.message.contains('Database error')) {
+        return "Sunucu tarafında profil oluşturulamadı. Lütfen veritabanı ayarlarını kontrol edin.";
+      }
       return e.message;
     } catch (e) {
-      return "Unknown error: $e";
+      return "Bilinmeyen hata: $e";
     }
   }
 
-  /// 🚪 Çıkış Yap
+  static Future<void> syncUserData(User authUser) async {
+    try {
+      var profileData = await _supabase
+          .from('profiles')
+          .select('full_name, avatar_url')
+          .eq('uid', authUser.id)
+          .maybeSingle();
+
+      if (profileData == null) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        profileData = await _supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('uid', authUser.id)
+            .maybeSingle();
+      }
+
+      if (profileData != null) {
+        AppState.user = UserProfile(
+            name: profileData['full_name'] ?? 'Oyuncu',
+            avatarUrl: profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png'
+        );
+      } else {
+        AppState.user = UserProfile(
+            name: authUser.userMetadata?['full_name'] ?? 'Oyuncu',
+            avatarUrl: authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png'
+        );
+      }
+
+      debugPrint('✅ Profile sync complete: ${AppState.user.name}');
+    } catch (e) {
+      debugPrint('❌ Profile Sync Error: $e');
+    }
+  }
+
   static Future<void> signOut() async {
     try {
       await _supabase.auth.signOut();
@@ -60,11 +95,10 @@ class AuthService {
     AppState.user = UserProfile.anonymous();
   }
 
-  // Helper Getter'lar
   static bool get isAuthenticated => _supabase.auth.currentUser != null;
   static String? get currentUserId => _supabase.auth.currentUser?.id;
+  static User? get currentUser => _supabase.auth.currentUser;
 
-  /// 🔄 Uygulama Açılışında Oturum Kontrolü
   static Future<void> checkSession() async {
     final session = _supabase.auth.currentSession;
     if (session != null) {
@@ -72,60 +106,54 @@ class AuthService {
     }
   }
 
-  /// 👤 Profil Bilgilerini Çek ve RAM'e (AppState) Yaz
-  static Future<void> syncUserData(User authUser) async {
-    try {
-      // Önce veritabanında profil var mı diye bak
-      final profileData = await _supabase
-          .from('profiles')
-          .select('full_name, avatar_url')
-          .eq('uid', authUser.id)
-          .maybeSingle();
-
-      if (profileData != null) {
-        // Varsa onu yükle
-        AppState.user = UserProfile(
-            name: profileData['full_name'] ?? 'Oyuncu',
-            avatarUrl: profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png'
-        );
-      } else {
-        final newName = authUser.userMetadata?['full_name'] ?? 'Oyuncu';
-        final newUrl = authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png';
-
-        // RAM'i güncelle
-        AppState.user = UserProfile(name: newName, avatarUrl: newUrl);
-
-        // Veritabanında profili oluştur
-        await _createUserProfile(authUser, newName, newUrl);
-      }
-
-      debugPrint('✅ Profile data loaded: ${AppState.user.name}');
-
-    } catch (e) {
-      debugPrint('❌ Profile Upload Error: $e');
-    }
-  }
-
-  static Future<void> _createUserProfile(User authUser, String initialName, String initialUrl) async {
-    try {
-      await _supabase.from('profiles').upsert({
-        'uid': authUser.id,
-        'email': authUser.email,
-        'full_name': initialName,
-        'avatar_url': initialUrl,
-      }, onConflict: 'uid');
-    } catch (e) {
-      debugPrint("Profile DB creation error: $e");
-    }
-  }
   static Future<String?> sendPasswordResetEmail(String email) async {
     try {
       await _supabase.auth.resetPasswordForEmail(email);
-      return null; // Başarılı
+      return null;
     } on AuthException catch (e) {
       return e.message;
     } catch (e) {
       return "Unexpected error: $e";
+    }
+  }
+
+  static Future<String?> updatePassword(String newPassword) async {
+    try {
+      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return "Beklenmedik bir hata: $e";
+    }
+  }
+
+  static Future<String?> updateEmail(String newEmail) async {
+    try {
+      await _supabase.auth.updateUser(UserAttributes(email: newEmail));
+      return null; // Başarılı
+    } on AuthException catch (e) {
+      debugPrint("Email Update Error: ${e.message}");
+      // Özel hata mesajı temizleme (isteğe bağlı)
+      if (e.message.contains('already registered')) {
+        return "Bu e-posta adresi zaten kullanımda.";
+      }
+      return e.message;
+    } catch (e) {
+      return "Beklenmedik bir hata oluştu: $e";
+    }
+  }
+
+  static Future<String?> updateProfileMetadata({required String name, required String avatarUrl}) async {
+    try {
+      await _supabase.auth.updateUser(
+        UserAttributes(data: {'full_name': name, 'avatar_url': avatarUrl}),
+      );
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return "Beklenmedik bir hata: $e";
     }
   }
 }

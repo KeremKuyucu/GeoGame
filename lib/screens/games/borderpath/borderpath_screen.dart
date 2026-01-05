@@ -934,7 +934,7 @@ class _BorderPathGameState extends State<BorderPathGame> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      "${secilenUlke.getLocalizedName(Localization.currentLanguage)} ${Localization.t('game_borderpath.not_a_neighbor') ?? 'is not a neighbor!'}",
+                      "${secilenUlke.getLocalizedName(Localization.currentLanguage)} ${Localization.t('game_borderpath.not_a_neighbor')}",
                       style: const TextStyle(color: Colors.white),
                     ),
                     backgroundColor: Colors.red,
