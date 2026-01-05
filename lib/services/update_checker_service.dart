@@ -115,8 +115,7 @@ class UpdateService {
               onPressed: () async {
                 Navigator.of(context).pop();
                 final Uri uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+await launchUrl(uri, mode: LaunchMode.externalApplication);
                 }
               },
               child: Text(Localization.t('version.update')),
