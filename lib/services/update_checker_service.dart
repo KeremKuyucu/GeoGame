@@ -135,6 +135,7 @@ class UpdateService {
 
                 if (dialogContext.mounted) {
                   Navigator.of(dialogContext).pop();
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
                 }
               },
               child: Text(Localization.t('version.update')),
