@@ -88,18 +88,18 @@ class Country {
     // Hem yerel dildeki isme hem de İngilizce isme göre doğru kabul eder
     return input == localized || input == english;
   }
-}
 
-Future<void> loadCountries() async {
-  try {
-    final String response = await rootBundle.loadString('assets/countries.json');
-    final List<dynamic> data = json.decode(response);
+  static Future<void> loadCountries() async {
+    try {
+      final String response = await rootBundle.loadString('assets/countries.json');
+      final List<dynamic> data = json.decode(response);
 
-    AppState.allCountries = data.map((item) => Country.fromJson(item)).toList();
+      AppState.allCountries = data.map((item) => Country.fromJson(item)).toList();
 
-    debugPrint("✅ Countries Loaded Successfully: ${AppState.allCountries.length}");
-  } catch (e) {
-    debugPrint("❌ CRITICAL ERROR: Could not load countries! $e");
-    AppState.allCountries = [];
+      debugPrint("✅ Countries Loaded Successfully: ${AppState.allCountries.length}");
+    } catch (e) {
+      debugPrint("❌ CRITICAL ERROR: Could not load countries! $e");
+      AppState.allCountries = [];
+    }
   }
 }

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
+import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/models/countries.dart';
 
 // Servisler
@@ -17,7 +17,7 @@ import 'package:geogame/services/game_service.dart';
 
 // Widgetlar ve Sayfalar
 import 'package:geogame/widgets/custom_notification.dart';
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
+import 'package:geogame/widgets/drawer_widget.dart';
 
 class CapitalGame extends StatefulWidget {
   const CapitalGame({super.key});
@@ -184,9 +184,10 @@ class _CapitalGameState extends State<CapitalGame> with SingleTickerProviderStat
             icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               GameLogService.syncPendingLogs();
-              Navigator.pushReplacement(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainScaffold()),
+                '/home',
+                    (route) => false,
               );
             },
           ),

@@ -9,93 +9,100 @@ class UpdateService {
   static const String repoOwner = 'KeremKuyucu';
   static const String repoName = 'GeoGame';
 
-  /// 🚀 Güncelleme Kontrolü
-  static Future<void> check(BuildContext context) async {
-    // 1. Yerel Versiyon
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String localVersion = packageInfo.version;
-
+  static bool _isNewVersionAvailable(String local, String remote) {
     try {
-      // 2. GitHub API
+      List<int> localParts = local.split('.').map(int.parse).toList();
+      List<int> remoteParts = remote.split('.').map(int.parse).toList();
+
+      for (var i = 0; i < remoteParts.length; i++) {
+        int localPart = i < localParts.length ? localParts[i] : 0;
+        if (remoteParts[i] > localPart) return true;
+        if (remoteParts[i] < localPart) return false;
+      }
+    } catch (e) {
+      debugPrint("Sürüm ayrıştırma hatası: $e");
+    }
+    return false;
+  }
+
+  static Future<void> check(BuildContext context) async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      String localVersion = packageInfo.version;
+
       final response = await http.get(
         Uri.parse('https://api.github.com/repos/$repoOwner/$repoName/releases/latest'),
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
-        // Versiyon temizliği (v1.0.0 -> 1.0.0)
+        String downloadUrl = data['html_url'] ?? 'https://github.com/$repoOwner/$repoName/releases';
         String remoteVersion = (data['tag_name'] as String? ?? '0.0.0').replaceAll(RegExp(r'^v'), '');
         String updateNotes = data['body'] ?? '';
-        // 3. Karşılaştırma
-        if (localVersion != remoteVersion) {
+
+        if (_isNewVersionAvailable(localVersion, remoteVersion)) {
           if (!context.mounted) return;
           _showUpdateDialog(
             context,
             localVersion,
             remoteVersion,
             updateNotes,
-            'https://github.com/$repoOwner/$repoName/releases/latest',
+            downloadUrl,
           );
         }
       }
     } catch (e) {
-      debugPrint('Güncelleme hatası: $e');
+      debugPrint('Güncelleme kontrol hatası: $e');
     }
   }
 
-  /// 📱 Diyalog (HTML Paketi Kaldırıldı)
   static void _showUpdateDialog(BuildContext context, String local, String remote, String notes, String url) {
-    // Markdown sembollerini basitçe temizleyelim (İsteğe bağlı)
-    // Bu basit regex başlıkları (#) ve kalın yazıları (**) temizler, okunaklı düz metin yapar.
     String cleanNotes = notes
-        .replaceAll(RegExp(r'#{1,6}\s?'), '') // Başlıkları kaldır (#)
-        .replaceAll(RegExp(r'\*\*|__'), '')   // Kalın sembolleri kaldır (**)
-        .replaceAll(RegExp(r'\* |_ '), '• '); // Listeleri noktaya çevir
+        .replaceAll(RegExp(r'#{1,6}\s?'), '')
+        .replaceAll(RegExp(r'\*\*|__'), '')
+        .replaceAll(RegExp(r'\* |_ '), '• ');
 
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           title: Row(
             children: [
-              Icon(Icons.system_update, color: Colors.blue),
-              SizedBox(width: 10),
-              Expanded(child: Text(Localization.t('version.new_available'), style: TextStyle(fontSize: 18))),
+              const Icon(Icons.system_update, color: Colors.blue),
+              const SizedBox(width: 10),
+              Expanded(child: Text(Localization.t('version.new_available'), style: const TextStyle(fontSize: 18))),
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Versiyon bilgisi
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
+                  color: Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('v$local', style: TextStyle(color: Colors.grey)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    Text('v$local', style: const TextStyle(color: Colors.grey)),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Icon(Icons.arrow_forward, size: 16, color: Colors.green),
                     ),
-                    Text('v$remote', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                    Text('v$remote', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
                   ],
                 ),
               ),
-              SizedBox(height: 15),
-              // Notlar
+              const SizedBox(height: 15),
               Flexible(
                 child: SingleChildScrollView(
                   child: Text(
                     cleanNotes,
-                    style: TextStyle(fontSize: 14, height: 1.5),
+                    style: const TextStyle(fontSize: 14, height: 1.5),
                   ),
                 ),
               ),
@@ -103,8 +110,8 @@ class UpdateService {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text(Localization.t('version.not_now'), style: TextStyle(color: Colors.grey)),
-              onPressed: () => Navigator.of(context).pop(),
+              child: Text(Localization.t('version.not_now'), style: const TextStyle(color: Colors.grey)),
+              onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -113,10 +120,21 @@ class UpdateService {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               onPressed: () async {
-                Navigator.of(context).pop();
                 final Uri uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                try {
+                  // canLaunchUrl bazen yapılandırma hatası nedeniyle false döner.
+                  // launchUrl'i doğrudan try-catch içinde çağırmak daha rasyoneldir.
+                  await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
+                  );
+                } catch (e) {
+                  debugPrint("URL başlatılamadı: $e");
+                  // Hata durumunda kullanıcıya bilgi verilebilir.
+                }
+
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
                 }
               },
               child: Text(Localization.t('version.update')),

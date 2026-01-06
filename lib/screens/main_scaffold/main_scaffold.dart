@@ -21,7 +21,7 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   final List<Widget> _sayfalar = [
      MainScreen(),    // Index 0: Oyunlar
-     Leaderboard(),     // Index 1: Sıralama
+     Leaderboard(),   // Index 1: Sıralama
      Profiles(),      // Index 2: Profil
      SettingsPage(),  // Index 3: Ayarlar
   ];
@@ -31,13 +31,17 @@ class _MainScaffoldState extends State<MainScaffold> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: IndexedStack(
-        index: AppState.selectedIndex, // Global değişkeni dinliyoruz
+        index: AppState.selectedIndex,
         children: _sayfalar,
       ),
 
       bottomNavigationBar: CustomNavBar(
         currentIndex: AppState.selectedIndex,
         onTap: (index) {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+            currentFocus.unfocus();
+          }
           setState(() {
             AppState.selectedIndex = index;
           });

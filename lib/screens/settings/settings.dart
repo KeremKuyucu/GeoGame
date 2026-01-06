@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:geogame/screens/auth/authpage.dart';
 import 'package:theme_mode_builder/theme_mode_builder.dart';
 import 'dart:async';
 
 import 'package:geogame/models/app_context.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
 
 import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 
+import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/restart_widget.dart';
-
-import 'package:geogame/screens/edit_profile/edit_profile.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -25,15 +22,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    _checkContinents();
-  }
-
-  Future<void> _checkContinents() async {
-    if (AppState.filteredCountries.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showContinentWarning();
-      });
-    }
   }
 
   // --- ACTIONS ---
@@ -46,11 +34,14 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<void> _openWebAuth() async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const EditProfilePage()),
-    );
+  Future<void> _openEditProfile() async {
+    await Navigator.pushNamed(context, '/profile/edit');
+
+    if (mounted) {
+      setState(() {
+        // Profil verilerini güncelleyen servis çağrısı buraya gelebilir
+      });
+    }
   }
 
   void _showSnackBar(String message, Color color) {
@@ -189,10 +180,12 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage(onLoginSuccess: () => setState(() {}))),
-                  ),
+                  onPressed: () async {
+                    await Navigator.pushNamed(context, '/auth');
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
@@ -252,7 +245,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 GestureDetector(
-                  onTap: _openWebAuth,
+                  onTap: _openEditProfile,
                   child: Row(
                     children: [
                       Text(
@@ -568,37 +561,4 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Future<void> _showContinentWarning() async {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                Localization.t('settings.continent_warning_title'),
-                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          "${Localization.t('settings.no_continent_active')}\n\n${Localization.t('settings.activate_continent_prompt')}",
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(Localization.t('common.ok'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          )
-        ],
-      ),
-    );
-  }
 }

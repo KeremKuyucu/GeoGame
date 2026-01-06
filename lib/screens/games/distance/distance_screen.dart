@@ -8,6 +8,8 @@ import 'dart:math' as math;
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game/guess_result.dart';
+import 'package:geogame/models/game_metadata.dart';
 
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/custom_notification.dart';
@@ -15,9 +17,6 @@ import 'package:geogame/widgets/custom_notification.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/game_service.dart';
-
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
-
 
 class DistanceGame extends StatefulWidget {
   const DistanceGame({super.key});
@@ -208,9 +207,10 @@ class _DistanceGameState extends State<DistanceGame> {
             icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               GameLogService.syncPendingLogs();
-              Navigator.pushReplacement(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainScaffold()),
+                '/home',
+                    (route) => false,
               );
             },
           ),
@@ -449,7 +449,6 @@ class _DistanceGameState extends State<DistanceGame> {
     }
   }
 
-  // Kod tekrarını önlemek için yardımcı fonksiyon
   Widget _networkImage(String url) {
     return ClipOval(
       child: Image.network(
@@ -461,7 +460,6 @@ class _DistanceGameState extends State<DistanceGame> {
       ),
     );
   }
-
 
   Widget _buildEmptyState(bool isDark) {
     return Center(

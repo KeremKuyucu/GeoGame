@@ -4,17 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
-class LoginPage extends StatefulWidget {
+class AuthPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;
-  const LoginPage({super.key, this.onLoginSuccess});
+  const AuthPage({super.key, this.onLoginSuccess});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   late final TextEditingController _nameController;
@@ -97,9 +96,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       await Future.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
       AppState.selectedIndex = 0;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const MainScaffold()),
-            (Route<dynamic> route) => false,
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+            (route) => false,
       );
     } else {
       _showSnackBar(error, Colors.redAccent);
@@ -142,9 +142,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       await Future.delayed(const Duration(milliseconds: 300));
       if (!mounted) return;
       AppState.selectedIndex = 0;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const MainScaffold()),
-            (Route<dynamic> route) => false,
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+            (route) => false,
       );
     } else {
       _showSnackBar(error, Colors.redAccent);

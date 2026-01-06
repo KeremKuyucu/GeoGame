@@ -10,9 +10,6 @@ import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/profile_view_widget.dart';
 
-// Ekranlar
-import 'package:geogame/screens/auth/authpage.dart';
-
 class Profiles extends StatefulWidget {
   const Profiles({super.key});
 
@@ -107,9 +104,6 @@ class _ProfilesState extends State<Profiles> {
         name: name,
         avatarUrl: avatarUrl,
         totalScore: totalScore,
-        // EN ÖNEMLİ KISIM:
-        // Veriyi parçalamadan, doğrudan Supabase Map'ini veriyoruz.
-        // Eğer veri yoksa boş bir map {} gönderiyoruz.
         stats: _userStats ?? {},
       ),
     );
@@ -145,16 +139,7 @@ class _ProfilesState extends State<Profiles> {
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
               ),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage(
-                      onLoginSuccess: () {
-                        setState(() => fetchUserProfile());
-                      },
-                    ),
-                  ),
-                );
+                Navigator.pushNamed(context, '/auth');
               },
             ),
           ],

@@ -27,12 +27,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _baslat() async {
-    // 1. Veri yükleme ve Oturum kontrolleri (Context gerektirmez)
-    await loadCountries();
+    await Country.loadCountries();
     AppState.activePool = AppState.filteredCountries;
     await AuthService.checkSession();
 
-    // ama arkaplanda çalışması UI'ı bloklamaz, bu hali de uygundur)
     GameLogService.syncPendingLogs();
 
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
