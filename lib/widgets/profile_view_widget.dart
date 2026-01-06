@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/game_metadata.dart';
 
 // --- Extension: GameType'a Görsel Özellikler Ekliyoruz ---
 extension GameTypeUI on GameType {
@@ -115,7 +116,7 @@ class ProfileViewWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),
@@ -167,7 +168,7 @@ class ProfileViewWidget extends StatelessWidget {
                     ),
                 ],
               );
-            }).toList(),
+            }),
           ],
         ),
       ),
@@ -193,7 +194,7 @@ class ProfileViewWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(icon, color: color, size: 20),

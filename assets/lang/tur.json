@@ -147,9 +147,7 @@
     "multiple_choice_mode": "Çoktan Seçmeli Mod",
     "continent_title": "Kıta Seçenekleri",
     "un_members": "BM Üyeliği Olmayan Ülkeler",
-    "continent_warning_title": "Uyarı",
     "no_continent_active": "Hiçbir kıta aktif değil.",
-    "activate_continent_prompt": "Lütfen en az bir kıta aktif edin.",
     "continents": {
       "south_america": "Güney Amerika Kıtasında Olan Ülkeler",
       "north_america": "Kuzey Amerika Kıtasında Olan Ülkeler",

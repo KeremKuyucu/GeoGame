@@ -1,42 +1,14 @@
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
+
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game/guess_result.dart';
+import 'package:geogame/models/game/border_path_data.dart';
+import 'package:geogame/models/game_metadata.dart';
+
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/localization_service.dart';
-
-// ============================================================================
-// ENUMS & MODELS
-// ============================================================================
-
-
-class GuessResultModel {
-  final String countryName;
-  final double distanceKm;
-  final String directionText;
-  final double bearing;
-  final bool isCorrect;
-
-  GuessResultModel({
-    required this.countryName,
-    required this.distanceKm,
-    required this.directionText,
-    required this.bearing,
-    required this.isCorrect,
-  });
-}
-
-class BorderPathGameData {
-  final Country startCountry;
-  final Country targetCountry;
-  final int optimalPathLength;
-
-  BorderPathGameData({
-    required this.startCountry,
-    required this.targetCountry,
-    required this.optimalPathLength,
-  });
-}
 
 // ============================================================================
 // GAME SERVICE
@@ -45,17 +17,27 @@ class BorderPathGameData {
 class GameService {
   static final math.Random _random = math.Random();
 
+  static Map<String, Country>? _cachedCountryMap;
+  static Map<String, Country> get _countryMap {
+    if (_cachedCountryMap == null || _cachedCountryMap!.isEmpty) {
+      _cachedCountryMap = {for (var c in AppState.allCountries) c.iso3: c};
+    }
+    return _cachedCountryMap!;
+  }
+
   // --------------------------------------------------------------------------
   // GAME INITIALIZATION
   // --------------------------------------------------------------------------
 
-  /// Oyunu başlatır ve ilk soruyu hazırlar
   static Future<void> initializeGame(GameType type) async {
     final scores = _getInitialScores(type);
     AppState.session.reset(
       startScore: scores['start']!,
       minScore: scores['min']!,
     );
+
+    // Cache'i temizle veya güncelle (Eğer ülke listesi değişmişse diye)
+    _cachedCountryMap = null;
 
     if (type != GameType.borderpath) {
       await startNewRound();
@@ -73,59 +55,62 @@ class GameService {
     }
   }
 
-
   // --------------------------------------------------------------------------
   // ROUND MANAGEMENT
   // --------------------------------------------------------------------------
 
-  /// Yeni soru seçer ve butonları hazırlar
   static Future<void> startNewRound() async {
     debugPrint("🔄 Yeni soru seçiliyor...");
 
     final available = AppState.activePool;
     if (available.length < 4) {
-      debugPrint("⚠️ Yeterli ülke yok!");
+      debugPrint("⚠️ Yetersiz havuz boyutu: ${available.length}");
+      // Fallback: Tüm ülkeleri kullan veya hata fırlat
       return;
     }
 
-    // Hedef ülkeyi seç
-    AppState.targetCountry = available[_random.nextInt(available.length)];
+    // Hedef ülkeyi rastgele seç
+    AppState.targetCountry = available.pickRandom(_random);
 
-    // Çeldiricileri hazırla
-    final distractors = _getDistractors(available);
+    // Çeldiricileri optimize edilmiş algoritma ile seç
+    final distractors = _getDistractors(available, AppState.targetCountry);
 
-    // Tüm seçenekleri karıştır ve butonları oluştur
-    final options = [AppState.targetCountry, ...distractors]..shuffle();
+    // Seçenekleri oluştur ve karıştır
+    final options = [AppState.targetCountry, ...distractors]..shuffle(_random);
     AppState.buttons = GameButton.createButtons(options);
 
-    debugPrint("🎯 Hedef: ${AppState.targetCountry.englishName}");
+    debugPrint("🎯 Hedef: ${AppState.targetCountry.englishName} (${AppState.targetCountry.iso3})");
   }
 
-  static List<Country> _getDistractors(List<Country> available) {
-    // Aynı kıtadan adayları bul
-    final sameContinentOptions = available.where((c) {
-      return c.englishName != AppState.targetCountry.englishName &&
-          c.continents.any((cont) =>
-              AppState.targetCountry.continents.contains(cont));
-    }).toList()..shuffle();
+  /// Optimize edilmiş çeldirici algoritması
+  static List<Country> _getDistractors(List<Country> available, Country target) {
+    // 1. Aynı kıtadan adayları filtrele (Stream/Iterables kullanarak memory allocation'ı azalt)
+    final sameContinentCandidates = available.where((c) =>
+    c.iso3 != target.iso3 &&
+        c.continents.any((cont) => target.continents.contains(cont))
+    ).toList();
 
     final distractors = <Country>[];
-    distractors.addAll(sameContinentOptions.take(3));
 
-    // Yeterli değilse, rastgele tamamla
+    // Aynı kıtadan rastgele 3 tane al
+    if (sameContinentCandidates.isNotEmpty) {
+      distractors.addAll(sameContinentCandidates.pickRandomCount(3, _random));
+    }
+
+    // Eğer yetmediyse, kalan havuzdan rastgele tamamla
     if (distractors.length < 3) {
-      final otherOptions = available.where((c) {
-        return c.englishName != AppState.targetCountry.englishName &&
-            !distractors.any((d) => d.englishName == c.englishName);
-      }).toList()..shuffle();
+      final needed = 3 - distractors.length;
+      final otherCandidates = available.where((c) =>
+      c.iso3 != target.iso3 &&
+          !distractors.any((d) => d.iso3 == c.iso3)
+      ).toList();
 
-      distractors.addAll(otherOptions.take(3 - distractors.length));
+      distractors.addAll(otherCandidates.pickRandomCount(needed, _random));
     }
 
     return distractors;
   }
 
-  /// Pas geçme işlemi
   static Future<String> handlePass() async {
     AppState.session.submitPass();
     final passCountryName = AppState.targetCountry
@@ -135,24 +120,24 @@ class GameService {
   }
 
   // --------------------------------------------------------------------------
-  // STANDARD GAME ANSWER CHECK
+  // STANDARD GAME CHECK
   // --------------------------------------------------------------------------
 
-  /// Standart oyunlar için cevap kontrolü (Bayrak, Başkent, Sınır)
-  static Future<bool> checkStandardAnswer(String answer, GameType type, int? buttonIndex,) async {
+  static Future<bool> checkStandardAnswer(String answer, GameType type, int? buttonIndex) async {
     final isCorrect = AppState.targetCountry
         .checkAnswer(answer.trim(), AppState.settings.language);
 
     if (isCorrect) {
       AppState.session.submitCorrect();
-      GameLogService.saveProgress(AppState.getGameModeKey(type));
+      // await ekleyerek log işleminin bitmesini garantiye alıyoruz
+      await GameLogService.saveProgress(AppState.getGameModeKey(type));
       await startNewRound();
       return true;
+    } else {
+      AppState.session.submitWrong();
+      _disableButton(buttonIndex);
+      return false;
     }
-
-    AppState.session.submitWrong();
-    _disableButton(buttonIndex);
-    return false;
   }
 
   static void _disableButton(int? buttonIndex) {
@@ -167,38 +152,35 @@ class GameService {
   // DISTANCE GAME
   // --------------------------------------------------------------------------
 
-  /// Mesafe oyunu için tahmin işleme
   static Future<GuessResultModel?> processDistanceGuess(String inputText) async {
     if (inputText.isEmpty) return null;
 
     final guessedCountry = _findCountryByName(inputText);
     if (guessedCountry == null) {
-      debugPrint("Ülke bulunamadı: $inputText");
+      debugPrint("❌ Ülke bulunamadı: $inputText");
       return null;
     }
 
     AppState.tempCountry = guessedCountry;
 
+    final target = AppState.targetCountry;
+
+    // Mesafeyi ve yönü hesapla
     final distance = _calculateDistance(
-      guessedCountry.latitude,
-      guessedCountry.longitude,
-      AppState.targetCountry.latitude,
-      AppState.targetCountry.longitude,
+      guessedCountry.latitude, guessedCountry.longitude,
+      target.latitude, target.longitude,
     );
 
     final directionData = _calculateBearing(
-      guessedCountry.latitude,
-      guessedCountry.longitude,
-      AppState.targetCountry.latitude,
-      AppState.targetCountry.longitude,
+      guessedCountry.latitude, guessedCountry.longitude,
+      target.latitude, target.longitude,
     );
 
-    final isCorrect =
-        guessedCountry.englishName == AppState.targetCountry.englishName;
+    final isCorrect = guessedCountry.iso3 == target.iso3;
 
     if (isCorrect) {
       AppState.session.submitCorrect();
-      GameLogService.saveProgress("distance");
+      await GameLogService.saveProgress("distance");
     } else {
       AppState.session.submitWrong();
     }
@@ -206,149 +188,124 @@ class GameService {
     return GuessResultModel(
       countryName: guessedCountry.getLocalizedName(AppState.settings.language),
       distanceKm: distance,
-      directionText: directionData['text'] as String,
-      bearing: directionData['bearing'] as double,
+      directionText: directionData.directionText,
+      bearing: directionData.bearing,
       isCorrect: isCorrect,
     );
   }
 
   static Country? _findCountryByName(String name) {
-    try {
-      return AppState.allCountries.firstWhere(
-            (c) => c.checkAnswer(name, AppState.settings.language),
-      );
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // --------------------------------------------------------------------------
-  // BORDER PATH GAME
-  // --------------------------------------------------------------------------
-
-  static BorderPathGameData? createBorderPathGame() {
-    final filteredCountries = AppState.activePool
-        .where((c) => c.borders.isNotEmpty)
-        .toList();
-
-    if (filteredCountries.length < 2) return null;
-
-    final startCountry =
-    filteredCountries[_random.nextInt(filteredCountries.length)];
-
-    final validTargets = _findValidTargets(startCountry, filteredCountries);
-    if (validTargets.isEmpty) return null;
-
-    final targetCountry =
-    validTargets[_random.nextInt(validTargets.length)];
-    final optimalPath = calculateMinDistance(startCountry, targetCountry);
-
-    return BorderPathGameData(
-      startCountry: startCountry,
-      targetCountry: targetCountry,
-      optimalPathLength: optimalPath,
+    // try-catch bloğuna gerek yok, firstWhere orElse ile daha temiz çözülür
+    return AppState.allCountries.firstWhere(
+          (c) => c.checkAnswer(name, AppState.settings.language),
+      orElse: () => throw StateError('Country not found'), // orElse null dönemediği için hack
     );
   }
 
-  static List<Country> _findValidTargets(Country start, List<Country> candidates,) {
-    final validTargets = <Country>[];
+  // --------------------------------------------------------------------------
+  // BORDER PATH GAME (Optimized)
+  // --------------------------------------------------------------------------
 
-    for (var country in candidates) {
-      if (country.iso3 == start.iso3) continue;
+  static BorderPathGameData? createBorderPathGame() {
+    // Sınır komşusu olan ülkeleri filtrele (sadece bir kez yapılmalı aslında ama şimdilik burada kalsın)
+    final connectedCountries = AppState.activePool
+        .where((c) => c.borders.isNotEmpty)
+        .toList();
 
-      final distance = calculateMinDistance(start, country);
-      if (distance >= 2 && distance <= 5) {
-        validTargets.add(country);
+    if (connectedCountries.length < 2) return null;
+
+    // Deneme sayısını sınırlayarak sonsuz döngüyü engelle
+    for (int i = 0; i < 15; i++) {
+      final startCountry = connectedCountries.pickRandom(_random);
+
+      // BFS ile erişilebilir mesafeleri al
+      // NOT: _countryMap artık önbellekten geliyor, performans kaybı yok.
+      final reachableDistances = _bfsDistances(startCountry);
+
+      // Hedefleri filtrele (Mesafe 2-5 arası)
+      final validTargets = connectedCountries.where((c) {
+        if (c.iso3 == startCountry.iso3) return false;
+        final dist = reachableDistances[c.iso3];
+        return dist != null && dist >= 2 && dist <= 5;
+      }).toList();
+
+      if (validTargets.isNotEmpty) {
+        final targetCountry = validTargets.pickRandom(_random);
+        return BorderPathGameData(
+          startCountry: startCountry,
+          targetCountry: targetCountry,
+          optimalPathLength: reachableDistances[targetCountry.iso3]!,
+        );
       }
     }
-
-    // Fallback: Herhangi bir farklı ülke
-    if (validTargets.isEmpty) {
-      return candidates.where((c) => c.iso3 != start.iso3).toList();
-    }
-
-    return validTargets;
+    return null;
   }
 
-  /// BFS ile iki ülke arasındaki minimum mesafe
-  static int calculateMinDistance(Country start, Country target) {
-    if (start.iso3 == target.iso3) return 0;
-
+  /// BFS Algoritması (Optimize Edilmiş)
+  static Map<String, int> _bfsDistances(Country start) {
     final distances = <String, int>{start.iso3: 0};
-    final queue = <Country>[start];
+    final queue = <String>[start.iso3]; // Queue'da sadece ISO string tutmak daha hafiftir
+
+    // Cachelenmiş haritayı kullan
+    final map = _countryMap;
+
     var head = 0;
-
     while (head < queue.length) {
-      final current = queue[head++];
-      final currentDistance = distances[current.iso3]!;
+      final currentIso = queue[head++];
+      final currentDist = distances[currentIso]!;
 
-      for (var neighborIso3 in current.borders) {
-        if (distances.containsKey(neighborIso3)) continue;
+      // Haritadan ülkeyi güvenli çek
+      final currentCountry = map[currentIso];
+      if (currentCountry == null) continue;
 
-        final neighbor = AppState.allCountries
-            .where((c) => c.iso3 == neighborIso3)
-            .firstOrNull;
-
-        if (neighbor == null) continue;
-
-        distances[neighborIso3] = currentDistance + 1;
-
-        if (neighborIso3 == target.iso3) {
-          return currentDistance + 1;
+      for (var neighborIso in currentCountry.borders) {
+        if (!distances.containsKey(neighborIso)) {
+          // Komşunun geçerli bir ülke olup olmadığını kontrol et (Veri tutarlılığı için)
+          if (map.containsKey(neighborIso)) {
+            distances[neighborIso] = currentDist + 1;
+            queue.add(neighborIso);
+          }
         }
-
-        queue.add(neighbor);
       }
     }
-
-    return 999; // Ulaşılamaz
+    return distances;
   }
 
-  /// Border Path oyunu tamamlandığında puan kaydet
-  static Future<void> completeBorderPathGame(int moves, int optimalMoves,) async {
+  static Future<void> completeBorderPathGame(int moves, int optimalMoves) async {
     AppState.session.submitCorrect();
 
-    final wrongCount = math.max(0, moves - optimalMoves);
-    for (var i = 0; i < wrongCount; i++) {
-      AppState.session.submitWrong();
+    final penalty = math.max(0, moves - optimalMoves);
+    if (penalty > 0) {
+      AppState.session.wrongCount += penalty;
     }
 
-    GameLogService.saveProgress("borderpath");
-
-    debugPrint("🏆 Border Path tamamlandı!");
-    debugPrint("📊 Hamle: $moves, Optimal: $optimalMoves");
+    await GameLogService.saveProgress("borderpath");
+    debugPrint("🏆 Border Path: $moves hamle (Optimal: $optimalMoves)");
   }
 
   // --------------------------------------------------------------------------
-  // MATHEMATICAL HELPERS
+  // MATH HELPERS
   // --------------------------------------------------------------------------
 
-  /// Haversine formülü ile mesafe hesaplama
-  static double _calculateDistance(double lat1, double lon1, double lat2, double lon2,) {
-    const earthRadius = 6371.0; // km
-    double toRad(double degree) => degree * math.pi / 180.0;
+  static double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const r = 6371.0; // Dünya yarıçapı (km)
+    double toRad(double d) => d * math.pi / 180.0;
 
     final dLat = toRad(lat2 - lat1);
     final dLon = toRad(lon2 - lon1);
 
     final a = math.pow(math.sin(dLat / 2), 2) +
-        math.cos(toRad(lat1)) *
-            math.cos(toRad(lat2)) *
+        math.cos(toRad(lat1)) * math.cos(toRad(lat2)) *
             math.pow(math.sin(dLon / 2), 2);
 
     final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return (earthRadius * c).roundToDouble();
+    return (r * c).roundToDouble(); // Virgülden sonrasını temizle
   }
 
-  /// Yön (bearing) hesaplama
-  static Map<String, dynamic> _calculateBearing(
-      double lat1,
-      double lon1,
-      double lat2,
-      double lon2,
-      ) {
-    double toRad(double deg) => deg * math.pi / 180.0;
-    double toDeg(double rad) => rad * 180.0 / math.pi;
+  static ({String directionText, double bearing}) _calculateBearing(double lat1, double lon1, double lat2, double lon2) {
+
+    double toRad(double d) => d * math.pi / 180.0;
+    double toDeg(double r) => r * 180.0 / math.pi;
 
     final phi1 = toRad(lat1);
     final phi2 = toRad(lat2);
@@ -358,20 +315,45 @@ class GameService {
     final x = math.cos(phi1) * math.sin(phi2) -
         math.sin(phi1) * math.cos(phi2) * math.cos(dLon);
 
-    var bearing = toDeg(math.atan2(y, x));
-    bearing = (bearing + 360) % 360;
+    final bearing = (toDeg(math.atan2(y, x)) + 360) % 360;
 
-    const directionKeys = [
+    // Yön metnini belirle (Record pattern)
+    const sectors = [
       "north", "north_east", "east", "south_east",
       "south", "south_west", "west", "north_west"
     ];
 
+    // 360 dereceyi 8 dilime böl (her biri 45 derece)
+    // +22.5 ofseti kaydırarak dilimleri ortalarız (Örn: North 337.5 - 22.5 arasıdır)
     final index = ((bearing + 22.5) / 45.0).floor() % 8;
-    final directionText = Localization.t("directions.${directionKeys[index]}");
 
-    return {
-      'text': directionText,
-      'bearing': bearing,
-    };
+    return (
+    directionText: Localization.t("directions.${sectors[index]}"),
+    bearing: bearing
+    );
   }
 }
+
+// ============================================================================
+// HELPER EXTENSIONS (CLEAN CODE)
+// ============================================================================
+
+extension ListRandomExtension<T> on List<T> {
+  /// Listeden rastgele bir eleman döner
+  T pickRandom(math.Random random) {
+    return this[random.nextInt(length)];
+  }
+
+  /// Listeden rastgele [count] adet benzersiz eleman seçer
+  List<T> pickRandomCount(int count, math.Random random) {
+    if (isEmpty) return [];
+    if (length <= count) return List.from(this)..shuffle(random);
+
+    final temp = List<T>.from(this)..shuffle(random);
+    return temp.take(count).toList();
+  }
+}
+
+// ============================================================================
+// MODELS (Moved to bottom for single-file structure)
+// ============================================================================

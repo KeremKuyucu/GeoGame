@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 // Modeller
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
+import 'package:geogame/models/game_metadata.dart';
 
 // Servisler
 import 'package:geogame/services/localization_service.dart';
@@ -16,8 +16,8 @@ import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/game_service.dart';
 
 // Widgetlar
+import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/custom_notification.dart';
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 
 class FlagGame extends StatefulWidget {
   const FlagGame({super.key});
@@ -185,9 +185,10 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
             icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               GameLogService.syncPendingLogs();
-              Navigator.pushReplacement(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainScaffold()),
+                '/home',
+                    (route) => false,
               );
             },
           ),
@@ -274,8 +275,6 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
 
   // --- WIDGET PARÇALARI ---
 
-  /// SADECE KONTROL: Asset'in varlığını kontrol eder.
-  /// FutureBuilder'ın 'future:' kısmına bunu vereceğiz.
   Future<bool> _checkFlagAsset(String iso2) async {
     final String assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
     try {
@@ -287,7 +286,6 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
     }
   }
 
-  /// SADECE ÇİZİM: Kontrol sonucuna göre uygun Widget'ı döner.
   Widget _buildFlagImage(bool exists, String iso2, String url) {
     if (exists) {
       return Image.asset(

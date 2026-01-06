@@ -1,16 +1,20 @@
 // lib/screens/games/borderpath/borderpath_screen.dart
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
+
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game/border_path_data.dart';
+import 'package:geogame/models/game_metadata.dart';
+
 import 'package:geogame/widgets/drawer_widget.dart';
+
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/game_service.dart';
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
-import 'package:http/http.dart' as http;
-import 'dart:math';
 
 class BorderPathGame extends StatefulWidget {
   const BorderPathGame({super.key});
@@ -392,9 +396,10 @@ class _BorderPathGameState extends State<BorderPathGame> {
             onPressed: () {
               GameLogService.syncPendingLogs();
               Navigator.of(context).pop();
-              Navigator.pushReplacement(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainScaffold()),
+                '/home',
+                    (route) => false,
               );
             },
             child: Text(Localization.t('game_common.main_menu')),
@@ -490,9 +495,10 @@ class _BorderPathGameState extends State<BorderPathGame> {
             icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               GameLogService.syncPendingLogs();
-              Navigator.pushReplacement(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainScaffold()),
+                '/home',
+                    (route) => false,
               );
             },
           ),
@@ -1087,9 +1093,9 @@ class PathMapPainter extends CustomPainter {
     final double offsetY = (size.height - (combinedBounds.height * scale)) / 2;
 
     final Matrix4 matrix = Matrix4.identity();
-    matrix.translate(offsetX, offsetY);
-    matrix.scale(scale, scale);
-    matrix.translate(-combinedBounds.left, -combinedBounds.top);
+    matrix.translateByDouble(offsetX, offsetY, 0.0, 1.0);
+    matrix.scaleByDouble(scale, scale, 1.0, 1.0);
+    matrix.translateByDouble(-combinedBounds.left, -combinedBounds.top, 0.0, 1.0);
 
     // 1. Hedef ülke (Hayalet)
     if (paths.containsKey(targetCountry.iso3) &&

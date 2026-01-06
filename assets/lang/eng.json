@@ -147,9 +147,7 @@
     "multiple_choice_mode": "Multiple Choice Mode",
     "continent_title": "Continent Options",
     "un_members": "Countries without UN Membership",
-    "continent_warning_title": "Warning",
     "no_continent_active": "No continent is active.",
-    "activate_continent_prompt": "Please activate at least one continent.",
     "continents": {
       "south_america": "Countries in South America",
       "north_america": "Countries in North America",

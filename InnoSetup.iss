@@ -9,7 +9,7 @@ AppVersion=1.5.4
 AppPublisher=Kerem Kuyucu
 DefaultDirName={localappdata}\GeoGame
 DefaultGroupName=GeoGame
-OutputDir=C:\Users\Kerem\Projects
+OutputDir=C:\Users\Kerem\Projects\APKs
 OutputBaseFilename=GeoGame_Installer
 Compression=lzma
 SolidCompression=yes
@@ -23,11 +23,11 @@ ArchitecturesInstallIn64BitMode=x64
 
 [Files]
 ; Uygulama ikonu
-Source: "C:\Users\Kerem\Projects\Flutter\geogame\assets\images\logo.ico"; \
+Source: "C:\Users\Kerem\Projects\geogame-flutter\assets\images\logo.ico"; \
 DestDir: "{app}"; Flags: ignoreversion
 
 ; Flutter Windows Release çıktısının TAMAMI
-Source: "C:\Users\Kerem\Projects\flutter\geogame\build\windows\x64\runner\Release\*"; \
+Source: "C:\Users\Kerem\Projects\geogame-flutter\build\windows\x64\runner\Release\*"; \
 DestDir: "{app}"; \
 Flags: recursesubdirs createallsubdirs ignoreversion
 

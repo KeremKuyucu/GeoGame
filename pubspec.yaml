@@ -35,6 +35,7 @@ flutter_icons:
     "generate": true
   }
   image_path: "assets/images/logo.png"
+# flutter pub run flutter_launcher_icons:main
 
 flutter:
   uses-material-design: true

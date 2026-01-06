@@ -3,11 +3,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
+import 'package:geogame/models/game_metadata.dart';
 
 // Servisler
 import 'package:geogame/services/localization_service.dart';
@@ -16,8 +17,7 @@ import 'package:geogame/services/game_service.dart';
 
 // Widgetlar
 import 'package:geogame/widgets/custom_notification.dart';
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
-import 'package:http/http.dart' as http;
+import 'package:geogame/widgets/drawer_widget.dart';
 
 class BorderLineGame extends StatefulWidget {
   const BorderLineGame({super.key});
@@ -275,9 +275,10 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
             icon: const Icon(Icons.home, color: Colors.white),
             onPressed: () {
               GameLogService.syncPendingLogs();
-              Navigator.pushReplacement(
+              Navigator.pushNamedAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const MainScaffold()),
+                '/home',
+                    (route) => false,
               );
             },
           ),
@@ -644,9 +645,9 @@ class CountryShapePainter extends CustomPainter {
     final double offsetX = (size.width - (bounds.width * scale)) / 2;
     final double offsetY = (size.height - (bounds.height * scale)) / 2;
 
-    matrix.translate(offsetX, offsetY);
-    matrix.scale(scale, scale);
-    matrix.translate(-bounds.left, -bounds.top);
+    matrix.translateByDouble(offsetX, offsetY, 0.0, 1.0);
+    matrix.scaleByDouble(scale, scale, 1.0, 1.0);
+    matrix.translateByDouble(-bounds.left, -bounds.top, 0.0, 1.0);
 
     // 4. Dönüştürülmüş path'i oluştur
     final Path transformedPath = path.transform(matrix.storage);

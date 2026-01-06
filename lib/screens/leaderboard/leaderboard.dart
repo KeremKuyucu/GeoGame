@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:geogame/widgets/drawer_widget.dart';
-import 'package:geogame/services/localization_service.dart';
-// Userprofile importunu kaldırdık
 import 'package:geogame/widgets/profile_view_widget.dart';
 
-import 'package:geogame/models/app_context.dart'; // Bunu eklemeyi unutma
+import 'package:geogame/services/localization_service.dart';
+
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/game_metadata.dart';
 
 class Leaderboard extends StatefulWidget {
   const Leaderboard({super.key});
