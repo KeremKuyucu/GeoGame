@@ -3,6 +3,8 @@ import 'package:geogame/models/countries.dart'; // Country modelinin burada oldu
 import 'package:geogame/models/game_metadata.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:geogame/services/localization_service.dart';
+
 
 // --- 1. ANA DURUM YÖNETİCİSİ (AppState) ---
 class AppState extends ChangeNotifier {
@@ -105,8 +107,8 @@ class UserProfile {
 
   factory UserProfile.anonymous() {
     return UserProfile(
-      name: 'Misafir',
-      avatarUrl: 'https://geogame-cdn.keremkk.com.tr/anon.png',
+      name: Localization.t('settings.guest'),
+      avatarUrl: 'https://robohash.org/kaplan.png?set=set4',
     );
   }
 
@@ -114,8 +116,8 @@ class UserProfile {
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
-      name: map['name'] ?? 'Misafir',
-      avatarUrl: map['avatarUrl'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+      name: map['name'] ?? Localization.t('settings.guest'),
+      avatarUrl: map['avatarUrl'] ?? 'https://robohash.org/kaplan.png?set=set4',
     );
   }
 }

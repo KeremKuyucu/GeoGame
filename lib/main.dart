@@ -13,8 +13,8 @@ import 'package:geogame/screens/games/flag/flag_screen.dart';
 import 'package:geogame/screens/leaderboard/leaderboard.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 import 'package:geogame/screens/profiles/profiles.dart';
-import 'package:geogame/screens/settings/settings.dart';
-import 'package:geogame/screens/auth/auth_page.dart';
+import 'package:geogame/screens/settings/settings_screen.dart';
+import 'package:geogame/screens/auth/auth_screen.dart';
 import 'package:geogame/screens/edit_profile/edit_profile.dart';
 
 import 'package:geogame/models/app_context.dart';

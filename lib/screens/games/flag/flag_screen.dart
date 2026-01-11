@@ -1,9 +1,6 @@
 // lib/screens/games/flag/flag_screen.dart
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
@@ -18,6 +15,7 @@ import 'package:geogame/services/game_service.dart';
 // Widgetlar
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/custom_notification.dart';
+import 'package:geogame/widgets/flag_loader.dart';
 
 class FlagGame extends StatefulWidget {
   const FlagGame({super.key});
@@ -220,7 +218,7 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: FutureBuilder<bool>(
-                          future: _checkFlagAsset(AppState.targetCountry.iso2),
+                          future: FlagLoader.checkFlagAsset(AppState.targetCountry.iso2),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const SizedBox(
@@ -231,7 +229,12 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
 
                             final bool exists = snapshot.data ?? false;
 
-                            return _buildFlagImage(exists, AppState.targetCountry.iso2, AppState.targetCountry.flagUrl);
+                            return FlagLoader.buildFlagImage(
+                              existsLocally: exists,
+                              iso2: AppState.targetCountry.iso2,
+                              url: AppState.targetCountry.flagUrl,
+                              height: 250,
+                            );
                           },
                         )
                       ),
@@ -274,43 +277,6 @@ class _FlagGameState extends State<FlagGame> with SingleTickerProviderStateMixin
   }
 
   // --- WIDGET PARÇALARI ---
-
-  Future<bool> _checkFlagAsset(String iso2) async {
-    final String assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
-    try {
-      final manifestContent = await rootBundle.loadString('AssetManifest.json');
-      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-      return manifestMap.containsKey(assetPath);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Widget _buildFlagImage(bool exists, String iso2, String url) {
-    if (exists) {
-      return Image.asset(
-        'assets/flags/${iso2.toLowerCase()}.webp',
-        width: double.infinity,
-        height: 250,
-        fit: BoxFit.contain,
-      );
-    } else {
-      return Image.network(
-        url,
-        width: double.infinity,
-        height: 250,
-        fit: BoxFit.contain,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const SizedBox(
-            height: 250,
-            child: Center(child: CircularProgressIndicator()),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) => const Icon(Icons.flag, size: 100),
-      );
-    }
-  }
 
   Widget _buildButtonModeUI(BuildContext context) {
     return Column(

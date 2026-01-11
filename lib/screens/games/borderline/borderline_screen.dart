@@ -1,9 +1,6 @@
 // lib/screens/games/borderline/borderline_screen.dart
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
 
 // Modeller
 import 'package:geogame/models/app_context.dart';
@@ -14,10 +11,12 @@ import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/game_service.dart';
+import 'package:geogame/services/geojson_service.dart';
 
 // Widgetlar
 import 'package:geogame/widgets/custom_notification.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
+import 'package:geogame/widgets/flag_loader.dart';
 
 class BorderLineGame extends StatefulWidget {
   const BorderLineGame({super.key});
@@ -61,7 +60,7 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
 
     // Seçilen ülkeye göre path oluşturma işlemini başlat
     setState(() {
-      _countryShapePathFuture = _loadAndParseGeoJson(AppState.targetCountry.iso3);
+      _countryShapePathFuture = GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);
     });
 
     _animController.forward(from: 0.0);
@@ -69,95 +68,6 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showRulesDialog();
     });
-  }
-
-  /// GeoJSON dosyasını okuyip Flutter Path nesnesine çeviren kritik fonksiyon
-  Future<Path?> _loadAndParseGeoJson(String isoCode) async {
-    Path path = Path();
-
-    // 1. Yerelden dene
-    try {
-      final String jsonString =
-      await rootBundle.loadString('assets/geojson/${isoCode.toLowerCase()}.geo.json');
-      final Map<String, dynamic> jsonData = jsonDecode(jsonString);
-      _parseGeoJsonToPath(jsonData, path);
-      return path;
-    } catch (e) {
-      debugPrint("Yerel GeoJSON yükleme hatası ($isoCode): $e");
-    }
-
-    // 2. Network fallback
-    try {
-      final Uri url = Uri.parse(
-          'https://raw.githubusercontent.com/mledoze/countries/master/data/${isoCode.toLowerCase()}.geo.json');
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        _parseGeoJsonToPath(jsonData, path);
-        return path;
-      } else {
-        debugPrint("GeoJSON network hatası: ${response.statusCode}");
-      }
-    } catch (e) {
-      debugPrint("GeoJSON Network Hatası ($isoCode): $e");
-    }
-
-    return null;
-  }
-
-  /// GeoJSON yapısını ayrıştırır
-  void _parseGeoJsonToPath(Map<String, dynamic> json, Path path) {
-    if (json.isEmpty || json['type'] == null) return;
-
-    final String type = json['type'];
-
-    switch (type) {
-      case 'FeatureCollection':
-        final features = json['features'] as List<dynamic>? ?? [];
-        for (var feature in features) {
-          if (feature is Map<String, dynamic>) {
-            _parseGeoJsonToPath(feature, path);
-          }
-        }
-        break;
-      case 'Feature':
-        final geometry = json['geometry'] as Map<String, dynamic>?;
-        if (geometry != null) _parseGeoJsonToPath(geometry, path);
-        break;
-      case 'Polygon':
-        final coordinates = json['coordinates'] as List<dynamic>? ?? [];
-        _addPolygonToPath(path, coordinates);
-        break;
-      case 'MultiPolygon':
-        final polygons = json['coordinates'] as List<dynamic>? ?? [];
-        for (var polygon in polygons) {
-          _addPolygonToPath(path, polygon as List<dynamic>);
-        }
-        break;
-      default:
-        debugPrint("Bilinmeyen GeoJSON tipi: $type");
-    }
-  }
-
-  /// Koordinat listesini Path'e ekleyen yardımcı metod
-  void _addPolygonToPath(Path path, List polygonCoords) {
-    for (var ring in polygonCoords) {
-      if (ring.isEmpty) continue;
-
-      // İlk nokta
-      final start = ring[0] as List<dynamic>;
-      double startX = (start[0] as num).toDouble();
-      double startY = -(start[1] as num).toDouble(); // Y ekseni ters çevrildi
-      path.moveTo(startX, startY);
-
-      for (int i = 1; i < ring.length; i++) {
-        final point = ring[i] as List<dynamic>;
-        double x = (point[0] as num).toDouble();
-        double y = -(point[1] as num).toDouble();
-        path.lineTo(x, y);
-      }
-      path.close();
-    }
   }
 
   Future<void> _showRulesDialog() async {
@@ -213,7 +123,7 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
     setState(() {
       if (isCorrect) {
         _controller.clear();
-        _countryShapePathFuture = _loadAndParseGeoJson(AppState.targetCountry.iso3);
+        _countryShapePathFuture = GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);
         _animController.forward(from: 0.0);
       } else {
         _controller.clear();
@@ -236,7 +146,7 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
 
     setState(() {
       _controller.clear();
-      _countryShapePathFuture = _loadAndParseGeoJson(AppState.targetCountry.iso3);
+      _countryShapePathFuture = GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);
       _animController.forward(from: 0.0);
     });
   }
@@ -531,21 +441,10 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
                                 ),
                               ],
                             ),
-                            child: FutureBuilder<Widget>(
-                              future: _loadOptionFlag(option.iso2, option.flagUrl),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const SizedBox(
-                                    width: 40,
-                                    height: 40,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  );
-                                } else if (snapshot.hasData) {
-                                  return snapshot.data!;
-                                } else {
-                                  return const Icon(Icons.flag);
-                                }
-                              },
+                            child: FlagWidget(
+                              iso2: option.iso2,
+                              flagUrl: option.flagUrl,
+                              size: 40,
                             ),
                           ),
                           title: Text(
@@ -564,49 +463,6 @@ class _BorderLineGameState extends State<BorderLineGame> with SingleTickerProvid
         }
     );
   }
-}
-
-Future<Widget> _loadOptionFlag(String iso2, String url) async {
-  final assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
-  bool exists = false;
-
-  try {
-    // WebP bir resim olduğu için loadString değil, doğrudan load (ByteData) kullanılır.
-    // Ancak en hızlı kontrol yolu AssetManifest'tir.
-    final manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-    exists = manifestMap.containsKey(assetPath);
-  } catch (_) {
-    exists = false;
-  }
-
-  if (exists) {
-    return ClipOval(
-      child: Image.asset(
-        assetPath,
-        width: 40,
-        height: 40,
-        fit: BoxFit.cover,
-        // Beklenmedik bir durumda asset yüklenemezse network'e düş
-        errorBuilder: (context, error, stackTrace) => _networkImage(url),
-      ),
-    );
-  } else {
-    return _networkImage(url);
-  }
-}
-
-// Kod tekrarını önlemek için yardımcı fonksiyon
-Widget _networkImage(String url) {
-  return ClipOval(
-    child: Image.network(
-      url,
-      width: 40,
-      height: 40,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => const Icon(Icons.flag, size: 24),
-    ),
-  );
 }
 
 
