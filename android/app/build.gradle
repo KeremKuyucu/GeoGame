@@ -35,26 +35,40 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
+    // Keystore configuration
+    def keystorePropertiesFile = rootProject.file("key.properties")
+    def keystoreProperties = new Properties()
+    def hasValidKeystore = false
+    
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        hasValidKeystore = keystoreProperties['storeFile'] != null && 
+                          keystoreProperties['storeFile'] != ''
+    }
+    
     signingConfigs {
-        debug {
-            storeFile file("C:\\Users\\Kerem\\Projects\\geogame-flutter\\ksk.jks")
-            storePassword "kerem2008"
-            keyAlias "ksk"
-            keyPassword "kerem2008"
-        }
-        release {
-            storeFile file("C:\\Users\\Kerem\\Projects\\geogame-flutter\\ksk.jks")
-            storePassword "kerem2008"
-            keyAlias "ksk"
-            keyPassword "kerem2008"
+        if (hasValidKeystore) {
+            release {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
         }
     }
+    
     buildTypes {
         debug {
             signingConfig = signingConfigs.debug
         }
         release {
-            signingConfig signingConfigs.release
+            if (hasValidKeystore) {
+                signingConfig signingConfigs.release
+            } else {
+                // Fallback to debug signing when no keystore is configured
+                signingConfig signingConfigs.debug
+                println "WARNING: No valid keystore found. Using debug signing for release build."
+            }
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
