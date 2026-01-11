@@ -43,10 +43,16 @@ try {
         $menuActive = $true
         
         Write-Host "`n--- Platform Secimi ---" -ForegroundColor Cyan
-        Write-Host "Yukari/Asagi: Gezinme | Space: Sec/Kaldir | Enter: Onayla`n" -ForegroundColor DarkGray
+        Write-Host "Yukari/Asagi: Gezinme | Space: Sec/Kaldir | Enter: Onayla" -ForegroundColor DarkGray
+        Write-Host ""
+        
+        # Ilk cizim icin bos satirlar olustur
+        for ($i = 0; $i -lt $platforms.Count; $i++) {
+            Write-Host ""
+        }
         
         while ($menuActive) {
-            # Menuyu ciz
+            # Cursor'u menu basina geri al
             [Console]::SetCursorPosition(0, [Console]::CursorTop - $platforms.Count)
             
             for ($i = 0; $i -lt $platforms.Count; $i++) {
@@ -54,7 +60,8 @@ try {
                 $checkbox = if ($platforms[$i].Selected) { "[X]" } else { "[ ]" }
                 $color = if ($i -eq $currentIndex) { "Yellow" } else { "White" }
                 
-                Write-Host "$prefix$checkbox $($platforms[$i].Name)" -ForegroundColor $color
+                # Satiri temizle ve yeniden yaz
+                Write-Host "$prefix$checkbox $($platforms[$i].Name)".PadRight(30) -ForegroundColor $color
             }
             
             # Tus okuma
