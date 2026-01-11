@@ -1,9 +1,6 @@
 // lib/screens/games/borderpath/borderpath_screen.dart
-import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
@@ -11,10 +8,12 @@ import 'package:geogame/models/game/border_path_data.dart';
 import 'package:geogame/models/game_metadata.dart';
 
 import 'package:geogame/widgets/drawer_widget.dart';
+import 'package:geogame/widgets/flag_loader.dart';
 
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/game_service.dart';
+import 'package:geogame/services/geojson_service.dart';
 
 class BorderPathGame extends StatefulWidget {
   const BorderPathGame({super.key});
@@ -77,8 +76,8 @@ class _BorderPathGameState extends State<BorderPathGame> {
 
     // 2. İki ülkeyi de PARALEL (aynı anda) yükle ve bekle
     final List<Path?> results = await Future.wait([
-      _loadAndParseGeoJson(startCountry!.iso3),
-      _loadAndParseGeoJson(targetCountry!.iso3),
+      GeoJsonService.loadCountryPathSimplified(startCountry!.iso3),
+      GeoJsonService.loadCountryPathSimplified(targetCountry!.iso3),
     ]);
 
     if (!mounted) return;
@@ -123,7 +122,7 @@ class _BorderPathGameState extends State<BorderPathGame> {
   Future<void> _loadCountryPath(Country country) async {
     if (countryPaths.containsKey(country.iso3)) return;
 
-    final path = await _loadAndParseGeoJson(country.iso3);
+    final path = await GeoJsonService.loadCountryPathSimplified(country.iso3);
     if (path != null) {
       if (!mounted) return;
       setState(() {
@@ -135,118 +134,16 @@ class _BorderPathGameState extends State<BorderPathGame> {
     }
   }
 
-  /// GeoJSON dosyasını okuyup Flutter Path nesnesine çeviren fonksiyon
-  Future<Path?> _loadAndParseGeoJson(String isoCode) async {
-    Path path = Path();
-
-    // 1. Yerelden dene
-    try {
-      final String jsonString =
-      await rootBundle.loadString('assets/geojson/${isoCode.toLowerCase()}.geo.json');
-      final Map<String, dynamic> jsonData = jsonDecode(jsonString);
-      _parseGeoJsonToPath(jsonData, path);
-      return path;
-    } catch (e) {
-      debugPrint("Local GeoJSON upload error ($isoCode): $e");
-    }
-
-    // 2. Network fallback
-    try {
-      final Uri url = Uri.parse(
-          'https://raw.githubusercontent.com/mledoze/countries/master/data/${isoCode.toLowerCase()}.geo.json');
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        _parseGeoJsonToPath(jsonData, path);
-        return path;
-      } else {
-        debugPrint("GeoJSON network hatası: ${response.statusCode}");
-      }
-    } catch (e) {
-      debugPrint("GeoJSON Network Hatası ($isoCode): $e");
-    }
-
-    return null;
-  }
-
-  /// GeoJSON yapısını ayrıştırır
-  void _parseGeoJsonToPath(Map<String, dynamic> json, Path path) {
-    if (json.isEmpty || json['type'] == null) return;
-
-    final String type = json['type'];
-
-    switch (type) {
-      case 'FeatureCollection':
-        final features = json['features'] as List<dynamic>? ?? [];
-        for (var feature in features) {
-          if (feature is Map<String, dynamic>) {
-            _parseGeoJsonToPath(feature, path);
-          }
-        }
-        break;
-      case 'Feature':
-        final geometry = json['geometry'] as Map<String, dynamic>?;
-        if (geometry != null) _parseGeoJsonToPath(geometry, path);
-        break;
-      case 'Polygon':
-        final coordinates = json['coordinates'] as List<dynamic>? ?? [];
-        _addPolygonToPath(path, coordinates);
-        break;
-      case 'MultiPolygon':
-        final polygons = json['coordinates'] as List<dynamic>? ?? [];
-        for (var polygon in polygons) {
-          _addPolygonToPath(path, polygon as List<dynamic>);
-        }
-        break;
-      default:
-        debugPrint("Bilinmeyen GeoJSON tipi: $type");
-    }
-  }
-
-  /// Koordinat listesini Path'e ekleyen yardımcı metod
-  void _addPolygonToPath(Path path, List polygonCoords) {
-    for (var ring in polygonCoords) {
-      if (ring.isEmpty) continue;
-
-      if (ring.length < 5) continue;
-
-      final start = ring[0] as List<dynamic>;
-      double startX = (start[0] as num).toDouble();
-      double startY = -(start[1] as num).toDouble();
-      path.moveTo(startX, startY);
-
-      for (int i = 1; i < ring.length; i++) {
-        if (ring.length > 100 && i % 2 != 0) continue;
-
-        final point = ring[i] as List<dynamic>;
-        double x = (point[0] as num).toDouble();
-        double y = -(point[1] as num).toDouble();
-        path.lineTo(x, y);
-      }
-      path.close();
-    }
-  }
-
   void _updateAvailableNeighbors() {
     if (currentPath.isEmpty) return;
 
-    Country lastCountry = currentPath.last;
-    availableNeighbors = [];
-
-    for (String borderIso3 in lastCountry.borders) {
-      Country? neighbor = AppState.allCountries
-          .where((c) => c.iso3 == borderIso3)
-          .firstOrNull;
-
-      if (neighbor != null && !currentPath.contains(neighbor)) {
-        availableNeighbors.add(neighbor);
-        _loadCountryPath(neighbor);
-      }
+    // GameService'den komşuları al
+    availableNeighbors = GameService.getAvailableNeighbors(currentPath);
+    
+    // Her komşu için path'i yükle
+    for (Country neighbor in availableNeighbors) {
+      _loadCountryPath(neighbor);
     }
-
-    availableNeighbors.sort((a, b) => a
-        .getLocalizedName(Localization.currentLanguage)
-        .compareTo(b.getLocalizedName(Localization.currentLanguage)));
   }
 
   void _selectCountry(Country country) {
@@ -280,24 +177,6 @@ class _BorderPathGameState extends State<BorderPathGame> {
     });
   }
 
-  // --- Helpers for Keyboard Mode ---
-  Future<Widget> _loadOptionFlag(String iso2, String flagUrl) async {
-    try {
-      return ClipOval(
-        child: Image.network(
-          flagUrl,
-          width: 40,
-          height: 40,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-          const Icon(Icons.flag, color: Colors.grey),
-        ),
-      );
-    } catch (e) {
-      return const Icon(Icons.flag, color: Colors.grey);
-    }
-  }
-  // ---------------------------------
 
   void _showRulesDialog() {
     showDialog(
@@ -1014,21 +893,10 @@ class _BorderPathGameState extends State<BorderPathGame> {
                                 ),
                               ],
                             ),
-                            child: FutureBuilder<Widget>(
-                              future: _loadOptionFlag(option.iso2, option.flagUrl),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const SizedBox(
-                                    width: 40,
-                                    height: 40,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  );
-                                } else if (snapshot.hasData) {
-                                  return snapshot.data!;
-                                } else {
-                                  return const Icon(Icons.flag);
-                                }
-                              },
+                            child: FlagWidget(
+                              iso2: option.iso2,
+                              flagUrl: option.flagUrl,
+                              size: 40,
                             ),
                           ),
                           title: Text(

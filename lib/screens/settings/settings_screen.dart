@@ -1,10 +1,10 @@
+// lib/screens/settings/settings_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:theme_mode_builder/theme_mode_builder.dart';
-import 'dart:async';
 
 import 'package:geogame/models/app_context.dart';
 
-import 'package:geogame/services/preferences_service.dart';
+import 'package:geogame/services/settings_service.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 
@@ -38,9 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
     await Navigator.pushNamed(context, '/profile/edit');
 
     if (mounted) {
-      setState(() {
-        // Profil verilerini güncelleyen servis çağrısı buraya gelebilir
-      });
+      setState(() {});
     }
   }
 
@@ -59,9 +57,9 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void restartApp(BuildContext context) async {
+  void _restartApp(BuildContext context) async {
     AppState.selectedIndex = 0;
-    await Localization.init(userPref: AppState.settings.language);
+    await Localization.init(userPref: SettingsService.currentLanguage);
     if (context.mounted) {
       RestartWidget.restartApp(context);
     }
@@ -70,7 +68,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    // iOS Settings tarzı arka plan renkleri
     final Color backgroundColor = isDark ? const Color(0xFF000000) : const Color(0xFFF2F2F7);
 
     return Scaffold(
@@ -85,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.transparent, // Saydam AppBar
+        backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
@@ -125,10 +122,9 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // --- BÖLÜM 1: HESAP KARTI (YENİ TASARIM) ---
+  // --- BÖLÜM 1: HESAP KARTI ---
 
   Widget _buildAccountSection(bool isDark) {
-    // Kartın arka planı
     final Color cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
 
     return Container(
@@ -223,7 +219,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: CircleAvatar(
               radius: 35,
               backgroundImage: NetworkImage(AppState.user.avatarUrl),
-              onBackgroundImageError: (_, __) {}, // Hata durumunda varsayılanı gösterir
+              onBackgroundImageError: (_, __) {},
               backgroundColor: Colors.grey[200],
             ),
           ),
@@ -288,27 +284,24 @@ class _SettingsPageState extends State<SettingsPage> {
     return _buildSettingsContainer(isDark, [
       _buildSettingsTile(
         title: Localization.t('settings.multiple_choice_mode'),
-        icon: Icons.grid_view_rounded, // Daha modern ikon
+        icon: Icons.grid_view_rounded,
         iconColor: Colors.deepPurple,
         isSwitch: true,
-        switchValue: AppState.filter.isButtonMode,
+        switchValue: SettingsService.isButtonMode,
         onSwitchChanged: (v) => setState(() {
-          AppState.filter.isButtonMode = v;
-          PreferencesService.saveConfig();
+          SettingsService.setButtonMode(v);
         }),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
-        title: Localization.t('settings.selected_theme', args: [AppState.settings.darkTheme ? 'Dark' : 'Light']),
+        title: Localization.t('settings.selected_theme', args: [SettingsService.isDarkTheme ? 'Dark' : 'Light']),
         icon: isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
         iconColor: isDark ? Colors.amber : Colors.orange,
         isSwitch: true,
-        switchValue: AppState.settings.darkTheme,
+        switchValue: SettingsService.isDarkTheme,
         onSwitchChanged: (v) {
           setState(() {
-            AppState.settings.darkTheme = v;
-            v ? ThemeModeBuilderConfig.setDark() : ThemeModeBuilderConfig.setLight();
-            PreferencesService.saveConfig();
+            SettingsService.setDarkTheme(v);
           });
         },
       ),
@@ -318,7 +311,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildLanguageTile(bool isDark) {
-    final String currentValue = AppState.settings.language;
+    final String currentValue = SettingsService.currentLanguage;
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -332,8 +325,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
       trailing: ConstrainedBox(
-        // KRİTİK DÜZELTME: Maksimum genişlik sınırı koyuyoruz.
-        // Böylece Dropdown sonsuza kadar uzamaya çalışıp hata vermiyor.
         constraints: const BoxConstraints(maxWidth: 120),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -343,7 +334,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              isExpanded: true, // Konteynırın içine tam sığması için
+              isExpanded: true,
               value: Localization.supportedLanguages.contains(currentValue)
                   ? currentValue
                   : 'eng',
@@ -353,7 +344,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: isDark ? Colors.white : Colors.black87,
                   fontWeight: FontWeight.w500
               ),
-              // Metin taşarsa "..." koysun diye Text'e overflow ekledik
               items: Localization.supportedLanguages.map((String code) => DropdownMenuItem(
                 value: code,
                 child: Text(
@@ -362,12 +352,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               )).toList(),
               onChanged: (String? newValue) async {
-                if (newValue != null && newValue != AppState.settings.language) {
-                  AppState.settings.language = newValue;
-                  await PreferencesService.saveConfig();
-                  await Localization.changeLanguage(newValue);
+                if (newValue != null && newValue != SettingsService.currentLanguage) {
+                  await SettingsService.changeLanguage(newValue);
                   if (mounted) {
-                    restartApp(context);
+                    _restartApp(context);
                   }
                 }
               },
@@ -384,11 +372,11 @@ class _SettingsPageState extends State<SettingsPage> {
     return _buildSettingsContainer(isDark, [
       _buildSettingsTile(
         title: Localization.t('settings.continents.europe'),
-        icon: Icons.euro_rounded, // Sembolik
+        icon: Icons.euro_rounded,
         iconColor: Colors.blueAccent,
         isSwitch: true,
-        switchValue: AppState.filter.europe,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.europe = v),
+        switchValue: SettingsService.europeEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setEuropeFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -396,8 +384,8 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.temple_buddhist,
         iconColor: Colors.redAccent,
         isSwitch: true,
-        switchValue: AppState.filter.asia,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.asia = v),
+        switchValue: SettingsService.asiaEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setAsiaFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -405,8 +393,8 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.landscape_rounded,
         iconColor: Colors.orange,
         isSwitch: true,
-        switchValue: AppState.filter.africa,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.africa = v),
+        switchValue: SettingsService.africaEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setAfricaFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -414,8 +402,8 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.location_city_rounded,
         iconColor: Colors.green,
         isSwitch: true,
-        switchValue: AppState.filter.northAmerica,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.northAmerica = v),
+        switchValue: SettingsService.northAmericaEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setNorthAmericaFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -423,8 +411,8 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.forest_rounded,
         iconColor: Colors.teal,
         isSwitch: true,
-        switchValue: AppState.filter.southAmerica,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.southAmerica = v),
+        switchValue: SettingsService.southAmericaEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setSouthAmericaFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -432,8 +420,8 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.surfing_rounded,
         iconColor: Colors.cyan,
         isSwitch: true,
-        switchValue: AppState.filter.oceania,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.oceania = v),
+        switchValue: SettingsService.oceaniaEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setOceaniaFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -441,8 +429,8 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.ac_unit_rounded,
         iconColor: Colors.lightBlueAccent,
         isSwitch: true,
-        switchValue: AppState.filter.antarctic,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.antarctic = v),
+        switchValue: SettingsService.antarcticaEnabled,
+        onSwitchChanged: (v) => setState(() => SettingsService.setAntarcticaFilter(v)),
       ),
       _buildDivider(isDark),
       _buildSettingsTile(
@@ -450,18 +438,10 @@ class _SettingsPageState extends State<SettingsPage> {
         icon: Icons.flag_circle_rounded,
         iconColor: Colors.indigoAccent,
         isSwitch: true,
-        switchValue: AppState.filter.includeNonUN,
-        onSwitchChanged: (v) => _updateContinent(() => AppState.filter.includeNonUN = v),
+        switchValue: SettingsService.includeNonUN,
+        onSwitchChanged: (v) => setState(() => SettingsService.setIncludeNonUN(v)),
       ),
     ]);
-  }
-
-  void _updateContinent(VoidCallback action) {
-    setState(() {
-      action();
-      AppState.activePool = AppState.filteredCountries;
-      PreferencesService.saveConfig();
-    });
   }
 
   // --- YARDIMCI WIDGETLAR ---
@@ -491,7 +471,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // Tekil bir ayar satırı (Modern Stil)
   Widget _buildSettingsTile({
     required String title,
     required IconData icon,
@@ -523,13 +502,12 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // iOS tarzı yuvarlak köşeli ikon kutusu
   Widget _buildIconContainer(IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(8), // Squircle
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(icon, color: Colors.white, size: 20),
     );
@@ -539,7 +517,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Divider(
       height: 1,
       thickness: 0.5,
-      indent: 56, // İkon hizasından sonra başlar
+      indent: 56,
       color: isDark ? Colors.grey[800] : Colors.grey[200],
     );
   }
@@ -553,12 +531,11 @@ class _SettingsPageState extends State<SettingsPage> {
             style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.grey[600] : Colors.grey[400]),
           ),
           Text(
-            "v${AppState.version}",
+            "v${SettingsService.appVersion}",
             style: TextStyle(color: isDark ? Colors.grey[700] : Colors.grey[400], fontSize: 12),
           ),
         ],
       ),
     );
   }
-
 }

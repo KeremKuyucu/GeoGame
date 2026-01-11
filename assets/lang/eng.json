@@ -54,6 +54,7 @@
     "confirm_password": "Confirm Password",
     "password_mismatch": "Passwords do not match",
     "password_too_short": "Password must be at least 6 characters",
+    "name_too_short": "Name must be at least 2 characters",
     "register_success": "Registration successful!",
     "forgot_password": "Forgot Password?",
     "reset_password_title": "Reset Password",

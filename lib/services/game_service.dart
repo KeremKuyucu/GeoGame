@@ -284,6 +284,60 @@ class GameService {
   }
 
   // --------------------------------------------------------------------------
+  // BORDER PATH HELPERS
+  // --------------------------------------------------------------------------
+
+  /// Verilen ülke listesindeki son ülkenin komşularını döner.
+  /// [currentPath] mevcut yolda ziyaret edilen ülkeler.
+  /// Zaten ziyaret edilenler hariç tutulur ve isme göre sıralanır.
+  static List<Country> getAvailableNeighbors(List<Country> currentPath) {
+    if (currentPath.isEmpty) return [];
+
+    final Country lastCountry = currentPath.last;
+    final List<Country> neighbors = [];
+
+    for (String borderIso3 in lastCountry.borders) {
+      Country? neighbor = AppState.allCountries
+          .where((c) => c.iso3 == borderIso3)
+          .firstOrNull;
+
+      if (neighbor != null && !currentPath.contains(neighbor)) {
+        neighbors.add(neighbor);
+      }
+    }
+
+    // İsme göre sırala (mevcut dile göre)
+    neighbors.sort((a, b) => a
+        .getLocalizedName(AppState.settings.language)
+        .compareTo(b.getLocalizedName(AppState.settings.language)));
+
+    return neighbors;
+  }
+
+  /// Verilen ülkenin mevcut yoldaki son ülkenin komşusu olup olmadığını kontrol eder.
+  static bool isValidNeighborMove(List<Country> currentPath, Country country) {
+    if (currentPath.isEmpty) return false;
+    
+    final Country lastCountry = currentPath.last;
+    return lastCountry.borders.contains(country.iso3) &&
+           !currentPath.any((c) => c.iso3 == country.iso3);
+  }
+
+  /// Border Path skoru hesaplar.
+  static int calculateBorderPathScore(int moves, int optimalMoves) {
+    final int wrongCount = (moves - optimalMoves).clamp(0, 1000);
+    return (100 - wrongCount * 10).clamp(20, 100);
+  }
+
+  /// Border Path performans metnini döner.
+  static String getBorderPathPerformanceKey(int score) {
+    if (score == 100) return 'game_borderpath.perf_perfect';
+    if (score >= 80) return 'game_borderpath.perf_great';
+    if (score >= 60) return 'game_borderpath.perf_good';
+    return 'game_borderpath.perf_try_harder';
+  }
+
+  // --------------------------------------------------------------------------
   // MATH HELPERS
   // --------------------------------------------------------------------------
 
