@@ -4,12 +4,12 @@
 
 [Setup]
 AppName=GeoGame
-AppVersion=1.5.4
+AppVersion=1.5.5
 
 AppPublisher=Kerem Kuyucu
 DefaultDirName={localappdata}\GeoGame
 DefaultGroupName=GeoGame
-OutputDir=C:\Users\Kerem\Projects\APKs
+OutputDir=C:\Users\Kerem\Projects\Outputs
 OutputBaseFilename=GeoGame_Installer
 Compression=lzma
 SolidCompression=yes

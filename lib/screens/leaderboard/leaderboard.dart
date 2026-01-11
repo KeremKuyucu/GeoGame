@@ -61,8 +61,8 @@ class _LeaderboardState extends State<Leaderboard> {
         final Map<String, dynamic> userMap = {
           'rank': toInt(row['rank']),
           'uid': row['uid']?.toString() ?? '',
-          'name': row['full_name']?.toString() ?? 'Guest',
-          'avatar_url': row['avatar_url']?.toString() ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+          'name': row['full_name']?.toString() ?? Localization.t('settings.guest'),
+          'avatar_url': row['avatar_url']?.toString() ?? 'https://robohash.org/kaplan.png?set=set4',
           'total_score': toInt(row['total_score']),
           'total_correct': toInt(row['total_correct']),
           'total_wrong': toInt(row['total_wrong']),
@@ -123,10 +123,9 @@ class _LeaderboardState extends State<Leaderboard> {
             title: Text(user['name'] ?? ''),
             centerTitle: true,
           ),
-          // DrawerWidget'ı burada kullanmıyoruz çünkü geri butonu olmalı
           body: ProfileViewWidget(
             name: user['name'] ?? Localization.t('settings.guest'),
-            avatarUrl: user['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png',
+            avatarUrl: user['avatar_url'] ?? 'https://robohash.org/kaplan.png?set=set4',
             totalScore: user['total_score'] ?? 0,
             stats: user,
           ),
