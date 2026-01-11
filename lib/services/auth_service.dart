@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 
+import 'localization_service.dart';
+
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
@@ -31,7 +33,7 @@ class AuthService {
         password: password,
         data: {
           'full_name': name,
-          'avatar_url': 'https://geogame-cdn.keremkk.com.tr/anon.png',
+          'avatar_url': 'https://robohash.org/kaplan.png?set=set4',
         },
       );
 
@@ -70,13 +72,13 @@ class AuthService {
 
       if (profileData != null) {
         AppState.user = UserProfile(
-            name: profileData['full_name'] ?? 'Oyuncu',
-            avatarUrl: profileData['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png'
+            name: profileData['full_name'] ?? Localization.t('settings.guest'),
+            avatarUrl: profileData['avatar_url'] ?? 'https://robohash.org/${authUser.id}.png?set=set4'
         );
       } else {
         AppState.user = UserProfile(
-            name: authUser.userMetadata?['full_name'] ?? 'Oyuncu',
-            avatarUrl: authUser.userMetadata?['avatar_url'] ?? 'https://geogame-cdn.keremkk.com.tr/anon.png'
+            name: authUser.userMetadata?['full_name'] ?? Localization.t('settings.guest'),
+            avatarUrl: authUser.userMetadata?['avatar_url'] ?? 'https://robohash.org/${authUser.id}.png?set=set4'
         );
       }
 
@@ -146,6 +148,12 @@ class AuthService {
 
   static Future<String?> updateProfileMetadata({required String name, required String avatarUrl}) async {
     try {
+      // Basic security validation for avatarUrl
+      final uri = Uri.tryParse(avatarUrl);
+      if (uri == null || !uri.hasAbsolutePath || !uri.isScheme('https')) {
+        return "Geçersiz profil resmi URL'si. Sektör standardı güvenli bağlantı (https) gereklidir.";
+      }
+
       await _supabase.auth.updateUser(
         UserAttributes(data: {'full_name': name, 'avatar_url': avatarUrl}),
       );
