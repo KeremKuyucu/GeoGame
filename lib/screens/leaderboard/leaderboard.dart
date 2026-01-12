@@ -17,10 +17,12 @@ class _LeaderboardState extends State<Leaderboard> {
   final LeaderboardController _controller = LeaderboardController();
 
   @override
+  @override
   void initState() {
     super.initState();
     _controller.fetchLeaderboard().then((_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      setState(() {});
       if (_controller.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(_controller.errorMessage!)),
@@ -28,6 +30,7 @@ class _LeaderboardState extends State<Leaderboard> {
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +78,9 @@ class _LeaderboardState extends State<Leaderboard> {
                               (context, index) {
                                 final listIndex =
                                     _controller.getActualIndex(index);
-                                if (listIndex >= _controller.users.length)
+                                if (listIndex >= _controller.users.length) {
                                   return null;
+                                }
                                 return LeaderboardUserCard(
                                   controller: _controller,
                                   index: listIndex,
