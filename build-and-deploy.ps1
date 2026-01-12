@@ -215,13 +215,24 @@ try {
                 # Yeni release olustur
                 Write-Host "`n[Yeni GitHub Release Olusturuluyor...]" -ForegroundColor Magenta
                 
-                # Release notlari
-                $releaseNotes = Read-Host "Release notlari (bos birakilabilir)"
-                if ([string]::IsNullOrWhiteSpace($releaseNotes)) {
-                    $releaseNotes = "Version $currentVersion - $(Get-Date -Format 'yyyy-MM-dd')"
+                # Release notlari - Önce RELEASE_X.X.X.md dosyasini kontrol et
+                $releaseNotesFile = Join-Path $projectRoot "RELEASE_$currentVersion.md"
+                $releaseNotesParam = ""
+                
+                if (Test-Path $releaseNotesFile) {
+                    Write-Host "[i] Release notu dosyasi bulundu: RELEASE_$currentVersion.md" -ForegroundColor Cyan
+                    $releaseNotesParam = "--notes-file `"$releaseNotesFile`""
+                }
+                else {
+                    # Dosya yoksa kullanicidan al
+                    $releaseNotes = Read-Host "Release notlari (bos birakilabilir)"
+                    if ([string]::IsNullOrWhiteSpace($releaseNotes)) {
+                        $releaseNotes = "Version $currentVersion - $(Get-Date -Format 'yyyy-MM-dd')"
+                    }
+                    $releaseNotesParam = "--notes `"$releaseNotes`""
                 }
                 
-                $ghCommand = "gh release create `"$tagName`" --title `"$releaseTitle`" --notes `"$releaseNotes`""
+                $ghCommand = "gh release create `"$tagName`" --title `"$releaseTitle`" $releaseNotesParam"
                 
                 # Dosyalari ekle
                 foreach ($file in $releaseFiles) {
