@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
-// Modeller ve Servisler
-import 'package:geogame/models/countries.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/widgets/splash_screen_widgets.dart';
 
-import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/services/game_log_service.dart';
-
-import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
-
+import 'splash_screen_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,99 +12,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final SplashScreenController _controller = SplashScreenController();
+
   @override
   void initState() {
     super.initState();
-    _baslat();
-  }
-
-  Future<void> _baslat() async {
-    await Country.loadCountries();
-    AppState.activePool = AppState.filteredCountries;
-    await AuthService.checkSession();
-
-    GameLogService.syncPendingLogs();
-
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    AppState.version = packageInfo.version;
-
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const AuthGate()),
-    );
+    _controller.initialize().then((_) {
+      if (mounted) {
+        _controller.navigateToHome(context, const AuthGate());
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blueGrey.shade900,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20), // Köşeleri yumuşatır
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  'assets/images/logo.png', // Dosya yolunun doğru olduğundan emin ol
-                  width: 150,        // Logonun genişliği
-                  height: 150,       // Logonun yüksekliği
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "GeoGame",
-              style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 2
-              ),
-            ),
-
-            const SizedBox(height: 50),
-
-            const CircularProgressIndicator(
-              color: Colors.blueAccent,
-              strokeWidth: 3,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ... AuthGate sınıfı aynı kalabilir ...
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<AuthState>(
-      stream: Supabase.instance.client.auth.onAuthStateChange,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-        return const MainScaffold();
-      },
-    );
+    return const SplashScreenBody();
   }
 }
