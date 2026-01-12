@@ -83,17 +83,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     controller: _controller,
                     isDark: isDark,
                     onSignOut: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final successMessage = Localization.t('auth.logout_success');
                       await _controller.signOut();
-                      if (mounted) {
-                        setState(() {});
-                        _controller.showSnackBar(
-                          context,
-                          Localization.t('auth.logout_success'),
-                          Colors.green,
-                        );
-                      }
+                      if (!mounted) return;
+                      setState(() {});
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(successMessage),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
                     },
-                    onEditComplete: () => setState(() {}),
+              onEditComplete: () => setState(() {}),
                   ),
           ),
           const SizedBox(height: 25),

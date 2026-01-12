@@ -18,10 +18,12 @@ class _ProfilesState extends State<Profiles> {
   final ProfilesController _controller = ProfilesController();
 
   @override
+  @override
   void initState() {
     super.initState();
     _controller.fetchUserProfile().then((_) {
-      if (mounted) setState(() {});
+      if (!mounted) return;
+      setState(() {});
       if (_controller.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -32,6 +34,7 @@ class _ProfilesState extends State<Profiles> {
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

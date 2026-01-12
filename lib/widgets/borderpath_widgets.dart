@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/flag_loader.dart';
