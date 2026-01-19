@@ -79,17 +79,24 @@
     "main_menu": "Main Menu",
     "score": "Score"
   },
+  "game_intro": {
+    "start_game": "Start Game"
+  },
   "game_capital": {
     "title": "Capital Hunt",
     "description": "Identify the country by its capital.",
     "content": "Capital of the country to guess:",
     "input_hint": "Which country is this the capital of?",
-    "rule_welcome": "Welcome to the Capital City Quiz.\nYour goal is to identify the country associated with a randomly selected capital from 250 countries."
+    "rule_welcome": "A capital city name will be shown. Find which country this capital belongs to.",
+    "rule_how_to_play": "Select from the options or type the country name in keyboard mode. Keep guessing until you find the correct answer.",
+    "rule_tip": "Tip: Learning European and Asian capitals is a great starting point!"
   },
   "game_flag": {
     "title": "Flag Hunt",
     "description": "Identify the country by its flag.",
-    "rule_welcome": "Welcome to the Flag Quiz.\nYour goal is to identify the country associated with a randomly selected flag from 250 countries."
+    "rule_welcome": "A country flag will be shown. Find which country this flag belongs to.",
+    "rule_how_to_play": "Select from the options or type the country name in keyboard mode. Keep guessing until you find the correct answer.",
+    "rule_tip": "Tip: Watch out for similar flags! (e.g., Romania-Chad, Monaco-Indonesia)"
   },
   "game_distance": {
     "title": "Distance Hunt",
@@ -97,22 +104,26 @@
     "guess": "Guess: ",
     "distance": "Distance: ",
     "direction": "Direction: ",
-    "rule_welcome": "Welcome to the Distance Quiz.\nYour goal is to find the randomly selected country from 250 options.\nDistances may vary by ±100 km.\nLocations are based on the geographic centers of the countries.",
-    "rule_score": "Scoring System: Each round starts with 300 points. 10 points are deducted for every wrong guess.\nAfter 15 guesses, the points earned are fixed at 100."
+    "rule_welcome": "A Wordle-like geography game! Make guesses to find the hidden country.",
+    "rule_how_to_play": "After each guess, you'll see the distance and direction to the target country. Use these hints to find the correct answer.",
+    "rule_score": "Score: Starts at 300, -10 per wrong guess. Minimum 100 points after 15+ guesses.",
+    "rule_tip": "Tip: Distances are calculated from geographic centers, ±100 km deviation possible."
   },
   "game_borderline": {
     "title": "Borderline",
     "description": "Identify the country by its shape.",
-    "hint_scale": "Country sizes have been scaled to fit the screen.",
-    "rule_welcome": "Welcome to the Shape Quiz.\nYour goal is to identify a randomly selected country from 250 options by its shape."
+    "hint_scale": "Country sizes are scaled to fit the screen, not actual proportions.",
+    "rule_welcome": "A country's border shape will be shown. Find which country this shape belongs to.",
+    "rule_how_to_play": "Select from the options or type the country name in keyboard mode. Keep guessing until you find the correct answer.",
+    "rule_tip": "Tip: Look for distinctive shapes! (Italy-boot, Japan-arc shape, etc.)"
   },
   "game_borderpath": {
     "title": "Border Path",
     "description": "Reach the target by following border neighbors.",
-    "rule_1": "Go from the starting country to the target country",
-    "rule_2": "You can only cross through neighboring countries",
-    "rule_3": "Fewer moves mean a higher score!",
-    "rule_4": "Follow your path on the map",
+    "rule_1": "Travel from the starting country to the target by following border neighbors.",
+    "rule_2": "You can only move to countries that share a land border.",
+    "rule_3": "Score: Starts at 100, -10 for each extra move beyond optimal. Minimum 20 points.",
+    "rule_4": "Track your path on the map. Use the undo button if you go the wrong way.",
     "victory_msg": "Target reached!",
     "stat_moves": "Move Count",
     "stat_optimal": "Optimal Path",

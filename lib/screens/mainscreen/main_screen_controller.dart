@@ -3,6 +3,7 @@ import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/update_checker_service.dart';
+import 'package:geogame/widgets/game_intro_screen.dart';
 
 /// MainScreen için controller sınıfı
 /// Tüm iş mantığı (business logic) burada tutulur
@@ -17,13 +18,45 @@ class MainScreenController {
   }
 
   /// Oyun başlatma işlemi
-  /// Eğer filtrelenmiş ülke yoksa uyarı gösterir
+  /// Önce intro ekranını gösterir, ardından oyun sayfasına yönlendirir
   void startGame(GameMetadata metadata) {
     if (AppState.filteredCountries.isEmpty) {
       showNoContinentWarning();
       return;
     }
-    Navigator.pushNamed(context, metadata.route);
+
+    // Intro ekranını göster
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return GameIntroScreen(
+            metadata: metadata,
+            onStart: () {
+              // Intro ekranını kapat ve oyun sayfasına git
+              Navigator.pop(context);
+              Navigator.pushNamed(context, metadata.route);
+            },
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              )),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
   }
 
   /// Kıta seçilmediğinde uyarı SnackBar'ı gösterir
