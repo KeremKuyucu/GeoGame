@@ -95,5 +95,4 @@ This project is licensed under the **GNU General Public License v3.0**. See the 
 
 ## 🙋‍♂️ Author
 
-**Kerem Kuyucu** - [GitHub Profile](https://github.com/keremkuyucu)  
-📍 Bilecik, Türkiye
+ - [**Kerem Kuyucu**](https://github.com/keremkuyucu)  
