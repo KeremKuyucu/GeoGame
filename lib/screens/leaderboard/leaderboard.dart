@@ -17,7 +17,6 @@ class _LeaderboardState extends State<Leaderboard> {
   final LeaderboardController _controller = LeaderboardController();
 
   @override
-  @override
   void initState() {
     super.initState();
     _controller.fetchLeaderboard().then((_) {

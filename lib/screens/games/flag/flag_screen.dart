@@ -45,10 +45,6 @@ class _FlagGameState extends State<FlagGame>
   Future<void> _initializeGame() async {
     await _controller.initializeGame();
     _animController.forward(from: 0.0);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showGameRulesDialog(context: context, rules: _controller.getRules());
-    });
   }
 
   Future<void> _checkAnswer(int index) async {

@@ -46,10 +46,6 @@ class _BorderLineGameState extends State<BorderLineGame>
     await _controller.initializeGame();
     setState(() {});
     _animController.forward(from: 0.0);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showGameRulesDialog(context: context, rules: _controller.getRules());
-    });
   }
 
   Future<void> _checkAnswer(int index) async {

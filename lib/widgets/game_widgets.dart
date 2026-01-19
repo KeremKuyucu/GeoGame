@@ -84,32 +84,6 @@ class GameBackground extends StatelessWidget {
   }
 }
 
-/// Oyun kuralları dialog item'ı
-class GameRuleItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final Color iconColor;
-
-  const GameRuleItem({
-    super.key,
-    required this.icon,
-    required this.text,
-    this.iconColor = Colors.teal,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: iconColor),
-        const SizedBox(width: 10),
-        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
-      ],
-    );
-  }
-}
-
 /// Çoktan seçmeli buton UI'ı
 class GameButtonModeUI extends StatelessWidget {
   final Function(int) onButtonPressed;
@@ -412,33 +386,4 @@ class GameScaffold extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Kurallar dialog'u göster
-void showGameRulesDialog({
-  required BuildContext context,
-  required List<Widget> rules,
-}) {
-  showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(Localization.t('game_common.rules')),
-        content: SingleChildScrollView(
-          child: ListBody(children: rules),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text(
-              Localization.t('common.ok'),
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      );
-    },
-  );
 }

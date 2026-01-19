@@ -79,17 +79,24 @@
     "main_menu": "Ana Menü",
     "score": "Puan"
   },
+  "game_intro": {
+    "start_game": "Oyuna Başla"
+  },
   "game_capital": {
     "title": "Başşehir",
     "description": "Başkentten ülkeyi tanıyın.",
     "content": "Tahmin edilecek ülkenin başkenti:",
     "input_hint": "Hangi ülkenin başkenti?",
-    "rule_welcome": "Başkent Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkenin başkentini bilmektir."
+    "rule_welcome": "Ekranda bir başkent ismi gösterilecek. Bu başkentin hangi ülkeye ait olduğunu bulmanız gerekiyor.",
+    "rule_how_to_play": "Şıklardan birini seçin veya klavye modunda ülke ismini yazın. Doğru cevabı bulana kadar tahmin yapabilirsiniz.",
+    "rule_tip": "İpucu: Avrupa ve Asya başkentlerini öğrenmek iyi bir başlangıçtır!"
   },
   "game_flag": {
     "title": "Bayrak Avı",
     "description": "Bayraktan ülkeyi tanıyın.",
-    "rule_welcome": "Bayrak Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkenin bayrağını bilmektir."
+    "rule_welcome": "Ekranda bir ülke bayrağı gösterilecek. Bu bayrağın hangi ülkeye ait olduğunu bulmanız gerekiyor.",
+    "rule_how_to_play": "Şıklardan birini seçin veya klavye modunda ülke ismini yazın. Doğru cevabı bulana kadar tahmin yapabilirsiniz.",
+    "rule_tip": "İpucu: Benzer bayrakları karıştırmamaya dikkat edin! (Örn: Romanya-Çad, Monako-Endonezya)"
   },
   "game_distance": {
     "title": "Mesafe Avı",
@@ -97,22 +104,26 @@
     "guess": "Tahmin: ",
     "distance": "Mesafe: ",
     "direction": "Yön: ",
-    "rule_welcome": "Mesafeden Ülke Bilme Oyununa hoş geldiniz.\nAmacınız, 250 ülke arasından rastgele seçilen bir ülkeyi bilmektir.\nMesafelerde ±100 km fark olabilir.\nKonum olarak ülkelerin coğrafi merkezleri baz alınmıştır.",
-    "rule_score": "Puan Sistemi: Her turda puanınız 300'den başlar, her yanlış tahminde 10 puan azalır.\n15 tahminden sonra kazanılan puan 100'e sabitlenir."
+    "rule_welcome": "Wordle benzeri coğrafya oyunu! Gizli ülkeyi bulmak için tahminler yapın.",
+    "rule_how_to_play": "Her tahminden sonra hedef ülkeye olan mesafe ve yön gösterilir. Bu ipuçlarını kullanarak doğru ülkeyi bulun.",
+    "rule_score": "Puan: 300 puanla başlar, her yanlış -10 puan. 15+ tahminde minimum 100 puan.",
+    "rule_tip": "İpucu: Mesafeler ülkelerin coğrafi merkezlerine göredir, ±100 km sapma olabilir."
   },
   "game_borderline": {
     "title": "Sınır hattı",
     "description": "Şekilden ülkeyi tanıyın.",
-    "hint_scale": "Ülke boyutları ekrana sığacak şekilde ölçeklendirilmiştir.",
-    "rule_welcome": "Şekil bilme oyununa hoş geldiniz.\nAmanınız, 250 ülke arasından rastgele seçilen bir ülkeyi şeklinden tanımaktır."
+    "hint_scale": "Ülke boyutları ekrana sığacak şekilde ölçeklendirilmiştir, gerçek boyutları yansıtmaz.",
+    "rule_welcome": "Ekranda bir ülkenin sınır şekli gösterilecek. Bu şeklin hangi ülkeye ait olduğunu bulmanız gerekiyor.",
+    "rule_how_to_play": "Şıklardan birini seçin veya klavye modunda ülke ismini yazın. Doğru cevabı bulana kadar tahmin yapabilirsiniz.",
+    "rule_tip": "İpucu: Karakteristik şekillere dikkat edin! (İtalya-çizme, Japonya-yay şekli gibi)"
   },
   "game_borderpath": {
     "title": "Sınır Yolu",
     "description": "Sınır komşularını takip ederek hedefe ulaşın.",
-    "rule_1": "Başlangıç ülkesinden hedef ülkeye gidin",
-    "rule_2": "Sadece sınır komşusu ülkelerden geçebilirsiniz",
-    "rule_3": "Daha az hamle daha yüksek puan!",
-    "rule_4": "Haritada yolunuzu takip edin",
+    "rule_1": "Başlangıç ülkesinden hedef ülkeye sınır komşularını takip ederek gidin.",
+    "rule_2": "Sadece kara sınırı olan komşu ülkelere geçiş yapabilirsiniz.",
+    "rule_3": "Puan: 100 puanla başlar, optimal yoldan her fazla hamle -10 puan. Minimum 20 puan.",
+    "rule_4": "Haritada gittiğiniz yolu görebilirsiniz. Yanlış gittiyseniz geri al butonunu kullanın.",
     "victory_msg": "Hedefe ulaştınız!",
     "stat_moves": "Hamle Sayısı",
     "stat_optimal": "Optimal Yol",

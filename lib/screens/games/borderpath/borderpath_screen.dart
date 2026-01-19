@@ -31,12 +31,7 @@ class _BorderPathGameState extends State<BorderPathGame> {
 
   Future<void> _initializeGame() async {
     await _controller.initializeGame();
-    if (mounted) {
-      setState(() {});
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showGameRulesDialog(context: context, rules: _controller.getRules());
-      });
-    }
+    if (mounted) setState(() {});
   }
 
   void _selectCountry(Country country) {

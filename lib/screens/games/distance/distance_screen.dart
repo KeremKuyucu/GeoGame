@@ -30,9 +30,6 @@ class _DistanceGameState extends State<DistanceGame> {
 
   Future<void> _initializeGame() async {
     await _controller.initializeGame();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showGameRulesDialog(context: context, rules: _controller.getRules());
-    });
   }
 
   Future<void> _checkAnswer() async {

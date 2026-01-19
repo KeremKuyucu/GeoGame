@@ -7,7 +7,6 @@ import 'package:geogame/services/localization_service.dart';
 
 import 'package:geogame/models/app_context.dart';
 
-
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
 
@@ -60,7 +59,8 @@ class DrawerWidget extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
               boxShadow: [
-                BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
+                BoxShadow(
+                    color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
               ],
             ),
             child: const CircleAvatar(
@@ -118,12 +118,16 @@ class DrawerWidget extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16, top: 8, right: 16),
           child: Text(
             Localization.t('drawer.feedback_note'),
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 12, fontStyle: FontStyle.italic),
+            style: TextStyle(
+                color: Colors.grey.shade500,
+                fontSize: 12,
+                fontStyle: FontStyle.italic),
           ),
         ),
       ],
     );
   }
+
   Future<void> _launchURL(String urlString) async {
     final Uri uri = Uri.parse(urlString);
     // mode: LaunchMode.externalApplication -> Uygulama içi webview değil, Chrome/Safari açar.
@@ -164,10 +168,11 @@ class DrawerWidget extends StatelessWidget {
         children: [
           Text(
             Localization.t('drawer.creator'),
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Colors.blueGrey),
           ),
-          const SizedBox(height: 5),
-          const Text("© 2025 All Rights Reserved", style: TextStyle(fontSize: 10, color: Colors.grey)),
         ],
       ),
     );
@@ -192,7 +197,8 @@ class DrawerWidget extends StatelessWidget {
           title,
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
         ),
-        trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: Colors.grey),
+        trailing: const Icon(Icons.chevron_right_rounded,
+            size: 20, color: Colors.grey),
         onTap: onTap,
       ),
     );
