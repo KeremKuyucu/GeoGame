@@ -60,7 +60,8 @@
     "reset_password_title": "Şifre Sıfırlama",
     "reset_password_desc": "E-posta adresinizi girin, size sıfırlama bağlantısı gönderelim.",
     "send_link": "Bağlantı Gönder",
-    "link_sent": "Sıfırlama bağlantısı gönderildi!"
+    "link_sent": "Sıfırlama bağlantısı gönderildi!",
+    "warning_no_account": "Hesabınız yok, puanlarınız kayıt edilmeyecek."
   },
   "game_common": {
     "input_hint": "Ülke ismini yazın...",
@@ -141,6 +142,16 @@
     "neighbors_label": "Komşu Ülkeler",
     "no_neighbors_left": "Gidebileceğiniz komşu ülke kalmadı!"
   },
+  "game_findmap": {
+    "title": "Haritada Bul",
+    "description": "İstenen ülkeyi haritada bulun.",
+    "rule_welcome": "Size bir ülke sorulacak. Haritada bu ülkeni yerini bulup tıklamanız gerekiyor.",
+    "rule_how_to_play": "Haritayı kaydırarak ve yakınlaştırarak sorulan ülkeyi arayın. Doğru olduğunu düşündüğünüz yere dokunun.",
+    "find_prompt": "Bul: {0}",
+    "loading_world": "Dünya haritası yükleniyor...",
+    "correct_feedback": "Doğru! {0} ülkesini buldun.",
+    "wrong_feedback": "Yanlış! Burası {0}."
+  },
   "directions": {
     "north": "Kuzey",
     "north_east": "Kuzeydoğu",
@@ -184,7 +195,8 @@
     "flag": "Bayrak",
     "capital": "Başşehir",
     "borderline": "Sınır hattı",
-    "borderpath": "Sınır yolu"
+    "borderpath": "Sınır yolu",
+    "findmap": "Haritada Bulma"
   },
   "edit_profile": {
     "edit_title": "Profili Düzenle",

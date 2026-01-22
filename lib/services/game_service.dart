@@ -78,9 +78,6 @@ class GameService {
     // Seçenekleri oluştur ve karıştır
     final options = [AppState.targetCountry, ...distractors]..shuffle(_random);
     AppState.buttons = GameButton.createButtons(options);
-
-    debugPrint(
-        "🎯 Hedef: ${AppState.targetCountry.englishName} (${AppState.targetCountry.iso3})");
   }
 
   /// Optimize edilmiş çeldirici algoritması
@@ -115,14 +112,6 @@ class GameService {
     return distractors;
   }
 
-  static Future<String> handlePass() async {
-    AppState.session.submitPass();
-    final passCountryName =
-        AppState.targetCountry.getLocalizedName(AppState.settings.language);
-    await startNewRound();
-    return passCountryName;
-  }
-
   // --------------------------------------------------------------------------
   // STANDARD GAME CHECK
   // --------------------------------------------------------------------------
@@ -151,6 +140,14 @@ class GameService {
         buttonIndex < AppState.buttons.length) {
       AppState.buttons[buttonIndex].isActive = false;
     }
+  }
+
+  static Future<String> handlePass() async {
+    AppState.session.submitPass();
+    final passCountryName =
+        AppState.targetCountry.getLocalizedName(AppState.settings.language);
+    await startNewRound();
+    return passCountryName;
   }
 
   // --------------------------------------------------------------------------
@@ -294,7 +291,6 @@ class GameService {
     }
 
     await GameLogService.saveProgress("borderpath");
-    debugPrint("🏆 Border Path: $moves hamle (Optimal: $optimalMoves)");
   }
 
   // --------------------------------------------------------------------------

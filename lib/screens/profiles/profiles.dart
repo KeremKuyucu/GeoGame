@@ -18,7 +18,6 @@ class _ProfilesState extends State<Profiles> {
   final ProfilesController _controller = ProfilesController();
 
   @override
-  @override
   void initState() {
     super.initState();
     _controller.fetchUserProfile().then((_) {
@@ -34,7 +33,6 @@ class _ProfilesState extends State<Profiles> {
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

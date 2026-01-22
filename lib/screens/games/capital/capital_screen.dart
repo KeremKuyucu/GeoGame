@@ -156,10 +156,11 @@ class _CapitalGameState extends State<CapitalGame>
                   onCountrySelected: (Country selected) => _checkAnswer(0),
                 ),
 
-              const SizedBox(height: 30),
-
-              // Pas butonu
-              GamePassButton(onPressed: _handlePass),
+              // Pas butonu (Sadece klavye modunda)
+              if (!_controller.isButtonMode) ...[
+                const SizedBox(height: 30),
+                GamePassButton(onPressed: _handlePass),
+              ],
             ],
           ),
         ),

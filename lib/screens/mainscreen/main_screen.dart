@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/mainscreen_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/auth_service.dart';
 
 import 'main_screen_controller.dart';
 
@@ -34,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isLoggedIn = AuthService.isAuthenticated;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -59,14 +61,36 @@ class _MainScreenState extends State<MainScreen> {
             colors: _controller.getBackgroundColors(isDark),
           ),
         ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final bool isGrid =
-                _controller.shouldUseGridLayout(constraints.maxWidth);
-            return isGrid
-                ? MainScreenGameGrid(controller: _controller)
-                : MainScreenGameList(controller: _controller);
-          },
+        child: Column(
+          children: [
+            if (!isLoggedIn) ...[
+              SizedBox(
+                  height: kToolbarHeight + MediaQuery.of(context).padding.top),
+              LoginWarningBanner(
+                onLoginPressed: () async {
+                  await Navigator.pushNamed(context, '/auth');
+                  setState(() {});
+                },
+              ),
+            ],
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final bool isGrid =
+                      _controller.shouldUseGridLayout(constraints.maxWidth);
+                  return isGrid
+                      ? MainScreenGameGrid(
+                          controller: _controller,
+                          topPadding: isLoggedIn ? null : 10,
+                        )
+                      : MainScreenGameList(
+                          controller: _controller,
+                          topPadding: isLoggedIn ? null : 10,
+                        );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

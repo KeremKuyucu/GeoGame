@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum GameType { flag, capital, distance, borderline, borderpath }
+enum GameType { flag, capital, distance, borderline, borderpath, findmap }
 
 /// Oyun kural bilgilerini tutan sınıf
 class GameRule {
@@ -118,6 +118,21 @@ final List<GameMetadata> gameMetadataList = [
       GameRule(icon: Icons.swap_horiz, textKey: 'game_borderpath.rule_2'),
       GameRule(icon: Icons.star_border, textKey: 'game_borderpath.rule_3'),
       GameRule(icon: Icons.map, textKey: 'game_borderpath.rule_4'),
+    ],
+  ),
+  GameMetadata(
+    type: GameType.findmap,
+    titleKey: 'game_findmap',
+    descKey: 'game_findmap',
+    img: 'assets/images/findmap.webp',
+    color: const Color(0xFF00ACC1),
+    route: '/game/findmap',
+    iconData: Icons.explore,
+    rules: const [
+      GameRule(icon: Icons.public, textKey: 'game_findmap.rule_welcome'),
+      GameRule(icon: Icons.touch_app, textKey: 'game_findmap.rule_how_to_play'),
+      GameRule(
+          icon: Icons.star_border, textKey: 'game_common.score_system_generic'),
     ],
   ),
 ];

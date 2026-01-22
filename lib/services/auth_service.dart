@@ -26,7 +26,8 @@ class AuthService {
     }
   }
 
-  static Future<String?> signUp(String email, String password, String name) async {
+  static Future<String?> signUp(
+      String email, String password, String name) async {
     try {
       final AuthResponse res = await _supabase.auth.signUp(
         email: email,
@@ -73,13 +74,14 @@ class AuthService {
       if (profileData != null) {
         AppState.user = UserProfile(
             name: profileData['full_name'] ?? Localization.t('settings.guest'),
-            avatarUrl: profileData['avatar_url'] ?? 'https://robohash.org/${authUser.id}.png?set=set4'
-        );
+            avatarUrl: profileData['avatar_url'] ??
+                'https://robohash.org/${authUser.id}.png?set=set4');
       } else {
         AppState.user = UserProfile(
-            name: authUser.userMetadata?['full_name'] ?? Localization.t('settings.guest'),
-            avatarUrl: authUser.userMetadata?['avatar_url'] ?? 'https://robohash.org/${authUser.id}.png?set=set4'
-        );
+            name: authUser.userMetadata?['full_name'] ??
+                Localization.t('settings.guest'),
+            avatarUrl: authUser.userMetadata?['avatar_url'] ??
+                'https://robohash.org/${authUser.id}.png?set=set4');
       }
 
       debugPrint('✅ Profile sync complete: ${AppState.user.name}');
@@ -135,7 +137,6 @@ class AuthService {
       await _supabase.auth.updateUser(UserAttributes(email: newEmail));
       return null; // Başarılı
     } on AuthException catch (e) {
-      debugPrint("Email Update Error: ${e.message}");
       // Özel hata mesajı temizleme (isteğe bağlı)
       if (e.message.contains('already registered')) {
         return "Bu e-posta adresi zaten kullanımda.";
@@ -146,7 +147,8 @@ class AuthService {
     }
   }
 
-  static Future<String?> updateProfileMetadata({required String name, required String avatarUrl}) async {
+  static Future<String?> updateProfileMetadata(
+      {required String name, required String avatarUrl}) async {
     try {
       // Basic security validation for avatarUrl
       final uri = Uri.tryParse(avatarUrl);

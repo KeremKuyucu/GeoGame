@@ -28,6 +28,7 @@ class GameCard extends StatelessWidget {
         decoration: _buildCardDecoration(),
         child: Stack(
           children: [
+            _buildBackgroundImage(),
             _buildGradientOverlay(),
             _buildCardContent(title, desc, screenWidth),
           ],
@@ -47,12 +48,27 @@ class GameCard extends StatelessWidget {
           offset: const Offset(0, 10),
         ),
       ],
-      image: DecorationImage(
-        image: AssetImage(metadata.img),
-        fit: BoxFit.cover,
-        colorFilter: ColorFilter.mode(
-          Colors.black.withValues(alpha: 0.3),
-          BlendMode.darken,
+    );
+  }
+
+  /// Arka plan görseli (Hata yönetimi ile)
+  Widget _buildBackgroundImage() {
+    return Positioned.fill(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Image.asset(
+          metadata.img,
+          fit: BoxFit.cover,
+          color: Colors.black.withValues(alpha: 0.3),
+          colorBlendMode: BlendMode.darken,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/errorimage.webp',
+              fit: BoxFit.cover,
+              color: Colors.black.withValues(alpha: 0.3),
+              colorBlendMode: BlendMode.darken,
+            );
+          },
         ),
       ),
     );

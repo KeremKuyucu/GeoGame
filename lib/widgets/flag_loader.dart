@@ -1,6 +1,5 @@
 // lib/widgets/flag_loader.dart
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -20,9 +19,8 @@ class FlagLoader {
     bool exists = false;
 
     try {
-      final manifestContent = await rootBundle.loadString('AssetManifest.json');
-      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-      exists = manifestMap.containsKey(assetPath);
+      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+      exists = manifest.listAssets().contains(assetPath);
     } catch (_) {
       exists = false;
     }
@@ -34,7 +32,8 @@ class FlagLoader {
         width: size,
         height: size,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => _networkImage(flagUrl, size, fit),
+        errorBuilder: (context, error, stackTrace) =>
+            _networkImage(flagUrl, size, fit),
       );
     } else {
       image = _networkImage(flagUrl, size, fit);
@@ -50,7 +49,8 @@ class FlagLoader {
       width: size,
       height: size,
       fit: fit,
-      errorBuilder: (context, error, stackTrace) => Icon(Icons.flag, size: size * 0.6),
+      errorBuilder: (context, error, stackTrace) =>
+          Icon(Icons.flag, size: size * 0.6),
     );
   }
 
@@ -58,9 +58,8 @@ class FlagLoader {
   static Future<bool> checkFlagAsset(String iso2) async {
     final String assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
     try {
-      final manifestContent = await rootBundle.loadString('AssetManifest.json');
-      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-      return manifestMap.containsKey(assetPath);
+      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+      return manifest.listAssets().contains(assetPath);
     } catch (e) {
       return false;
     }
@@ -95,7 +94,8 @@ class FlagLoader {
             child: const Center(child: CircularProgressIndicator()),
           );
         },
-        errorBuilder: (context, error, stackTrace) => Icon(Icons.flag, size: height * 0.4),
+        errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.flag, size: height * 0.4),
       );
     }
   }

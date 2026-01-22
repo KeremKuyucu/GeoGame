@@ -20,7 +20,7 @@ class MainScreenController {
   /// Oyun başlatma işlemi
   /// Önce intro ekranını gösterir, ardından oyun sayfasına yönlendirir
   void startGame(GameMetadata metadata) {
-    if (AppState.filteredCountries.isEmpty) {
+    if (AppState.filteredCountries.length < 4) {
       showNoContinentWarning();
       return;
     }

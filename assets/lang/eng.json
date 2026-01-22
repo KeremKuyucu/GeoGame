@@ -60,7 +60,8 @@
     "reset_password_title": "Reset Password",
     "reset_password_desc": "Enter your email to receive a reset link.",
     "send_link": "Send Link",
-    "link_sent": "Reset link sent!"
+    "link_sent": "Reset link sent!",
+    "warning_no_account": "You don't have an account, your scores will not be saved."
   },
   "game_common": {
     "input_hint": "Type country name...",
@@ -141,6 +142,16 @@
     "neighbors_label": "Neighboring Countries",
     "no_neighbors_left": "No neighboring countries left to move to!"
   },
+  "game_findmap": {
+    "title": "Find on Map",
+    "description": "Find the requested country on the map.",
+    "rule_welcome": "You will be asked to find a country. Locate and tap it on the map.",
+    "rule_how_to_play": "Pan and zoom the map to search. Tap on the location you think is correct.",
+    "find_prompt": "Find: {0}",
+    "loading_world": "Loading world map...",
+    "correct_feedback": "Correct! You found {0}.",
+    "wrong_feedback": "Wrong! This is {0}."
+  },
   "directions": {
     "north": "North",
     "north_east": "Northeast",
@@ -184,7 +195,8 @@
     "flag": "Flag",
     "capital": "Capital",
     "borderline": "Borderline",
-    "borderpath": "Border Path"
+    "borderpath": "Border Path",
+    "findmap": "Find Map"
   },
   "edit_profile": {
     "edit_title": "Edit Profile",

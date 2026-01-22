@@ -21,7 +21,7 @@ class LeaderboardController {
 
     try {
       final response =
-          await _supabase.from('leaderboard_view').select().limit(100);
+          await _supabase.from('leaderboard_v2').select().limit(100);
 
       if ((response as List).isEmpty) {
         users = [];
@@ -41,6 +41,8 @@ class LeaderboardController {
   /// Ham veriyi parse eder
   List<Map<String, dynamic>> _parseLeaderboardData(List<dynamic> rawList) {
     return rawList.map((row) {
+      final Map<String, dynamic> modesData = row['modes'] ?? {};
+
       final Map<String, dynamic> userMap = {
         'rank': _toInt(row['rank']),
         'uid': row['uid']?.toString() ?? '',
@@ -49,16 +51,30 @@ class LeaderboardController {
         'avatar_url': row['avatar_url']?.toString() ??
             'https://robohash.org/kaplan.png?set=set4',
         'total_score': _toInt(row['total_score']),
-        'total_correct': _toInt(row['total_correct']),
-        'total_wrong': _toInt(row['total_wrong']),
+        // total_correct ve total_wrong view'da yoksa hesaplayacağız
       };
+
+      int calcTotalCorrect = 0;
+      int calcTotalWrong = 0;
 
       for (var type in GameType.values) {
         final String mode = AppState.getGameModeKey(type);
-        userMap['score_$mode'] = _toInt(row['score_$mode']);
-        userMap['${mode}_correct'] = _toInt(row['${mode}_correct']);
-        userMap['${mode}_wrong'] = _toInt(row['${mode}_wrong']);
+        final modeStat = modesData[mode] ?? {};
+
+        final score = _toInt(modeStat['score']);
+        final correct = _toInt(modeStat['correct']);
+        final wrong = _toInt(modeStat['wrong']);
+
+        userMap['score_$mode'] = score;
+        userMap['${mode}_correct'] = correct;
+        userMap['${mode}_wrong'] = wrong;
+
+        calcTotalCorrect += correct;
+        calcTotalWrong += wrong;
       }
+
+      userMap['total_correct'] = calcTotalCorrect;
+      userMap['total_wrong'] = calcTotalWrong;
 
       return userMap;
     }).toList();
