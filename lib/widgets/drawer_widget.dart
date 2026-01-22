@@ -66,7 +66,7 @@ class DrawerWidget extends StatelessWidget {
             child: const CircleAvatar(
               radius: 35,
               backgroundColor: Colors.white,
-              backgroundImage: AssetImage('assets/images/logo.png'),
+              backgroundImage: AssetImage('assets/images/logo.webp'),
             ),
           ),
           const SizedBox(width: 15),

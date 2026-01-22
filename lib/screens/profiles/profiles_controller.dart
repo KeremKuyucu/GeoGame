@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 
@@ -49,18 +50,37 @@ class ProfilesController {
 
     try {
       final data = await _supabase
-          .from('leaderboard_view')
+          .from('leaderboard_v2')
           .select()
           .eq('uid', currentId)
           .maybeSingle();
 
-      userStats = data;
+      if (data != null) {
+        userStats = _parseProfileData(data);
+      } else {
+        userStats = null;
+      }
       isLoading = false;
     } catch (e) {
       debugPrint('❌ Profil yükleme hatası: $e');
       errorMessage = 'Hata: $e';
       isLoading = false;
     }
+  }
+
+  Map<String, dynamic> _parseProfileData(Map<String, dynamic> rawData) {
+    final Map<String, dynamic> result = Map.from(rawData);
+    final Map<String, dynamic> modesData = rawData['modes'] ?? {};
+
+    for (var type in GameType.values) {
+      final String mode = AppState.getGameModeKey(type);
+      final modeStat = modesData[mode] ?? {};
+
+      result['score_$mode'] = modeStat['score'] ?? 0;
+      result['${mode}_correct'] = modeStat['correct'] ?? 0;
+      result['${mode}_wrong'] = modeStat['wrong'] ?? 0;
+    }
+    return result;
   }
 
   /// Auth sayfasına yönlendirir

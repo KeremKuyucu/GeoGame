@@ -76,7 +76,7 @@ class AuthLogo extends StatelessWidget {
           ],
         ),
         child: Image.asset(
-          'assets/images/logo.png',
+          'assets/images/logo.webp',
           height: 100,
           fit: BoxFit.contain,
         ),

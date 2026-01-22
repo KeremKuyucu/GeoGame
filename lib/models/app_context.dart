@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 
 import 'package:geogame/services/localization_service.dart';
 
-
 // --- 1. ANA DURUM YÖNETİCİSİ (AppState) ---
 class AppState extends ChangeNotifier {
   static int selectedIndex = 0;
@@ -32,6 +31,7 @@ class AppState extends ChangeNotifier {
       GameType.distance => "distance",
       GameType.borderline => "borderline",
       GameType.borderpath => "borderpath",
+      GameType.findmap => "findmap",
     };
   }
 
@@ -42,8 +42,13 @@ class AppState extends ChangeNotifier {
     if (allCountries.isEmpty) return [];
 
     // Hiçbir kıta seçili değilse boş dön (Hızlı çıkış)
-    if (!f.northAmerica && !f.southAmerica && !f.asia && !f.africa &&
-        !f.europe && !f.oceania && !f.antarctic) {
+    if (!f.northAmerica &&
+        !f.southAmerica &&
+        !f.asia &&
+        !f.africa &&
+        !f.europe &&
+        !f.oceania &&
+        !f.antarctic) {
       return [];
     }
 
@@ -88,11 +93,13 @@ class GameButton {
 
   // Buton oluşturucu fabrika metodu
   static List<GameButton> createButtons(List<Country> options) {
-    return List.generate(options.length, (i) => GameButton(
-      country: options[i],
-      color: _palette[i % _palette.length],
-      isActive: true,
-    ));
+    return List.generate(
+        options.length,
+        (i) => GameButton(
+              country: options[i],
+              color: _palette[i % _palette.length],
+              isActive: true,
+            ));
   }
 
   // UI etiketi
@@ -128,9 +135,15 @@ class GameFilter {
   bool isButtonMode;
 
   GameFilter({
-    this.northAmerica = true, this.southAmerica = true, this.asia = true,
-    this.africa = true, this.europe = true, this.oceania = true,
-    this.antarctic = true, this.isButtonMode = true, this.includeNonUN = false,
+    this.northAmerica = true,
+    this.southAmerica = true,
+    this.asia = true,
+    this.africa = true,
+    this.europe = true,
+    this.oceania = true,
+    this.antarctic = true,
+    this.isButtonMode = true,
+    this.includeNonUN = false,
   });
 
   factory GameFilter.fromMap(Map<String, dynamic> map) {
@@ -149,9 +162,15 @@ class GameFilter {
 
   Map<String, dynamic> toMap() {
     return {
-      'northAmerica': northAmerica, 'southAmerica': southAmerica, 'asia': asia,
-      'africa': africa, 'europe': europe, 'oceania': oceania,
-      'antarctic': antarctic, 'isButtonMode': isButtonMode, 'includeNonUN': includeNonUN,
+      'northAmerica': northAmerica,
+      'southAmerica': southAmerica,
+      'asia': asia,
+      'africa': africa,
+      'europe': europe,
+      'oceania': oceania,
+      'antarctic': antarctic,
+      'isButtonMode': isButtonMode,
+      'includeNonUN': includeNonUN,
     };
   }
 }
@@ -165,12 +184,15 @@ class AppSettings {
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
       darkTheme: map['darkTheme'] ?? true,
-      language: (map['language'] != null && map['language'].toString().isNotEmpty)
-          ? map['language'] : 'eng',
+      language:
+          (map['language'] != null && map['language'].toString().isNotEmpty)
+              ? map['language']
+              : 'eng',
     );
   }
 
-  Map<String, dynamic> toMap() => {'darkTheme': darkTheme, 'language': language};
+  Map<String, dynamic> toMap() =>
+      {'darkTheme': darkTheme, 'language': language};
 }
 
 class GameSession {
@@ -186,9 +208,14 @@ class GameSession {
   int currentQuestionScore = 50;
 
   void reset({required int startScore, required int minScore}) {
-    totalScore = 0; correctCount = 0; wrongCount = 0; passCount = 0;
+    totalScore = 0;
+    correctCount = 0;
+    wrongCount = 0;
+    passCount = 0;
     sessionId = _uuid.v4();
-    _startScore = startScore; _minScore = minScore; currentQuestionScore = _startScore;
+    _startScore = startScore;
+    _minScore = minScore;
+    currentQuestionScore = _startScore;
   }
 
   void nextQuestion() => currentQuestionScore = _startScore;

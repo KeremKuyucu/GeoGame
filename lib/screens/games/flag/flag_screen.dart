@@ -123,10 +123,11 @@ class _FlagGameState extends State<FlagGame>
                   onCountrySelected: (Country selected) => _checkAnswer(4),
                 ),
 
-              const SizedBox(height: 20),
-
-              // Pas butonu
-              GamePassButton(onPressed: _handlePass),
+              // Pas butonu (Sadece klavye modunda)
+              if (!_controller.isButtonMode) ...[
+                const SizedBox(height: 20),
+                GamePassButton(onPressed: _handlePass),
+              ],
             ],
           ),
         ),

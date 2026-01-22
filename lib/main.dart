@@ -10,6 +10,7 @@ import 'package:geogame/screens/games/borderpath/borderpath_screen.dart';
 import 'package:geogame/screens/games/capital/capital_screen.dart';
 import 'package:geogame/screens/games/distance/distance_screen.dart';
 import 'package:geogame/screens/games/flag/flag_screen.dart';
+import 'package:geogame/screens/games/findmap/findmap_screen.dart';
 import 'package:geogame/screens/leaderboard/leaderboard.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 import 'package:geogame/screens/profiles/profiles.dart';
@@ -33,10 +34,11 @@ void main() async {
   await PreferencesService.loadConfig();
 
   Locale deviceLocale = PlatformDispatcher.instance.locale;
+  debugPrint("Cihaz dili: ${deviceLocale.languageCode}");
+  debugPrint("Kullanıcı tercihi: ${AppState.settings.language}");
   await Localization.init(
       deviceLocale: deviceLocale.languageCode,
-      userPref: AppState.settings.language
-  );
+      userPref: AppState.settings.language);
 
   runApp(
     const RestartWidget(
@@ -76,7 +78,6 @@ class _GeogameState extends State<Geogame> {
             useMaterial3: true,
           ),
           initialRoute: '/',
-
           routes: {
             // Başlangıç ekranı
             '/': (context) => const SplashScreen(),
@@ -88,6 +89,7 @@ class _GeogameState extends State<Geogame> {
             '/game/distance': (context) => const DistanceGame(),
             '/game/borderline': (context) => const BorderLineGame(),
             '/game/borderpath': (context) => const BorderPathGame(),
+            '/game/findmap': (context) => const FindMapGame(),
 
             '/leaderboard': (context) => const Leaderboard(),
             '/profile': (context) => const Profiles(),

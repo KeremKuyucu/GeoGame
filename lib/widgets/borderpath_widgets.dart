@@ -199,6 +199,7 @@ class BorderPathMapArea extends StatelessWidget {
                     painter: PathMapPainter(
                       paths: controller.countryPaths,
                       currentPath: controller.currentPath,
+                      availableNeighbors: controller.availableNeighbors,
                       targetCountry: controller.targetCountry!,
                       isDark: controller.isDark,
                     ),
@@ -546,12 +547,14 @@ class BorderPathNeighborsSection extends StatelessWidget {
 class PathMapPainter extends CustomPainter {
   final Map<String, Path> paths;
   final List<Country> currentPath;
+  final List<Country> availableNeighbors;
   final Country targetCountry;
   final bool isDark;
 
   PathMapPainter({
     required this.paths,
     required this.currentPath,
+    required this.availableNeighbors,
     required this.targetCountry,
     required this.isDark,
   });
@@ -560,9 +563,18 @@ class PathMapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (paths.isEmpty) return;
 
+    // Sadece gösterilmesi gereken ülkelerin listesi
+    final relevantIsos = {
+      ...currentPath.map((c) => c.iso3),
+      ...availableNeighbors.map((c) => c.iso3),
+      targetCountry.iso3,
+    };
+
     Rect? combinedBounds;
-    for (final path in paths.values) {
-      final bounds = path.getBounds();
+    for (final entry in paths.entries) {
+      if (!relevantIsos.contains(entry.key)) continue;
+
+      final bounds = entry.value.getBounds();
       if (bounds.isEmpty) continue;
       combinedBounds = combinedBounds == null
           ? bounds
@@ -585,6 +597,8 @@ class PathMapPainter extends CustomPainter {
         -combinedBounds.left, -combinedBounds.top, 0.0, 1.0);
 
     for (final entry in paths.entries) {
+      if (!relevantIsos.contains(entry.key)) continue;
+
       final iso3 = entry.key;
       final path = entry.value;
       final transformedPath = path.transform(matrix.storage);
@@ -602,6 +616,7 @@ class PathMapPainter extends CustomPainter {
         fillColor = Colors.blue.withValues(alpha: 0.5);
         strokeColor = Colors.blue.shade800;
       } else {
+        // Komşular (ama henüz seçilmemiş)
         fillColor = isDark ? Colors.grey.shade700 : Colors.grey.shade300;
         strokeColor = isDark ? Colors.grey.shade500 : Colors.grey.shade600;
       }
@@ -625,6 +640,248 @@ class PathMapPainter extends CustomPainter {
   bool shouldRepaint(covariant PathMapPainter oldDelegate) {
     return oldDelegate.paths != paths ||
         oldDelegate.currentPath != currentPath ||
+        oldDelegate.availableNeighbors != availableNeighbors ||
         oldDelegate.targetCountry != targetCountry;
+  }
+}
+
+/// Zafer Dialogu
+class BorderPathVictoryDialog extends StatelessWidget {
+  final int score;
+  final String performance;
+  final int movesCount;
+  final int optimalPathLength;
+  final Color performanceColor;
+  final VoidCallback onMainMenu;
+  final VoidCallback onNewGame;
+
+  const BorderPathVictoryDialog({
+    super.key,
+    required this.score,
+    required this.performance,
+    required this.movesCount,
+    required this.optimalPathLength,
+    required this.performanceColor,
+    required this.onMainMenu,
+    required this.onNewGame,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color bgColor = isDark ? const Color(0xFF1E2746) : Colors.white;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: Colors.amber.withValues(alpha: 0.5),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Trophy Icon with Glow
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.amber.withValues(alpha: 0.4),
+                    blurRadius: 30,
+                    spreadRadius: 10,
+                  )
+                ],
+              ),
+              child: const Icon(
+                Icons.emoji_events_rounded,
+                color: Colors.amber,
+                size: 80,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Title
+            Text(
+              Localization.t('game_common.congratulations'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+                color: textColor,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              Localization.t('game_borderpath.victory_msg'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: textColor.withValues(alpha: 0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Stats Grid
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.black26 : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  _buildStatRow(
+                    Icons.directions_walk_rounded,
+                    Localization.t('game_borderpath.stat_moves'),
+                    "$movesCount",
+                    Colors.blue,
+                    textColor,
+                  ),
+                  const Divider(height: 24),
+                  _buildStatRow(
+                    Icons.map_rounded,
+                    Localization.t('game_borderpath.stat_optimal'),
+                    "$optimalPathLength",
+                    Colors.purple,
+                    textColor,
+                  ),
+                  const Divider(height: 24),
+                  _buildStatRow(
+                    Icons.star_rounded,
+                    Localization.t('game_common.score'),
+                    "$score",
+                    Colors.amber,
+                    textColor,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Performance Badge
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    performanceColor.withValues(alpha: 0.2),
+                    performanceColor.withValues(alpha: 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: performanceColor.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Text(
+                performance,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: performanceColor,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(
+                          color: isDark ? Colors.white54 : Colors.black26),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      foregroundColor: textColor,
+                    ),
+                    onPressed: onMainMenu,
+                    child: Text(Localization.t('game_common.main_menu')),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: const Color(0xff6200ee),
+                      foregroundColor: Colors.white,
+                      elevation: 4,
+                      shadowColor:
+                          const Color(0xff6200ee).withValues(alpha: 0.4),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: onNewGame,
+                    child: Text(
+                      Localization.t('game_common.new_game'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatRow(IconData icon, String label, String value,
+      Color iconColor, Color textColor) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: iconColor, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: textColor.withValues(alpha: 0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+      ],
+    );
   }
 }

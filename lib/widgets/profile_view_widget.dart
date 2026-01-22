@@ -12,6 +12,7 @@ extension GameTypeUI on GameType {
       GameType.distance => Icons.straighten,
       GameType.borderline => Icons.border_all,
       GameType.borderpath => Icons.route,
+      GameType.findmap => Icons.explore,
     };
   }
 
@@ -22,6 +23,7 @@ extension GameTypeUI on GameType {
       GameType.distance => Colors.tealAccent,
       GameType.borderline => Colors.pinkAccent,
       GameType.borderpath => Colors.blueAccent,
+      GameType.findmap => Colors.greenAccent,
     };
   }
 }
@@ -234,9 +236,14 @@ class ProfileViewWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSmallStat(Localization.t('profile.correct_label', args: [correct]), Colors.green.shade400),
-            _buildSmallStat(Localization.t('profile.wrong_label', args: [wrong]), Colors.red.shade400),
-            _buildSmallStat("${(successRate * 100).toStringAsFixed(1)}%", isDark ? Colors.white54 : Colors.blueGrey),
+            _buildSmallStat(
+                Localization.t('profile.correct_label', args: [correct]),
+                Colors.green.shade400),
+            _buildSmallStat(
+                Localization.t('profile.wrong_label', args: [wrong]),
+                Colors.red.shade400),
+            _buildSmallStat("${(successRate * 100).toStringAsFixed(1)}%",
+                isDark ? Colors.white54 : Colors.blueGrey),
           ],
         ),
       ],

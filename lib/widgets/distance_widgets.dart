@@ -12,15 +12,15 @@ import 'package:geogame/screens/games/distance/distance_controller.dart';
 class DistanceInputDashboard extends StatelessWidget {
   final DistanceGameController controller;
   final VoidCallback onAnswerSubmit;
-  final VoidCallback onPass;
   final VoidCallback onClearGuesses;
+  final VoidCallback onPass;
 
   const DistanceInputDashboard({
     super.key,
     required this.controller,
     required this.onAnswerSubmit,
-    required this.onPass,
     required this.onClearGuesses,
+    required this.onPass,
   });
 
   @override
@@ -165,12 +165,12 @@ class DistanceInputDashboard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onPass,
-                  icon: const Icon(Icons.skip_next, size: 18),
-                  label: Text(Localization.t('common.pass')),
+                  onPressed: onClearGuesses,
+                  icon: const Icon(Icons.delete_sweep, size: 18),
+                  label: Text(Localization.t('game_common.clear_guesses')),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.orange,
-                    side: const BorderSide(color: Colors.orange),
+                    foregroundColor: Colors.redAccent,
+                    side: const BorderSide(color: Colors.redAccent),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -181,12 +181,12 @@ class DistanceInputDashboard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onClearGuesses,
-                  icon: const Icon(Icons.delete_sweep, size: 18),
-                  label: Text(Localization.t('game_common.clear_guesses')),
+                  onPressed: onPass,
+                  icon: const Icon(Icons.skip_next, size: 18),
+                  label: Text(Localization.t('common.pass')),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.redAccent,
-                    side: const BorderSide(color: Colors.redAccent),
+                    foregroundColor: Colors.orange,
+                    side: const BorderSide(color: Colors.orange),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

@@ -28,8 +28,7 @@ class GameLogService {
     if (session.sessionId.isEmpty) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final List<String> rawList =
-        prefs.getStringList(_unsentLogsKey) ?? [];
+    final List<String> rawList = prefs.getStringList(_unsentLogsKey) ?? [];
 
     Map<String, dynamic>? existing;
 
@@ -48,14 +47,13 @@ class GameLogService {
       'correctCount': session.correctCount,
       'wrongCount': session.wrongCount,
       'scoreEarned': session.totalScore,
-      'played_at': existing?['played_at'] ??
-          DateTime.now().toUtc().toIso8601String(),
+      'played_at':
+          existing?['played_at'] ?? DateTime.now().toUtc().toIso8601String(),
     };
 
     rawList.add(jsonEncode(log));
     await prefs.setStringList(_unsentLogsKey, rawList);
   }
-
 
   /// 🏁 Ana menüye dönünce / oyun bitince çağrılır
   /// Kuyruktaki tüm logları server’a yollar
@@ -64,8 +62,7 @@ class GameLogService {
 
     final uid = AuthService.currentUserId!;
     final prefs = await SharedPreferences.getInstance();
-    final List<String> rawList =
-        prefs.getStringList(_unsentLogsKey) ?? [];
+    final List<String> rawList = prefs.getStringList(_unsentLogsKey) ?? [];
 
     if (rawList.isEmpty) return;
 
@@ -87,16 +84,13 @@ class GameLogService {
     }
 
     try {
-      await _supabase.from('game_logs').upsert(
-        payload,
-        onConflict: 'user_id,client_log_id',
-        ignoreDuplicates: true,
-      );
+      await _supabase.from('game_logs').insert(
+            payload,
+          );
 
       // ❗ başarılıysa kuyruk temizlenir
       await prefs.remove(_unsentLogsKey);
       debugPrint("✅ Sync tamamlandı");
-
     } catch (e) {
       // ❗ duplicate varsa DB reddeder ama kuyruk KALIR
       debugPrint("❌ Sync hatası (tekrar denenecek): $e");

@@ -60,77 +60,20 @@ class _BorderPathGameState extends State<BorderPathGame> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.emoji_events, color: Colors.amber, size: 30),
-            const SizedBox(width: 10),
-            Text(Localization.t('game_common.congratulations')),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              Localization.t('game_borderpath.victory_msg'),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            _buildStatRow(Localization.t('game_borderpath.stat_moves'),
-                "${_controller.movesCount}"),
-            _buildStatRow(Localization.t('game_borderpath.stat_optimal'),
-                "${_controller.optimalPathLength}"),
-            _buildStatRow(Localization.t('game_common.score'), "$score"),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _controller.getPerformanceColor().withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                performance,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: _controller.getPerformanceColor(),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _startNextRound(passMode: true);
-            },
-            child: Text(Localization.t('game_common.new_game')),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _controller.navigateHome(context);
-            },
-            child: Text(Localization.t('game_common.main_menu')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: Colors.grey.shade600)),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ],
+      builder: (context) => BorderPathVictoryDialog(
+        score: score,
+        performance: performance,
+        movesCount: _controller.movesCount,
+        optimalPathLength: _controller.optimalPathLength,
+        performanceColor: _controller.getPerformanceColor(),
+        onMainMenu: () {
+          Navigator.of(context).pop();
+          _controller.navigateHome(context);
+        },
+        onNewGame: () {
+          Navigator.of(context).pop();
+          _startNextRound(passMode: true);
+        },
       ),
     );
   }
