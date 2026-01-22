@@ -79,16 +79,19 @@ class GameService {
     final options = [AppState.targetCountry, ...distractors]..shuffle(_random);
     AppState.buttons = GameButton.createButtons(options);
 
-    debugPrint("🎯 Hedef: ${AppState.targetCountry.englishName} (${AppState.targetCountry.iso3})");
+    debugPrint(
+        "🎯 Hedef: ${AppState.targetCountry.englishName} (${AppState.targetCountry.iso3})");
   }
 
   /// Optimize edilmiş çeldirici algoritması
-  static List<Country> _getDistractors(List<Country> available, Country target) {
+  static List<Country> _getDistractors(
+      List<Country> available, Country target) {
     // 1. Aynı kıtadan adayları filtrele (Stream/Iterables kullanarak memory allocation'ı azalt)
-    final sameContinentCandidates = available.where((c) =>
-    c.iso3 != target.iso3 &&
-        c.continents.any((cont) => target.continents.contains(cont))
-    ).toList();
+    final sameContinentCandidates = available
+        .where((c) =>
+            c.iso3 != target.iso3 &&
+            c.continents.any((cont) => target.continents.contains(cont)))
+        .toList();
 
     final distractors = <Country>[];
 
@@ -100,10 +103,11 @@ class GameService {
     // Eğer yetmediyse, kalan havuzdan rastgele tamamla
     if (distractors.length < 3) {
       final needed = 3 - distractors.length;
-      final otherCandidates = available.where((c) =>
-      c.iso3 != target.iso3 &&
-          !distractors.any((d) => d.iso3 == c.iso3)
-      ).toList();
+      final otherCandidates = available
+          .where((c) =>
+              c.iso3 != target.iso3 &&
+              !distractors.any((d) => d.iso3 == c.iso3))
+          .toList();
 
       distractors.addAll(otherCandidates.pickRandomCount(needed, _random));
     }
@@ -113,8 +117,8 @@ class GameService {
 
   static Future<String> handlePass() async {
     AppState.session.submitPass();
-    final passCountryName = AppState.targetCountry
-        .getLocalizedName(AppState.settings.language);
+    final passCountryName =
+        AppState.targetCountry.getLocalizedName(AppState.settings.language);
     await startNewRound();
     return passCountryName;
   }
@@ -123,7 +127,8 @@ class GameService {
   // STANDARD GAME CHECK
   // --------------------------------------------------------------------------
 
-  static Future<bool> checkStandardAnswer(String answer, GameType type, int? buttonIndex) async {
+  static Future<bool> checkStandardAnswer(
+      String answer, GameType type, int? buttonIndex) async {
     final isCorrect = AppState.targetCountry
         .checkAnswer(answer.trim(), AppState.settings.language);
 
@@ -152,7 +157,8 @@ class GameService {
   // DISTANCE GAME
   // --------------------------------------------------------------------------
 
-  static Future<GuessResultModel?> processDistanceGuess(String inputText) async {
+  static Future<GuessResultModel?> processDistanceGuess(
+      String inputText) async {
     if (inputText.isEmpty) return null;
 
     final guessedCountry = _findCountryByName(inputText);
@@ -167,19 +173,24 @@ class GameService {
 
     // Mesafeyi ve yönü hesapla
     final distance = _calculateDistance(
-      guessedCountry.latitude, guessedCountry.longitude,
-      target.latitude, target.longitude,
+      guessedCountry.latitude,
+      guessedCountry.longitude,
+      target.latitude,
+      target.longitude,
     );
 
     final directionData = _calculateBearing(
-      guessedCountry.latitude, guessedCountry.longitude,
-      target.latitude, target.longitude,
+      guessedCountry.latitude,
+      guessedCountry.longitude,
+      target.latitude,
+      target.longitude,
     );
 
     final isCorrect = guessedCountry.iso3 == target.iso3;
 
     if (isCorrect) {
       AppState.session.submitCorrect();
+      await startNewRound();
       await GameLogService.saveProgress("distance");
     } else {
       AppState.session.submitWrong();
@@ -197,8 +208,9 @@ class GameService {
   static Country? _findCountryByName(String name) {
     // try-catch bloğuna gerek yok, firstWhere orElse ile daha temiz çözülür
     return AppState.allCountries.firstWhere(
-          (c) => c.checkAnswer(name, AppState.settings.language),
-      orElse: () => throw StateError('Country not found'), // orElse null dönemediği için hack
+      (c) => c.checkAnswer(name, AppState.settings.language),
+      orElse: () => throw StateError(
+          'Country not found'), // orElse null dönemediği için hack
     );
   }
 
@@ -208,9 +220,8 @@ class GameService {
 
   static BorderPathGameData? createBorderPathGame() {
     // Sınır komşusu olan ülkeleri filtrele (sadece bir kez yapılmalı aslında ama şimdilik burada kalsın)
-    final connectedCountries = AppState.activePool
-        .where((c) => c.borders.isNotEmpty)
-        .toList();
+    final connectedCountries =
+        AppState.activePool.where((c) => c.borders.isNotEmpty).toList();
 
     if (connectedCountries.length < 2) return null;
 
@@ -244,7 +255,9 @@ class GameService {
   /// BFS Algoritması (Optimize Edilmiş)
   static Map<String, int> _bfsDistances(Country start) {
     final distances = <String, int>{start.iso3: 0};
-    final queue = <String>[start.iso3]; // Queue'da sadece ISO string tutmak daha hafiftir
+    final queue = <String>[
+      start.iso3
+    ]; // Queue'da sadece ISO string tutmak daha hafiftir
 
     // Cachelenmiş haritayı kullan
     final map = _countryMap;
@@ -271,7 +284,8 @@ class GameService {
     return distances;
   }
 
-  static Future<void> completeBorderPathGame(int moves, int optimalMoves) async {
+  static Future<void> completeBorderPathGame(
+      int moves, int optimalMoves) async {
     AppState.session.submitCorrect();
 
     final penalty = math.max(0, moves - optimalMoves);
@@ -297,9 +311,8 @@ class GameService {
     final List<Country> neighbors = [];
 
     for (String borderIso3 in lastCountry.borders) {
-      Country? neighbor = AppState.allCountries
-          .where((c) => c.iso3 == borderIso3)
-          .firstOrNull;
+      Country? neighbor =
+          AppState.allCountries.where((c) => c.iso3 == borderIso3).firstOrNull;
 
       if (neighbor != null && !currentPath.contains(neighbor)) {
         neighbors.add(neighbor);
@@ -317,10 +330,10 @@ class GameService {
   /// Verilen ülkenin mevcut yoldaki son ülkenin komşusu olup olmadığını kontrol eder.
   static bool isValidNeighborMove(List<Country> currentPath, Country country) {
     if (currentPath.isEmpty) return false;
-    
+
     final Country lastCountry = currentPath.last;
     return lastCountry.borders.contains(country.iso3) &&
-           !currentPath.any((c) => c.iso3 == country.iso3);
+        !currentPath.any((c) => c.iso3 == country.iso3);
   }
 
   /// Border Path skoru hesaplar.
@@ -341,7 +354,8 @@ class GameService {
   // MATH HELPERS
   // --------------------------------------------------------------------------
 
-  static double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  static double _calculateDistance(
+      double lat1, double lon1, double lat2, double lon2) {
     const r = 6371.0; // Dünya yarıçapı (km)
     double toRad(double d) => d * math.pi / 180.0;
 
@@ -349,15 +363,16 @@ class GameService {
     final dLon = toRad(lon2 - lon1);
 
     final a = math.pow(math.sin(dLat / 2), 2) +
-        math.cos(toRad(lat1)) * math.cos(toRad(lat2)) *
+        math.cos(toRad(lat1)) *
+            math.cos(toRad(lat2)) *
             math.pow(math.sin(dLon / 2), 2);
 
     final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
     return (r * c).roundToDouble(); // Virgülden sonrasını temizle
   }
 
-  static ({String directionText, double bearing}) _calculateBearing(double lat1, double lon1, double lat2, double lon2) {
-
+  static ({String directionText, double bearing}) _calculateBearing(
+      double lat1, double lon1, double lat2, double lon2) {
     double toRad(double d) => d * math.pi / 180.0;
     double toDeg(double r) => r * 180.0 / math.pi;
 
@@ -373,8 +388,14 @@ class GameService {
 
     // Yön metnini belirle (Record pattern)
     const sectors = [
-      "north", "north_east", "east", "south_east",
-      "south", "south_west", "west", "north_west"
+      "north",
+      "north_east",
+      "east",
+      "south_east",
+      "south",
+      "south_west",
+      "west",
+      "north_west"
     ];
 
     // 360 dereceyi 8 dilime böl (her biri 45 derece)
@@ -382,8 +403,8 @@ class GameService {
     final index = ((bearing + 22.5) / 45.0).floor() % 8;
 
     return (
-    directionText: Localization.t("directions.${sectors[index]}"),
-    bearing: bearing
+      directionText: Localization.t("directions.${sectors[index]}"),
+      bearing: bearing
     );
   }
 }
