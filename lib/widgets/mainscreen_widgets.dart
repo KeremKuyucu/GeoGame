@@ -36,37 +36,6 @@ class MainScreenGameGrid extends StatelessWidget {
   }
 }
 
-/// Liste görünümü widget'ı
-class MainScreenGameList extends StatelessWidget {
-  final MainScreenController controller;
-  final double? topPadding;
-
-  const MainScreenGameList({
-    super.key,
-    required this.controller,
-    this.topPadding,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(20, topPadding ?? 100, 20, 20),
-      itemCount: gameMetadataList.length,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.only(bottom: 25),
-        child: SizedBox(
-          height: 200,
-          child: GameCard(
-            metadata: gameMetadataList[index],
-            isGrid: false,
-            onTap: () => controller.startGame(gameMetadataList[index]),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// Giriş yapmamış kullanıcılar için uyarı banner'ı
 class LoginWarningBanner extends StatelessWidget {
   final VoidCallback onLoginPressed;

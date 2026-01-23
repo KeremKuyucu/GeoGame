@@ -134,5 +134,5 @@ final List<GameMetadata> gameMetadataList = [
       GameRule(
           icon: Icons.star_border, textKey: 'game_common.score_system_generic'),
     ],
-  ),
+  )
 ];
