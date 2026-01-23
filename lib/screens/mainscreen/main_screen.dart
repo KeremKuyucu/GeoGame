@@ -76,13 +76,19 @@ class _MainScreenState extends State<MainScreen> {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  return MainScreenGameGrid(
-                    controller: _controller,
-                    topPadding: isLoggedIn ? null : 10.0,
-                  );
+                  final bool isGrid =
+                      _controller.shouldUseGridLayout(constraints.maxWidth);
+                  return isGrid
+                  ? MainScreenGameGrid(
+                        controller: _controller,
+                          topPadding: isLoggedIn ? null : 10,
+                        )
+                      : MainScreenGameList(
+                          controller: _controller,
+                          topPadding: isLoggedIn ? null : 10,
+                        );
                 },
               ),
-            ),
           ],
         ),
       ),
