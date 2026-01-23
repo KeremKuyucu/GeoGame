@@ -10,48 +10,92 @@ class SplashScreenBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey.shade900,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1A1A2E),
+              Color(0xFF16213E),
+              Color(0xFF0F3460),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.8, end: 1.0),
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.elasticOut,
+                builder: (context, scale, child) {
+                  return Transform.scale(
+                    scale: scale,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blueAccent.withValues(alpha: 0.3),
+                            blurRadius: 30,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/logo.webp',
+                          width: 160,
+                          height: 160,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  'assets/images/logo.webp',
-                  width: 150,
-                  height: 150,
-                  fit: BoxFit.cover,
+              const SizedBox(height: 40),
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeIn,
+                builder: (context, opacity, child) {
+                  return Opacity(
+                    opacity: opacity,
+                    child: child,
+                  );
+                },
+                child: Column(
+                  children: [
+                    Text(
+                      "GeoGame",
+                      style: TextStyle(
+                        fontSize: 42,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 4,
+                        shadows: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              "GeoGame",
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 2,
+              const SizedBox(height: 60),
+              const CircularProgressIndicator(
+                color: Color(0xFFE94560),
+                strokeWidth: 3,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE94560)),
               ),
-            ),
-            const SizedBox(height: 50),
-            const CircularProgressIndicator(
-              color: Colors.blueAccent,
-              strokeWidth: 3,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
