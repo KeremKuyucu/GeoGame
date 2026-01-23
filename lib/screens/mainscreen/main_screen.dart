@@ -21,7 +21,6 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller = MainScreenController(context);
       _controller.checkForUpdates();
     });
   }
@@ -69,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
               LoginWarningBanner(
                 onLoginPressed: () async {
                   await Navigator.pushNamed(context, '/auth');
-                  setState(() {});
+                  if (mounted) setState(() {});
                 },
               ),
             ],
@@ -79,8 +78,8 @@ class _MainScreenState extends State<MainScreen> {
                   final bool isGrid =
                       _controller.shouldUseGridLayout(constraints.maxWidth);
                   return isGrid
-                  ? MainScreenGameGrid(
-                        controller: _controller,
+                      ? MainScreenGameGrid(
+                          controller: _controller,
                           topPadding: isLoggedIn ? null : 10,
                         )
                       : MainScreenGameList(
@@ -89,6 +88,7 @@ class _MainScreenState extends State<MainScreen> {
                         );
                 },
               ),
+            ),
           ],
         ),
       ),
