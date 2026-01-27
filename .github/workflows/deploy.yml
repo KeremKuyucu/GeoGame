@@ -17,7 +17,7 @@ jobs:
       - name: Build Web
         run: |
           flutter pub get
-          flutter build web --release --web-renderer html
+          flutter build web --release
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
