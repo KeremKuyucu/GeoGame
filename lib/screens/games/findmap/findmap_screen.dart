@@ -27,6 +27,11 @@ class _FindMapGameState extends State<FindMapGame>
   late AnimationController _scoreController;
   bool _showHint = false;
 
+  // Küçük ülke mantığı için sabitler
+  static const double _smallCountryAreaThreshold = 2000.0;
+  static const double _markerBaseRadius = 8.0; // Marker'ın görsel taban yarıçapı
+  static const double _hitBaseRadius = 20.0; // Tıklama algılama yarıçapı
+
   @override
   void initState() {
     super.initState();
@@ -65,13 +70,43 @@ class _FindMapGameState extends State<FindMapGame>
   void _onTapLocal(TapUpDetails details) {
     if (_controller.isLoading || _controller.targetCountry == null) return;
 
-    final clickedCountry = _controller.handleTap(details.localPosition);
+    // 1. ÖNCE MARKER KONTROLÜ (KÜÇÜK ÜLKELER)
+    // Küçük ülkelere tıklamayı kolaylaştırmak için önce marker mesafesini kontrol ediyoruz.
+    Country? hitCountry;
 
-    if (clickedCountry != null) {
-      if (clickedCountry.iso3 == _controller.targetCountry!.iso3) {
-        _showResultDialog(true, clickedCountry);
+    // Not: _controller.countries listesinin erişilebilir olduğunu varsayıyoruz.
+    // Eğer controller'da bu liste 'private' ise public bir getter eklemelisiniz.
+    for (var country in _controller.countries) {
+      // Area verisi null ise veya eşikten büyükse atla
+      if ((country.area ?? 999999) >= _smallCountryAreaThreshold) continue;
+
+      final path = _controller.countryPaths[country.iso3];
+      if (path == null) continue;
+
+      // Path'i harita matrisine göre dönüştür ve merkezini bul
+      final transformedPath = path.transform(_controller.mapMatrix.storage);
+      final center = transformedPath.getBounds().center;
+
+      // Tıklama ile merkez arasındaki mesafeyi hesapla
+      final distance = (details.localPosition - center).distance;
+      
+      // Hit radius scale'e göre ayarlanır ki kullanıcı zoom yapsa bile tıklama alanı mantıklı kalsın
+      // Zoom arttıkça (scale büyüdükçe), screen-space'deki pixel aynı kalmalı, bu yüzden world-space radius küçülmeli.
+      if (distance <= _hitBaseRadius / _currentScale) {
+        hitCountry = country;
+        break; // İlk bulunan küçük ülkeyi al
+      }
+    }
+
+    // 2. NORMAL HARİTA KONTROLÜ
+    // Eğer marker'a tıklanmadıysa normal path kontrolüne (ray-casting) geç
+    hitCountry ??= _controller.handleTap(details.localPosition);
+
+    if (hitCountry != null) {
+      if (hitCountry.iso3 == _controller.targetCountry!.iso3) {
+        _showResultDialog(true, hitCountry);
       } else {
-        _showResultDialog(false, clickedCountry);
+        _showResultDialog(false, hitCountry);
       }
     }
   }
@@ -187,6 +222,7 @@ class _FindMapGameState extends State<FindMapGame>
                       size: mapSize,
                       painter: WorldMapPainter(
                         paths: _controller.countryPaths,
+                        countries: _controller.countries, // Painter'a ülke listesini geçiyoruz
                         mapMatrix: _controller.mapMatrix,
                         targetIso:
                             _showHint ? _controller.targetCountry?.iso3 : null,
@@ -451,6 +487,7 @@ class _FindMapGameState extends State<FindMapGame>
 
 class WorldMapPainter extends CustomPainter {
   final Map<String, Path> paths;
+  final List<Country> countries; // Yeni: Area kontrolü için eklendi
   final Matrix4 mapMatrix;
   final String? targetIso;
   final bool isDark;
@@ -460,6 +497,7 @@ class WorldMapPainter extends CustomPainter {
 
   WorldMapPainter({
     required this.paths,
+    required this.countries, // Parametre olarak eklendi
     required this.mapMatrix,
     required this.targetIso,
     required this.isDark,
@@ -497,6 +535,16 @@ class WorldMapPainter extends CustomPainter {
       ..strokeWidth = max(2.0, 3.0 / scale)
       ..color = isDark ? Colors.amber : Colors.orange;
 
+    // Küçük ülke markerları için kalem
+    final Paint markerPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = (isDark ? Colors.white : Colors.black54).withValues(alpha: 0.6);
+
+    // Marker'ın boyutu ekrana göre sabit kalması için scale ile ters orantılı yapılır.
+    // Ancak zoom çok uzaksa (scale 1.0) çok küçük kalabilir, bu yüzden min bir boyut koyabiliriz.
+    final double markerRadius = max(2.0, 5.0 / scale);
+
+    // Path'leri çiz
     for (var entry in paths.entries) {
       final path = entry.value;
       final transformedPath = path.transform(mapMatrix.storage);
@@ -513,6 +561,21 @@ class WorldMapPainter extends CustomPainter {
       if (showHint && targetIso != null && entry.key == targetIso) {
         canvas.drawPath(transformedPath, hintPaint);
         canvas.drawPath(transformedPath, hintStrokePaint);
+      }
+    }
+
+    // Küçük ülkeler için marker çizimi (Area < 2000)
+    for (var country in countries) {
+      if ((country.area ?? 999999) < 2000) {
+        final path = paths[country.iso3];
+        if (path != null) {
+          // Performans Uyarısı: .transform ve .getBounds her frame'de yapılıyor.
+          // İdeal olarak bu pointler initialize'da hesaplanmalıdır.
+          final transformedPath = path.transform(mapMatrix.storage);
+          final center = transformedPath.getBounds().center;
+          
+          canvas.drawCircle(center, markerRadius, markerPaint);
+        }
       }
     }
   }
