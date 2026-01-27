@@ -4,20 +4,34 @@ import 'package:vector_math/vector_math_64.dart' as vector;
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
-import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 
 class FindMapGameController {
   bool isLoading = true;
+  
+  // Harita verileri
   Map<String, Path> countryPaths = {};
+  
+  // UI tarafından erişilecek aktif ülke listesi
+  List<Country> countries = []; 
+  
+  // Küçük ülkeler için özel liste (Marker çizimi için)
+  List<Country> smallCountries = [];
+  
+  // Küçük ülkelerin HAM merkez noktaları (Transform edilmemiş)
+  Map<String, Offset> smallCountryCenters = {};
+  
   Country? targetCountry;
 
-  // Cache bounds for hit testing optimization
+  // Hit test optimizasyonu için bounds cache'i
   final Map<String, Rect> _pathBounds = {};
 
-  // UI Helpers
+  // Sabitler
+  static const double _smallCountryAreaThreshold = 2000.0;
+
+  // UI Yardımcıları
   Color get backgroundColor => AppState.settings.darkTheme
       ? const Color(0xFF1E2746)
       : Colors.blue.shade50;
@@ -34,17 +48,50 @@ class FindMapGameController {
     isLoading = true;
     GameService.initializeGame(GameType.findmap);
 
-    // Tek dosyadan tüm dünyayı yükle
+    // 1. Path'leri yükle
     countryPaths = await GeoJsonService.loadWorldMapSimplified();
 
-    // Bounds hesapla ve cache'le
-    _pathBounds.clear();
-    for (var entry in countryPaths.entries) {
-      _pathBounds[entry.key] = entry.value.getBounds();
-    }
+    // 2. Verileri hazırla (Bounds ve Küçük Ülke Analizi)
+    _prepareData();
 
     startNewRound();
     isLoading = false;
+  }
+
+  void _prepareData() {
+    _pathBounds.clear();
+    countries.clear();
+    smallCountries.clear();
+    smallCountryCenters.clear();
+
+    for (var entry in countryPaths.entries) {
+      final iso = entry.key;
+      final path = entry.value;
+
+      // Bounds cache
+      final bounds = path.getBounds();
+      _pathBounds[iso] = bounds;
+
+      // Ülke modelini bul ve listeye ekle
+      try {
+        final country = AppState.allCountries.firstWhere(
+          (c) => c.iso3 == iso,
+        );
+        countries.add(country);
+
+        // Küçük ülke kontrolü (Area < 2000)
+        // Eğer area verisi null ise varsayılan olarak büyük kabul et (hata önleme)
+        if ((country.area ?? 999999) < _smallCountryAreaThreshold) {
+          smallCountries.add(country);
+          // Merkez noktasını BİR KEZ hesapla ve sakla.
+          // Bu, her karede (frame) hesaplama yapmayı önler.
+          smallCountryCenters[iso] = bounds.center;
+        }
+      } catch (_) {
+        // AppState içinde olmayan bir ISO kodu varsa (örn: disputed territories), atla.
+        continue;
+      }
+    }
   }
 
   void startNewRound() {
@@ -56,18 +103,11 @@ class FindMapGameController {
         .toList();
 
     if (possibleTargets.isEmpty) {
-      // Fallback: Tüm haritadan seç (eğer havuz pathlerle eşleşmezse)
-      final keys = countryPaths.keys.toList();
-      final randomIso = keys[Random().nextInt(keys.length)];
-      // Bu ISO'ya sahip ülkeyi bulmaya çalış, yoksa hata
-      try {
-        targetCountry =
-            AppState.allCountries.firstWhere((c) => c.iso3 == randomIso);
-      } catch (_) {
-        // Modelde yoksa (örn: disputed territories), pas geç ve tekrar dene veya ilkini al
-        targetCountry = AppState.allCountries.isNotEmpty
-            ? AppState.allCountries.first
-            : null;
+      // Fallback
+      if (countries.isNotEmpty) {
+        targetCountry = countries[Random().nextInt(countries.length)];
+      } else {
+        targetCountry = null;
       }
     } else {
       targetCountry = possibleTargets[Random().nextInt(possibleTargets.length)];
@@ -80,11 +120,8 @@ class FindMapGameController {
     if (countryPaths.isEmpty) return;
 
     Rect? combinedBounds;
-    for (final path in countryPaths.values) {
-      final bounds = path.getBounds();
+    for (final bounds in _pathBounds.values) {
       if (bounds.isEmpty || bounds.width == 0 || bounds.height == 0) continue;
-
-      // Sanity check for bounds (sometimes artifacts create huge bounds)
       if (bounds.width > 10000 || bounds.height > 10000) continue;
 
       combinedBounds = combinedBounds == null
@@ -94,13 +131,10 @@ class FindMapGameController {
 
     if (combinedBounds == null || combinedBounds.isEmpty) return;
 
-    // Calculate scale to fit
     final double scaleX = size.width / combinedBounds.width;
     final double scaleY = size.height / combinedBounds.height;
-    final double scale = min(scaleX, scaleY) * 0.95; // %5 padding
+    final double scale = min(scaleX, scaleY) * 0.95; 
 
-    // Center filtering:
-    // Move data center to (0,0) -> Scale -> Move to screen center
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
     final double dataCenterX = combinedBounds.center.dx;
@@ -118,7 +152,7 @@ class FindMapGameController {
       );
   }
 
-  /// Tıklanan konumu kontrol eder ve ülkeyi döner
+  /// Tıklanan konumu kontrol eder ve ülkeyi döner (Normal Path Hit Test)
   Country? handleTap(Offset localPosition) {
     try {
       final Matrix4 inverse =
@@ -135,7 +169,7 @@ class FindMapGameController {
         // Bounds check optimization
         if (_pathBounds[iso]?.contains(point) == true) {
           if (path.contains(point)) {
-            return AppState.allCountries.firstWhere((c) => c.iso3 == iso);
+            return countries.firstWhere((c) => c.iso3 == iso);
           }
         }
       }
