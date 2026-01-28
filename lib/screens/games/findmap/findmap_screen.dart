@@ -29,7 +29,7 @@ class _FindMapGameState extends State<FindMapGame>
 
   // Küçük ülke mantığı için sabitler
   static const double _smallCountryAreaThreshold = 2000.0;
-  static const double _markerBaseRadius = 8.0; // Marker'ın görsel taban yarıçapı
+
   static const double _hitBaseRadius = 20.0; // Tıklama algılama yarıçapı
 
   @override
@@ -78,7 +78,7 @@ class _FindMapGameState extends State<FindMapGame>
     // Eğer controller'da bu liste 'private' ise public bir getter eklemelisiniz.
     for (var country in _controller.countries) {
       // Area verisi null ise veya eşikten büyükse atla
-      if ((country.area ?? 999999) >= _smallCountryAreaThreshold) continue;
+      if (country.area >= _smallCountryAreaThreshold) continue;
 
       final path = _controller.countryPaths[country.iso3];
       if (path == null) continue;
@@ -89,7 +89,7 @@ class _FindMapGameState extends State<FindMapGame>
 
       // Tıklama ile merkez arasındaki mesafeyi hesapla
       final distance = (details.localPosition - center).distance;
-      
+
       // Hit radius scale'e göre ayarlanır ki kullanıcı zoom yapsa bile tıklama alanı mantıklı kalsın
       // Zoom arttıkça (scale büyüdükçe), screen-space'deki pixel aynı kalmalı, bu yüzden world-space radius küçülmeli.
       if (distance <= _hitBaseRadius / _currentScale) {
@@ -222,7 +222,8 @@ class _FindMapGameState extends State<FindMapGame>
                       size: mapSize,
                       painter: WorldMapPainter(
                         paths: _controller.countryPaths,
-                        countries: _controller.countries, // Painter'a ülke listesini geçiyoruz
+                        countries: _controller
+                            .countries, // Painter'a ülke listesini geçiyoruz
                         mapMatrix: _controller.mapMatrix,
                         targetIso:
                             _showHint ? _controller.targetCountry?.iso3 : null,
@@ -566,14 +567,14 @@ class WorldMapPainter extends CustomPainter {
 
     // Küçük ülkeler için marker çizimi (Area < 2000)
     for (var country in countries) {
-      if ((country.area ?? 999999) < 2000) {
+      if (country.area < 2000) {
         final path = paths[country.iso3];
         if (path != null) {
           // Performans Uyarısı: .transform ve .getBounds her frame'de yapılıyor.
           // İdeal olarak bu pointler initialize'da hesaplanmalıdır.
           final transformedPath = path.transform(mapMatrix.storage);
           final center = transformedPath.getBounds().center;
-          
+
           canvas.drawCircle(center, markerRadius, markerPaint);
         }
       }

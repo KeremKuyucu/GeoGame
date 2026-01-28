@@ -4,25 +4,26 @@ import 'package:vector_math/vector_math_64.dart' as vector;
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 
 class FindMapGameController {
   bool isLoading = true;
-  
+
   // Harita verileri
   Map<String, Path> countryPaths = {};
-  
+
   // UI tarafından erişilecek aktif ülke listesi
-  List<Country> countries = []; 
-  
+  List<Country> countries = [];
+
   // Küçük ülkeler için özel liste (Marker çizimi için)
   List<Country> smallCountries = [];
-  
+
   // Küçük ülkelerin HAM merkez noktaları (Transform edilmemiş)
   Map<String, Offset> smallCountryCenters = {};
-  
+
   Country? targetCountry;
 
   // Hit test optimizasyonu için bounds cache'i
@@ -81,7 +82,7 @@ class FindMapGameController {
 
         // Küçük ülke kontrolü (Area < 2000)
         // Eğer area verisi null ise varsayılan olarak büyük kabul et (hata önleme)
-        if ((country.area ?? 999999) < _smallCountryAreaThreshold) {
+        if (country.area < _smallCountryAreaThreshold) {
           smallCountries.add(country);
           // Merkez noktasını BİR KEZ hesapla ve sakla.
           // Bu, her karede (frame) hesaplama yapmayı önler.
@@ -133,7 +134,7 @@ class FindMapGameController {
 
     final double scaleX = size.width / combinedBounds.width;
     final double scaleY = size.height / combinedBounds.height;
-    final double scale = min(scaleX, scaleY) * 0.95; 
+    final double scale = min(scaleX, scaleY) * 0.95;
 
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
