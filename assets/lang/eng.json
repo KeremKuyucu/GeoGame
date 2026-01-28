@@ -150,7 +150,11 @@
     "find_prompt": "Find: {0}",
     "loading_world": "Loading world map...",
     "correct_feedback": "Correct! You found {0}.",
-    "wrong_feedback": "Wrong! This is {0}."
+    "wrong_feedback": "Wrong! This is {0}.",
+    "hide_hint": "Hide Hint",
+    "show_hint": "Show Hint",
+    "reset_view": "Reset View",
+    "web_performance_warning": "Please install the app for better performance."
   },
   "directions": {
     "north": "North",

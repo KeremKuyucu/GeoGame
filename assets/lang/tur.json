@@ -150,7 +150,11 @@
     "find_prompt": "Bul: {0}",
     "loading_world": "Dünya haritası yükleniyor...",
     "correct_feedback": "Doğru! {0} ülkesini buldun.",
-    "wrong_feedback": "Yanlış! Burası {0}."
+    "wrong_feedback": "Yanlış! Burası {0}.",
+    "hide_hint": "İpucunu Gizle",
+    "show_hint": "İpucunu Göster",
+    "reset_view": "Görünümü Sıfırla",
+    "web_performance_warning": "Kasma sorunları için lütfen uygulamayı yükleyin."
   },
   "directions": {
     "north": "Kuzey",

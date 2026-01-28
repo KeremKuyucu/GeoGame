@@ -46,17 +46,22 @@ class FindMapGameController {
   int get wrongAnswers => AppState.session.wrongCount;
 
   Future<void> initializeGame() async {
-    isLoading = true;
-    GameService.initializeGame(GameType.findmap);
+    try {
+      isLoading = true;
+      GameService.initializeGame(GameType.findmap);
 
-    // 1. Path'leri yükle
-    countryPaths = await GeoJsonService.loadWorldMapSimplified();
+      // 1. Path'leri yükle
+      countryPaths = await GeoJsonService.loadWorldMapSimplified();
 
-    // 2. Verileri hazırla (Bounds ve Küçük Ülke Analizi)
-    _prepareData();
+      // 2. Verileri hazırla (Bounds ve Küçük Ülke Analizi)
+      _prepareData();
 
-    startNewRound();
-    isLoading = false;
+      startNewRound();
+    } catch (e) {
+      debugPrint("Game initialization error: $e");
+    } finally {
+      isLoading = false;
+    }
   }
 
   void _prepareData() {
@@ -64,6 +69,9 @@ class FindMapGameController {
     countries.clear();
     smallCountries.clear();
     smallCountryCenters.clear();
+    transformedPaths.clear();
+    transformedSmallCountryCenters.clear();
+    _lastMapSize = null;
 
     for (var entry in countryPaths.entries) {
       final iso = entry.key;
@@ -116,9 +124,18 @@ class FindMapGameController {
   }
 
   Matrix4 mapMatrix = Matrix4.identity();
+  Map<String, Path> transformedPaths = {};
+  Map<String, Offset> transformedSmallCountryCenters = {};
+  Size? _lastMapSize;
 
   void prepareMapMatrix(Size size) {
     if (countryPaths.isEmpty) return;
+    // Eğer boyut değişmediyse ve daha önce hesaplama yapıldıysa tekrar yapma
+    if (_lastMapSize == size && transformedPaths.isNotEmpty) return;
+
+    _lastMapSize = size;
+    transformedPaths.clear();
+    transformedSmallCountryCenters.clear();
 
     Rect? combinedBounds;
     for (final bounds in _pathBounds.values) {
@@ -151,6 +168,24 @@ class FindMapGameController {
       ..translateByVector3(
         vector.Vector3(-dataCenterX, -dataCenterY, 0.0),
       );
+
+    // Path'leri ve merkezleri transform et ve cache'le
+    for (var entry in countryPaths.entries) {
+      final iso = entry.key;
+      final path = entry.value;
+
+      // Transform Path
+      final transformedPath = path.transform(mapMatrix.storage);
+      transformedPaths[iso] = transformedPath;
+
+      // Küçük ülke ise merkezini de transform et
+      if (smallCountryCenters.containsKey(iso)) {
+        final rawCenter = smallCountryCenters[iso]!;
+        final vector.Vector3 pointVec = mapMatrix.perspectiveTransform(
+            vector.Vector3(rawCenter.dx, rawCenter.dy, 0));
+        transformedSmallCountryCenters[iso] = Offset(pointVec.x, pointVec.y);
+      }
+    }
   }
 
   /// Tıklanan konumu kontrol eder ve ülkeyi döner (Normal Path Hit Test)
