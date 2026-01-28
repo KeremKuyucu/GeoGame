@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
@@ -26,9 +27,6 @@ class _FindMapGameState extends State<FindMapGame>
   late AnimationController _pulseController;
   late AnimationController _scoreController;
   bool _showHint = false;
-
-  // Küçük ülke mantığı için sabitler
-  static const double _smallCountryAreaThreshold = 2000.0;
 
   static const double _hitBaseRadius = 20.0; // Tıklama algılama yarıçapı
 
@@ -71,35 +69,23 @@ class _FindMapGameState extends State<FindMapGame>
     if (_controller.isLoading || _controller.targetCountry == null) return;
 
     // 1. ÖNCE MARKER KONTROLÜ (KÜÇÜK ÜLKELER)
-    // Küçük ülkelere tıklamayı kolaylaştırmak için önce marker mesafesini kontrol ediyoruz.
     Country? hitCountry;
 
-    // Not: _controller.countries listesinin erişilebilir olduğunu varsayıyoruz.
-    // Eğer controller'da bu liste 'private' ise public bir getter eklemelisiniz.
-    for (var country in _controller.countries) {
-      // Area verisi null ise veya eşikten büyükse atla
-      if (country.area >= _smallCountryAreaThreshold) continue;
+    for (var country in _controller.smallCountries) {
+      final center = _controller.transformedSmallCountryCenters[country.iso3];
+      if (center == null) continue;
 
-      final path = _controller.countryPaths[country.iso3];
-      if (path == null) continue;
-
-      // Path'i harita matrisine göre dönüştür ve merkezini bul
-      final transformedPath = path.transform(_controller.mapMatrix.storage);
-      final center = transformedPath.getBounds().center;
-
-      // Tıklama ile merkez arasındaki mesafeyi hesapla
+      // LocalPosition (2000x1000 space) ile merkez arasındaki mesafe
       final distance = (details.localPosition - center).distance;
 
-      // Hit radius scale'e göre ayarlanır ki kullanıcı zoom yapsa bile tıklama alanı mantıklı kalsın
-      // Zoom arttıkça (scale büyüdükçe), screen-space'deki pixel aynı kalmalı, bu yüzden world-space radius küçülmeli.
       if (distance <= _hitBaseRadius / _currentScale) {
         hitCountry = country;
-        break; // İlk bulunan küçük ülkeyi al
+        break;
       }
     }
 
     // 2. NORMAL HARİTA KONTROLÜ
-    // Eğer marker'a tıklanmadıysa normal path kontrolüne (ray-casting) geç
+    // Marker bulunamadıysa ray-casting ile kontrol et
     hitCountry ??= _controller.handleTap(details.localPosition);
 
     if (hitCountry != null) {
@@ -221,10 +207,10 @@ class _FindMapGameState extends State<FindMapGame>
                     child: CustomPaint(
                       size: mapSize,
                       painter: WorldMapPainter(
-                        paths: _controller.countryPaths,
-                        countries: _controller
-                            .countries, // Painter'a ülke listesini geçiyoruz
-                        mapMatrix: _controller.mapMatrix,
+                        // Cached paths passed directly
+                        paths: _controller.transformedPaths,
+                        smallCountryCenters:
+                            _controller.transformedSmallCountryCenters,
                         targetIso:
                             _showHint ? _controller.targetCountry?.iso3 : null,
                         isDark: AppState.settings.darkTheme,
@@ -239,7 +225,7 @@ class _FindMapGameState extends State<FindMapGame>
             ),
           ),
           Positioned(
-            top: 16,
+            top: kIsWeb ? 60 : 16,
             left: 16,
             right: 16,
             child: Center(
@@ -383,7 +369,9 @@ class _FindMapGameState extends State<FindMapGame>
                       _showHint = !_showHint;
                     });
                   },
-                  tooltip: _showHint ? 'Hide Hint' : 'Show Hint',
+                  tooltip: _showHint
+                      ? Localization.t('game_findmap.hide_hint')
+                      : Localization.t('game_findmap.show_hint'),
                 ),
                 const SizedBox(height: 12),
                 _buildActionButton(
@@ -392,7 +380,7 @@ class _FindMapGameState extends State<FindMapGame>
                   onPressed: () {
                     _transformController.value = Matrix4.identity();
                   },
-                  tooltip: 'Reset View',
+                  tooltip: Localization.t('game_findmap.reset_view'),
                 ),
               ],
             ),
@@ -423,6 +411,36 @@ class _FindMapGameState extends State<FindMapGame>
                         color: _controller.textColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (kIsWeb)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: Colors.amber,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.warning_amber_rounded,
+                        color: Colors.black87),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        Localization.t('game_findmap.web_performance_warning'),
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
@@ -487,9 +505,8 @@ class _FindMapGameState extends State<FindMapGame>
 }
 
 class WorldMapPainter extends CustomPainter {
-  final Map<String, Path> paths;
-  final List<Country> countries; // Yeni: Area kontrolü için eklendi
-  final Matrix4 mapMatrix;
+  final Map<String, Path> paths; // Already Transformed Paths
+  final Map<String, Offset> smallCountryCenters; // ALready Transformed Centers
   final String? targetIso;
   final bool isDark;
   final double scale;
@@ -498,8 +515,7 @@ class WorldMapPainter extends CustomPainter {
 
   WorldMapPainter({
     required this.paths,
-    required this.countries, // Parametre olarak eklendi
-    required this.mapMatrix,
+    required this.smallCountryCenters,
     required this.targetIso,
     required this.isDark,
     required this.scale,
@@ -541,14 +557,11 @@ class WorldMapPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..color = (isDark ? Colors.white : Colors.black54).withValues(alpha: 0.6);
 
-    // Marker'ın boyutu ekrana göre sabit kalması için scale ile ters orantılı yapılır.
-    // Ancak zoom çok uzaksa (scale 1.0) çok küçük kalabilir, bu yüzden min bir boyut koyabiliriz.
     final double markerRadius = max(2.0, 5.0 / scale);
 
-    // Path'leri çiz
+    // Path'leri çiz (Zaten transform edilmiş durumda)
     for (var entry in paths.entries) {
-      final path = entry.value;
-      final transformedPath = path.transform(mapMatrix.storage);
+      final transformedPath = entry.value;
 
       if (isDark) {
         countryPaint.color = const Color(0xFF263238);
@@ -565,19 +578,10 @@ class WorldMapPainter extends CustomPainter {
       }
     }
 
-    // Küçük ülkeler için marker çizimi (Area < 2000)
-    for (var country in countries) {
-      if (country.area < 2000) {
-        final path = paths[country.iso3];
-        if (path != null) {
-          // Performans Uyarısı: .transform ve .getBounds her frame'de yapılıyor.
-          // İdeal olarak bu pointler initialize'da hesaplanmalıdır.
-          final transformedPath = path.transform(mapMatrix.storage);
-          final center = transformedPath.getBounds().center;
-
-          canvas.drawCircle(center, markerRadius, markerPaint);
-        }
-      }
+    // Küçük ülkeler için marker çizimi
+    // Zaten sadece küçük ülkelerin keyleri smallCountryCenters içinde var
+    for (var center in smallCountryCenters.values) {
+      canvas.drawCircle(center, markerRadius, markerPaint);
     }
   }
 
