@@ -36,7 +36,7 @@ android {
         versionName = flutter.versionName
     }
     // Keystore configuration
-    def keystorePropertiesFile = rootProject.file("key.properties")
+    def keystorePropertiesFile = file("C:\\Users\\Kerem\\Projects\\Thinks\\key.properties")
     def keystoreProperties = new Properties()
     def hasValidKeystore = false
     
