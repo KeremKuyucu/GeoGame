@@ -1,10 +1,8 @@
 import 'package:theme_mode_builder/theme_mode_builder/theme_mode_builder.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 import 'package:geogame/app_routes.dart';
-import 'package:geogame/models/app_context.dart';
 
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
@@ -19,10 +17,7 @@ void main() async {
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   await PreferencesService.loadConfig();
 
-  Locale deviceLocale = PlatformDispatcher.instance.locale;
-  await Localization.init(
-      deviceLocale: deviceLocale.languageCode,
-      userPref: AppState.settings.language);
+  await Localization.init();
 
   runApp(
     const RestartWidget(

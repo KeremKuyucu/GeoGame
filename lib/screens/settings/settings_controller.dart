@@ -73,7 +73,7 @@ class SettingsController {
   /// Uygulamayı yeniden başlat
   Future<void> restartApp(BuildContext context) async {
     AppState.selectedIndex = 0;
-    await Localization.init(userPref: currentLanguage);
+    await Localization.init();
     if (context.mounted) {
       RestartWidget.restartApp(context);
     }
