@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geogame/models/app_context.dart';
 
 class Localization {
-
   static const Map<String, String> languages = {
     'eng': 'English',
     'tur': 'Türkçe',
-    /* Eklenecek dil listesi:
+    /* Eklenebilecek diller:
     'fin': 'Suomi',
     'jpn': '日本語',
     'ara': 'العربية',
@@ -33,53 +33,16 @@ class Localization {
     'zho': '中文',
      */
   };
-  static const Map<String, String> _deviceIsoMap = {
-    'en': 'eng',
-    'tr': 'tur',
-    /* Cihaz eşleme listesi:
-    'ar': 'ara',
-    'cs': 'ces',
-    'de': 'deu',
-    'et': 'est',
-    'fi': 'fin',
-    'fr': 'fra',
-    'hr': 'hrv',
-    'hu': 'hun',
-    'it': 'ita',
-    'ja': 'jpn',
-    'ko': 'kor',
-    'nl': 'nld',
-    'fa': 'per',
-    'pl': 'pol',
-    'pt': 'por',
-    'ru': 'rus',
-    'sk': 'slk',
-    'es': 'spa',
-    'sr': 'srp',
-    'sv': 'swe',
-    'ur': 'urd',
-    'zh': 'zho',
-    */
-  };
 
   static Map<String, dynamic>? _localizedStrings;
   static String _currentLanguage = 'eng';
   static List<String> get supportedLanguages => languages.keys.toList();
   static String get currentLanguage => _currentLanguage;
-  static String get currentLanguageName => languages[_currentLanguage] ?? 'English';
+  static String get currentLanguageName =>
+      languages[_currentLanguage] ?? 'English';
 
-  static Future<void> init({String? userPref, String? deviceLocale}) async {
-    String target;
-
-    if (userPref != null && languages.containsKey(userPref)) {
-      target = userPref;
-    } else if (deviceLocale != null && _deviceIsoMap.containsKey(deviceLocale)) {
-      target = _deviceIsoMap[deviceLocale]!;
-    } else {
-      target = 'eng';
-    }
-
-    await changeLanguage(target);
+  static Future<void> init() async {
+    await changeLanguage(AppState.settings.language);
   }
 
   /// Çalışma anında dil değiştirme
@@ -87,10 +50,12 @@ class Localization {
     if (!languages.containsKey(iso3Code)) iso3Code = 'eng';
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/lang/$iso3Code.json');
+      final String jsonString =
+          await rootBundle.loadString('assets/lang/$iso3Code.json');
       _localizedStrings = json.decode(jsonString);
       _currentLanguage = iso3Code;
-      debugPrint("🌍 Language Loaded: $_currentLanguage (assets/lang/$iso3Code.json)");
+      debugPrint(
+          "🌍 Language Loaded: $_currentLanguage (assets/lang/$iso3Code.json)");
     } catch (e) {
       debugPrint("❌ Language File Could Not Be Loaded ($iso3Code): $e");
 
@@ -103,6 +68,7 @@ class Localization {
       }
     }
   }
+
   /// Çeviri motoru
   static String t(String key, {List<dynamic>? args}) {
     if (_localizedStrings == null) return key;
@@ -134,5 +100,6 @@ class Localization {
     return text.replaceAll('\\n', '\n');
   }
 
-  static String getDisplayName(String iso3Code) => languages[iso3Code] ?? iso3Code;
+  static String getDisplayName(String iso3Code) =>
+      languages[iso3Code] ?? iso3Code;
 }
