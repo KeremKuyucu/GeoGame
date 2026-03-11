@@ -55,13 +55,13 @@ class Localization {
       _localizedStrings = json.decode(jsonString);
       _currentLanguage = iso3Code;
       debugPrint(
-          "🌍 Language Loaded: $_currentLanguage (assets/lang/$iso3Code.json)");
+          '🌍 Language Loaded: $_currentLanguage (assets/lang/$iso3Code.json)');
     } catch (e) {
-      debugPrint("❌ Language File Could Not Be Loaded ($iso3Code): $e");
+      debugPrint('❌ Language File Could Not Be Loaded ($iso3Code): $e');
 
       // Hata durumunda (örneğin dosya yoksa) İngilizceyi yüklemeyi dene
       if (iso3Code != 'eng') {
-        debugPrint("⚠️ Switching to English (fallback)...");
+        debugPrint('⚠️ Switching to English (fallback)...');
         await changeLanguage('eng');
       } else {
         _localizedStrings = {}; // Hiçbir şey yoksa boş map ata
@@ -73,7 +73,7 @@ class Localization {
   static String t(String key, {List<dynamic>? args}) {
     if (_localizedStrings == null) return key;
 
-    List<String> keys = key.split('.');
+    final List<String> keys = key.split('.');
     dynamic current = _localizedStrings;
 
     // JSON içinde ilerle (Map -> Map -> String)

@@ -16,7 +16,8 @@ class AuthUIService {
   /// Email formatını kontrol eder
   static bool isValidEmail(String email) {
     if (email.isEmpty) return false;
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -48,7 +49,10 @@ class AuthUIService {
     required String name,
     required String confirmPassword,
   }) {
-    if (email.isEmpty || password.isEmpty || name.isEmpty || confirmPassword.isEmpty) {
+    if (email.isEmpty ||
+        password.isEmpty ||
+        name.isEmpty ||
+        confirmPassword.isEmpty) {
       return Localization.t('common.field_required');
     }
     if (!isValidEmail(email)) {
@@ -91,12 +95,12 @@ class AuthUIService {
 
     // Auth işlemi
     final String? error = await AuthService.signIn(email, password);
-    
+
     if (error == null) {
-      debugPrint("✅ Login successful");
+      debugPrint('✅ Login successful');
       return AuthResult.success(Localization.t('auth.login_success'));
     } else {
-      debugPrint("❌ Login failed: $error");
+      debugPrint('❌ Login failed: $error');
       return AuthResult.failure(error);
     }
   }
@@ -121,12 +125,12 @@ class AuthUIService {
 
     // Auth işlemi
     final String? error = await AuthService.signUp(email, password, name);
-    
+
     if (error == null) {
-      debugPrint("✅ Registration successful");
+      debugPrint('✅ Registration successful');
       return AuthResult.success(Localization.t('auth.register_success'));
     } else {
-      debugPrint("❌ Registration failed: $error");
+      debugPrint('❌ Registration failed: $error');
       return AuthResult.failure(error);
     }
   }
@@ -141,12 +145,12 @@ class AuthUIService {
 
     // Email gönderimi
     final String? error = await AuthService.sendPasswordResetEmail(email);
-    
+
     if (error == null) {
-      debugPrint("✅ Password reset email sent");
+      debugPrint('✅ Password reset email sent');
       return AuthResult.success(Localization.t('auth.link_sent'));
     } else {
-      debugPrint("❌ Password reset failed: $error");
+      debugPrint('❌ Password reset failed: $error');
       return AuthResult.failure(error);
     }
   }
@@ -172,7 +176,7 @@ class AuthUIService {
   /// Çıkış yap
   static Future<void> signOut() async {
     await AuthService.signOut();
-    debugPrint("👋 User signed out");
+    debugPrint('👋 User signed out');
   }
 }
 
@@ -183,6 +187,8 @@ class AuthResult {
 
   AuthResult._({required this.isSuccess, required this.message});
 
-  factory AuthResult.success(String message) => AuthResult._(isSuccess: true, message: message);
-  factory AuthResult.failure(String message) => AuthResult._(isSuccess: false, message: message);
+  factory AuthResult.success(String message) =>
+      AuthResult._(isSuccess: true, message: message);
+  factory AuthResult.failure(String message) =>
+      AuthResult._(isSuccess: false, message: message);
 }

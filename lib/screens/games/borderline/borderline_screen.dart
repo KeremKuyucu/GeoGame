@@ -5,7 +5,7 @@ import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/borderline_widgets.dart';
 import 'package:geogame/widgets/game_widgets.dart';
 
-import 'borderline_controller.dart';
+import 'package:geogame/screens/games/borderline/borderline_controller.dart';
 
 class BorderLineGame extends StatefulWidget {
   const BorderLineGame({super.key});
@@ -49,7 +49,7 @@ class _BorderLineGameState extends State<BorderLineGame>
   }
 
   Future<void> _checkAnswer(int index) async {
-    bool isCorrect = await _controller.checkAnswer(index);
+    final bool isCorrect = await _controller.checkAnswer(index);
     setState(() {
       if (isCorrect) {
         _animController.forward(from: 0.0);
@@ -58,7 +58,7 @@ class _BorderLineGameState extends State<BorderLineGame>
   }
 
   Future<void> _handlePass() async {
-    String passCountry = await _controller.handlePass();
+    final String passCountry = await _controller.handlePass();
     if (!mounted) return;
     _controller.showPassDialog(context, passCountry);
     setState(() {

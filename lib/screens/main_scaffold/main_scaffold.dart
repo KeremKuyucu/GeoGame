@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/widgets/custom_navbar.dart';
 import 'package:geogame/app_routes.dart';
 
-import 'main_scaffold_controller.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold_controller.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});

@@ -5,7 +5,7 @@ import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/flag_loader.dart';
 import 'package:geogame/widgets/game_widgets.dart';
 
-import 'flag_controller.dart';
+import 'package:geogame/screens/games/flag/flag_controller.dart';
 
 class FlagGame extends StatefulWidget {
   const FlagGame({super.key});
@@ -48,7 +48,7 @@ class _FlagGameState extends State<FlagGame>
   }
 
   Future<void> _checkAnswer(int index) async {
-    bool isCorrect = await _controller.checkAnswer(index);
+    final isCorrect = await _controller.checkAnswer(index);
     setState(() {
       if (isCorrect) {
         _animController.forward(from: 0.0);
@@ -57,7 +57,7 @@ class _FlagGameState extends State<FlagGame>
   }
 
   Future<void> _handlePass() async {
-    String passCountry = await _controller.handlePass();
+    final passCountry = await _controller.handlePass();
     if (!mounted) return;
     _controller.showPassDialog(context, passCountry);
     setState(() {

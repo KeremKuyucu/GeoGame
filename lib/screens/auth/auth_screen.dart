@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/auth_widgets.dart';
 
-import 'auth_controller.dart';
+import 'package:geogame/screens/auth/auth_controller.dart';
 
 class AuthPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;

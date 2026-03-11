@@ -33,7 +33,7 @@ class EditProfileController {
 
     String finalAvatarUrl = avatarUrl.trim();
     if (finalAvatarUrl.isEmpty) {
-      finalAvatarUrl = "https://api.dicebear.com/8.x/initials/png?seed=$name";
+      finalAvatarUrl = 'https://api.dicebear.com/8.x/initials/png?seed=$name';
     }
 
     final String? error = await AuthService.updateProfileMetadata(
@@ -67,7 +67,7 @@ class EditProfileController {
   String getPreviewUrl(String avatarUrl, String name) {
     return avatarUrl.isNotEmpty
         ? avatarUrl
-        : "https://api.dicebear.com/8.x/initials/png?seed=$name";
+        : 'https://api.dicebear.com/8.x/initials/png?seed=$name';
   }
 
   void showSnackBar(BuildContext context, String message, Color color) {

@@ -43,7 +43,7 @@ class BorderLineGameController {
       answer = AppState.buttons[index].label;
     }
 
-    bool isCorrect = await GameService.checkStandardAnswer(
+    final bool isCorrect = await GameService.checkStandardAnswer(
         answer, GameType.borderline, index);
     textController.clear();
 
@@ -56,7 +56,7 @@ class BorderLineGameController {
   }
 
   Future<String> handlePass() async {
-    String passCountry = await GameService.handlePass();
+    final String passCountry = await GameService.handlePass();
     textController.clear();
     countryShapePathFuture =
         GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);

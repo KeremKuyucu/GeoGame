@@ -68,12 +68,12 @@ class BorderPathStartEndCard extends StatelessWidget {
               children: [
                 _InfoChip(
                   label: Localization.t('game_borderpath.label_moves'),
-                  value: "${controller.movesCount}",
+                  value: '${controller.movesCount}',
                   icon: Icons.numbers,
                 ),
                 _InfoChip(
                   label: Localization.t('game_borderpath.label_optimal'),
-                  value: "${controller.optimalPathLength}",
+                  value: '${controller.optimalPathLength}',
                   icon: Icons.route,
                 ),
               ],
@@ -133,7 +133,7 @@ class _InfoChip extends StatelessWidget {
       children: [
         Icon(icon, size: 16, color: Colors.blue),
         const SizedBox(width: 5),
-        Text("$label: ", style: const TextStyle(fontSize: 14)),
+        Text('$label: ', style: const TextStyle(fontSize: 14)),
         Text(value,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
       ],
@@ -255,10 +255,10 @@ class BorderPathCurrentPath extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: controller.currentPath.asMap().entries.map((entry) {
-              int index = entry.key;
-              Country country = entry.value;
-              bool isStart = index == 0;
-              bool isEnd = country.iso3 == controller.targetCountry!.iso3;
+              final index = entry.key;
+              final country = entry.value;
+              final isStart = index == 0;
+              final isEnd = country.iso3 == controller.targetCountry!.iso3;
 
               return Container(
                 padding:
@@ -283,7 +283,7 @@ class BorderPathCurrentPath extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "${index + 1}.",
+                      '${index + 1}.',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: controller.textColor),
@@ -381,7 +381,7 @@ class BorderPathNeighborsSection extends StatelessWidget {
               spacing: 10,
               runSpacing: 10,
               children: controller.availableNeighbors.map((country) {
-                bool isTarget = country.iso3 == controller.targetCountry!.iso3;
+                final isTarget = country.iso3 == controller.targetCountry!.iso3;
                 return ElevatedButton(
                   onPressed: () => onCountrySelected(country),
                   style: ElevatedButton.styleFrom(
@@ -499,7 +499,7 @@ class BorderPathNeighborsSection extends StatelessWidget {
                     ),
                     itemBuilder: (context, index) {
                       final Country option = options.elementAt(index);
-                      bool isTarget =
+                      final bool isTarget =
                           option.iso3 == controller.targetCountry!.iso3;
                       return ListTile(
                         leading: Container(
@@ -750,7 +750,7 @@ class BorderPathVictoryDialog extends StatelessWidget {
                   _buildStatRow(
                     Icons.directions_walk_rounded,
                     Localization.t('game_borderpath.stat_moves'),
-                    "$movesCount",
+                    '$movesCount',
                     Colors.blue,
                     textColor,
                   ),
@@ -758,7 +758,7 @@ class BorderPathVictoryDialog extends StatelessWidget {
                   _buildStatRow(
                     Icons.map_rounded,
                     Localization.t('game_borderpath.stat_optimal'),
-                    "$optimalPathLength",
+                    '$optimalPathLength',
                     Colors.purple,
                     textColor,
                   ),
@@ -766,7 +766,7 @@ class BorderPathVictoryDialog extends StatelessWidget {
                   _buildStatRow(
                     Icons.star_rounded,
                     Localization.t('game_common.score'),
-                    "$score",
+                    '$score',
                     Colors.amber,
                     textColor,
                   ),

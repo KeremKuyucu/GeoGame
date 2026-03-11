@@ -33,15 +33,15 @@ class GameMetadata {
 }
 
 final List<GameMetadata> gameMetadataList = [
-  GameMetadata(
+  const GameMetadata(
     type: GameType.capital,
     titleKey: 'game_capital',
     descKey: 'game_capital',
     img: 'assets/images/capital.webp',
-    color: const Color(0xFF6A1B9A),
+    color: Color(0xFF6A1B9A),
     route: '/game/capital',
     iconData: Icons.location_city,
-    rules: const [
+    rules: [
       GameRule(icon: Icons.info_outline, textKey: 'game_capital.rule_welcome'),
       GameRule(
           icon: Icons.videogame_asset,
@@ -51,15 +51,15 @@ final List<GameMetadata> gameMetadataList = [
       GameRule(icon: Icons.lightbulb_outline, textKey: 'game_capital.rule_tip'),
     ],
   ),
-  GameMetadata(
+  const GameMetadata(
     type: GameType.flag,
     titleKey: 'game_flag',
     descKey: 'game_flag',
     img: 'assets/images/flag.webp',
-    color: const Color(0xFF2E7D32),
+    color: Color(0xFF2E7D32),
     route: '/game/flag',
     iconData: Icons.flag,
-    rules: const [
+    rules: [
       GameRule(icon: Icons.flag, textKey: 'game_flag.rule_welcome'),
       GameRule(
           icon: Icons.videogame_asset, textKey: 'game_flag.rule_how_to_play'),
@@ -68,15 +68,15 @@ final List<GameMetadata> gameMetadataList = [
       GameRule(icon: Icons.lightbulb_outline, textKey: 'game_flag.rule_tip'),
     ],
   ),
-  GameMetadata(
+  const GameMetadata(
     type: GameType.distance,
     titleKey: 'game_distance',
     descKey: 'game_distance',
     img: 'assets/images/distance.webp',
-    color: const Color(0xFF1565C0),
+    color: Color(0xFF1565C0),
     route: '/game/distance',
     iconData: Icons.straighten,
-    rules: const [
+    rules: [
       GameRule(icon: Icons.map, textKey: 'game_distance.rule_welcome'),
       GameRule(
           icon: Icons.videogame_asset,
@@ -86,15 +86,15 @@ final List<GameMetadata> gameMetadataList = [
           icon: Icons.lightbulb_outline, textKey: 'game_distance.rule_tip'),
     ],
   ),
-  GameMetadata(
+  const GameMetadata(
     type: GameType.borderline,
     titleKey: 'game_borderline',
     descKey: 'game_borderline',
     img: 'assets/images/borderline.webp',
-    color: const Color(0xFF283593),
+    color: Color(0xFF283593),
     route: '/game/borderline',
     iconData: Icons.public,
-    rules: const [
+    rules: [
       GameRule(icon: Icons.public, textKey: 'game_borderline.rule_welcome'),
       GameRule(
           icon: Icons.videogame_asset,
@@ -105,30 +105,30 @@ final List<GameMetadata> gameMetadataList = [
           icon: Icons.lightbulb_outline, textKey: 'game_borderline.rule_tip'),
     ],
   ),
-  GameMetadata(
+  const GameMetadata(
     type: GameType.borderpath,
     titleKey: 'game_borderpath',
     descKey: 'game_borderpath',
     img: 'assets/images/borderpath.webp',
-    color: const Color(0xFFD84315),
+    color: Color(0xFFD84315),
     route: '/game/borderpath',
     iconData: Icons.route,
-    rules: const [
+    rules: [
       GameRule(icon: Icons.flag, textKey: 'game_borderpath.rule_1'),
       GameRule(icon: Icons.swap_horiz, textKey: 'game_borderpath.rule_2'),
       GameRule(icon: Icons.star_border, textKey: 'game_borderpath.rule_3'),
       GameRule(icon: Icons.map, textKey: 'game_borderpath.rule_4'),
     ],
   ),
-  GameMetadata(
+  const GameMetadata(
     type: GameType.findmap,
     titleKey: 'game_findmap',
     descKey: 'game_findmap',
     img: 'assets/images/findmap.webp',
-    color: const Color(0xFF00ACC1),
+    color: Color(0xFF00ACC1),
     route: '/game/findmap',
     iconData: Icons.explore,
-    rules: const [
+    rules: [
       GameRule(icon: Icons.public, textKey: 'game_findmap.rule_welcome'),
       GameRule(icon: Icons.touch_app, textKey: 'game_findmap.rule_how_to_play'),
       GameRule(

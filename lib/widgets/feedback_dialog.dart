@@ -79,7 +79,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
       _showCustomNotification(
         Localization.t('common.error'),
-        "Error: $e",
+        'Error: $e',
       );
     }
   }
@@ -140,7 +140,8 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.redAccent,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     child: Text(Localization.t('common.cancel')),
                   ),
@@ -150,10 +151,15 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     child: _isLoading
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2))
                         : Text(Localization.t('common.send')),
                   ),
                 ],
@@ -165,18 +171,24 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, bool isDark, {int maxLines = 1}) {
+  Widget _buildTextField(
+      TextEditingController controller, String hint, bool isDark,
+      {int maxLines = 1}) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
       style: TextStyle(color: isDark ? Colors.white : Colors.black87),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: isDark ? Colors.grey : Colors.grey.shade600),
+        hintStyle:
+            TextStyle(color: isDark ? Colors.grey : Colors.grey.shade600),
         filled: true,
         fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
       ),
     );
   }

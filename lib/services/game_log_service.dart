@@ -66,7 +66,7 @@ class GameLogService {
 
     if (rawList.isEmpty) return;
 
-    debugPrint("🔄 Sync: ${rawList.length} log gönderiliyor");
+    debugPrint('🔄 Sync: ${rawList.length} log gönderiliyor');
 
     final List<Map<String, dynamic>> payload = [];
 
@@ -90,10 +90,10 @@ class GameLogService {
 
       // ❗ başarılıysa kuyruk temizlenir
       await prefs.remove(_unsentLogsKey);
-      debugPrint("✅ Sync tamamlandı");
+      debugPrint('✅ Sync tamamlandı');
     } catch (e) {
       // ❗ duplicate varsa DB reddeder ama kuyruk KALIR
-      debugPrint("❌ Sync hatası (tekrar denenecek): $e");
+      debugPrint('❌ Sync hatası (tekrar denenecek): $e');
     }
   }
 }

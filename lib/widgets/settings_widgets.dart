@@ -308,14 +308,14 @@ class SettingsVersionInfo extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "GeoGame",
+            'GeoGame',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.grey[600] : Colors.grey[400],
             ),
           ),
           Text(
-            "v$version",
+            'v$version',
             style: TextStyle(
               color: isDark ? Colors.grey[700] : Colors.grey[400],
               fontSize: 12,

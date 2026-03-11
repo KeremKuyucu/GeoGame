@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/edit_profile_widgets.dart';
 
-import 'edit_profile_controller.dart';
+import 'package:geogame/screens/edit_profile/edit_profile_controller.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -135,7 +135,7 @@ class _EditProfilePageState extends State<EditProfilePage>
           label: Localization.t('common.save'),
           onPressed: _updateProfile,
           isLoading: _controller.isLoading,
-          colors: [Colors.cyanAccent, Colors.blueAccent],
+          colors: const [Colors.cyanAccent, Colors.blueAccent],
         ),
       ],
     );
@@ -156,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage>
           label: Localization.t('auth.update_email'),
           onPressed: _changeEmail,
           isLoading: _controller.isLoading,
-          colors: [Colors.blueGrey, Colors.indigo],
+          colors: const [Colors.blueGrey, Colors.indigo],
         ),
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
@@ -173,7 +173,7 @@ class _EditProfilePageState extends State<EditProfilePage>
           label: Localization.t('auth.update_password'),
           onPressed: _changePassword,
           isLoading: _controller.isLoading,
-          colors: [Colors.orangeAccent, Colors.deepOrange],
+          colors: const [Colors.orangeAccent, Colors.deepOrange],
         ),
       ],
     );

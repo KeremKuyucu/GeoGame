@@ -23,9 +23,9 @@ class PreferencesService {
       AppState.settings = AppSettings.fromMap(data);
       AppState.filter = GameFilter.fromMap(data);
 
-      debugPrint("✅ Settings and preferences loaded.");
+      debugPrint('✅ Settings and preferences loaded.');
     } catch (e) {
-      debugPrint("❌ Config Loading Error: $e");
+      debugPrint('❌ Config Loading Error: $e');
       // Hata durumunda varsayılan değerlerle devam edilir (AppState zaten varsayılanla başlar)
     }
   }

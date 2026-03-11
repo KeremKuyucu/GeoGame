@@ -242,7 +242,7 @@ class ProfileViewWidget extends StatelessWidget {
             _buildSmallStat(
                 Localization.t('profile.wrong_label', args: [wrong]),
                 Colors.red.shade400),
-            _buildSmallStat("${(successRate * 100).toStringAsFixed(1)}%",
+            _buildSmallStat('${(successRate * 100).toStringAsFixed(1)}%',
                 isDark ? Colors.white54 : Colors.blueGrey),
           ],
         ),

@@ -307,7 +307,7 @@ class DistanceGuessCard extends StatelessWidget {
                         Icon(Icons.straighten, size: 14, color: distanceColor),
                         const SizedBox(width: 6),
                         Text(
-                          "${guess.distanceKm.toInt()} km",
+                          '${guess.distanceKm.toInt()} km',
                           style: TextStyle(
                             color: distanceColor,
                             fontWeight: FontWeight.w900,

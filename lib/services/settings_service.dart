@@ -18,25 +18,27 @@ class SettingsService {
   static void setButtonMode(bool value) {
     AppState.filter.isButtonMode = value;
     PreferencesService.saveConfig();
-    debugPrint("🎮 Button Mode: $value");
+    debugPrint('🎮 Button Mode: $value');
   }
 
   /// Dark mode değişikliği
   static void setDarkTheme(bool value) {
     AppState.settings.darkTheme = value;
-    value ? ThemeModeBuilderConfig.setDark() : ThemeModeBuilderConfig.setLight();
+    value
+        ? ThemeModeBuilderConfig.setDark()
+        : ThemeModeBuilderConfig.setLight();
     PreferencesService.saveConfig();
-    debugPrint("🌙 Dark Theme: $value");
+    debugPrint('🌙 Dark Theme: $value');
   }
 
   /// Dil değişikliği (Uygulama yeniden başlatılmalı)
   static Future<void> changeLanguage(String languageCode) async {
     if (languageCode == AppState.settings.language) return;
-    
+
     AppState.settings.language = languageCode;
     await PreferencesService.saveConfig();
     await Localization.changeLanguage(languageCode);
-    debugPrint("🌍 Language changed to: $languageCode");
+    debugPrint('🌍 Language changed to: $languageCode');
   }
 
   // ============================================================================
@@ -95,7 +97,8 @@ class SettingsService {
   static void _updateActivePool() {
     AppState.activePool = AppState.filteredCountries;
     PreferencesService.saveConfig();
-    debugPrint("🗺️ Active pool updated: ${AppState.activePool.length} countries");
+    debugPrint(
+        '🗺️ Active pool updated: ${AppState.activePool.length} countries');
   }
 
   // ============================================================================

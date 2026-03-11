@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 
-import 'localization_service.dart';
+import 'package:geogame/services/localization_service.dart';
 
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
@@ -18,11 +18,11 @@ class AuthService {
         await syncUserData(res.user!);
         return null;
       }
-      return "Giriş yapılamadı.";
+      return Localization.t('auth.error_login_failed');
     } on AuthException catch (e) {
       return e.message;
     } catch (e) {
-      return "Bilinmeyen hata: $e";
+      return Localization.t('auth.error_unknown', args: [e.toString()]);
     }
   }
 
@@ -42,15 +42,15 @@ class AuthService {
         await syncUserData(res.user!);
         return null;
       }
-      return "Kayıt işlemi başarısız.";
+      return Localization.t('auth.error_register_failed');
     } on AuthException catch (e) {
-      debugPrint("Auth Error: ${e.message}");
+      debugPrint('Auth Error: ${e.message}');
       if (e.message.contains('Database error')) {
-        return "Sunucu tarafında profil oluşturulamadı. Lütfen veritabanı ayarlarını kontrol edin.";
+        return Localization.t('auth.error_db_profile');
       }
       return e.message;
     } catch (e) {
-      return "Bilinmeyen hata: $e";
+      return Localization.t('auth.error_unknown', args: [e.toString()]);
     }
   }
 
@@ -94,7 +94,7 @@ class AuthService {
     try {
       await _supabase.auth.signOut();
     } catch (e) {
-      debugPrint("Supabase exit error: $e");
+      debugPrint('Supabase exit error: $e');
     }
     AppState.user = UserProfile.anonymous();
   }
@@ -117,7 +117,7 @@ class AuthService {
     } on AuthException catch (e) {
       return e.message;
     } catch (e) {
-      return "Unexpected error: $e";
+      return Localization.t('auth.error_unexpected', args: [e.toString()]);
     }
   }
 
@@ -128,7 +128,7 @@ class AuthService {
     } on AuthException catch (e) {
       return e.message;
     } catch (e) {
-      return "Beklenmedik bir hata: $e";
+      return Localization.t('auth.error_unexpected', args: [e.toString()]);
     }
   }
 
@@ -139,11 +139,11 @@ class AuthService {
     } on AuthException catch (e) {
       // Özel hata mesajı temizleme (isteğe bağlı)
       if (e.message.contains('already registered')) {
-        return "Bu e-posta adresi zaten kullanımda.";
+        return Localization.t('auth.error_email_in_use');
       }
       return e.message;
     } catch (e) {
-      return "Beklenmedik bir hata oluştu: $e";
+      return Localization.t('auth.error_unexpected', args: [e.toString()]);
     }
   }
 
@@ -153,7 +153,7 @@ class AuthService {
       // Basic security validation for avatarUrl
       final uri = Uri.tryParse(avatarUrl);
       if (uri == null || !uri.hasAbsolutePath || !uri.isScheme('https')) {
-        return "Geçersiz profil resmi URL'si. Sektör standardı güvenli bağlantı (https) gereklidir.";
+        return Localization.t('auth.error_invalid_avatar');
       }
 
       await _supabase.auth.updateUser(
@@ -163,7 +163,7 @@ class AuthService {
     } on AuthException catch (e) {
       return e.message;
     } catch (e) {
-      return "Beklenmedik bir hata: $e";
+      return Localization.t('auth.error_unexpected', args: [e.toString()]);
     }
   }
 }

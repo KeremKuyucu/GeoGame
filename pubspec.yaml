@@ -17,6 +17,7 @@ dependencies:
   url_launcher: ^6.3.2
   uuid: ^4.5.2
   vector_math: ^2.2.0
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4

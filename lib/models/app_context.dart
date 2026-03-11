@@ -8,7 +8,7 @@ import 'package:geogame/services/localization_service.dart';
 // --- 1. ANA DURUM YÖNETİCİSİ (AppState) ---
 class AppState extends ChangeNotifier {
   static int selectedIndex = 0;
-  static String version = "";
+  static String version = '';
 
   // Modeller
   static UserProfile user = UserProfile.anonymous();
@@ -26,12 +26,12 @@ class AppState extends ChangeNotifier {
 
   static String getGameModeKey(GameType type) {
     return switch (type) {
-      GameType.flag => "flag",
-      GameType.capital => "capital",
-      GameType.distance => "distance",
-      GameType.borderline => "borderline",
-      GameType.borderpath => "borderpath",
-      GameType.findmap => "findmap",
+      GameType.flag => 'flag',
+      GameType.capital => 'capital',
+      GameType.distance => 'distance',
+      GameType.borderline => 'borderline',
+      GameType.borderpath => 'borderpath',
+      GameType.findmap => 'findmap',
     };
   }
 
@@ -59,13 +59,13 @@ class AppState extends ChangeNotifier {
       // 2. Kıta Filtresi
       // contains metodu string karşılaştırması yaptığı için maliyetlidir.
       // Ancak 250 eleman için bu maliyet mikrosaniyeler sürer.
-      if (f.europe && c.continents.contains("Europe")) return true;
-      if (f.asia && c.continents.contains("Asia")) return true;
-      if (f.africa && c.continents.contains("Africa")) return true;
-      if (f.oceania && c.continents.contains("Oceania")) return true;
-      if (f.northAmerica && c.continents.contains("North America")) return true;
-      if (f.southAmerica && c.continents.contains("South America")) return true;
-      if (f.antarctic && c.continents.contains("Antarctic")) return true;
+      if (f.europe && c.continents.contains('Europe')) return true;
+      if (f.asia && c.continents.contains('Asia')) return true;
+      if (f.africa && c.continents.contains('Africa')) return true;
+      if (f.oceania && c.continents.contains('Oceania')) return true;
+      if (f.northAmerica && c.continents.contains('North America')) return true;
+      if (f.southAmerica && c.continents.contains('South America')) return true;
+      if (f.antarctic && c.continents.contains('Antarctic')) return true;
 
       return false;
     }).toList();
@@ -201,7 +201,7 @@ class GameSession {
   int correctCount = 0;
   int wrongCount = 0;
   int passCount = 0;
-  String sessionId = "";
+  String sessionId = '';
 
   int _startScore = 50;
   int _minScore = 20;

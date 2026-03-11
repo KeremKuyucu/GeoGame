@@ -70,7 +70,7 @@ class SplashScreenBody extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      "GeoGame",
+                      'GeoGame',
                       style: TextStyle(
                         fontSize: 42,
                         fontWeight: FontWeight.w900,

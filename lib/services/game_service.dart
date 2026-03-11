@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
@@ -60,11 +61,11 @@ class GameService {
   // --------------------------------------------------------------------------
 
   static Future<void> startNewRound() async {
-    debugPrint("🔄 Yeni soru seçiliyor...");
+    debugPrint('🔄 Yeni soru seçiliyor...');
 
     final available = AppState.activePool;
     if (available.length < 4) {
-      debugPrint("⚠️ Yetersiz havuz boyutu: ${available.length}");
+      debugPrint('⚠️ Yetersiz havuz boyutu: ${available.length}');
       // Fallback: Tüm ülkeleri kullan veya hata fırlat
       return;
     }
@@ -160,7 +161,7 @@ class GameService {
 
     final guessedCountry = _findCountryByName(inputText);
     if (guessedCountry == null) {
-      debugPrint("❌ Ülke bulunamadı: $inputText");
+      debugPrint('❌ Country didn\'t find: $inputText');
       return null;
     }
 
@@ -188,7 +189,7 @@ class GameService {
     if (isCorrect) {
       AppState.session.submitCorrect();
       await startNewRound();
-      await GameLogService.saveProgress("distance");
+      await GameLogService.saveProgress('distance');
     } else {
       AppState.session.submitWrong();
     }
@@ -203,11 +204,8 @@ class GameService {
   }
 
   static Country? _findCountryByName(String name) {
-    // try-catch bloğuna gerek yok, firstWhere orElse ile daha temiz çözülür
-    return AppState.allCountries.firstWhere(
+    return AppState.allCountries.firstWhereOrNull(
       (c) => c.checkAnswer(name, AppState.settings.language),
-      orElse: () => throw StateError(
-          'Country not found'), // orElse null dönemediği için hack
     );
   }
 
@@ -290,7 +288,7 @@ class GameService {
       AppState.session.wrongCount += penalty;
     }
 
-    await GameLogService.saveProgress("borderpath");
+    await GameLogService.saveProgress('borderpath');
   }
 
   // --------------------------------------------------------------------------
@@ -307,7 +305,7 @@ class GameService {
     final List<Country> neighbors = [];
 
     for (String borderIso3 in lastCountry.borders) {
-      Country? neighbor =
+      final Country? neighbor =
           AppState.allCountries.where((c) => c.iso3 == borderIso3).firstOrNull;
 
       if (neighbor != null && !currentPath.contains(neighbor)) {
@@ -384,14 +382,14 @@ class GameService {
 
     // Yön metnini belirle (Record pattern)
     const sectors = [
-      "north",
-      "north_east",
-      "east",
-      "south_east",
-      "south",
-      "south_west",
-      "west",
-      "north_west"
+      'north',
+      'north_east',
+      'east',
+      'south_east',
+      'south',
+      'south_west',
+      'west',
+      'north_west',
     ];
 
     // 360 dereceyi 8 dilime böl (her biri 45 derece)
@@ -399,7 +397,7 @@ class GameService {
     final index = ((bearing + 22.5) / 45.0).floor() % 8;
 
     return (
-      directionText: Localization.t("directions.${sectors[index]}"),
+      directionText: Localization.t('directions.${sectors[index]}'),
       bearing: bearing
     );
   }

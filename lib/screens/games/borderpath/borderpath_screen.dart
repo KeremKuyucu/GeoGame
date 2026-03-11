@@ -5,7 +5,7 @@ import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/borderpath_widgets.dart';
 import 'package:geogame/widgets/game_widgets.dart';
 
-import 'borderpath_controller.dart';
+import 'package:geogame/screens/games/borderpath/borderpath_controller.dart';
 
 class BorderPathGame extends StatefulWidget {
   const BorderPathGame({super.key});
@@ -54,8 +54,8 @@ class _BorderPathGameState extends State<BorderPathGame> {
 
   void _showVictoryDialog() {
     _controller.completeGame();
-    int score = _controller.getScore();
-    String performance = _controller.getPerformanceText();
+    final score = _controller.getScore();
+    final performance = _controller.getPerformanceText();
 
     showDialog(
       context: context,

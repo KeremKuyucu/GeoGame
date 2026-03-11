@@ -38,14 +38,14 @@ class FlagGameController {
       answer = AppState.buttons[index].label;
     }
 
-    bool isCorrect =
+    final isCorrect =
         await GameService.checkStandardAnswer(answer, GameType.flag, index);
     textController.clear();
     return isCorrect;
   }
 
   Future<String> handlePass() async {
-    String passCountry = await GameService.handlePass();
+    final passCountry = await GameService.handlePass();
     textController.clear();
     return passCountry;
   }

@@ -33,11 +33,10 @@ class DistanceGameController {
   }
 
   Future<GuessResultModel?> checkAnswer() async {
-    String inputText = textController.text.trim();
+    final inputText = textController.text.trim();
     if (inputText.isEmpty) return null;
 
-    GuessResultModel? result =
-        await GameService.processDistanceGuess(inputText);
+    final result = await GameService.processDistanceGuess(inputText);
     textController.clear();
     return result;
   }
@@ -55,7 +54,7 @@ class DistanceGameController {
   }
 
   Future<String> handlePass() async {
-    String passCountry = await GameService.handlePass();
+    final passCountry = await GameService.handlePass();
     textController.clear();
     guesses.clear();
     return passCountry;
@@ -65,7 +64,7 @@ class DistanceGameController {
     showDialog(
       context: context,
       builder: (context) => CustomNotification(
-        baslik: Localization.t('game_common.passed_msg', args: [""]),
+        baslik: Localization.t('game_common.passed_msg', args: ['']),
         metin: passCountry,
       ),
     );

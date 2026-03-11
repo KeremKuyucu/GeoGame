@@ -4,7 +4,7 @@ import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/leaderboard_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
 
-import 'leaderboard_controller.dart';
+import 'package:geogame/screens/leaderboard/leaderboard_controller.dart';
 
 class Leaderboard extends StatefulWidget {
   const Leaderboard({super.key});
@@ -29,7 +29,6 @@ class _LeaderboardState extends State<Leaderboard> {
       }
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

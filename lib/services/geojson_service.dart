@@ -12,18 +12,18 @@ class GeoJsonService {
   /// GeoJSON dosyasını okuyup Flutter Path nesnesine çevirir.
   /// Önce assets'ten, başarısız olursa network'ten yükler.
   static Future<Path?> loadCountryPath(String isoCode) async {
-    Path path = Path();
+    final path = Path();
 
     // 1. Yerelden dene
     try {
-      final String jsonString = await rootBundle.loadString(
+      final jsonString = await rootBundle.loadString(
         'assets/geojson/${isoCode.toLowerCase()}.geojson',
       );
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
       _parseGeoJsonToPath(jsonData, path);
       return path;
     } catch (e) {
-      debugPrint("Local GeoJSON upload error ($isoCode): $e");
+      debugPrint('Local GeoJSON upload error ($isoCode): $e');
     }
 
     // 2. Network fallback
@@ -37,10 +37,10 @@ class GeoJsonService {
         _parseGeoJsonToPath(jsonData, path);
         return path;
       } else {
-        debugPrint("GeoJSON network error: ${response.statusCode}");
+        debugPrint('GeoJSON network error: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint("GeoJSON Network Error ($isoCode): $e");
+      debugPrint('GeoJSON Network Error ($isoCode): $e');
     }
 
     return null;
@@ -93,7 +93,7 @@ class GeoJsonService {
         }
         break;
       default:
-        debugPrint("Unknown GeoJSON type: $type");
+        debugPrint('Unknown GeoJSON type: $type');
     }
   }
 
@@ -123,8 +123,8 @@ class GeoJsonService {
 
       // İlk nokta
       final start = ring[0] as List<dynamic>;
-      double startX = (start[0] as num).toDouble();
-      double startY = -(start[1] as num).toDouble(); // Y ekseni ters çevrildi
+      final startX = (start[0] as num).toDouble();
+      final startY = -(start[1] as num).toDouble(); // Y ekseni ters çevrildi
       path.moveTo(startX, startY);
 
       for (int i = 1; i < ring.length; i++) {
@@ -132,8 +132,8 @@ class GeoJsonService {
         if (simplify && i % skipFactor != 0 && i != ring.length - 1) continue;
 
         final point = ring[i] as List<dynamic>;
-        double x = (point[0] as num).toDouble();
-        double y = -(point[1] as num).toDouble();
+        final x = (point[0] as num).toDouble();
+        final y = -(point[1] as num).toDouble();
         path.lineTo(x, y);
       }
       path.close();
@@ -143,7 +143,7 @@ class GeoJsonService {
   /// GeoJSON Path'ini basitleştirilmiş modda yükler.
   /// Border Path oyunu gibi çok fazla ülke çizilecek durumlarda kullanılır.
   static Future<Path?> loadCountryPathSimplified(String isoCode) async {
-    Path path = Path();
+    final path = Path();
 
     // 1. Yerelden dene
     try {
@@ -154,7 +154,7 @@ class GeoJsonService {
       _parseGeoJsonToPath(jsonData, path);
       return path;
     } catch (e) {
-      debugPrint("Local GeoJSON upload error ($isoCode): $e");
+      debugPrint('Local GeoJSON upload error ($isoCode): $e');
     }
 
     // 2. Network fallback
@@ -169,7 +169,7 @@ class GeoJsonService {
         return path;
       }
     } catch (e) {
-      debugPrint("GeoJSON Network Error ($isoCode): $e");
+      debugPrint('GeoJSON Network Error ($isoCode): $e');
     }
 
     return null;
@@ -182,7 +182,7 @@ class GeoJsonService {
 
     // AppState'deki kayıtlı ülkeler üzerinden gidiyoruz
     if (AppState.allCountries.isEmpty) {
-      debugPrint("Warning: AppState.allCountries is empty during map load.");
+      debugPrint('Warning: AppState.allCountries is empty during map load.');
       return result;
     }
 

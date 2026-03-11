@@ -9,7 +9,7 @@ import 'package:geogame/services/preferences_service.dart';
 
 import 'package:geogame/widgets/restart_widget.dart';
 
-import 'env.dart';
+import 'package:geogame/env.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +35,7 @@ class Geogame extends StatelessWidget {
       builder: (BuildContext context, ThemeMode themeMode) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: "GeoGame",
+          title: 'GeoGame',
           themeMode: themeMode,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
@@ -47,7 +47,7 @@ class Geogame extends StatelessWidget {
           darkTheme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
               brightness: Brightness.dark,
-              seedColor: Colors.deepPurple,
+              seedColor: Colors.red,
             ),
             useMaterial3: true,
           ),

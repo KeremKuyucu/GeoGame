@@ -49,7 +49,7 @@ class BorderPathGameController {
 
   Future<void> loadLevel(BorderPathGameData? gameData) async {
     if (gameData == null) {
-      debugPrint("⚠️ Oyun verisi oluşturulamadı!");
+      debugPrint('⚠️ Game data could not be created!');
       isLoadingMaps = false;
       return;
     }
@@ -141,12 +141,12 @@ class BorderPathGameController {
   }
 
   int getScore() {
-    int wrongCount = (movesCount - optimalPathLength).clamp(0, 1000);
+    final wrongCount = (movesCount - optimalPathLength).clamp(0, 1000);
     return (100 - wrongCount * 10).clamp(20, 100);
   }
 
   String getPerformanceText() {
-    int score = AppState.session.totalScore;
+    final score = AppState.session.totalScore;
     if (score == 100) return Localization.t('game_borderpath.perf_perfect');
     if (score >= 80) return Localization.t('game_borderpath.perf_great');
     if (score >= 60) return Localization.t('game_borderpath.perf_good');
@@ -154,7 +154,7 @@ class BorderPathGameController {
   }
 
   Color getPerformanceColor() {
-    int score = AppState.session.totalScore;
+    final score = AppState.session.totalScore;
     if (score == 100) return Colors.green;
     if (score >= 80) return Colors.blue;
     if (score >= 60) return Colors.orange;
