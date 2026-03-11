@@ -44,8 +44,8 @@ try {
 
     # SignTool / PFX
     $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\signtool.exe"
-    $pfxPath = "C:\Users\Kerem\Projects\Thinks\KeremKuyucu.pfx"
-    $pfxPropertiesPath = "C:\Users\Kerem\Projects\Thinks\pfx.properties"
+    $pfxPath = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\KeremKuyucu.pfx"
+    $pfxPropertiesPath = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\pfx.properties"
 
     # Inno installer ciktisindaki dosya adi ipucu (OutputBaseFilename ile eslessin)
     $installerNameHint = "GeoGame"
