@@ -61,7 +61,14 @@
     "reset_password_desc": "E-posta adresinizi girin, size sıfırlama bağlantısı gönderelim.",
     "send_link": "Bağlantı Gönder",
     "link_sent": "Sıfırlama bağlantısı gönderildi!",
-    "warning_no_account": "Hesabınız yok, puanlarınız kayıt edilmeyecek."
+    "warning_no_account": "Hesabınız yok, puanlarınız kayıt edilmeyecek.",
+    "error_login_failed": "Giriş yapılamadı.",
+    "error_register_failed": "Kayıt işlemi başarısız.",
+    "error_unknown": "Bilinmeyen hata: {0}",
+    "error_unexpected": "Beklenmedik bir hata: {0}",
+    "error_db_profile": "Sunucu tarafında profil oluşturulamadı. Lütfen veritabanı ayarlarını kontrol edin.",
+    "error_email_in_use": "Bu e-posta adresi zaten kullanımda.",
+    "error_invalid_avatar": "Geçersiz profil resmi URL'si. Sektör standardı güvenli bağlantı (https) gereklidir."
   },
   "game_common": {
     "input_hint": "Ülke ismini yazın...",

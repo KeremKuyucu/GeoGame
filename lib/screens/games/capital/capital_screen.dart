@@ -4,7 +4,7 @@ import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/game_widgets.dart';
 
-import 'capital_controller.dart';
+import 'package:geogame/screens/games/capital/capital_controller.dart';
 
 class CapitalGame extends StatefulWidget {
   const CapitalGame({super.key});
@@ -47,7 +47,7 @@ class _CapitalGameState extends State<CapitalGame>
   }
 
   Future<void> _checkAnswer(int index) async {
-    bool isCorrect = await _controller.checkAnswer(index);
+    final isCorrect = await _controller.checkAnswer(index);
     setState(() {
       if (isCorrect) {
         _animController.forward(from: 0.0);
@@ -56,7 +56,7 @@ class _CapitalGameState extends State<CapitalGame>
   }
 
   Future<void> _handlePass() async {
-    String passCountry = await _controller.handlePass();
+    final passCountry = await _controller.handlePass();
     if (!mounted) return;
     _controller.showPassDialog(context, passCountry);
     setState(() {

@@ -5,7 +5,7 @@ import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/profile_view_widget.dart';
 import 'package:geogame/widgets/profiles_widgets.dart';
 
-import 'profiles_controller.dart';
+import 'package:geogame/screens/profiles/profiles_controller.dart';
 
 class Profiles extends StatefulWidget {
   const Profiles({super.key});

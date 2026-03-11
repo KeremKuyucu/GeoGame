@@ -7,7 +7,7 @@ class MainScaffoldController {
   void onTabChanged(
       BuildContext context, int index, VoidCallback onStateChanged) {
     // Klavyeyi kapat
-    FocusScopeNode currentFocus = FocusScope.of(context);
+    final FocusScopeNode currentFocus = FocusScope.of(context);
     if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
       currentFocus.unfocus();
     }

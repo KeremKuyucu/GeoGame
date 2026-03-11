@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'app_context.dart';
+import 'package:geogame/models/app_context.dart';
 
 // lib/models/country.dart
 
@@ -38,14 +38,23 @@ class Country {
   });
 
   factory Country.empty() => Country(
-    iso3: '', iso2: '',
-    englishName: '', translations: {}, flagEmoji: '', flagUrl: '',
-    capital: '', continents: [], isUNMember: false, latitude: 0.0,
-    longitude: 0.0, borders: [], area: 0.0,
-  );
+        iso3: '',
+        iso2: '',
+        englishName: '',
+        translations: {},
+        flagEmoji: '',
+        flagUrl: '',
+        capital: '',
+        continents: [],
+        isUNMember: false,
+        latitude: 0.0,
+        longitude: 0.0,
+        borders: [],
+        area: 0.0,
+      );
 
   factory Country.fromJson(Map<String, dynamic> json) {
-    String capitalData = "";
+    String capitalData = '';
     if (json['capital'] is List && (json['capital'] as List).isNotEmpty) {
       capitalData = json['capital'][0].toString();
     } else if (json['capital'] is String) {
@@ -80,8 +89,10 @@ class Country {
     }
     return englishName;
   }
+
   bool checkAnswer(String guess, String languageCode) {
-    final String localized = getLocalizedName(languageCode).toLowerCase().trim();
+    final String localized =
+        getLocalizedName(languageCode).toLowerCase().trim();
     final String english = englishName.toLowerCase().trim();
     final String input = guess.toLowerCase().trim();
 
@@ -91,14 +102,17 @@ class Country {
 
   static Future<void> loadCountries() async {
     try {
-      final String response = await rootBundle.loadString('assets/countries.json');
+      final String response =
+          await rootBundle.loadString('assets/countries.json');
       final List<dynamic> data = json.decode(response);
 
-      AppState.allCountries = data.map((item) => Country.fromJson(item)).toList();
+      AppState.allCountries =
+          data.map((item) => Country.fromJson(item)).toList();
 
-      debugPrint("✅ Countries Loaded Successfully: ${AppState.allCountries.length}");
+      debugPrint(
+          '✅ Countries Loaded Successfully: ${AppState.allCountries.length}');
     } catch (e) {
-      debugPrint("❌ CRITICAL ERROR: Could not load countries! $e");
+      debugPrint('❌ CRITICAL ERROR: Could not load countries! $e');
       AppState.allCountries = [];
     }
   }

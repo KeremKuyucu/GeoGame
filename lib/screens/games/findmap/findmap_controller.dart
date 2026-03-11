@@ -58,7 +58,7 @@ class FindMapGameController {
 
       startNewRound();
     } catch (e) {
-      debugPrint("Game initialization error: $e");
+      debugPrint('Game initialization error: $e');
     } finally {
       isLoading = false;
     }
@@ -210,7 +210,7 @@ class FindMapGameController {
         }
       }
     } catch (e) {
-      debugPrint("Hit test error: $e");
+      debugPrint('Hit test error: $e');
     }
     return null;
   }
@@ -219,7 +219,7 @@ class FindMapGameController {
     if (!hintUsed) {
       AppState.session.submitCorrect();
     }
-    await GameLogService.saveProgress("findmap");
+    await GameLogService.saveProgress('findmap');
     startNewRound();
   }
 

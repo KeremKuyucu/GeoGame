@@ -31,13 +31,13 @@ class ProfilesGuestView extends StatelessWidget {
             const Icon(Icons.person_off, size: 80, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
-              Localization.t("auth.login_required"),
+              Localization.t('auth.login_required'),
               style: const TextStyle(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               icon: const Icon(Icons.login),
-              label: Text(Localization.t("auth.login")),
+              label: Text(Localization.t('auth.login')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
                 foregroundColor: Colors.white,

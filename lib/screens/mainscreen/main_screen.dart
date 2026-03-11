@@ -5,7 +5,7 @@ import 'package:geogame/widgets/mainscreen_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/auth_service.dart';
 
-import 'main_screen_controller.dart';
+import 'package:geogame/screens/mainscreen/main_screen_controller.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

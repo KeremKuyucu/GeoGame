@@ -4,7 +4,7 @@ import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/settings_widgets.dart';
 
-import 'settings_controller.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         title: Text(
           Localization.t('settings.title').toUpperCase(),
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 2,
             color: Colors.orange,

@@ -61,7 +61,14 @@
     "reset_password_desc": "Enter your email to receive a reset link.",
     "send_link": "Send Link",
     "link_sent": "Reset link sent!",
-    "warning_no_account": "You don't have an account, your scores will not be saved."
+    "warning_no_account": "You don't have an account, your scores will not be saved.",
+    "error_login_failed": "Login failed.",
+    "error_register_failed": "Registration failed.",
+    "error_unknown": "Unknown error: {0}",
+    "error_unexpected": "Unexpected error: {0}",
+    "error_db_profile": "Profile creation failed on server. Please check database settings.",
+    "error_email_in_use": "This e-mail address is already in use.",
+    "error_invalid_avatar": "Invalid profile picture URL. HTTPS secure connection required."
   },
   "game_common": {
     "input_hint": "Type country name...",

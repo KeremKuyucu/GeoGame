@@ -58,7 +58,7 @@ class DrawerWidget extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                     color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
               ],
@@ -132,7 +132,7 @@ class DrawerWidget extends StatelessWidget {
     final Uri uri = Uri.parse(urlString);
     // mode: LaunchMode.externalApplication -> Uygulama içi webview değil, Chrome/Safari açar.
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      debugPrint("Link açılamadı: $urlString");
+      debugPrint('Link açılamadı: $urlString');
     }
   }
 

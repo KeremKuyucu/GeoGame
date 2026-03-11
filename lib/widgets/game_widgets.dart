@@ -116,7 +116,7 @@ class GameButtonModeUI extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           Localization.t('game_common.options_hint'),
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white70,
             fontSize: 12,
             shadows: [Shadow(blurRadius: 2, color: Colors.black45)],

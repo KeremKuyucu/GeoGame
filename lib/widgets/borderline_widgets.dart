@@ -46,7 +46,7 @@ class BorderLineMapContainer extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Harita verisi yüklenemedi",
+                  'Harita verisi yüklenemedi',
                   style: TextStyle(
                     color: controller.isDark ? Colors.white38 : Colors.grey,
                   ),

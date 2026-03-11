@@ -4,7 +4,7 @@ import 'package:geogame/widgets/distance_widgets.dart';
 import 'package:geogame/widgets/game_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
 
-import 'distance_controller.dart';
+import 'package:geogame/screens/games/distance/distance_controller.dart';
 
 class DistanceGame extends StatefulWidget {
   const DistanceGame({super.key});
@@ -50,7 +50,7 @@ class _DistanceGameState extends State<DistanceGame> {
   }
 
   Future<void> _handlePass() async {
-    String passCountry = await _controller.handlePass();
+    final passCountry = await _controller.handlePass();
     if (!mounted) return;
     _controller.showPassDialog(context, passCountry);
     setState(() {});
