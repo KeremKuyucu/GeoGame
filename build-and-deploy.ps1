@@ -4,7 +4,7 @@
     GeoGame - Otomatik Build, Imzala ve Dagit (Web / APK / Windows)
 .DESCRIPTION
     Flutter projesini secilen platformlar icin derler, Inno Setup ile installer olusturur,
-    signtool ile imzalar, web build'i deploy eder ve opsiyonel GitHub Release yapar.
+    signtool ile imzalar, web build'i Vercel CLI ile deploy eder ve opsiyonel GitHub Release yapar.
 .NOTES
     Proje kokunde calistirilmalidir. ISS, PFX vb. yollari asagida config bolumunden degistirin.
 #>
@@ -36,20 +36,24 @@ try {
     $projectRoot = $PSScriptRoot
     Set-Location $projectRoot
 
-    $webDeployPath = "C:\Users\Kerem\Projects\geogame-web-build"
-    $distPath = "C:\Users\Kerem\Projects\Outputs"
+    $distPath      = "C:\Users\Kerem\Projects\Outputs"
     $innoSetupPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-    $issFilePath = Join-Path $projectRoot "InnoSetup.iss"
-    $innoOutPath = Join-Path $projectRoot "Output"
+    $issFilePath   = Join-Path $projectRoot "InnoSetup.iss"
+    $innoOutPath   = Join-Path $projectRoot "Output"
+
+    # Vercel CLI
+    # `vercel login` ile bir kere giris yapilmis olmalidir.
+    # Projeyi ilk kez deploy ediyorsaniz once `vercel link` calistirin.
+    $vercelCmd = "vercel"  # PATH'te yoksa tam yolu verin: "C:\...\vercel.cmd"
 
     # SignTool / PFX
-    $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\signtool.exe"
-    $pfxPath = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\KeremKuyucu.pfx"
-    $pfxPropertiesPath = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\pfx.properties"
+    $signtool           = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\signtool.exe"
+    $pfxPath            = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\KeremKuyucu.pfx"
+    $pfxPropertiesPath  = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\pfx.properties"
 
     # Inno installer ciktisindaki dosya adi ipucu (OutputBaseFilename ile eslessin)
     $installerNameHint = "GeoGame"
-    $timestampUrl = "http://timestamp.digicert.com"
+    $timestampUrl      = "http://timestamp.digicert.com"
 
     # -- Yardimci Fonksiyonlar -----------------------------------------------------
     function Ensure-Dir ([string]$path) {
@@ -59,7 +63,6 @@ try {
     }
 
     function Escape-ProcessArg ([string]$arg) {
-        # Bosluk veya ozel karakter iceren argumanlari tirnak icine al
         if ($arg -match '\s') {
             return "`"$arg`""
         }
@@ -76,56 +79,42 @@ try {
             [Parameter(Mandatory = $true)][string]$FilePath,
             [Parameter(Mandatory = $false)][string[]]$ArgumentList = @(),
             [Parameter(Mandatory = $false)][string]$WorkingDirectory = $projectRoot,
-            [Parameter(Mandatory = $false)][switch]$AllowNonZero   # Bazi komutlar (git commit) 1 donebilir
+            [Parameter(Mandatory = $false)][switch]$AllowNonZero
         )
 
-        # flutter, git, gh gibi komutlar Windows'ta .bat/.cmd dosyasidir.
-        # UseShellExecute=false ile Process.Start bunlari PATH'ten bulamaz.
-        # Get-Command ile tam yolu cozumle; .bat/.cmd ise cmd.exe /c uzerinden calistir.
         $resolvedPath = $FilePath
-        $prependArgs = @()
+        $prependArgs  = @()
         $cmd = Get-Command $FilePath -ErrorAction SilentlyContinue
         if ($cmd) {
             $resolvedPath = $cmd.Source
-            # .bat / .cmd dosyalarini cmd.exe uzerinden calistir
             if ($resolvedPath -match '\.(bat|cmd)$') {
-                $prependArgs = @("/c", $resolvedPath)
+                $prependArgs  = @("/c", $resolvedPath)
                 $resolvedPath = "$env:SystemRoot\System32\cmd.exe"
             }
         }
 
         $psi = New-Object System.Diagnostics.ProcessStartInfo
-        $psi.FileName = $resolvedPath
-        $psi.WorkingDirectory = $WorkingDirectory
-        $psi.UseShellExecute = $false
+        $psi.FileName               = $resolvedPath
+        $psi.WorkingDirectory       = $WorkingDirectory
+        $psi.UseShellExecute        = $false
         $psi.RedirectStandardOutput = $true
-        $psi.RedirectStandardError = $true
+        $psi.RedirectStandardError  = $true
         $psi.StandardOutputEncoding = [System.Text.Encoding]::UTF8
-        $psi.StandardErrorEncoding = [System.Text.Encoding]::UTF8
+        $psi.StandardErrorEncoding  = [System.Text.Encoding]::UTF8
 
-        # PS 5.1 (.NET Framework) ArgumentList desteklemez; Arguments string olarak birlestir
         $allArgs = $prependArgs + $ArgumentList
         if ($allArgs.Count -gt 0) {
             $psi.Arguments = ($allArgs | ForEach-Object { Escape-ProcessArg $_ }) -join ' '
         }
 
-        $proc = New-Object System.Diagnostics.Process
+        $proc           = New-Object System.Diagnostics.Process
         $proc.StartInfo = $psi
 
-        # Async cikti toplama (buyuk buffer'larda deadlock onlenir)
         $stdoutBuilder = New-Object System.Text.StringBuilder
         $stderrBuilder = New-Object System.Text.StringBuilder
 
-        $onStdout = {
-            if ($EventArgs.Data) {
-                [void]$Event.MessageData.AppendLine($EventArgs.Data)
-            }
-        }
-        $onStderr = {
-            if ($EventArgs.Data) {
-                [void]$Event.MessageData.AppendLine($EventArgs.Data)
-            }
-        }
+        $onStdout = { if ($EventArgs.Data) { [void]$Event.MessageData.AppendLine($EventArgs.Data) } }
+        $onStderr = { if ($EventArgs.Data) { [void]$Event.MessageData.AppendLine($EventArgs.Data) } }
 
         $stdoutEvent = Register-ObjectEvent -InputObject $proc -EventName OutputDataReceived -Action $onStdout -MessageData $stdoutBuilder
         $stderrEvent = Register-ObjectEvent -InputObject $proc -EventName ErrorDataReceived  -Action $onStderr -MessageData $stderrBuilder
@@ -138,7 +127,6 @@ try {
             $proc.BeginErrorReadLine()
             $proc.WaitForExit()
 
-            # Olay kuyrugunun bosalmasini bekle
             Start-Sleep -Milliseconds 200
 
             $stdout = $stdoutBuilder.ToString().TrimEnd()
@@ -167,7 +155,7 @@ try {
     }
 
     # -- 1) Versiyon Bilgisi -------------------------------------------------------
-    $pubspecPath = Join-Path $projectRoot "pubspec.yaml"
+    $pubspecPath    = Join-Path $projectRoot "pubspec.yaml"
     $currentVersion = $null
 
     if (Test-Path $pubspecPath) {
@@ -203,7 +191,7 @@ try {
         )
 
         $currentIndex = 0
-        $menuActive = $true
+        $menuActive   = $true
 
         Write-Host "`n-- Platform Secimi --" -ForegroundColor Cyan
         Write-Host "   Yukari/Asagi: Gezinme | Space: Sec/Kaldir | Enter: Onayla" -ForegroundColor DarkGray
@@ -225,10 +213,10 @@ try {
 
             $key = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
             switch ($key.VirtualKeyCode) {
-                38 { if ($currentIndex -gt 0) { $currentIndex-- } }  # Up
-                40 { if ($currentIndex -lt ($platforms.Count - 1)) { $currentIndex++ } }  # Down
-                32 { $platforms[$currentIndex].Selected = -not $platforms[$currentIndex].Selected }  # Space
-                13 { $menuActive = $false }  # Enter
+                38 { if ($currentIndex -gt 0) { $currentIndex-- } }
+                40 { if ($currentIndex -lt ($platforms.Count - 1)) { $currentIndex++ } }
+                32 { $platforms[$currentIndex].Selected = -not $platforms[$currentIndex].Selected }
+                13 { $menuActive = $false }
             }
         }
 
@@ -242,12 +230,11 @@ try {
         return
     }
 
-    # @() ile sarmala - tek eleman secildiginde dizi olarak kalsin
     $selectedNames = @($selectedPlatforms | ForEach-Object { $_.Name })
     Write-Ok "Secilen platformlar: $($selectedNames -join ', ')"
 
     # -- Flutter Clean (Opsiyonel) -------------------------------------------------
-    $doClean = Read-Host "`nOnce 'flutter clean' calistirilsin mi? (E/H)"
+    $doClean = Read-Host "`nOnce 'flutter clean' calistirilsin mi? (e/H)"
     if ($doClean -match '^[Ee]$') {
         Write-Step "Flutter Clean"
         Run-Exe -FilePath "flutter" -ArgumentList @("clean") -WorkingDirectory $projectRoot
@@ -284,7 +271,7 @@ try {
         }
     }
 
-    # -- 4) APK Kopyalama ---------------------------------------------------------
+    # -- 4) APK Kopyalama ----------------------------------------------------------
     if ($selectedNames -contains "APK") {
         Write-Step "APK Dosyalari Kopyalaniyor"
 
@@ -308,35 +295,31 @@ try {
 
     # -- 5) Windows Installer (Inno Setup) + Imzalama -----------------------------
     if ($selectedNames -contains "Windows") {
-        # On kontroller
         if (-not (Test-Path $innoSetupPath)) { throw "Inno Setup bulunamadi: $innoSetupPath" }
-        if (-not (Test-Path $issFilePath)) { throw "ISS dosyasi bulunamadi: $issFilePath" }
+        if (-not (Test-Path $issFilePath))   { throw "ISS dosyasi bulunamadi: $issFilePath" }
 
         Write-Step "Inno Setup Calistiriliyor"
         Run-Exe -FilePath $innoSetupPath -ArgumentList @($issFilePath) -WorkingDirectory $projectRoot
 
-        # Installer .exe dosyasini bul
         $searchPaths = @()
         if (Test-Path $innoOutPath) { $searchPaths += $innoOutPath }
         if (-not ($searchPaths -contains $distPath)) { $searchPaths += $distPath }
 
         $installerExe = $null
 
-        # Once isim ipucuyla esleseni ara
         foreach ($sp in $searchPaths) {
             $installerExe = Get-ChildItem -Path $sp -Filter "*.exe" -File -ErrorAction SilentlyContinue |
-            Where-Object { $_.BaseName -like "*$installerNameHint*" } |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -First 1
+                Where-Object { $_.BaseName -like "*$installerNameHint*" } |
+                Sort-Object LastWriteTime -Descending |
+                Select-Object -First 1
             if ($installerExe) { break }
         }
 
-        # Fallback: en yeni .exe
         if (-not $installerExe) {
             foreach ($sp in $searchPaths) {
                 $installerExe = Get-ChildItem -Path $sp -Filter "*.exe" -File -ErrorAction SilentlyContinue |
-                Sort-Object LastWriteTime -Descending |
-                Select-Object -First 1
+                    Sort-Object LastWriteTime -Descending |
+                    Select-Object -First 1
                 if ($installerExe) { break }
             }
         }
@@ -345,7 +328,6 @@ try {
             throw "Installer .exe bulunamadi. Aranan yerler: $($searchPaths -join ', ')"
         }
 
-        # Dist'e kopyala
         $installerDest = Join-Path $distPath $installerExe.Name
         if ($installerExe.FullName -ne $installerDest) {
             Copy-Item $installerExe.FullName $installerDest -Force
@@ -355,13 +337,11 @@ try {
         $sizeMB = "{0:N2} MB" -f ($installerExe.Length / 1MB)
         Write-Info "Installer: $($installerExe.Name) ($sizeMB)"
 
-        # Imzalama
         if (-not (Test-Path $signtool)) { throw "signtool bulunamadi: $signtool" }
-        if (-not (Test-Path $pfxPath)) { throw "PFX bulunamadi: $pfxPath" }
+        if (-not (Test-Path $pfxPath))  { throw "PFX bulunamadi: $pfxPath" }
 
         Write-Step "Installer Imzalaniyor"
 
-        # PFX sifresini pfx.properties dosyasindan oku (password=... satiri)
         $pfxPassPlain = $null
         if (Test-Path $pfxPropertiesPath) {
             $propLine = Get-Content $pfxPropertiesPath | Select-String "^\s*password\s*="
@@ -370,24 +350,21 @@ try {
                 Write-Info "PFX sifresi pfx.properties dosyasindan okundu."
             }
         }
-        # Dosyadan okunamazsa kullanicidan iste
         if ([string]::IsNullOrWhiteSpace($pfxPassPlain)) {
             Write-Warn "pfx.properties bulunamadi veya password satiri yok."
             $pfxPassSecure = Read-Host "PFX password" -AsSecureString
-            $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pfxPassSecure)
-            $pfxPassPlain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+            $bstr         = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pfxPassSecure)
+            $pfxPassPlain  = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
             [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
         }
 
         try {
-
             Run-Exe -FilePath $signtool -ArgumentList @(
                 "sign", "/fd", "SHA256",
                 "/tr", $timestampUrl, "/td", "SHA256",
                 "/f", $pfxPath, "/p", $pfxPassPlain,
                 $installerExe.FullName
             )
-
             Run-Exe -FilePath $signtool -ArgumentList @("verify", "/pa", "/v", $installerExe.FullName)
             Write-Ok "Installer imzalandi ve dogrulandi."
         }
@@ -396,44 +373,36 @@ try {
         }
     }
 
-    # -- 6) Web Dagitim & Git Push -------------------------------------------------
+    # -- 6) Web Deploy (Vercel CLI) ------------------------------------------------
     if ($selectedNames -contains "Web") {
-        if (-not (Test-Path $webDeployPath)) { throw "Web deploy yolu bulunamadi: $webDeployPath" }
-
         $webBuildSrc = Join-Path $projectRoot "build\web"
-        if (-not (Test-Path $webBuildSrc)) { throw "Web build ciktisi bulunamadi: $webBuildSrc" }
-
-        Write-Step "Web Senkronizasyonu & Git Push"
-
-        Push-Location $webDeployPath
-        try {
-            # Mevcut dosyalari temizle (.git haric)
-            Get-ChildItem -Force | Where-Object { $_.Name -ne ".git" } | Remove-Item -Recurse -Force
-
-            # Yeni build'i kopyala
-            Copy-Item -Path "$webBuildSrc\*" -Destination . -Recurse -Force
-
-            # Git islemleri
-            Run-Exe -FilePath "git" -ArgumentList @("add", ".") -WorkingDirectory $webDeployPath
-
-            $commitMsg = "Auto-build V$currentVersion - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-            $commitExit = Run-Exe -FilePath "git" -ArgumentList @("commit", "-m", $commitMsg) -WorkingDirectory $webDeployPath -AllowNonZero
-            if ($commitExit -ne 0) {
-                Write-Info "Commit atlanmis olabilir (degisiklik yok)."
-            }
-
-            Run-Exe -FilePath "git" -ArgumentList @("push", "origin", "main", "--force-with-lease") -WorkingDirectory $webDeployPath
-            Write-Ok "Web deploy tamamlandi."
+        if (-not (Test-Path $webBuildSrc)) {
+            throw "Web build ciktisi bulunamadi: $webBuildSrc"
         }
-        finally {
-            Pop-Location
+
+        # vercel CLI kurulu mu?
+        $vercelCheck = Get-Command $vercelCmd -ErrorAction SilentlyContinue
+        if (-not $vercelCheck) {
+            throw "Vercel CLI bulunamadi. Kurmak icin: npm i -g vercel"
         }
+
+        Write-Step "Vercel'e Deploy Ediliyor"
+        Write-Info "Kaynak: $webBuildSrc"
+
+        # `vercel --prod` komutu projeyi production ortamina deploy eder.
+        # Proje ilk kez deploy ediliyorsa `vercel link` ile baglanti kurulmus olmalidir.
+        # `--yes` bayragi interaktif sorulari atlar.
+        Run-Exe -FilePath "cmd.exe" `
+            -ArgumentList @("/c", "vercel --prod --yes") `
+            -WorkingDirectory $webBuildSrc
+
+        Write-Ok "Web deploy tamamlandi (Vercel production)."
     }
 
     # -- 7) GitHub Release (Opsiyonel) ---------------------------------------------
     Write-Host ""
     Write-Host "-- GitHub Release --" -ForegroundColor Cyan
-    $createRelease = Read-Host "   GitHub Release olusturulsun mu? (E/H)"
+    $createRelease = Read-Host "   GitHub Release olusturulsun mu? (e/H)"
 
     if ($createRelease -match '^[Ee]$') {
         $releaseFiles = @()
@@ -445,7 +414,7 @@ try {
 
         if ($selectedNames -contains "Windows") {
             $exe = Get-ChildItem -Path $distPath -Filter "*.exe" -ErrorAction SilentlyContinue |
-            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+                Sort-Object LastWriteTime -Descending | Select-Object -First 1
             if ($exe) { $releaseFiles += $exe.FullName }
         }
 
@@ -453,20 +422,17 @@ try {
             Write-Warn "Release icin yuklenecek dosya bulunamadi."
         }
         else {
-            $tagName = "v$currentVersion"
+            $tagName      = "v$currentVersion"
             $releaseTitle = "GeoGame v$currentVersion"
 
             Push-Location $projectRoot
             try {
-                # Mevcut release var mi kontrol et
                 $releaseExists = $false
                 try {
                     $null = & gh release view $tagName 2>&1
                     if ($LASTEXITCODE -eq 0) { $releaseExists = $true }
                 }
-                catch {
-                    $releaseExists = $false
-                }
+                catch { $releaseExists = $false }
 
                 if ($releaseExists) {
                     Write-Step "Mevcut release'e dosyalar yukleniyor: $tagName"
@@ -480,7 +446,7 @@ try {
                     Write-Step "Yeni GitHub Release Olusturuluyor"
 
                     $releaseNotesFile = Join-Path $projectRoot "RELEASE_$currentVersion.md"
-                    $ghArgs = @("release", "create", $tagName, "--title", $releaseTitle)
+                    $ghArgs           = @("release", "create", $tagName, "--title", $releaseTitle)
 
                     if (Test-Path $releaseNotesFile) {
                         Write-Info "Release notu dosyasi bulundu: RELEASE_$currentVersion.md"
@@ -518,24 +484,23 @@ try {
     Write-Host "+=======================================================+" -ForegroundColor Green
 
     foreach ($name in $buildResults.Keys) {
-        $r = $buildResults[$name]
-        if ($r.Success) { $status = "Basarili" } else { $status = "HATALI" }
-        if ($r.Success) { $sColor = "Green" } else { $sColor = "Red" }
+        $r       = $buildResults[$name]
+        $status  = if ($r.Success) { "Basarili" } else { "HATALI" }
+        $sColor  = if ($r.Success) { "Green" }    else { "Red" }
         $elapsed = Format-Elapsed $r.Elapsed
-        $line = "|  {0,-10}  {1,-12}  {2,-18}  |" -f $name, $status, $elapsed
+        $line    = "|  {0,-10}  {1,-12}  {2,-18}  |" -f $name, $status, $elapsed
         Write-Host $line -ForegroundColor $sColor
     }
 
-    # Dist klasorundeki dosyalar
     if (Test-Path $distPath) {
         $distFiles = Get-ChildItem -Path $distPath -File -ErrorAction SilentlyContinue |
-        Sort-Object LastWriteTime -Descending | Select-Object -First 10
+            Sort-Object LastWriteTime -Descending | Select-Object -First 10
         if ($distFiles) {
             Write-Host "+-------------------------------------------------------+" -ForegroundColor Green
             Write-Host "|  Cikti Dosyalari ($distPath)" -ForegroundColor Green
             foreach ($f in $distFiles) {
                 $sizeMB = "{0:N2} MB" -f ($f.Length / 1MB)
-                $fLine = "|    {0,-32} {1,10}" -f $f.Name, $sizeMB
+                $fLine  = "|    {0,-32} {1,10}" -f $f.Name, $sizeMB
                 Write-Host $fLine -ForegroundColor White
             }
         }
