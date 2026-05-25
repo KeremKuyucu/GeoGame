@@ -197,6 +197,7 @@ class _AuthPageState extends State<AuthPage>
           },
         ),
         if (_controller.isLoginMode)
+          /*
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -217,22 +218,23 @@ class _AuthPageState extends State<AuthPage>
               ),
             ),
           ),
-        if (!_controller.isLoginMode) ...[
-          const SizedBox(height: 20),
-          AuthGlassTextField(
-            controller: _confirmPasswordController,
-            focusNode: _confirmPasswordFocusNode,
-            icon: Icons.lock_outline_rounded,
-            hintText: Localization.t('auth.confirm_password'),
-            obscureText: true,
-            obscurePassword: _controller.obscurePassword,
-            autofillHints: const [AutofillHints.password],
-            textInputAction: TextInputAction.done,
-            onTogglePassword: () =>
-                setState(() => _controller.togglePasswordVisibility()),
-            onSubmitted: (_) => _handleRegister(),
-          ),
-        ],
+          */
+          if (!_controller.isLoginMode) ...[
+            const SizedBox(height: 20),
+            AuthGlassTextField(
+              controller: _confirmPasswordController,
+              focusNode: _confirmPasswordFocusNode,
+              icon: Icons.lock_outline_rounded,
+              hintText: Localization.t('auth.confirm_password'),
+              obscureText: true,
+              obscurePassword: _controller.obscurePassword,
+              autofillHints: const [AutofillHints.password],
+              textInputAction: TextInputAction.done,
+              onTogglePassword: () =>
+                  setState(() => _controller.togglePasswordVisibility()),
+              onSubmitted: (_) => _handleRegister(),
+            ),
+          ],
       ],
     );
   }
