@@ -131,6 +131,72 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() => _controller.setDarkTheme(v)),
               ),
               SettingsDivider(isDark: isDark),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                leading: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.security_rounded, color: Colors.white, size: 20),
+                ),
+                title: Text(
+                  'Anonim Kullanım Verisi (Ping) Gönder',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                trailing: Switch.adaptive(
+                  value: _controller.isTelemetryEnabled,
+                  onChanged: (v) async {
+                    if (!v) {
+                      final shouldDisable = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                          title: Text(
+                            'Emin misiniz?',
+                            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                          ),
+                          content: Text(
+                            'Bu veri sizinle asla ilişkilendirilemez. Tek amacı uygulamanın günlük kullanım sayısını öğrenmektir.\n\nGönderilen örnek ping:\n{\n  "uid": "123e4567-e89b-12d3...",\n  "timestamp": "2026-05-25T14:30:00",\n  "app": "geogame",\n  "event": "app_opened_daily",\n  "platform": "mobile" // veya "web"\n}',
+                            style: TextStyle(
+                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              fontSize: 13,
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              child: const Text(
+                                'Yine de Kapat',
+                                style: TextStyle(color: Colors.redAccent),
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.teal,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: const Text('Açık Kalsın'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (shouldDisable != true) return;
+                    }
+
+                    setState(() => _controller.setTelemetryEnabled(v));
+                  },
+                  activeThumbColor: Colors.green,
+                ),
+              ),
+              SettingsDivider(isDark: isDark),
               SettingsLanguageTile(
                 controller: _controller,
                 isDark: isDark,

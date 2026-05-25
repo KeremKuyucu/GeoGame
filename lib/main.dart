@@ -6,6 +6,7 @@ import 'package:geogame/app_routes.dart';
 
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
+import 'package:geogame/services/logging_service.dart';
 
 import 'package:geogame/widgets/restart_widget.dart';
 
@@ -16,6 +17,7 @@ void main() async {
 
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   await PreferencesService.loadConfig();
+  await LoggingService.init();
 
   await Localization.init();
 

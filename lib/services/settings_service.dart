@@ -41,6 +41,13 @@ class SettingsService {
     debugPrint('🌍 Language changed to: $languageCode');
   }
 
+  /// Telemetri durumu değişikliği
+  static void setTelemetryEnabled(bool value) {
+    AppState.settings.telemetryEnabled = value;
+    PreferencesService.saveConfig();
+    debugPrint('📡 Telemetry Enabled: $value');
+  }
+
   // ============================================================================
   // KITA FİLTRELERİ
   // ============================================================================
@@ -113,6 +120,9 @@ class SettingsService {
 
   /// Mevcut dil kodu
   static String get currentLanguage => AppState.settings.language;
+
+  /// Telemetri durumu
+  static bool get isTelemetryEnabled => AppState.settings.telemetryEnabled;
 
   /// Kıta filtreleri
   static bool get europeEnabled => AppState.filter.europe;

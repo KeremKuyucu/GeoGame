@@ -178,8 +178,9 @@ class GameFilter {
 class AppSettings {
   bool darkTheme;
   String language;
+  bool telemetryEnabled;
 
-  AppSettings({this.darkTheme = true, this.language = 'eng'});
+  AppSettings({this.darkTheme = true, this.language = 'eng', this.telemetryEnabled = true});
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
@@ -188,11 +189,12 @@ class AppSettings {
           (map['language'] != null && map['language'].toString().isNotEmpty)
               ? map['language']
               : 'eng',
+      telemetryEnabled: map['telemetryEnabled'] ?? true,
     );
   }
 
   Map<String, dynamic> toMap() =>
-      {'darkTheme': darkTheme, 'language': language};
+      {'darkTheme': darkTheme, 'language': language, 'telemetryEnabled': telemetryEnabled};
 }
 
 class GameSession {

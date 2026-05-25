@@ -24,6 +24,9 @@ class SettingsController {
   /// Dil bilgisi
   String get currentLanguage => SettingsService.currentLanguage;
 
+  /// Telemetri durumu
+  bool get isTelemetryEnabled => SettingsService.isTelemetryEnabled;
+
   /// Versiyon bilgisi
   String get appVersion => SettingsService.appVersion;
 
@@ -87,6 +90,11 @@ class SettingsController {
   /// Tema değiştir
   void setDarkTheme(bool value) {
     SettingsService.setDarkTheme(value);
+  }
+
+  /// Telemetri değiştir
+  void setTelemetryEnabled(bool value) {
+    SettingsService.setTelemetryEnabled(value);
   }
 
   /// Dil değiştir
