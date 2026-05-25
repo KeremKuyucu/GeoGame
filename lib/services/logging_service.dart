@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
-import 'package:geogame/services/settings_service.dart';
+import 'package:geogame/models/app_context.dart';
 
 class LoggingService {
   static const String _uidKey = 'app_unique_id';
@@ -22,7 +22,7 @@ class LoggingService {
       }
 
       // 2. Günlük log kontrolü
-      final isTelemetryEnabled = SettingsService.isTelemetryEnabled;
+      final isTelemetryEnabled = AppState.settings.telemetryEnabled;
       if (!isTelemetryEnabled) return;
 
       try {
