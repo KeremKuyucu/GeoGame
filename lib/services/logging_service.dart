@@ -9,7 +9,7 @@ class LoggingService {
   static const String _uidKey = 'app_unique_id';
   static const String _lastLogDateKey = 'last_log_date';
 
-  static const String _logApiUrl = 'https://keremkk.com/api/logs';
+  static const String _logApiUrl = 'https://keremkk.com.tr/api/logs';
 
   /// Uygulama açılışında çağrılacak ana metod
   static Future<void> init() async {
@@ -52,10 +52,10 @@ class LoggingService {
           'timestamp': DateTime.now().toIso8601String(),
           'app': 'geogame',
           'event': 'app_opened_daily',
-          'platform': kIsWeb 
-              ? 'web' 
-              : (defaultTargetPlatform == TargetPlatform.windows 
-                  ? 'windows' 
+          'platform': kIsWeb
+              ? 'web'
+              : (defaultTargetPlatform == TargetPlatform.windows
+                  ? 'windows'
                   : 'mobile'),
         }),
       );
