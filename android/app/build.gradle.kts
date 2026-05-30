@@ -1,6 +1,9 @@
+import java.util.Properties
+import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
-    id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -15,9 +18,7 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
 
     splits {
         abi {
@@ -38,9 +39,9 @@ android {
 
     // Keystore configuration
     val keystorePropertiesFile = file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
-    val keystoreProperties = java.util.Properties()
+    val keystoreProperties = Properties()
     val hasValidKeystore = if (keystorePropertiesFile.exists()) {
-        keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
         !keystoreProperties.getProperty("storeFile").isNullOrEmpty()
     } else {
         false
@@ -89,5 +90,11 @@ configurations.all {
         force("androidx.browser:browser:1.10.0")
         force("androidx.core:core-ktx:1.18.0")
         force("androidx.core:core:1.18.0")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }

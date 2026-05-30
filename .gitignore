@@ -162,3 +162,4 @@ app.*.symbols
 .gclient_previous_custom_vars
 .gclient_previous_sync_commits
 lib/env.dart
+.vercel_backup/

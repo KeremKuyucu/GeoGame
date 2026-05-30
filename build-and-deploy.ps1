@@ -48,8 +48,8 @@ try {
 
     # SignTool / PFX
     $signtool           = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\signtool.exe"
-    $pfxPath            = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\KeremKuyucu.pfx"
-    $pfxPropertiesPath  = "C:\Users\Kerem\Projects\Thinks\imza-bilgileri\pfx.properties"
+    $pfxPath            = "C:\Users\Kerem\Projects\imza-bilgileri\KeremKuyucu.pfx"
+    $pfxPropertiesPath  = "C:\Users\Kerem\Projects\imza-bilgileri\pfx.properties"
 
     # Inno installer ciktisindaki dosya adi ipucu (OutputBaseFilename ile eslessin)
     $installerNameHint = "GeoGame"
@@ -365,8 +365,12 @@ try {
                 "/f", $pfxPath, "/p", $pfxPassPlain,
                 $installerExe.FullName
             )
-            Run-Exe -FilePath $signtool -ArgumentList @("verify", "/pa", "/v", $installerExe.FullName)
-            Write-Ok "Installer imzalandi ve dogrulandi."
+            $verifyExit = Run-Exe -FilePath $signtool -ArgumentList @("verify", "/pa", "/v", $installerExe.FullName) -AllowNonZero
+            if ($verifyExit -eq 0) {
+                Write-Ok "Installer imzalandi ve dogrulandi."
+            } else {
+                Write-Warn "Installer imzalandi, ancak dogrulama basarisiz oldu. Bu genellikle sertifikanin Windows tarafindan henuz guvenilir olarak taninmamasindan (self-signed) kaynaklanir."
+            }
         }
         finally {
             Remove-Variable -Name pfxPassPlain -Force -ErrorAction SilentlyContinue
@@ -384,6 +388,15 @@ try {
         $vercelCheck = Get-Command $vercelCmd -ErrorAction SilentlyContinue
         if (-not $vercelCheck) {
             throw "Vercel CLI bulunamadi. Kurmak icin: npm i -g vercel"
+        }
+
+        # Vercel baglantisini korumak icin yedegi geri yukle (flutter clean sonrasi silinmis olabilir)
+        $vercelBackupDir = Join-Path $projectRoot ".vercel_backup"
+        $vercelDestDir   = Join-Path $webBuildSrc ".vercel"
+        if (Test-Path $vercelBackupDir) {
+            Ensure-Dir $vercelDestDir
+            Copy-Item -Path (Join-Path $vercelBackupDir "project.json") -Destination (Join-Path $vercelDestDir "project.json") -Force
+            Write-Info "Vercel proje baglantisi yedekten geri yuklendi."
         }
 
         Write-Step "Vercel'e Deploy Ediliyor"
