@@ -286,35 +286,4 @@ class _AuthPageState extends State<AuthPage>
       _controller.showSnackBar(context, result.message, Colors.redAccent);
     }
   }
-
-  void _showForgotPasswordDialog() {
-    final resetEmailController =
-        TextEditingController(text: _emailController.text);
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AuthForgotPasswordDialog(
-        emailController: resetEmailController,
-        onSend: () async {
-          final email = resetEmailController.text.trim();
-          if (email.isEmpty) return;
-
-          Navigator.pop(dialogContext);
-          setState(() => _controller.isLoading = true);
-
-          final result = await _controller.sendPasswordReset(email);
-
-          if (!mounted) return;
-          setState(() => _controller.isLoading = false);
-
-          if (result.isSuccess) {
-            _controller.showSnackBar(
-                context, result.message, Colors.greenAccent);
-          } else {
-            _controller.showSnackBar(context, result.message, Colors.redAccent);
-          }
-        },
-      ),
-    );
-  }
 }
