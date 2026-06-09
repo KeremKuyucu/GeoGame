@@ -39,7 +39,7 @@ class CapitalGameController {
     }
 
     final isCorrect =
-        await GameService.checkStandardAnswer(answer, GameType.flag, index);
+        await GameService.checkStandardAnswer(answer, GameType.capital, index);
     textController.clear();
     return isCorrect;
   }
