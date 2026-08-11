@@ -196,30 +196,7 @@ class _AuthPageState extends State<AuthPage>
             }
           },
         ),
-        if (_controller.isLoginMode)
-          /*
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _showForgotPasswordDialog,
-              style: TextButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                minimumSize: const Size(0, 30),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                Localization.t('auth.forgot_password'),
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-          */
-          if (!_controller.isLoginMode) ...[
+        if (!_controller.isLoginMode) ...[
             const SizedBox(height: 20),
             AuthGlassTextField(
               controller: _confirmPasswordController,

@@ -20,14 +20,16 @@ android {
 
 
 
-    splits {
-        abi {
-            isEnable = true // ABI başına ayrı APK oluştur
-            reset()         // Varsayılan ayarları sıfırla
-            include("armeabi-v7a", "arm64-v8a", "x86_64") // Desteklenecek mimariler
-            isUniversalApk = true // Tek bir evrensel APK oluşturma
-        }
-    }
+    // ABI splits disabled for App Bundle builds (AAB handles this natively)
+    // Enable only when building APKs directly
+    // splits {
+    //     abi {
+    //         isEnable = true
+    //         reset()
+    //         include("armeabi-v7a", "arm64-v8a", "x86_64")
+    //         isUniversalApk = true
+    //     }
+    // }
 
     defaultConfig {
         applicationId = "com.keremkuyucu.geogame"
