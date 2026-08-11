@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/name_filter_service.dart';
 
 class EditProfileController {
   String? uid;
@@ -9,7 +10,6 @@ class EditProfileController {
 
   Future<void> loadUserProfile(
     TextEditingController nameController,
-    TextEditingController avatarUrlController,
     TextEditingController emailController,
   ) async {
     final user = AuthService.currentUser;
@@ -20,7 +20,6 @@ class EditProfileController {
       final metadata = user.userMetadata;
       if (metadata != null) {
         nameController.text = metadata['full_name'] ?? '';
-        avatarUrlController.text = metadata['avatar_url'] ?? '';
       }
       debugPrint("✅ Kullanıcı bilgileri cache'den başarıyla okundu.");
     }
@@ -28,17 +27,25 @@ class EditProfileController {
 
   bool get isUserAvailable => AuthService.currentUser != null;
 
-  Future<String?> updateProfile(String name, String avatarUrl) async {
+  Future<String?> updateProfile(String name) async {
     if (uid == null) return 'User not found';
 
-    String finalAvatarUrl = avatarUrl.trim();
-    if (finalAvatarUrl.isEmpty) {
-      finalAvatarUrl = 'https://api.dicebear.com/8.x/initials/png?seed=$name';
+    final trimmedName = name.trim();
+    if (trimmedName.isEmpty || trimmedName.length < 2) {
+      return Localization.t('auth.name_too_short');
     }
 
+    // İsim filtresi kontrolü
+    final filterError = NameFilterService.validate(trimmedName);
+    if (filterError != null) {
+      return Localization.t('edit_profile.$filterError');
+    }
+
+    final String avatarUrl = 'https://robohash.org/$uid';
+
     final String? error = await AuthService.updateProfileMetadata(
-      name: name.trim(),
-      avatarUrl: finalAvatarUrl,
+      name: trimmedName,
+      avatarUrl: avatarUrl,
     );
 
     if (error == null) {
@@ -64,10 +71,11 @@ class EditProfileController {
     return await AuthService.updatePassword(newPassword);
   }
 
-  String getPreviewUrl(String avatarUrl, String name) {
-    return avatarUrl.isNotEmpty
-        ? avatarUrl
-        : 'https://api.dicebear.com/8.x/initials/png?seed=$name';
+  String getAvatarUrl() {
+    if (uid != null) {
+      return 'https://robohash.org/$uid';
+    }
+    return 'https://robohash.org/default';
   }
 
   void showSnackBar(BuildContext context, String message, Color color) {

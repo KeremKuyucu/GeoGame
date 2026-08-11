@@ -142,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: const Icon(Icons.security_rounded, color: Colors.white, size: 20),
                 ),
                 title: Text(
-                  'Anonim Kullanım Verisi (Ping) Gönder',
+                  Localization.t('settings.use_anonymous_data'),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,

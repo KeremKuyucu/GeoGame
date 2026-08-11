@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/name_filter_service.dart';
 
 /// Auth UI mantığını yöneten servis.
 /// Validasyon, form kontrolü ve auth işlemlerini yönetir.
@@ -60,6 +61,10 @@ class AuthUIService {
     }
     if (!isValidName(name)) {
       return Localization.t('auth.name_too_short');
+    }
+    final nameFilterError = NameFilterService.validate(name);
+    if (nameFilterError != null) {
+      return Localization.t('edit_profile.$nameFilterError');
     }
     if (!isValidPassword(password)) {
       return Localization.t('auth.password_too_short');

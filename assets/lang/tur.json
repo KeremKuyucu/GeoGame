@@ -182,6 +182,7 @@
     "continent_title": "Kıta Seçenekleri",
     "un_members": "BM Üyeliği Olmayan Ülkeler",
     "no_continent_active": "Hiçbir kıta aktif değil.",
+    "use_anonymous_data": "Anonim Kullanım Verisi (Ping) Gönder",
     "continents": {
       "south_america": "Güney Amerika Kıtasında Olan Ülkeler",
       "north_america": "Kuzey Amerika Kıtasında Olan Ülkeler",
@@ -213,8 +214,10 @@
     "edit_title": "Profili Düzenle",
     "personal_info": "Kişisel Bilgiler",
     "display_name": "Görünen İsim",
-    "avatar_url": "Avatar URL",
-    "update_success": "Profil başarıyla güncellendi"
+    "update_success": "Profil başarıyla güncellendi",
+    "name_too_long": "İsim en fazla 20 karakter olabilir",
+    "name_invalid_chars": "İsim sadece harf, rakam, boşluk ve alt çizgi içerebilir",
+    "name_inappropriate": "Bu isim uygunsuz içerik barındırıyor"
   },
   "leaderboard": {
     "title": "Sıralama",

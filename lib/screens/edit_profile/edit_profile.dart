@@ -16,7 +16,6 @@ class _EditProfilePageState extends State<EditProfilePage>
   final EditProfileController _controller = EditProfileController();
 
   late final TextEditingController _nameController;
-  late final TextEditingController _avatarUrlController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
 
@@ -28,7 +27,6 @@ class _EditProfilePageState extends State<EditProfilePage>
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _avatarUrlController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
 
@@ -45,7 +43,7 @@ class _EditProfilePageState extends State<EditProfilePage>
 
     _controller
         .loadUserProfile(
-            _nameController, _avatarUrlController, _emailController)
+            _nameController, _emailController)
         .then((_) {
       if (!_controller.isUserAvailable && mounted) {
         Navigator.pop(context);
@@ -57,7 +55,6 @@ class _EditProfilePageState extends State<EditProfilePage>
   @override
   void dispose() {
     _nameController.dispose();
-    _avatarUrlController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _animController.dispose();
@@ -66,10 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    final previewUrl = _controller.getPreviewUrl(
-      _avatarUrlController.text,
-      _nameController.text,
-    );
+    final previewUrl = _controller.getAvatarUrl();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -122,13 +116,6 @@ class _EditProfilePageState extends State<EditProfilePage>
           controller: _nameController,
           hintText: Localization.t('edit_profile.display_name'),
           icon: Icons.person_outline_rounded,
-        ),
-        const SizedBox(height: 15),
-        EditProfileGlassTextField(
-          controller: _avatarUrlController,
-          hintText: Localization.t('edit_profile.avatar_url'),
-          icon: Icons.link_rounded,
-          onChanged: (val) => setState(() {}),
         ),
         const SizedBox(height: 25),
         EditProfileGradientButton(
@@ -185,7 +172,6 @@ class _EditProfilePageState extends State<EditProfilePage>
 
     final error = await _controller.updateProfile(
       _nameController.text,
-      _avatarUrlController.text,
     );
 
     if (mounted) {

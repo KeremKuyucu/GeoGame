@@ -182,6 +182,7 @@
     "continent_title": "Continent Options",
     "un_members": "Countries without UN Membership",
     "no_continent_active": "No continent is active.",
+    "use_anonymous_data": "Send Anonymous Usage Data (Ping)",
     "continents": {
       "south_america": "Countries in South America",
       "north_america": "Countries in North America",
@@ -213,8 +214,10 @@
     "edit_title": "Edit Profile",
     "personal_info": "Personal Information",
     "display_name": "Display Name",
-    "avatar_url": "Avatar URL",
-    "update_success": "Profile updated successfully"
+    "update_success": "Profile updated successfully",
+    "name_too_long": "Name must be at most 20 characters",
+    "name_invalid_chars": "Name can only contain letters, numbers, spaces and underscores",
+    "name_inappropriate": "This name contains inappropriate content"
   },
   "leaderboard": {
     "title": "Leaderboard",
