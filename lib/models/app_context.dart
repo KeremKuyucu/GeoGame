@@ -115,7 +115,7 @@ class UserProfile {
   factory UserProfile.anonymous() {
     return UserProfile(
       name: Localization.t('settings.guest'),
-      avatarUrl: 'https://robohash.org/kaplan.png?set=set4',
+      avatarUrl: 'https://robohash.org/',
     );
   }
 
@@ -124,7 +124,7 @@ class UserProfile {
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
       name: map['name'] ?? Localization.t('settings.guest'),
-      avatarUrl: map['avatarUrl'] ?? 'https://robohash.org/kaplan.png?set=set4',
+      avatarUrl: map['avatarUrl'] ?? 'https://robohash.org/',
     );
   }
 }
@@ -180,7 +180,10 @@ class AppSettings {
   String language;
   bool telemetryEnabled;
 
-  AppSettings({this.darkTheme = true, this.language = 'eng', this.telemetryEnabled = true});
+  AppSettings(
+      {this.darkTheme = true,
+      this.language = 'eng',
+      this.telemetryEnabled = true});
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
@@ -193,8 +196,11 @@ class AppSettings {
     );
   }
 
-  Map<String, dynamic> toMap() =>
-      {'darkTheme': darkTheme, 'language': language, 'telemetryEnabled': telemetryEnabled};
+  Map<String, dynamic> toMap() => {
+        'darkTheme': darkTheme,
+        'language': language,
+        'telemetryEnabled': telemetryEnabled
+      };
 }
 
 class GameSession {

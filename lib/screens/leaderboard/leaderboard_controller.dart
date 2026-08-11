@@ -48,8 +48,7 @@ class LeaderboardController {
         'uid': row['uid']?.toString() ?? '',
         'name':
             row['full_name']?.toString() ?? Localization.t('settings.guest'),
-        'avatar_url': row['avatar_url']?.toString() ??
-            'https://robohash.org/kaplan.png?set=set4',
+        'avatar_url': row['avatar_url']?.toString() ?? 'https://robohash.org/',
         'total_score': _toInt(row['total_score']),
         // total_correct ve total_wrong view'da yoksa hesaplayacağız
       };

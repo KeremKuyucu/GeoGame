@@ -34,11 +34,18 @@ class AuthService {
         password: password,
         data: {
           'full_name': name,
-          'avatar_url': 'https://robohash.org/kaplan.png?set=set4',
+          'avatar_url': 'https://robohash.org/${name.hashCode.abs()}',
         },
       );
 
       if (res.user != null) {
+        // Now that we have the uid, update avatar_url with the real uid
+        await _supabase.auth.updateUser(
+          UserAttributes(data: {
+            'full_name': name,
+            'avatar_url': 'https://robohash.org/${res.user!.id}',
+          }),
+        );
         await syncUserData(res.user!);
         return null;
       }
@@ -75,13 +82,13 @@ class AuthService {
         AppState.user = UserProfile(
             name: profileData['full_name'] ?? Localization.t('settings.guest'),
             avatarUrl: profileData['avatar_url'] ??
-                'https://robohash.org/${authUser.id}.png?set=set4');
+                'https://robohash.org/${authUser.id}');
       } else {
         AppState.user = UserProfile(
             name: authUser.userMetadata?['full_name'] ??
                 Localization.t('settings.guest'),
             avatarUrl: authUser.userMetadata?['avatar_url'] ??
-                'https://robohash.org/${authUser.id}.png?set=set4');
+                'https://robohash.org/${authUser.id}');
       }
 
       debugPrint('✅ Profile sync complete: ${AppState.user.name}');
