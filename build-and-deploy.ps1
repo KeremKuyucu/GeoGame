@@ -409,6 +409,13 @@ try {
             -ArgumentList @("/c", "vercel --prod --yes") `
             -WorkingDirectory $webBuildSrc
 
+        # Vercel baglanti yapilandirmasini gelecekteki build'ler icin yedekle
+        $buildProjectJson = Join-Path $vercelDestDir "project.json"
+        if (Test-Path $buildProjectJson) {
+            Ensure-Dir $vercelBackupDir
+            Copy-Item -Path $buildProjectJson -Destination (Join-Path $vercelBackupDir "project.json") -Force
+        }
+
         Write-Ok "Web deploy tamamlandi (Vercel production)."
     }
 
