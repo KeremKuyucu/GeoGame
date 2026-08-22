@@ -53,7 +53,12 @@ try {
 
     # Inno installer ciktisindaki dosya adi ipucu (OutputBaseFilename ile eslessin)
     $installerNameHint = "GeoGame"
-    $timestampUrl      = "http://timestamp.digicert.com"
+    $timestampServers  = @(
+        "http://timestamp.sectigo.com",
+        "http://timestamp.digicert.com",
+        "http://tsa.starfieldtech.com",
+        "http://timestamp.globalsign.com/tsa/r6advanced1"
+    )
 
     # -- Yardimci Fonksiyonlar -----------------------------------------------------
     function Ensure-Dir ([string]$path) {
@@ -281,7 +286,7 @@ try {
             throw "Kaynak APK yolu bulunamadi: $flutterApkPath"
         }
 
-        $apkFiles = Get-ChildItem -Path $flutterApkPath -Filter "*.apk" -Recurse
+        $apkFiles = @(Get-ChildItem -Path $flutterApkPath -Filter "*.apk" -Recurse)
         if ($apkFiles.Count -eq 0) {
             Write-Warn "APK dosyasi bulunamadi: $flutterApkPath"
         }
@@ -302,7 +307,7 @@ try {
             throw "Kaynak AAB yolu bulunamadi: $flutterAabPath"
         }
 
-        $aabFiles = Get-ChildItem -Path $flutterAabPath -Filter "*.aab" -Recurse
+        $aabFiles = @(Get-ChildItem -Path $flutterAabPath -Filter "*.aab" -Recurse)
         if ($aabFiles.Count -eq 0) {
             Write-Warn "AAB dosyasi bulunamadi: $flutterAabPath"
         }
@@ -381,12 +386,32 @@ try {
         }
 
         try {
-            Run-Exe -FilePath $signtool -ArgumentList @(
-                "sign", "/fd", "SHA256",
-                "/tr", $timestampUrl, "/td", "SHA256",
-                "/f", $pfxPath, "/p", $pfxPassPlain,
-                $installerExe.FullName
-            )
+            $signedSuccessfully = $false
+            foreach ($tsUrl in $timestampServers) {
+                Write-Info "Zaman damgasi sunucusu deneniyor: $tsUrl"
+                $signExit = Run-Exe -FilePath $signtool -ArgumentList @(
+                    "sign", "/fd", "SHA256",
+                    "/tr", $tsUrl, "/td", "SHA256",
+                    "/f", $pfxPath, "/p", $pfxPassPlain,
+                    $installerExe.FullName
+                ) -AllowNonZero
+
+                if ($signExit -eq 0) {
+                    $signedSuccessfully = $true
+                    break
+                }
+                Write-Warn "$tsUrl sunucusuna erisilemedi veya yanit vermedi, baska sunucu deneniyor..."
+            }
+
+            if (-not $signedSuccessfully) {
+                Write-Warn "Zaman damgasi sunucularina erisilemedi. Zaman damgasiz imzalaniyor..."
+                Run-Exe -FilePath $signtool -ArgumentList @(
+                    "sign", "/fd", "SHA256",
+                    "/f", $pfxPath, "/p", $pfxPassPlain,
+                    $installerExe.FullName
+                )
+            }
+
             $verifyExit = Run-Exe -FilePath $signtool -ArgumentList @("verify", "/pa", "/v", $installerExe.FullName) -AllowNonZero
             if ($verifyExit -eq 0) {
                 Write-Ok "Installer imzalandi ve dogrulandi."
@@ -450,14 +475,11 @@ try {
         $releaseFiles = @()
 
         if ($selectedNames -contains "APK") {
-            $apks = Get-ChildItem -Path $distPath -Filter "*.apk" -ErrorAction SilentlyContinue
+            $apks = @(Get-ChildItem -Path $distPath -Filter "*.apk" -ErrorAction SilentlyContinue)
             foreach ($apk in $apks) { $releaseFiles += $apk.FullName }
         }
 
-        if ($selectedNames -contains "AAB") {
-            $aabs = Get-ChildItem -Path $distPath -Filter "*.aab" -ErrorAction SilentlyContinue
-            foreach ($aab in $aabs) { $releaseFiles += $aab.FullName }
-        }
+        # AAB dosyasi (Google Play Store icin) sadece cikti klasorunde ($distPath) saklanir, GitHub Release'e yuklenmez.
 
         if ($selectedNames -contains "Windows") {
             $exe = Get-ChildItem -Path $distPath -Filter "*.exe" -ErrorAction SilentlyContinue |

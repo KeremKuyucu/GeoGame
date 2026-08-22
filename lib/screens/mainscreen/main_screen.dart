@@ -20,9 +20,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    /*
+    Play Storeda var artık uygulama githubdan update kontrolüne gerek yok. 
+    İlerde ayrı sürüm olarak çıkarabilirim burda kalsın bu
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.checkForUpdates();
     });
+    */
   }
 
   @override
