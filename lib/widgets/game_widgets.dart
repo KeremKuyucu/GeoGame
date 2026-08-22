@@ -4,8 +4,10 @@ import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
+import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/flag_loader.dart';
+import 'package:geogame/widgets/ad_banner_widget.dart';
 
 /// Oyun AppBar widget'ı
 class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -42,6 +44,8 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
         IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
+            // Interstitial reklam göster (fire-and-forget)
+            AdService.showInterstitialAd();
             GameLogService.syncPendingLogs();
             Navigator.pushNamedAndRemoveUntil(
               context,
@@ -382,7 +386,14 @@ class GameScaffold extends StatelessWidget {
       drawer: const DrawerWidget(),
       body: GameBackground(
         colors: backgroundColors,
-        child: SafeArea(child: body),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(child: body),
+              const AdBannerWidget(),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -140,6 +140,19 @@ class AuthUIService {
     }
   }
 
+  /// Google ile giriş işlemi sonucu
+  static Future<AuthResult> performGoogleSignIn() async {
+    final String? error = await AuthService.signInWithGoogle();
+
+    if (error == null) {
+      debugPrint('✅ Google Sign-In successful');
+      return AuthResult.success(Localization.t('auth.google_login_success'));
+    } else {
+      debugPrint('❌ Google Sign-In failed: $error');
+      return AuthResult.failure(error);
+    }
+  }
+
   /// Şifre sıfırlama email gönderimi
   static Future<AuthResult> sendPasswordReset(String email) async {
     // Validasyon

@@ -116,16 +116,16 @@ class NameFilterService {
     if (_filter.hasProfanity(normalized)) return true;
 
     // 2. Leetspeak çözümlemesi yap (Örn: s1k3r1m -> sikerim)
-    String decoded = _decodeLeetspeak(normalized);
+    final String decoded = _decodeLeetspeak(normalized);
     if (_filter.hasProfanity(decoded)) return true;
 
     // 3. Özel karakter ve boşlukları silerek kontrol et (Örn: p.i.c -> pic)
     //    Sadece ASCII Latin harf ve rakamları tut — tüm Unicode sembollerini de siler
-    String condensed = decoded.replaceAll(RegExp(r'[^a-z0-9]'), '');
+    final String condensed = decoded.replaceAll(RegExp(r'[^a-z0-9]'), '');
     if (_filter.hasProfanity(condensed)) return true;
 
     // 4. Ardışık tekrarlanan karakterleri sıkıştırarak kontrol et (Örn: siiiiik -> sik)
-    String collapsed = _collapseRepeats(condensed);
+    final String collapsed = _collapseRepeats(condensed);
     if (_filter.hasProfanity(collapsed)) return true;
 
     return false;

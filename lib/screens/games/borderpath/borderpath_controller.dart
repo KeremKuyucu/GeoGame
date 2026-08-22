@@ -9,6 +9,7 @@ import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/ad_service.dart';
 
 class BorderPathGameController {
   final TextEditingController textController = TextEditingController();
@@ -186,6 +187,7 @@ class BorderPathGameController {
   }
 
   void navigateHome(BuildContext context) {
+    AdService.showInterstitialAd();
     GameLogService.syncPendingLogs();
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }

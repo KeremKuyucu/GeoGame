@@ -68,7 +68,12 @@
     "error_unexpected": "Beklenmedik bir hata: {0}",
     "error_db_profile": "Sunucu tarafında profil oluşturulamadı. Lütfen veritabanı ayarlarını kontrol edin.",
     "error_email_in_use": "Bu e-posta adresi zaten kullanımda.",
-    "error_invalid_avatar": "Geçersiz profil resmi URL'si. Sektör standardı güvenli bağlantı (https) gereklidir."
+    "error_invalid_avatar": "Geçersiz profil resmi URL'si. Sektör standardı güvenli bağlantı (https) gereklidir.",
+    "google_sign_in": "Google ile Giriş Yap",
+    "or_divider": "veya",
+    "google_login_success": "Google ile giriş başarılı!",
+    "error_google_cancelled": "Google girişi iptal edildi.",
+    "error_google_sign_in": "Google ile giriş yapılamadı. Lütfen tekrar deneyin."
   },
   "game_common": {
     "input_hint": "Ülke ismini yazın...",

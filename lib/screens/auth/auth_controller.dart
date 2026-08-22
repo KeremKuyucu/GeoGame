@@ -8,6 +8,7 @@ import 'package:geogame/services/localization_service.dart';
 class AuthController {
   // State
   bool isLoading = false;
+  bool isGoogleLoading = false;
   bool isLoginMode = true;
   bool obscurePassword = true;
 
@@ -31,6 +32,10 @@ class AuthController {
       name: name.trim(),
       confirmPassword: confirmPassword.trim(),
     );
+  }
+
+  Future<AuthResult> handleGoogleLogin() async {
+    return await AuthUIService.performGoogleSignIn();
   }
 
   Future<AuthResult> sendPasswordReset(String email) async {

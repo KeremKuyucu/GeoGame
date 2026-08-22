@@ -402,3 +402,197 @@ class AuthForgotPasswordDialog extends StatelessWidget {
     );
   }
 }
+
+class GoogleLogoWidget extends StatelessWidget {
+  final double size;
+  const GoogleLogoWidget({super.key, this.size = 24});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(size, size),
+      painter: _GoogleLogoPainter(),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+
+    final Paint paint = Paint()..style = PaintingStyle.fill;
+
+    // Blue: #4285F4
+    paint.color = const Color(0xFF4285F4);
+    final Path bluePath = Path()
+      ..moveTo(w * 0.98, h * 0.51)
+      ..cubicTo(w * 0.98, h * 0.47, w * 0.97, h * 0.43, w * 0.96, h * 0.40)
+      ..lineTo(w * 0.50, h * 0.40)
+      ..lineTo(w * 0.50, h * 0.60)
+      ..lineTo(w * 0.77, h * 0.60)
+      ..cubicTo(w * 0.76, h * 0.66, w * 0.72, h * 0.72, w * 0.66, h * 0.76)
+      ..lineTo(w * 0.66, h * 0.89)
+      ..lineTo(w * 0.83, h * 0.89)
+      ..cubicTo(w * 0.93, h * 0.80, w * 0.98, h * 0.67, w * 0.98, h * 0.51)
+      ..close();
+    canvas.drawPath(bluePath, paint);
+
+    // Green: #34A853
+    paint.color = const Color(0xFF34A853);
+    final Path greenPath = Path()
+      ..moveTo(w * 0.50, h * 0.98)
+      ..cubicTo(w * 0.64, h * 0.98, w * 0.75, h * 0.94, w * 0.83, h * 0.89)
+      ..lineTo(w * 0.66, h * 0.76)
+      ..cubicTo(w * 0.62, h * 0.79, w * 0.56, h * 0.81, w * 0.50, h * 0.81)
+      ..cubicTo(w * 0.37, h * 0.81, w * 0.27, h * 0.72, w * 0.23, h * 0.60)
+      ..lineTo(w * 0.06, h * 0.60)
+      ..lineTo(w * 0.06, h * 0.74)
+      ..cubicTo(w * 0.14, h * 0.88, w * 0.31, h * 0.98, w * 0.50, h * 0.98)
+      ..close();
+    canvas.drawPath(greenPath, paint);
+
+    // Yellow: #FBBC05
+    paint.color = const Color(0xFFFBBC05);
+    final Path yellowPath = Path()
+      ..moveTo(w * 0.23, h * 0.60)
+      ..cubicTo(w * 0.22, h * 0.57, w * 0.21, h * 0.54, w * 0.21, h * 0.50)
+      ..cubicTo(w * 0.21, h * 0.46, w * 0.22, h * 0.43, w * 0.23, h * 0.40)
+      ..lineTo(w * 0.23, h * 0.40)
+      ..lineTo(w * 0.06, h * 0.26)
+      ..cubicTo(w * 0.02, h * 0.33, 0.00, h * 0.41, 0.00, h * 0.50)
+      ..cubicTo(0.00, h * 0.59, w * 0.02, h * 0.67, w * 0.06, h * 0.74)
+      ..lineTo(w * 0.23, h * 0.60)
+      ..close();
+    canvas.drawPath(yellowPath, paint);
+
+    // Red: #EA4335
+    paint.color = const Color(0xFFEA4335);
+    final Path redPath = Path()
+      ..moveTo(w * 0.50, h * 0.19)
+      ..cubicTo(w * 0.58, h * 0.19, w * 0.65, h * 0.22, w * 0.70, h * 0.27)
+      ..lineTo(w * 0.84, h * 0.13)
+      ..cubicTo(w * 0.75, h * 0.05, w * 0.64, 0.00, w * 0.50, 0.00)
+      ..cubicTo(w * 0.31, 0.00, w * 0.14, h * 0.10, w * 0.06, h * 0.26)
+      ..lineTo(w * 0.23, h * 0.40)
+      ..cubicTo(w * 0.27, h * 0.28, w * 0.37, h * 0.19, w * 0.50, h * 0.19)
+      ..close();
+    canvas.drawPath(redPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class AuthGoogleButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback? onPressed;
+  final String? label;
+
+  const AuthGoogleButton({
+    super.key,
+    required this.isLoading,
+    required this.onPressed,
+    this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final text = label ?? Localization.t('auth.google_sign_in');
+    return Container(
+      width: double.infinity,
+      height: 54,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: isLoading ? null : onPressed,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isLoading)
+                  const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Color(0xFF4285F4),
+                    ),
+                  )
+                else ...[
+                  const GoogleLogoWidget(size: 22),
+                  const SizedBox(width: 14),
+                  Flexible(
+                    child: Text(
+                      text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF1F1F1F),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AuthOrDivider extends StatelessWidget {
+  final String? text;
+  const AuthOrDivider({super.key, this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = text ?? Localization.t('auth.or_divider');
+    return Row(
+      children: [
+        Expanded(
+          child: Divider(
+            color: Colors.white.withValues(alpha: 0.2),
+            thickness: 1,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Divider(
+            color: Colors.white.withValues(alpha: 0.2),
+            thickness: 1,
+          ),
+        ),
+      ],
+    );
+  }
+}

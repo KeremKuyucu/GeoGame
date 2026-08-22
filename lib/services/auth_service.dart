@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:geogame/env.dart';
 import 'package:geogame/models/app_context.dart';
-
 import 'package:geogame/services/localization_service.dart';
 
 class AuthService {
@@ -61,6 +62,81 @@ class AuthService {
     }
   }
 
+  /// Google ile Giriş Yap (Native ID Token ve OAuth Fallback destekli)
+  static Future<String?> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        serverClientId:
+            Env.googleWebClientId.isNotEmpty ? Env.googleWebClientId : null,
+        clientId:
+            Env.googleIosClientId.isNotEmpty ? Env.googleIosClientId : null,
+        scopes: const ['email', 'profile'],
+      );
+
+      // Önceki oturumu temizle
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
+
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        // Kullanıcı giriş penceresini kapattı / iptal etti
+        return Localization.t('auth.error_google_cancelled');
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+      final String? accessToken = googleAuth.accessToken;
+
+      if (idToken == null) {
+        debugPrint('⚠️ ID Token is null from native GoogleSignIn, trying OAuth fallback');
+        return await _signInWithOAuthFallback();
+      }
+
+      final AuthResponse res = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      if (res.user != null) {
+        await syncUserData(res.user!);
+        return null;
+      }
+      return Localization.t('auth.error_login_failed');
+    } on AuthException catch (e) {
+      debugPrint('AuthException in Google Sign-In: ${e.message}');
+      return e.message;
+    } catch (e) {
+      debugPrint('Unexpected error in Google Sign-In: $e');
+      if (!kIsWeb) {
+        return await _signInWithOAuthFallback();
+      }
+      return Localization.t('auth.error_google_sign_in');
+    }
+  }
+
+  /// Supabase OAuth tarayıcı tabanlı yönlendirme alternatifi
+  static Future<String?> _signInWithOAuthFallback() async {
+    try {
+      final bool success = await _supabase.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: kIsWeb
+            ? null
+            : 'io.supabase.geogame://login-callback/',
+      );
+      if (!success) {
+        return Localization.t('auth.error_login_failed');
+      }
+      return null;
+    } on AuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return Localization.t('auth.error_google_sign_in');
+    }
+  }
+
   static Future<void> syncUserData(User authUser) async {
     try {
       var profileData = await _supabase
@@ -78,17 +154,34 @@ class AuthService {
             .maybeSingle();
       }
 
+      final rawMeta = authUser.userMetadata ?? {};
+      final String fallbackName = rawMeta['full_name'] ??
+          rawMeta['name'] ??
+          authUser.email?.split('@').first ??
+          Localization.t('settings.guest');
+      final String fallbackAvatar = rawMeta['avatar_url'] ??
+          rawMeta['picture'] ??
+          'https://robohash.org/${authUser.id}';
+
       if (profileData != null) {
         AppState.user = UserProfile(
-            name: profileData['full_name'] ?? Localization.t('settings.guest'),
-            avatarUrl: profileData['avatar_url'] ??
-                'https://robohash.org/${authUser.id}');
+            name: profileData['full_name'] ?? fallbackName,
+            avatarUrl: profileData['avatar_url'] ?? fallbackAvatar);
       } else {
         AppState.user = UserProfile(
-            name: authUser.userMetadata?['full_name'] ??
-                Localization.t('settings.guest'),
-            avatarUrl: authUser.userMetadata?['avatar_url'] ??
-                'https://robohash.org/${authUser.id}');
+            name: fallbackName,
+            avatarUrl: fallbackAvatar);
+
+        // Yeni Google kaydı için profiles tablosuna da kaydetmeyi dene
+        try {
+          await _supabase.from('profiles').upsert({
+            'uid': authUser.id,
+            'full_name': fallbackName,
+            'avatar_url': fallbackAvatar,
+          });
+        } catch (e) {
+          debugPrint('Notice: Initial profile upsert: $e');
+        }
       }
 
       debugPrint('✅ Profile sync complete: ${AppState.user.name}');
@@ -103,6 +196,10 @@ class AuthService {
     } catch (e) {
       debugPrint('Supabase exit error: $e');
     }
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
+    } catch (_) {}
     AppState.user = UserProfile.anonymous();
   }
 

@@ -117,9 +117,16 @@ class _AuthPageState extends State<AuthPage>
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 24),
+                          AuthGoogleButton(
+                            isLoading: _controller.isGoogleLoading,
+                            onPressed: _handleGoogleLogin,
+                          ),
+                          const SizedBox(height: 24),
+                          const AuthOrDivider(),
+                          const SizedBox(height: 24),
                           AutofillGroup(child: _buildFormFields()),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 24),
                           AuthSubmitButton(
                             label: _controller.getSubmitButtonText(),
                             isLoading: _controller.isLoading,
@@ -196,6 +203,27 @@ class _AuthPageState extends State<AuthPage>
             }
           },
         ),
+        if (_controller.isLoginMode)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: _showForgotPasswordDialog,
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                minimumSize: const Size(0, 30),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                Localization.t('auth.forgot_password'),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
         if (!_controller.isLoginMode) ...[
             const SizedBox(height: 20),
             AuthGlassTextField(
@@ -214,6 +242,28 @@ class _AuthPageState extends State<AuthPage>
           ],
       ],
     );
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    _controller.unfocusAndFinishAutofill(context);
+    setState(() => _controller.isGoogleLoading = true);
+
+    final result = await _controller.handleGoogleLogin();
+
+    if (!mounted) return;
+    setState(() => _controller.isGoogleLoading = false);
+
+    if (result.isSuccess) {
+      _controller.showSnackBar(context, result.message, Colors.greenAccent);
+      widget.onLoginSuccess?.call();
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!mounted) return;
+      _controller.navigateToHome(context);
+    } else {
+      if (result.message != Localization.t('auth.error_google_cancelled')) {
+        _controller.showSnackBar(context, result.message, Colors.redAccent);
+      }
+    }
   }
 
   Future<void> _handleLogin() async {
@@ -262,5 +312,36 @@ class _AuthPageState extends State<AuthPage>
     } else {
       _controller.showSnackBar(context, result.message, Colors.redAccent);
     }
+  }
+
+  void _showForgotPasswordDialog() {
+    final resetEmailController =
+        TextEditingController(text: _emailController.text);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AuthForgotPasswordDialog(
+        emailController: resetEmailController,
+        onSend: () async {
+          final email = resetEmailController.text.trim();
+          if (email.isEmpty) return;
+
+          Navigator.pop(dialogContext);
+          setState(() => _controller.isLoading = true);
+
+          final result = await _controller.sendPasswordReset(email);
+
+          if (!mounted) return;
+          setState(() => _controller.isLoading = false);
+
+          if (result.isSuccess) {
+            _controller.showSnackBar(
+                context, result.message, Colors.greenAccent);
+          } else {
+            _controller.showSnackBar(context, result.message, Colors.redAccent);
+          }
+        },
+      ),
+    );
   }
 }

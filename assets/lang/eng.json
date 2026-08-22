@@ -68,7 +68,12 @@
     "error_unexpected": "Unexpected error: {0}",
     "error_db_profile": "Profile creation failed on server. Please check database settings.",
     "error_email_in_use": "This e-mail address is already in use.",
-    "error_invalid_avatar": "Invalid profile picture URL. HTTPS secure connection required."
+    "error_invalid_avatar": "Invalid profile picture URL. HTTPS secure connection required.",
+    "google_sign_in": "Sign in with Google",
+    "or_divider": "or",
+    "google_login_success": "Successfully signed in with Google!",
+    "error_google_cancelled": "Google sign-in was cancelled.",
+    "error_google_sign_in": "Could not sign in with Google. Please try again."
   },
   "game_common": {
     "input_hint": "Type country name...",

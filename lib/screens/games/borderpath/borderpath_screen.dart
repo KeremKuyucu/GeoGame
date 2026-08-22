@@ -42,11 +42,6 @@ class _BorderPathGameState extends State<BorderPathGame> {
     }
   }
 
-  void _undoLastMove() {
-    _controller.undoLastMove();
-    setState(() {});
-  }
-
   Future<void> _startNextRound({bool passMode = false}) async {
     await _controller.startNextRound(passMode: passMode);
     if (mounted) setState(() {});
@@ -103,19 +98,6 @@ class _BorderPathGameState extends State<BorderPathGame> {
               BorderPathNeighborsSection(
                 controller: _controller,
                 onCountrySelected: _selectCountry,
-              ),
-            const SizedBox(height: 20),
-            if (_controller.currentPath.length > 1 && !_controller.gameWon)
-              ElevatedButton.icon(
-                onPressed: _undoLastMove,
-                icon: const Icon(Icons.undo),
-                label: Text(Localization.t('game_borderpath.undo_move')),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
               ),
           ],
         ),
