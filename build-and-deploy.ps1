@@ -1,7 +1,7 @@
 #requires -version 5.1
 <#
 .SYNOPSIS
-    GeoGame - Otomatik Build, Imzala ve Dagit (Web / APK / Windows)
+    GeoGame - Otomatik Build, Imzala ve Dagit (Web / APK / AAB / Windows)
 .DESCRIPTION
     Flutter projesini secilen platformlar icin derler, Inno Setup ile installer olusturur,
     signtool ile imzalar, web build'i Vercel CLI ile deploy eder ve opsiyonel GitHub Release yapar.
@@ -187,6 +187,7 @@ try {
         $platforms = @(
             [pscustomobject]@{ Name = "Web"; Command = @("flutter", "build", "web", "--release"); Selected = $true }
             [pscustomobject]@{ Name = "APK"; Command = @("flutter", "build", "apk", "--release", "--split-per-abi"); Selected = $true }
+            [pscustomobject]@{ Name = "AAB"; Command = @("flutter", "build", "appbundle", "--release"); Selected = $true }
             [pscustomobject]@{ Name = "Windows"; Command = @("flutter", "build", "windows", "--release"); Selected = $true }
         )
 
@@ -271,7 +272,7 @@ try {
         }
     }
 
-    # -- 4) APK Kopyalama ----------------------------------------------------------
+    # -- 4) APK & AAB Kopyalama ----------------------------------------------------
     if ($selectedNames -contains "APK") {
         Write-Step "APK Dosyalari Kopyalaniyor"
 
@@ -290,6 +291,27 @@ try {
             Copy-Item -Path $apk.FullName -Destination $destFile -Force
             $sizeMB = "{0:N2} MB" -f ($apk.Length / 1MB)
             Write-Info "Kopyalandi: $($apk.Name) ($sizeMB)"
+        }
+    }
+
+    if ($selectedNames -contains "AAB") {
+        Write-Step "AAB (App Bundle) Dosyasi Kopyalaniyor"
+
+        $flutterAabPath = Join-Path $projectRoot "build\app\outputs\bundle\release"
+        if (-not (Test-Path $flutterAabPath)) {
+            throw "Kaynak AAB yolu bulunamadi: $flutterAabPath"
+        }
+
+        $aabFiles = Get-ChildItem -Path $flutterAabPath -Filter "*.aab" -Recurse
+        if ($aabFiles.Count -eq 0) {
+            Write-Warn "AAB dosyasi bulunamadi: $flutterAabPath"
+        }
+
+        foreach ($aab in $aabFiles) {
+            $destFile = Join-Path $distPath $aab.Name
+            Copy-Item -Path $aab.FullName -Destination $destFile -Force
+            $sizeMB = "{0:N2} MB" -f ($aab.Length / 1MB)
+            Write-Info "Kopyalandi: $($aab.Name) ($sizeMB)"
         }
     }
 
@@ -430,6 +452,11 @@ try {
         if ($selectedNames -contains "APK") {
             $apks = Get-ChildItem -Path $distPath -Filter "*.apk" -ErrorAction SilentlyContinue
             foreach ($apk in $apks) { $releaseFiles += $apk.FullName }
+        }
+
+        if ($selectedNames -contains "AAB") {
+            $aabs = Get-ChildItem -Path $distPath -Filter "*.aab" -ErrorAction SilentlyContinue
+            foreach ($aab in $aabs) { $releaseFiles += $aab.FullName }
         }
 
         if ($selectedNames -contains "Windows") {
