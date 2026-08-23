@@ -65,6 +65,10 @@ class AuthService {
   /// Google ile Giriş Yap (Native ID Token ve OAuth Fallback destekli)
   static Future<String?> signInWithGoogle() async {
     try {
+      if (kIsWeb) {
+        return await _signInWithOAuthFallback();
+      }
+
       final GoogleSignIn googleSignIn = GoogleSignIn(
         serverClientId:
             Env.googleWebClientId.isNotEmpty ? Env.googleWebClientId : null,
@@ -109,10 +113,7 @@ class AuthService {
       return e.message;
     } catch (e) {
       debugPrint('Unexpected error in Google Sign-In: $e');
-      if (!kIsWeb) {
-        return await _signInWithOAuthFallback();
-      }
-      return Localization.t('auth.error_google_sign_in');
+      return await _signInWithOAuthFallback();
     }
   }
 

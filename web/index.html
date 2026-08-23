@@ -6,21 +6,133 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A location guessing game based on maps, available on both mobile and PC.">
+  <meta name="description" content="A location guessing game based on maps, available on mobile, PC and web.">
 
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="GeoGame">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
+  <!-- Google Sign-In Client ID -->
+  <meta name="google-signin-client_id" content="645967433817-2j7q0vksmee6k9gqihe4p2hksvtufbm4.apps.googleusercontent.com">
+
   <link rel="icon" type="image/png" href="favicon.ico" />
 
   <title>GeoGame</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0d1117;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #0d1117 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+    }
+
+    .logo-container {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #8E2DE2, #4A00E0);
+      filter: blur(20px);
+      opacity: 0.6;
+      animation: pulse 2.5s infinite ease-in-out;
+    }
+
+    .logo-img {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .app-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #C084FC, #818CF8, #60A5FA);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 28px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #8E2DE2;
+      border-right: 3px solid #4A00E0;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.95); opacity: 0.4; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="loading-overlay">
+    <div class="logo-container">
+      <div class="logo-glow"></div>
+      <img src="icons/Icon-192.png" alt="GeoGame" class="logo-img" onerror="this.src='favicon.png'">
+    </div>
+    <h1 class="app-title">GeoGame</h1>
+    <div class="spinner"></div>
+  </div>
+
   <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var loader = document.getElementById('loading-overlay');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(function () {
+          if (loader.parentNode) {
+            loader.parentNode.removeChild(loader);
+          }
+        }, 400);
+      }
+    });
+
+    // Analytics
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
   <script defer src="/_vercel/insights/script.js"></script>

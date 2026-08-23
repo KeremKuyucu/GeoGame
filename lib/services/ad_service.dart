@@ -21,18 +21,14 @@ class AdService {
   // Yayında gerçek ID'ler ile değiştirilmeli
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/6300978111'; // Android test banner
-    } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/2934735716'; // iOS test banner
+      return 'ca-app-pub-4674396016131447/1324822353'; // Android test banner
     }
     return '';
   }
 
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712'; // Android test interstitial
-    } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/4411468910'; // iOS test interstitial
+      return 'ca-app-pub-4674396016131447/3683287187'; // Android test interstitial
     }
     return '';
   }
