@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/auth_widgets.dart';
 
@@ -16,6 +20,7 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage>
     with SingleTickerProviderStateMixin {
   final AuthController _controller = AuthController();
+  StreamSubscription<AuthState>? _authSub;
 
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -55,11 +60,30 @@ class _AuthPageState extends State<AuthPage>
         Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutQuart),
     );
+
+    // OAuth deep link dönüşlerini dinle
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+      if (data.event == AuthChangeEvent.signedIn && mounted) {
+        if (data.session?.user != null) {
+          await AuthService.syncUserData(data.session!.user);
+        }
+        if (!mounted) return;
+        _controller.showSnackBar(
+          context,
+          Localization.t('auth.google_login_success'),
+          Colors.greenAccent,
+        );
+        widget.onLoginSuccess?.call();
+        _controller.navigateToHome(context);
+      }
+    });
+
     _animController.forward();
   }
 
   @override
   void dispose() {
+    _authSub?.cancel();
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
@@ -117,13 +141,15 @@ class _AuthPageState extends State<AuthPage>
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 24),
-                          AuthGoogleButton(
-                            isLoading: _controller.isGoogleLoading,
-                            onPressed: _handleGoogleLogin,
-                          ),
-                          const SizedBox(height: 24),
-                          const AuthOrDivider(),
+                          if (!kIsWeb) ...[
+                            const SizedBox(height: 24),
+                            AuthGoogleButton(
+                              isLoading: _controller.isGoogleLoading,
+                              onPressed: _handleGoogleLogin,
+                            ),
+                            const SizedBox(height: 24),
+                            const AuthOrDivider(),
+                          ],
                           const SizedBox(height: 24),
                           AutofillGroup(child: _buildFormFields()),
                           const SizedBox(height: 24),
@@ -254,11 +280,13 @@ class _AuthPageState extends State<AuthPage>
     setState(() => _controller.isGoogleLoading = false);
 
     if (result.isSuccess) {
-      _controller.showSnackBar(context, result.message, Colors.greenAccent);
-      widget.onLoginSuccess?.call();
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (!mounted) return;
-      _controller.navigateToHome(context);
+      if (AuthService.isAuthenticated) {
+        _controller.showSnackBar(context, result.message, Colors.greenAccent);
+        widget.onLoginSuccess?.call();
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (!mounted) return;
+        _controller.navigateToHome(context);
+      }
     } else {
       if (result.message != Localization.t('auth.error_google_cancelled')) {
         _controller.showSnackBar(context, result.message, Colors.redAccent);

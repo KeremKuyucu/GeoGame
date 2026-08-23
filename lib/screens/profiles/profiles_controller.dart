@@ -45,6 +45,8 @@ class ProfilesController {
       return;
     }
 
+    await AuthService.checkSession();
+
     isLoading = true;
     errorMessage = null;
 

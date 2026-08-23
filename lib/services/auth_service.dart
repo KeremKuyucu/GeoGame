@@ -73,11 +73,6 @@ class AuthService {
         scopes: const ['email', 'profile'],
       );
 
-      // Önceki oturumu temizle
-      try {
-        await googleSignIn.signOut();
-      } catch (_) {}
-
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         // Kullanıcı giriş penceresini kapattı / iptal etti
@@ -101,7 +96,11 @@ class AuthService {
       );
 
       if (res.user != null) {
-        await syncUserData(res.user!);
+        await syncUserData(
+          res.user!,
+          googleName: googleUser.displayName,
+          googleAvatar: googleUser.photoUrl,
+        );
         return null;
       }
       return Localization.t('auth.error_login_failed');
@@ -137,57 +136,137 @@ class AuthService {
     }
   }
 
-  static Future<void> syncUserData(User authUser) async {
+  static Future<void> syncUserData(
+    User authUser, {
+    String? googleName,
+    String? googleAvatar,
+  }) async {
     try {
-      var profileData = await _supabase
-          .from('profiles')
-          .select('full_name, avatar_url')
-          .eq('uid', authUser.id)
-          .maybeSingle();
+      final rawMeta = authUser.userMetadata ?? {};
 
-      if (profileData == null) {
-        await Future.delayed(const Duration(milliseconds: 500));
-        profileData = await _supabase
+      // 1. ANINDA yerel oturum bilgilerini ayarla (Bekleme yapmadan!)
+      String candidateName = '';
+      if (googleName != null && googleName.trim().isNotEmpty) {
+        candidateName = googleName.trim();
+      } else if (rawMeta['full_name'] != null &&
+          rawMeta['full_name'].toString().trim().isNotEmpty) {
+        candidateName = rawMeta['full_name'].toString().trim();
+      } else if (rawMeta['name'] != null &&
+          rawMeta['name'].toString().trim().isNotEmpty) {
+        candidateName = rawMeta['name'].toString().trim();
+      } else if (rawMeta['user_name'] != null &&
+          rawMeta['user_name'].toString().trim().isNotEmpty) {
+        candidateName = rawMeta['user_name'].toString().trim();
+      } else {
+        candidateName = authUser.email?.split('@').first ??
+            Localization.t('settings.guest');
+      }
+
+      String candidateAvatar = '';
+      if (googleAvatar != null && googleAvatar.trim().isNotEmpty) {
+        candidateAvatar = googleAvatar.trim();
+      } else if (rawMeta['avatar_url'] != null &&
+          rawMeta['avatar_url'].toString().trim().isNotEmpty &&
+          !rawMeta['avatar_url'].toString().contains('robohash.org')) {
+        candidateAvatar = rawMeta['avatar_url'].toString().trim();
+      } else if (rawMeta['picture'] != null &&
+          rawMeta['picture'].toString().trim().isNotEmpty &&
+          !rawMeta['picture'].toString().contains('robohash.org')) {
+        candidateAvatar = rawMeta['picture'].toString().trim();
+      } else if (rawMeta['avatar'] != null &&
+          rawMeta['avatar'].toString().trim().isNotEmpty &&
+          !rawMeta['avatar'].toString().contains('robohash.org')) {
+        candidateAvatar = rawMeta['avatar'].toString().trim();
+      } else {
+        candidateAvatar = 'https://robohash.org/${authUser.id}';
+      }
+
+      // AppState.user ANINDA güncellenir
+      AppState.user = UserProfile(
+        name: candidateName,
+        avatarUrl: candidateAvatar,
+      );
+
+      // 2. Veritabanından profil kontrolü (Gecikmesiz)
+      try {
+        final profileData = await _supabase
             .from('profiles')
             .select('full_name, avatar_url')
             .eq('uid', authUser.id)
             .maybeSingle();
-      }
 
-      final rawMeta = authUser.userMetadata ?? {};
-      final String fallbackName = rawMeta['full_name'] ??
-          rawMeta['name'] ??
-          authUser.email?.split('@').first ??
-          Localization.t('settings.guest');
-      final String fallbackAvatar = rawMeta['avatar_url'] ??
-          rawMeta['picture'] ??
-          'https://robohash.org/${authUser.id}';
+        if (profileData != null) {
+          final dbName = profileData['full_name']?.toString().trim();
+          final dbAvatar = profileData['avatar_url']?.toString().trim();
 
-      if (profileData != null) {
-        AppState.user = UserProfile(
-            name: profileData['full_name'] ?? fallbackName,
-            avatarUrl: profileData['avatar_url'] ?? fallbackAvatar);
-      } else {
-        AppState.user = UserProfile(
-            name: fallbackName,
-            avatarUrl: fallbackAvatar);
+          if (dbName != null &&
+              dbName.isNotEmpty &&
+              dbName != Localization.t('settings.guest') &&
+              dbName != 'Misafir' &&
+              dbName != 'Guest') {
+            candidateName = dbName;
+          }
+          if (dbAvatar != null &&
+              dbAvatar.isNotEmpty &&
+              !dbAvatar.contains('robohash.org')) {
+            candidateAvatar = dbAvatar;
+          }
 
-        // Yeni Google kaydı için profiles tablosuna da kaydetmeyi dene
-        try {
-          await _supabase.from('profiles').upsert({
-            'uid': authUser.id,
-            'full_name': fallbackName,
-            'avatar_url': fallbackAvatar,
-          });
-        } catch (e) {
-          debugPrint('Notice: Initial profile upsert: $e');
+          AppState.user = UserProfile(
+            name: candidateName,
+            avatarUrl: candidateAvatar,
+          );
         }
+      } catch (e) {
+        debugPrint('Notice: Profile fetch error: $e');
       }
 
-      debugPrint('✅ Profile sync complete: ${AppState.user.name}');
+      // 3. Veritabanı (profiles) tablosunu son güncel verilerle doldur
+      try {
+        await _supabase.from('profiles').upsert({
+          'uid': authUser.id,
+          'full_name': candidateName,
+          'avatar_url': candidateAvatar,
+        });
+      } catch (e) {
+        debugPrint('Notice: Profile upsert error: $e');
+      }
+
+      // 4. Supabase userMetadata'yı da senkronize et
+      try {
+        await _supabase.auth.updateUser(
+          UserAttributes(data: {
+            'full_name': candidateName,
+            'avatar_url': candidateAvatar,
+          }),
+        );
+      } catch (e) {
+        debugPrint('Notice: User metadata update: $e');
+      }
+
+      debugPrint('✅ Profile sync complete: ${AppState.user.name}, Avatar: ${AppState.user.avatarUrl}');
     } catch (e) {
       debugPrint('❌ Profile Sync Error: $e');
     }
+  }
+
+  /// Global Supabase Auth durum dinleyicisi
+  static void initAuthStateListener() {
+    _supabase.auth.onAuthStateChange.listen((data) async {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+      debugPrint('🔔 Supabase Auth State Changed: $event');
+      if (event == AuthChangeEvent.signedIn ||
+          event == AuthChangeEvent.userUpdated ||
+          event == AuthChangeEvent.tokenRefreshed ||
+          event == AuthChangeEvent.initialSession) {
+        if (session?.user != null) {
+          await syncUserData(session!.user);
+        }
+      } else if (event == AuthChangeEvent.signedOut) {
+        AppState.user = UserProfile.anonymous();
+      }
+    });
   }
 
   static Future<void> signOut() async {

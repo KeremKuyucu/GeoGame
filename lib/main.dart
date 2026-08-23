@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/app_routes.dart';
 
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/services/logging_service.dart';
 import 'package:geogame/services/ad_service.dart';
 
+import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/widgets/restart_widget.dart';
 
 import 'package:geogame/env.dart';
@@ -17,6 +19,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+  AuthService.initAuthStateListener();
   await PreferencesService.loadConfig();
   await LoggingService.init();
   await AdService.initialize();
@@ -57,6 +60,20 @@ class Geogame extends StatelessWidget {
           ),
           initialRoute: '/',
           routes: AppRoutes.routes,
+          onGenerateRoute: (settings) {
+            if (settings.name != null &&
+                (settings.name!.contains('login-callback') ||
+                    settings.name!.startsWith('io.supabase.geogame') ||
+                    settings.name!.startsWith('com.keremkuyucu.geogame'))) {
+              return MaterialPageRoute(
+                  builder: (context) => const SplashScreen());
+            }
+            return null;
+          },
+          onUnknownRoute: (settings) {
+            return MaterialPageRoute(
+                builder: (context) => const SplashScreen());
+          },
         );
       },
     );

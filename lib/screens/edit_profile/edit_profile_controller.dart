@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/name_filter_service.dart';
@@ -18,10 +19,17 @@ class EditProfileController {
       emailController.text = user.email ?? '';
 
       final metadata = user.userMetadata;
-      if (metadata != null) {
-        nameController.text = metadata['full_name'] ?? '';
+      final metaName = metadata?['full_name'] ?? metadata?['name'];
+
+      if (AppState.user.name.isNotEmpty &&
+          AppState.user.name != Localization.t('settings.guest')) {
+        nameController.text = AppState.user.name;
+      } else if (metaName != null && metaName.toString().trim().isNotEmpty) {
+        nameController.text = metaName.toString().trim();
+      } else {
+        nameController.text = user.email?.split('@').first ?? '';
       }
-      debugPrint("✅ Kullanıcı bilgileri cache'den başarıyla okundu.");
+      debugPrint('✅ Kullanıcı bilgileri yüklendi: ${nameController.text}');
     }
   }
 
@@ -41,7 +49,7 @@ class EditProfileController {
       return Localization.t('edit_profile.$filterError');
     }
 
-    final String avatarUrl = 'https://robohash.org/$uid';
+    final String avatarUrl = getAvatarUrl();
 
     final String? error = await AuthService.updateProfileMetadata(
       name: trimmedName,
@@ -72,6 +80,16 @@ class EditProfileController {
   }
 
   String getAvatarUrl() {
+    if (AppState.user.avatarUrl.isNotEmpty &&
+        !AppState.user.avatarUrl.endsWith('.org/')) {
+      return AppState.user.avatarUrl;
+    }
+    final user = AuthService.currentUser;
+    final metaAvatar =
+        user?.userMetadata?['avatar_url'] ?? user?.userMetadata?['picture'];
+    if (metaAvatar != null && metaAvatar.toString().trim().isNotEmpty) {
+      return metaAvatar.toString().trim();
+    }
     if (uid != null) {
       return 'https://robohash.org/$uid';
     }

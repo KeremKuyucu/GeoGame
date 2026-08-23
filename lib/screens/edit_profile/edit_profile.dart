@@ -42,11 +42,14 @@ class _EditProfilePageState extends State<EditProfilePage>
     );
 
     _controller
-        .loadUserProfile(
-            _nameController, _emailController)
+        .loadUserProfile(_nameController, _emailController)
         .then((_) {
-      if (!_controller.isUserAvailable && mounted) {
-        Navigator.pop(context);
+      if (mounted) {
+        if (!_controller.isUserAvailable) {
+          Navigator.pop(context);
+        } else {
+          setState(() {});
+        }
       }
     });
     _animController.forward();

@@ -36,5 +36,9 @@ class AppRoutes {
 
     '/auth': (context) => const AuthPage(),
     '/profile/edit': (context) => const EditProfilePage(),
+
+    // Deep link callbacks
+    '/login-callback': (context) => const SplashScreen(),
+    'login-callback': (context) => const SplashScreen(),
   };
 }
