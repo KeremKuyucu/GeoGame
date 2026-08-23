@@ -33,6 +33,7 @@ class AuthService {
       final AuthResponse res = await _supabase.auth.signUp(
         email: email,
         password: password,
+        emailRedirectTo: redirectUrl,
         data: {
           'full_name': name,
           'avatar_url': 'https://robohash.org/${name.hashCode.abs()}',
@@ -65,7 +66,10 @@ class AuthService {
   /// Google ile Giriş Yap (Native ID Token ve OAuth Fallback destekli)
   static Future<String?> signInWithGoogle() async {
     try {
-      if (kIsWeb) {
+      // Web ve Masaüstü (Windows vb.) platformlarda doğrudan OAuth akışını kullan
+      if (kIsWeb ||
+          (defaultTargetPlatform != TargetPlatform.android &&
+              defaultTargetPlatform != TargetPlatform.iOS)) {
         return await _signInWithOAuthFallback();
       }
 
@@ -117,14 +121,16 @@ class AuthService {
     }
   }
 
+  static String get redirectUrl => kIsWeb
+      ? '${Uri.base.origin}/'
+      : 'io.supabase.geogame://login-callback/';
+
   /// Supabase OAuth tarayıcı tabanlı yönlendirme alternatifi
   static Future<String?> _signInWithOAuthFallback() async {
     try {
       final bool success = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: kIsWeb
-            ? null
-            : 'io.supabase.geogame://login-callback/',
+        redirectTo: redirectUrl,
       );
       if (!success) {
         return Localization.t('auth.error_login_failed');
@@ -296,7 +302,10 @@ class AuthService {
 
   static Future<String?> sendPasswordResetEmail(String email) async {
     try {
-      await _supabase.auth.resetPasswordForEmail(email);
+      await _supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: redirectUrl,
+      );
       return null;
     } on AuthException catch (e) {
       return e.message;
