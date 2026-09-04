@@ -62,9 +62,9 @@ class _AuthPageState extends State<AuthPage>
       CurvedAnimation(parent: _animController, curve: Curves.easeOutQuart),
     );
 
-    // Harici OAuth deep link dönüşlerini dinle (Sadece doğrudan buton akışında olmayan durumlar için)
+    // Harici OAuth deep link dönüşlerini dinle
     _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
-      if (data.event == AuthChangeEvent.signedIn && mounted && !_isHandlingAuth && !_hasNavigated) {
+      if (data.event == AuthChangeEvent.signedIn && mounted && !_hasNavigated) {
         final user = data.session?.user;
         if (user != null) {
           _hasNavigated = true;

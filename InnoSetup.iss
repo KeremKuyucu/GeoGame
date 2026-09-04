@@ -4,7 +4,7 @@
 
 [Setup]
 AppName=GeoGame
-AppVersion=1.6.3
+AppVersion=1.6.4
 AppPublisher=Kerem Kuyucu
 
 PrivilegesRequired=lowest
@@ -47,3 +47,13 @@ Name: "{group}\GeoGame"; Filename: "{app}\geogame.exe"; IconFilename: "{app}\log
 
 [Run]
 Filename: "{app}\geogame.exe"; Description: "GeoGame'i Başlat"; Flags: nowait postinstall skipifsilent
+
+; ===============================
+; URL PROTOCOL (OAUTH DEEP LINK)
+; ===============================
+
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame"; ValueType: string; ValueName: ""; ValueData: "URL:GeoGame Protocol"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\geogame.exe,0"
+Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\geogame.exe"" ""%1"""

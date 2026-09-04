@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class Localization {
   static const Map<String, String> languages = {
@@ -42,7 +42,7 @@ class Localization {
       languages[_currentLanguage] ?? 'English';
 
   static Future<void> init() async {
-    await changeLanguage(AppState.settings.language);
+    await changeLanguage(SettingsController.settings.language);
   }
 
   /// Çalışma anında dil değiştirme

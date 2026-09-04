@@ -13,11 +13,13 @@ import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/widgets/restart_widget.dart';
 
+import 'package:geogame/services/windows_auth_service.dart';
 import 'package:geogame/env.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  WindowsAuthService.registerProtocolHandler();
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   AuthService.initAuthStateListener();
   await PreferencesService.loadConfig();

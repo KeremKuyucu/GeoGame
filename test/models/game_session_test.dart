@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game/game_button.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
+import 'package:geogame/services/game_log_service.dart';
 
 void main() {
   group('GameSession', () {

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game/guess_result.dart';
 import 'package:geogame/services/localization_service.dart';
@@ -328,7 +329,7 @@ class DistanceGuessCard extends StatelessWidget {
                   width: 45,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: AppState.settings.darkTheme
+                    color: SettingsController.settings.darkTheme
                         ? Colors.black26
                         : Colors.grey.shade100,
                     shape: BoxShape.circle,

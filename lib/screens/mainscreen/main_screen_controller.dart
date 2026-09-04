@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/update_checker_service.dart';
@@ -20,7 +21,7 @@ class MainScreenController {
   /// Oyun başlatma işlemi
   /// Önce intro ekranını gösterir, ardından oyun sayfasına yönlendirir
   void startGame(GameMetadata metadata) {
-    if (AppState.filteredCountries.length < 4) {
+    if (SettingsController.filteredCountries.length < 4) {
       showNoContinentWarning();
       return;
     }

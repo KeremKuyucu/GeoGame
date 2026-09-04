@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game/border_path_data.dart';
 import 'package:geogame/models/game_metadata.dart';
@@ -10,6 +9,7 @@ import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/ad_service.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class BorderPathGameController {
   final TextEditingController textController = TextEditingController();
@@ -26,20 +26,20 @@ class BorderPathGameController {
   bool isLoadingMaps = true;
 
   List<Color> getBackgroundColors() {
-    return AppState.settings.darkTheme
+    return SettingsController.settings.darkTheme
         ? [const Color(0xFF1A237E), Colors.black]
         : [const Color(0xFFE8EAF6), const Color(0xFF9FA8DA)];
   }
 
-  Color get cardBg => AppState.settings.darkTheme
+  Color get cardBg => SettingsController.settings.darkTheme
       ? const Color(0xFF283593).withValues(alpha: 0.5)
       : Colors.white;
 
   Color get textColor =>
-      AppState.settings.darkTheme ? Colors.white : Colors.black87;
+      SettingsController.settings.darkTheme ? Colors.white : Colors.black87;
 
-  bool get isDark => AppState.settings.darkTheme;
-  bool get isButtonMode => AppState.filter.isButtonMode;
+  bool get isDark => SettingsController.settings.darkTheme;
+  bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
 
   Future<void> initializeGame() async {
     isLoadingMaps = true;
@@ -83,7 +83,7 @@ class BorderPathGameController {
 
   Future<void> startNextRound({bool passMode = false}) async {
     isLoadingMaps = true;
-    if (passMode) AppState.session.submitPass();
+    if (passMode) GameLogService.submitPass();
     final data = GameService.createBorderPathGame();
     await loadLevel(data);
   }
@@ -147,7 +147,7 @@ class BorderPathGameController {
   }
 
   String getPerformanceText() {
-    final score = AppState.session.totalScore;
+    final score = GameLogService.totalScore;
     if (score == 100) return Localization.t('game_borderpath.perf_perfect');
     if (score >= 80) return Localization.t('game_borderpath.perf_great');
     if (score >= 60) return Localization.t('game_borderpath.perf_good');
@@ -155,7 +155,7 @@ class BorderPathGameController {
   }
 
   Color getPerformanceColor() {
-    final score = AppState.session.totalScore;
+    final score = GameLogService.totalScore;
     if (score == 100) return Colors.green;
     if (score >= 80) return Colors.blue;
     if (score >= 60) return Colors.orange;

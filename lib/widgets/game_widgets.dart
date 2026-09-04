@@ -5,6 +5,8 @@ import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/ad_service.dart';
+import 'package:geogame/services/game_service.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/flag_loader.dart';
 import 'package:geogame/widgets/ad_banner_widget.dart';
@@ -146,7 +148,7 @@ class GameOptionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final button = AppState.buttons[index];
+    final button = GameService.buttonAt(index);
 
     return SizedBox(
       height: height,
@@ -200,7 +202,7 @@ class GameKeyboardModeUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = AppState.settings.darkTheme;
+    final bool isDark = SettingsController.settings.darkTheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -343,7 +345,7 @@ class GamePassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = AppState.settings.darkTheme;
+    final bool isDark = SettingsController.settings.darkTheme;
     final Color color =
         textColor ?? (isDark ? Colors.white70 : Colors.grey.shade700);
 

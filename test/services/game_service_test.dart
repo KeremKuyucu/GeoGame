@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/game_service.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 void main() {
   // ===========================================================================
@@ -296,18 +297,19 @@ void main() {
 
     tearDown(() {
       AppState.allCountries = [];
-      AppState.filter = GameFilter();
+      SettingsController.gameFilter = GameFilter();
     });
 
     test('tüm kıtalar açıkken tüm BM üyesi ülkeler dönmeli', () {
-      AppState.filter = GameFilter(); // Varsayılan: hepsi açık, nonUN kapalı
+      SettingsController.gameFilter =
+          GameFilter(); // Varsayılan: hepsi açık, nonUN kapalı
 
-      final result = AppState.filteredCountries;
+      final result = SettingsController.filteredCountries;
       expect(result.length, 4); // Taiwan hariç (non-UN)
     });
 
     test('sadece Avrupa filtresi açıkken sadece Avrupa ülkeleri dönmeli', () {
-      AppState.filter = GameFilter(
+      SettingsController.gameFilter = GameFilter(
         europe: true,
         asia: false,
         africa: false,
@@ -317,7 +319,7 @@ void main() {
         antarctic: false,
       );
 
-      final result = AppState.filteredCountries;
+      final result = SettingsController.filteredCountries;
       // Turkey (Asia + Europe) ve Germany (Europe) = 2
       expect(result.length, 2);
       expect(result.any((c) => c.iso3 == 'TUR'), true);
@@ -325,7 +327,7 @@ void main() {
     });
 
     test('hiçbir kıta seçili değilken boş liste dönmeli', () {
-      AppState.filter = GameFilter(
+      SettingsController.gameFilter = GameFilter(
         europe: false,
         asia: false,
         africa: false,
@@ -335,13 +337,13 @@ void main() {
         antarctic: false,
       );
 
-      expect(AppState.filteredCountries, isEmpty);
+      expect(SettingsController.filteredCountries, isEmpty);
     });
 
     test('includeNonUN açıkken BM üyesi olmayan ülkeler de gelmeli', () {
-      AppState.filter = GameFilter(includeNonUN: true);
+      SettingsController.gameFilter = GameFilter(includeNonUN: true);
 
-      final result = AppState.filteredCountries;
+      final result = SettingsController.filteredCountries;
       expect(result.length, 5); // Taiwan dahil
       expect(result.any((c) => c.iso3 == 'TWN'), true);
     });

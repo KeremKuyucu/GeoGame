@@ -4,13 +4,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 
 class GameLogService {
   static final _supabase = Supabase.instance.client;
   static const String _unsentLogsKey = 'game_logs';
   static const _uuid = Uuid();
+  static final _session = GameSession();
+
+  static int get totalScore => _session.totalScore;
+  static int get correctCount => _session.correctCount;
+  static int get wrongCount => _session.wrongCount;
+  static void resetSession({required int startScore, required int minScore}) =>
+      _session.reset(startScore: startScore, minScore: minScore);
+  static void submitCorrect() => _session.submitCorrect();
+  static void submitWrong() => _session.submitWrong();
+  static void submitPass() => _session.submitPass();
+  static void addWrongAnswers(int count) => _session.wrongCount += count;
 
   /// 🎮 Oyun başladığında ÇAĞRILACAK
   /// Tek bir oyun için tek bir log id üretir
@@ -23,7 +33,7 @@ class GameLogService {
   static Future<void> saveProgress(String gameType) async {
     if (!AuthService.isAuthenticated) return;
 
-    final session = AppState.session;
+    final session = _session;
 
     if (session.sessionId.isEmpty) return;
 
@@ -95,5 +105,41 @@ class GameLogService {
       // ❗ duplicate varsa DB reddeder ama kuyruk KALIR
       debugPrint('❌ Sync hatası (tekrar denenecek): $e');
     }
+  }
+}
+
+class GameSession {
+  int totalScore = 0;
+  int correctCount = 0;
+  int wrongCount = 0;
+  int passCount = 0;
+  String sessionId = '';
+  int _startScore = 50;
+  int _minScore = 20;
+  int currentQuestionScore = 50;
+
+  void reset({required int startScore, required int minScore}) {
+    totalScore = correctCount = wrongCount = passCount = 0;
+    sessionId = const Uuid().v4();
+    _startScore = startScore;
+    _minScore = minScore;
+    currentQuestionScore = _startScore;
+  }
+
+  void submitCorrect() {
+    correctCount++;
+    totalScore += currentQuestionScore;
+    currentQuestionScore = _startScore;
+  }
+
+  void submitWrong() {
+    wrongCount++;
+    currentQuestionScore -= 10;
+    if (currentQuestionScore < _minScore) currentQuestionScore = _minScore;
+  }
+
+  void submitPass() {
+    passCount++;
+    currentQuestionScore = _startScore;
   }
 }

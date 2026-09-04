@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game/guess_result.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
@@ -13,20 +13,21 @@ class DistanceGameController {
   final List<GuessResultModel> guesses = [];
 
   List<Color> getBackgroundColors() {
-    return AppState.settings.darkTheme
+    return SettingsController.settings.darkTheme
         ? [const Color(0xFF0D47A1), const Color(0xFF000000)]
         : [const Color(0xFFE3F2FD), const Color(0xFF90CAF9)];
   }
 
-  Color get cardBg =>
-      AppState.settings.darkTheme ? const Color(0xFF1E2746) : Colors.white;
+  Color get cardBg => SettingsController.settings.darkTheme
+      ? const Color(0xFF1E2746)
+      : Colors.white;
 
   Color get textColor =>
-      AppState.settings.darkTheme ? Colors.white : Colors.black87;
+      SettingsController.settings.darkTheme ? Colors.white : Colors.black87;
 
   Color get accentColor => Colors.blueAccent;
 
-  bool get isDark => AppState.settings.darkTheme;
+  bool get isDark => SettingsController.settings.darkTheme;
 
   Future<void> initializeGame() async {
     await GameService.initializeGame(GameType.distance);

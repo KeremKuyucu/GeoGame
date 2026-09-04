@@ -8,6 +8,7 @@ import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/game_log_service.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class FindMapGameController {
   bool isLoading = true;
@@ -33,17 +34,17 @@ class FindMapGameController {
   static const double _smallCountryAreaThreshold = 2000.0;
 
   // UI Yardımcıları
-  Color get backgroundColor => AppState.settings.darkTheme
+  Color get backgroundColor => SettingsController.settings.darkTheme
       ? const Color(0xFF1E2746)
       : Colors.blue.shade50;
   Color get cardBg =>
-      AppState.settings.darkTheme ? Colors.black45 : Colors.white;
+      SettingsController.settings.darkTheme ? Colors.black45 : Colors.white;
   Color get textColor =>
-      AppState.settings.darkTheme ? Colors.white : Colors.black87;
+      SettingsController.settings.darkTheme ? Colors.white : Colors.black87;
 
-  bool get isDark => AppState.settings.darkTheme;
-  int get correctAnswers => AppState.session.correctCount;
-  int get wrongAnswers => AppState.session.wrongCount;
+  bool get isDark => SettingsController.settings.darkTheme;
+  int get correctAnswers => GameLogService.correctCount;
+  int get wrongAnswers => GameLogService.wrongCount;
 
   Future<void> initializeGame() async {
     try {
@@ -217,14 +218,14 @@ class FindMapGameController {
 
   Future<void> handleCorrectAnswer({bool hintUsed = false}) async {
     if (!hintUsed) {
-      AppState.session.submitCorrect();
+      GameLogService.submitCorrect();
     }
     await GameLogService.saveProgress('findmap');
     startNewRound();
   }
 
   void handleWrongAnswer() {
-    AppState.session.submitWrong();
+    GameLogService.submitWrong();
   }
 
   void dispose() {

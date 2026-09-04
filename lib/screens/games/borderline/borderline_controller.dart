@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
@@ -12,22 +13,22 @@ class BorderLineGameController {
   Future<Path?>? countryShapePathFuture;
 
   List<Color> getBackgroundColors() {
-    return AppState.settings.darkTheme
+    return SettingsController.settings.darkTheme
         ? [const Color(0xFF1A237E), const Color(0xFF000000)]
         : [const Color(0xFFE8EAF6), const Color(0xFF9FA8DA)];
   }
 
-  Color get cardBg => AppState.settings.darkTheme
+  Color get cardBg => SettingsController.settings.darkTheme
       ? const Color(0xFF283593).withValues(alpha: 0.5)
       : Colors.white;
 
   Color get textColor =>
-      AppState.settings.darkTheme ? Colors.white : Colors.black87;
+      SettingsController.settings.darkTheme ? Colors.white : Colors.black87;
 
   Color get accentColor => const Color(0xFF536DFE);
 
-  bool get isButtonMode => AppState.filter.isButtonMode;
-  bool get isDark => AppState.settings.darkTheme;
+  bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
+  bool get isDark => SettingsController.settings.darkTheme;
 
   String get targetIso3 => AppState.targetCountry.iso3;
 
@@ -39,8 +40,8 @@ class BorderLineGameController {
 
   Future<bool> checkAnswer(int index) async {
     String answer = textController.text;
-    if (AppState.filter.isButtonMode && index < 4) {
-      answer = AppState.buttons[index].label;
+    if (SettingsController.gameFilter.isButtonMode && index < 4) {
+      answer = GameService.buttonAt(index).label;
     }
 
     final bool isCorrect = await GameService.checkStandardAnswer(

@@ -4,12 +4,14 @@ import 'package:collection/collection.dart';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game/game_button.dart';
 import 'package:geogame/models/game/guess_result.dart';
 import 'package:geogame/models/game/border_path_data.dart';
 import 'package:geogame/models/game_metadata.dart';
 
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 // ============================================================================
 // GAME SERVICE
@@ -17,6 +19,10 @@ import 'package:geogame/services/localization_service.dart';
 
 class GameService {
   static final math.Random _random = math.Random();
+  static List<GameButton> _buttons = [];
+
+  static GameButton buttonAt(int index) => _buttons[index];
+  static int get buttonCount => _buttons.length;
 
   static Map<String, Country>? _cachedCountryMap;
   static Map<String, Country> get _countryMap {
@@ -32,7 +38,7 @@ class GameService {
 
   static Future<void> initializeGame(GameType type) async {
     final scores = _getInitialScores(type);
-    AppState.session.reset(
+    GameLogService.resetSession(
       startScore: scores['start']!,
       minScore: scores['min']!,
     );
@@ -78,7 +84,7 @@ class GameService {
 
     // Seçenekleri oluştur ve karıştır
     final options = [AppState.targetCountry, ...distractors]..shuffle(_random);
-    AppState.buttons = GameButton.createButtons(options);
+    _buttons = GameButton.createButtons(options);
   }
 
   /// Optimize edilmiş çeldirici algoritması
@@ -120,16 +126,16 @@ class GameService {
   static Future<bool> checkStandardAnswer(
       String answer, GameType type, int? buttonIndex) async {
     final isCorrect = AppState.targetCountry
-        .checkAnswer(answer.trim(), AppState.settings.language);
+        .checkAnswer(answer.trim(), SettingsController.settings.language);
 
     if (isCorrect) {
-      AppState.session.submitCorrect();
+      GameLogService.submitCorrect();
       // await ekleyerek log işleminin bitmesini garantiye alıyoruz
       await GameLogService.saveProgress(AppState.getGameModeKey(type));
       await startNewRound();
       return true;
     } else {
-      AppState.session.submitWrong();
+      GameLogService.submitWrong();
       _disableButton(buttonIndex);
       return false;
     }
@@ -138,15 +144,15 @@ class GameService {
   static void _disableButton(int? buttonIndex) {
     if (buttonIndex != null &&
         buttonIndex >= 0 &&
-        buttonIndex < AppState.buttons.length) {
-      AppState.buttons[buttonIndex].isActive = false;
+        buttonIndex < _buttons.length) {
+      _buttons[buttonIndex].isActive = false;
     }
   }
 
   static Future<String> handlePass() async {
-    AppState.session.submitPass();
-    final passCountryName =
-        AppState.targetCountry.getLocalizedName(AppState.settings.language);
+    GameLogService.submitPass();
+    final passCountryName = AppState.targetCountry
+        .getLocalizedName(SettingsController.settings.language);
     await startNewRound();
     return passCountryName;
   }
@@ -187,15 +193,16 @@ class GameService {
     final isCorrect = guessedCountry.iso3 == target.iso3;
 
     if (isCorrect) {
-      AppState.session.submitCorrect();
+      GameLogService.submitCorrect();
       await startNewRound();
       await GameLogService.saveProgress('distance');
     } else {
-      AppState.session.submitWrong();
+      GameLogService.submitWrong();
     }
 
     return GuessResultModel(
-      countryName: guessedCountry.getLocalizedName(AppState.settings.language),
+      countryName:
+          guessedCountry.getLocalizedName(SettingsController.settings.language),
       distanceKm: distance,
       directionText: directionData.directionText,
       bearing: directionData.bearing,
@@ -205,7 +212,7 @@ class GameService {
 
   static Country? _findCountryByName(String name) {
     return AppState.allCountries.firstWhereOrNull(
-      (c) => c.checkAnswer(name, AppState.settings.language),
+      (c) => c.checkAnswer(name, SettingsController.settings.language),
     );
   }
 
@@ -281,11 +288,11 @@ class GameService {
 
   static Future<void> completeBorderPathGame(
       int moves, int optimalMoves) async {
-    AppState.session.submitCorrect();
+    GameLogService.submitCorrect();
 
     final penalty = math.max(0, moves - optimalMoves);
     if (penalty > 0) {
-      AppState.session.wrongCount += penalty;
+      GameLogService.addWrongAnswers(penalty);
     }
 
     await GameLogService.saveProgress('borderpath');
@@ -315,8 +322,8 @@ class GameService {
 
     // İsme göre sırala (mevcut dile göre)
     neighbors.sort((a, b) => a
-        .getLocalizedName(AppState.settings.language)
-        .compareTo(b.getLocalizedName(AppState.settings.language)));
+        .getLocalizedName(SettingsController.settings.language)
+        .compareTo(b.getLocalizedName(SettingsController.settings.language)));
 
     return neighbors;
   }

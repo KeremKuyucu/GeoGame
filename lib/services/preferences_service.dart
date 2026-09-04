@@ -3,7 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class PreferencesService {
   static const String _storageKey = 'geogame_config';
@@ -20,8 +20,8 @@ class PreferencesService {
 
       final Map<String, dynamic> data = jsonDecode(jsonString);
       // Global State'i güncelle
-      AppState.settings = AppSettings.fromMap(data);
-      AppState.filter = GameFilter.fromMap(data);
+      SettingsController.settings = AppSettings.fromMap(data);
+      SettingsController.gameFilter = GameFilter.fromMap(data);
 
       debugPrint('✅ Settings and preferences loaded.');
     } catch (e) {
@@ -36,8 +36,8 @@ class PreferencesService {
       final prefs = await SharedPreferences.getInstance();
 
       final Map<String, dynamic> data = {
-        ...AppState.settings.toMap(),
-        ...AppState.filter.toMap(),
+        ...SettingsController.settings.toMap(),
+        ...SettingsController.gameFilter.toMap(),
         // ...AppState.stats.toMap(),
       };
 

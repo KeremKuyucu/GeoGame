@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class LoggingService {
   static const String _uidKey = 'app_unique_id';
@@ -22,7 +22,7 @@ class LoggingService {
       }
 
       // 2. Günlük log kontrolü
-      final isTelemetryEnabled = AppState.settings.telemetryEnabled;
+      final isTelemetryEnabled = SettingsController.settings.telemetryEnabled;
       if (!isTelemetryEnabled) return;
 
       try {
@@ -33,7 +33,7 @@ class LoggingService {
             'uid': uid,
             'timestamp': DateTime.now().toIso8601String(),
             'app': 'geogame',
-            'event': 'app_opened_daily',
+            'event': 'app_opened',
             'platform': kIsWeb
                 ? 'web'
                 : (defaultTargetPlatform == TargetPlatform.windows

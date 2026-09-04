@@ -39,8 +39,12 @@ android {
         versionName = flutter.versionName
     }
 
-    // Keystore configuration
-    val keystorePropertiesFile = file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
+    // Keystore configuration (Supports Vault path, relative path, and legacy path)
+    val possibleKeyFiles = listOf(
+        rootProject.projectDir.parentFile.parentFile.resolve("imza-bilgileri/key.properties"),
+        file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
+    )
+    val keystorePropertiesFile = possibleKeyFiles.firstOrNull { it.exists() } ?: file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
     val keystoreProperties = Properties()
     val hasValidKeystore = if (keystorePropertiesFile.exists()) {
         keystoreProperties.load(FileInputStream(keystorePropertiesFile))
@@ -52,7 +56,9 @@ android {
     signingConfigs {
         if (hasValidKeystore) {
             create("release") {
-                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                val configuredStore = keystoreProperties.getProperty("storeFile")
+                val storeF = file(configuredStore)
+                storeFile = if (storeF.exists()) storeF else file(keystorePropertiesFile.parentFile, "ksk.jks")
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")

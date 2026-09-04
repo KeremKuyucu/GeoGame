@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/game_widgets.dart';
@@ -213,7 +213,7 @@ class _FindMapGameState extends State<FindMapGame>
                             _controller.transformedSmallCountryCenters,
                         targetIso:
                             _showHint ? _controller.targetCountry?.iso3 : null,
-                        isDark: AppState.settings.darkTheme,
+                        isDark: SettingsController.settings.darkTheme,
                         scale: _currentScale,
                         pulseAnimation: _pulseController,
                         showHint: _showHint,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/localization_service.dart';
@@ -10,23 +11,24 @@ class FlagGameController {
   final TextEditingController textController = TextEditingController();
 
   List<Color> getBackgroundColors() {
-    return AppState.settings.darkTheme
+    return SettingsController.settings.darkTheme
         ? [const Color(0xFF004D40), const Color(0xFF00251A)]
         : [const Color(0xFFE0F2F1), const Color(0xFF80CBC4)];
   }
 
-  Color get cardBg =>
-      AppState.settings.darkTheme ? const Color(0xFF263238) : Colors.white;
+  Color get cardBg => SettingsController.settings.darkTheme
+      ? const Color(0xFF263238)
+      : Colors.white;
 
   Color get textColor =>
-      AppState.settings.darkTheme ? Colors.white : Colors.black87;
+      SettingsController.settings.darkTheme ? Colors.white : Colors.black87;
 
   Color get accentColor => const Color(0xFF009688);
 
   String get targetIso2 => AppState.targetCountry.iso2;
   String get targetFlagUrl => AppState.targetCountry.flagUrl;
 
-  bool get isButtonMode => AppState.filter.isButtonMode;
+  bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
 
   Future<void> initializeGame() async {
     await GameService.initializeGame(GameType.flag);
@@ -34,8 +36,8 @@ class FlagGameController {
 
   Future<bool> checkAnswer(int index) async {
     String answer = textController.text;
-    if (AppState.filter.isButtonMode && index < 4) {
-      answer = AppState.buttons[index].label;
+    if (SettingsController.gameFilter.isButtonMode && index < 4) {
+      answer = GameService.buttonAt(index).label;
     }
 
     final isCorrect =
