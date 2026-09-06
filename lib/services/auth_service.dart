@@ -8,61 +8,6 @@ import 'package:geogame/services/localization_service.dart';
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
-  static Future<String?> signIn(String email, String password) async {
-    try {
-      final AuthResponse res = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
-
-      if (res.user != null) {
-        await syncUserData(res.user!);
-        return null;
-      }
-      return Localization.t('auth.error_login_failed');
-    } on AuthException catch (e) {
-      return e.message;
-    } catch (e) {
-      return Localization.t('auth.error_unknown', args: [e.toString()]);
-    }
-  }
-
-  static Future<String?> signUp(
-      String email, String password, String name) async {
-    try {
-      final AuthResponse res = await _supabase.auth.signUp(
-        email: email,
-        password: password,
-        emailRedirectTo: redirectUrl,
-        data: {
-          'full_name': name,
-          'avatar_url': 'https://robohash.org/${name.hashCode.abs()}',
-        },
-      );
-
-      if (res.user != null) {
-        // Now that we have the uid, update avatar_url with the real uid
-        await _supabase.auth.updateUser(
-          UserAttributes(data: {
-            'full_name': name,
-            'avatar_url': 'https://robohash.org/${res.user!.id}',
-          }),
-        );
-        await syncUserData(res.user!);
-        return null;
-      }
-      return Localization.t('auth.error_register_failed');
-    } on AuthException catch (e) {
-      debugPrint('Auth Error: ${e.message}');
-      if (e.message.contains('Database error')) {
-        return Localization.t('auth.error_db_profile');
-      }
-      return e.message;
-    } catch (e) {
-      return Localization.t('auth.error_unknown', args: [e.toString()]);
-    }
-  }
-
   /// Google ile Giriş Yap (Native ID Token ve OAuth Fallback destekli)
   static Future<String?> signInWithGoogle() async {
     try {
@@ -297,20 +242,6 @@ class AuthService {
     final session = _supabase.auth.currentSession;
     if (session != null) {
       await syncUserData(session.user);
-    }
-  }
-
-  static Future<String?> sendPasswordResetEmail(String email) async {
-    try {
-      await _supabase.auth.resetPasswordForEmail(
-        email,
-        redirectTo: redirectUrl,
-      );
-      return null;
-    } on AuthException catch (e) {
-      return e.message;
-    } catch (e) {
-      return Localization.t('auth.error_unexpected', args: [e.toString()]);
     }
   }
 

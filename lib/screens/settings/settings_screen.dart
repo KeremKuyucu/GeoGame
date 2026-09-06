@@ -37,25 +37,36 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.menu_rounded,
-                color: isDark ? Colors.white : Colors.black87,
-                size: 20,
-              ),
-            ),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: isDark ? Colors.white : Colors.black87,
+                  size: 20,
+                ),
+                onPressed: () => Navigator.pop(context),
+              )
+            : (SettingsController.isChildMode
+                ? null
+                : Builder(
+                    builder: (context) => IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey[800] : Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.menu_rounded,
+                          color: isDark ? Colors.white : Colors.black87,
+                          size: 20,
+                        ),
+                      ),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
+                  )),
       ),
-      drawer: const DrawerWidget(),
+      drawer: SettingsController.isChildMode ? null : const DrawerWidget(),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -96,7 +107,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       );
                     },
-                    onEditComplete: () => setState(() {}),
                   ),
           ),
           const SizedBox(height: 25),
@@ -132,14 +142,16 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               SettingsDivider(isDark: isDark),
               ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 leading: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.teal,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.security_rounded, color: Colors.white, size: 20),
+                  child: const Icon(Icons.security_rounded,
+                      color: Colors.white, size: 20),
                 ),
                 title: Text(
                   Localization.t('settings.use_anonymous_data'),
@@ -156,15 +168,18 @@ class _SettingsPageState extends State<SettingsPage> {
                       final shouldDisable = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                          backgroundColor:
+                              isDark ? const Color(0xFF2C2C2E) : Colors.white,
                           title: Text(
                             'Emin misiniz?',
-                            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                            style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black87),
                           ),
                           content: Text(
                             'Bu veri sizinle asla ilişkilendirilemez. Tek amacı uygulamanın günlük kullanım sayısını öğrenmektir.\n\nGönderilen örnek ping:\n{\n  "uid": "123e4567-e89b-12d3...",\n  "timestamp": "2026-05-25T14:30:00",\n  "app": "geogame",\n  "event": "app_opened_daily",\n  "platform": "mobile" // veya "web"\n}',
                             style: TextStyle(
-                              color: isDark ? Colors.grey[400] : Colors.grey[600],
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[600],
                               fontSize: 13,
                             ),
                           ),
@@ -201,6 +216,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 controller: _controller,
                 isDark: isDark,
                 onLanguageChanged: () => setState(() {}),
+              ),
+              SettingsDivider(isDark: isDark),
+              SettingsTile(
+                title: Localization.t('settings.child_mode'),
+                subtitle: Localization.t('settings.child_mode_desc'),
+                icon: Icons.child_care_rounded,
+                iconColor: Colors.pinkAccent,
+                isDark: isDark,
+                isSwitch: true,
+                switchValue: SettingsController.isChildMode,
+                onSwitchChanged: (v) => _handleChildModeToggle(v, isDark),
               ),
             ],
           ),
@@ -308,6 +334,309 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 30),
         ],
       ),
+    );
+  }
+
+  Future<void> _handleChildModeToggle(bool targetValue, bool isDark) async {
+    if (targetValue) {
+      await _showEnableChildModeDialog(isDark);
+    } else {
+      await _showDisableChildModeDialog(isDark);
+    }
+  }
+
+  Future<void> _showEnableChildModeDialog(bool isDark) async {
+    final pinController = TextEditingController();
+    final confirmPinController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.pinkAccent.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.child_care_rounded,
+                        color: Colors.pinkAccent),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      Localization.t('settings.child_mode_enable_title'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Localization.t('settings.child_mode_enable_desc'),
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        color: isDark ? Colors.grey[300] : Colors.grey[700],
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: pinController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: 4,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        letterSpacing: 8,
+                        fontSize: 18,
+                      ),
+                      decoration: InputDecoration(
+                        labelText:
+                            Localization.t('settings.child_mode_pin_hint'),
+                        labelStyle:
+                            const TextStyle(letterSpacing: 0, fontSize: 14),
+                        counterText: '',
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: confirmPinController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: 4,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        letterSpacing: 8,
+                        fontSize: 18,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: Localization.t(
+                            'settings.child_mode_pin_confirm_hint'),
+                        labelStyle:
+                            const TextStyle(letterSpacing: 0, fontSize: 14),
+                        counterText: '',
+                        prefixIcon: const Icon(Icons.lock_rounded),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(
+                    Localization.t('common.cancel'),
+                    style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    final pin = pinController.text.trim();
+                    final confirm = confirmPinController.text.trim();
+
+                    if (pin.length != 4 || !RegExp(r'^\d{4}$').hasMatch(pin)) {
+                      setDialogState(() {
+                        errorMessage = Localization.t(
+                            'settings.child_mode_pin_length_error');
+                      });
+                      return;
+                    }
+                    if (pin != confirm) {
+                      setDialogState(() {
+                        errorMessage =
+                            Localization.t('settings.child_mode_pin_mismatch');
+                      });
+                      return;
+                    }
+
+                    Navigator.pop(dialogContext);
+                    _controller.setChildMode(true, pin: pin);
+                    _controller.showSnackBar(
+                      context,
+                      Localization.t('settings.child_mode_enabled_msg'),
+                      Colors.green,
+                    );
+                    setState(() {});
+                  },
+                  child: Text(Localization.t('common.confirm')),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showDisableChildModeDialog(bool isDark) async {
+    final pinController = TextEditingController();
+    String? errorMessage;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.lock_rounded, color: Colors.amber),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      Localization.t('settings.child_mode_disable_title'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Localization.t('settings.child_mode_disable_desc'),
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        color: isDark ? Colors.grey[300] : Colors.grey[700],
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: pinController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: 4,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                        letterSpacing: 8,
+                        fontSize: 18,
+                      ),
+                      decoration: InputDecoration(
+                        labelText:
+                            Localization.t('settings.child_mode_pin_hint'),
+                        labelStyle:
+                            const TextStyle(letterSpacing: 0, fontSize: 14),
+                        counterText: '',
+                        prefixIcon: const Icon(Icons.pin_rounded),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(
+                    Localization.t('common.cancel'),
+                    style: TextStyle(
+                        color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                  ),
+                ),
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      final enteredPin = pinController.text.trim();
+                      final savedPin = SettingsController.childModePin;
+
+                      if (enteredPin == savedPin) {
+                        Navigator.pop(dialogContext);
+                        _controller.setChildMode(false);
+                        _controller.showSnackBar(
+                          context,
+                          Localization.t('settings.child_mode_disabled_msg'),
+                          Colors.green,
+                        );
+                        setState(() {});
+                      } else {
+                        setDialogState(() {
+                          errorMessage =
+                              Localization.t('settings.child_mode_wrong_pin');
+                        });
+                      }
+                    },
+                    child: Text(Localization.t('common.close'))),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -239,16 +239,22 @@ void main() {
 
       expect(settings.darkTheme, true);
       expect(settings.language, 'eng');
+      expect(settings.childMode, false);
+      expect(settings.childModePin, '');
     });
 
     test('fromMap doğru doldurulmalı', () {
       final settings = AppSettings.fromMap({
         'darkTheme': false,
         'language': 'tur',
+        'childMode': true,
+        'childModePin': '1234',
       });
 
       expect(settings.darkTheme, false);
       expect(settings.language, 'tur');
+      expect(settings.childMode, true);
+      expect(settings.childModePin, '1234');
     });
 
     test('fromMap boş/null language varsayılan olmalı', () {

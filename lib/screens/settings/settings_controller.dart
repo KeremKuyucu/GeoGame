@@ -42,6 +42,21 @@ class SettingsController {
   bool get isButtonMode => gameFilter.isButtonMode;
   String get currentLanguage => language;
   bool get isTelemetryEnabled => settings.telemetryEnabled;
+  static bool get isChildMode {
+    try {
+      return settings.childMode;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static String get childModePin {
+    try {
+      return settings.childModePin;
+    } catch (_) {
+      return '';
+    }
+  }
   String get appVersion => AppState.version;
   bool get europeEnabled => gameFilter.europe;
   bool get asiaEnabled => gameFilter.asia;
@@ -53,8 +68,6 @@ class SettingsController {
   bool get includeNonUN => gameFilter.includeNonUN;
 
   Future<void> signOut() => AuthService.signOut();
-  Future<void> navigateToEditProfile(BuildContext context) =>
-      Navigator.pushNamed(context, '/profile/edit');
   Future<void> navigateToAuth(BuildContext context) =>
       Navigator.pushNamed(context, '/auth');
   void showSnackBar(BuildContext context, String message, Color color) =>
@@ -86,6 +99,16 @@ class SettingsController {
 
   void setTelemetryEnabled(bool value) =>
       _save(() => settings.telemetryEnabled = value);
+
+  void setChildMode(bool value, {String? pin}) {
+    _save(() {
+      settings.childMode = value;
+      if (pin != null && pin.isNotEmpty) {
+        settings.childModePin = pin;
+      }
+    });
+    AppState.childModeNotifier.value = value;
+  }
   Future<void> changeLanguage(String code, BuildContext context) async {
     if (code == language) return;
     settings.language = code;
@@ -125,20 +148,39 @@ class AppSettings {
   bool darkTheme;
   String language;
   bool telemetryEnabled;
-  AppSettings(
-      {this.darkTheme = true,
-      this.language = 'eng',
-      this.telemetryEnabled = true});
+  bool? _childMode;
+  bool get childMode => _childMode ?? false;
+  set childMode(bool? value) => _childMode = value ?? false;
+
+  String? _childModePin;
+  String get childModePin => _childModePin ?? '';
+  set childModePin(String? value) => _childModePin = value ?? '';
+
+  AppSettings({
+    this.darkTheme = true,
+    this.language = 'eng',
+    this.telemetryEnabled = true,
+    bool childMode = false,
+    String childModePin = '',
+  })  : _childMode = childMode,
+        _childModePin = childModePin;
+
   factory AppSettings.fromMap(Map<String, dynamic> map) => AppSettings(
-      darkTheme: map['darkTheme'] ?? true,
-      language: map['language']?.toString().isNotEmpty == true
-          ? map['language']
-          : 'eng',
-      telemetryEnabled: map['telemetryEnabled'] ?? true);
+        darkTheme: map['darkTheme'] ?? true,
+        language: map['language']?.toString().isNotEmpty == true
+            ? map['language']
+            : 'eng',
+        telemetryEnabled: map['telemetryEnabled'] ?? true,
+        childMode: map['childMode'] == true,
+        childModePin: map['childModePin']?.toString() ?? '',
+      );
+
   Map<String, dynamic> toMap() => {
         'darkTheme': darkTheme,
         'language': language,
-        'telemetryEnabled': telemetryEnabled
+        'telemetryEnabled': telemetryEnabled,
+        'childMode': childMode,
+        'childModePin': childModePin,
       };
 }
 

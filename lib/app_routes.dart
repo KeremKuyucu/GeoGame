@@ -13,7 +13,6 @@ import 'package:geogame/screens/leaderboard/leaderboard.dart';
 import 'package:geogame/screens/profiles/profiles.dart';
 import 'package:geogame/screens/settings/settings_screen.dart';
 import 'package:geogame/screens/auth/auth_screen.dart';
-import 'package:geogame/screens/edit_profile/edit_profile.dart';
 
 class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
@@ -35,7 +34,6 @@ class AppRoutes {
     '/settings': (context) => const SettingsPage(),
 
     '/auth': (context) => const AuthPage(),
-    '/profile/edit': (context) => const EditProfilePage(),
 
     // Deep link callbacks
     '/login-callback': (context) => const SplashScreen(),

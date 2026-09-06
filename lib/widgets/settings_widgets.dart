@@ -67,7 +67,7 @@ class SettingsGuestCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
-                    "${Localization.t('auth.login')} / ${Localization.t('auth.signup')}",
+                    Localization.t('auth.login'),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -85,14 +85,12 @@ class SettingsProfileCard extends StatelessWidget {
   final SettingsController controller;
   final bool isDark;
   final VoidCallback onSignOut;
-  final VoidCallback onEditComplete;
 
   const SettingsProfileCard({
     super.key,
     required this.controller,
     required this.isDark,
     required this.onSignOut,
-    required this.onEditComplete,
   });
 
   @override
@@ -133,27 +131,36 @@ class SettingsProfileCard extends StatelessWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () async {
-                    await controller.navigateToEditProfile(context);
-                    onEditComplete();
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        Localization.t('settings.edit_profile'),
-                        style: const TextStyle(
-                          color: Colors.blueAccent,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.blue.withValues(alpha: 0.15)
+                            : Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.arrow_forward_ios_rounded,
-                          size: 12, color: Colors.blueAccent),
-                    ],
-                  ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.account_circle_outlined,
+                              size: 14, color: Colors.blueAccent),
+                          SizedBox(width: 4),
+                          Text(
+                            'Google Account',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -178,6 +185,7 @@ class SettingsProfileCard extends StatelessWidget {
 /// Ayar tile widget'ı
 class SettingsTile extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final IconData icon;
   final Color iconColor;
   final bool isDark;
@@ -188,6 +196,7 @@ class SettingsTile extends StatelessWidget {
   const SettingsTile({
     super.key,
     required this.title,
+    this.subtitle,
     required this.icon,
     required this.iconColor,
     required this.isDark,
@@ -216,6 +225,15 @@ class SettingsTile extends StatelessWidget {
           color: isDark ? Colors.white : Colors.black87,
         ),
       ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle!,
+              style: TextStyle(
+                fontSize: 12.5,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            )
+          : null,
       trailing: isSwitch
           ? Switch.adaptive(
               value: switchValue,

@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 class PreferencesService {
@@ -22,6 +23,7 @@ class PreferencesService {
       // Global State'i güncelle
       SettingsController.settings = AppSettings.fromMap(data);
       SettingsController.gameFilter = GameFilter.fromMap(data);
+      AppState.childModeNotifier.value = SettingsController.isChildMode;
 
       debugPrint('✅ Settings and preferences loaded.');
     } catch (e) {

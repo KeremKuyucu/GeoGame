@@ -7,7 +7,7 @@ import 'package:geogame/app_routes.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
-import 'package:geogame/services/logging_service.dart';
+import 'package:geogame/services/telemetry_service.dart';
 import 'package:geogame/services/ad_service.dart';
 
 import 'package:geogame/screens/splash_screen/splash_screen.dart';
@@ -23,8 +23,8 @@ void main() async {
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   AuthService.initAuthStateListener();
   await PreferencesService.loadConfig();
-  await LoggingService.init();
-  await AdService.initialize();
+  TelemetryService.init();
+  AdService.initialize();
 
   await Localization.init();
 

@@ -7,6 +7,8 @@ import 'package:geogame/services/localization_service.dart';
 class AppState extends ChangeNotifier {
   static int selectedIndex = 0;
   static String version = '';
+  static final ValueNotifier<bool> childModeNotifier =
+      ValueNotifier<bool>(false);
 
   static UserProfile user = UserProfile.anonymous();
   static Country targetCountry = Country.empty();

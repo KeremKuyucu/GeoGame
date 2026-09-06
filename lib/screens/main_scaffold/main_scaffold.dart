@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/widgets/custom_navbar.dart';
 import 'package:geogame/app_routes.dart';
-
+import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold_controller.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -15,24 +16,60 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   final MainScaffoldController _controller = MainScaffoldController();
 
-  final List<String> _pageKeys = const [
-    '/games',
-    '/leaderboard',
-    '/profile',
-    '/settings',
-  ];
+  List<String> get _pageKeys => [
+        '/games',
+        if (!SettingsController.isChildMode) '/leaderboard',
+        '/profile',
+        '/settings',
+      ];
+
+  @override
+  void initState() {
+    super.initState();
+    AppState.childModeNotifier.addListener(_onChildModeChanged);
+  }
+
+  @override
+  void dispose() {
+    AppState.childModeNotifier.removeListener(_onChildModeChanged);
+    super.dispose();
+  }
+
+  void _onChildModeChanged() {
+    if (mounted) {
+      if (SettingsController.isChildMode) {
+        if (AppState.selectedIndex == 1) {
+          AppState.selectedIndex = 0;
+        } else if (AppState.selectedIndex > 1) {
+          AppState.selectedIndex -= 1;
+        }
+      } else {
+        if (AppState.selectedIndex >= 1) {
+          AppState.selectedIndex += 1;
+        }
+      }
+      if (AppState.selectedIndex >= _pageKeys.length) {
+        AppState.selectedIndex = 0;
+      }
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final int safeIndex = _controller.currentIndex < _pageKeys.length
+        ? _controller.currentIndex
+        : 0;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: IndexedStack(
-        index: _controller.currentIndex,
+        index: safeIndex,
         children:
             _pageKeys.map((key) => AppRoutes.routes[key]!(context)).toList(),
       ),
       bottomNavigationBar: CustomNavBar(
-        currentIndex: _controller.currentIndex,
+        currentIndex: safeIndex,
         onTap: (index) => _controller.onTabChanged(
           context,
           index,

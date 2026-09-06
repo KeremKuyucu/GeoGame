@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/auth_widgets.dart';
-
 import 'package:geogame/screens/auth/auth_controller.dart';
 
 class AuthPage extends StatefulWidget {
@@ -23,16 +22,6 @@ class _AuthPageState extends State<AuthPage>
   bool _isHandlingAuth = false;
   bool _hasNavigated = false;
 
-  late final TextEditingController _emailController;
-  late final TextEditingController _passwordController;
-  late final TextEditingController _nameController;
-  late final TextEditingController _confirmPasswordController;
-
-  late final FocusNode _emailFocusNode;
-  late final FocusNode _passwordFocusNode;
-  late final FocusNode _nameFocusNode;
-  late final FocusNode _confirmPasswordFocusNode;
-
   late AnimationController _animController;
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _slideAnimation;
@@ -40,15 +29,6 @@ class _AuthPageState extends State<AuthPage>
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-    _nameController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
-
-    _emailFocusNode = FocusNode();
-    _passwordFocusNode = FocusNode();
-    _nameFocusNode = FocusNode();
-    _confirmPasswordFocusNode = FocusNode();
 
     _animController = AnimationController(
       vsync: this,
@@ -58,7 +38,7 @@ class _AuthPageState extends State<AuthPage>
       CurvedAnimation(parent: _animController, curve: Curves.easeOut),
     );
     _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+        Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutQuart),
     );
 
@@ -71,17 +51,9 @@ class _AuthPageState extends State<AuthPage>
           await AuthService.syncUserData(user);
           if (!mounted) return;
 
-          final provider = user.appMetadata['provider']?.toString().toLowerCase() ?? '';
-          final isGoogle = provider == 'google' ||
-              (user.identities?.any((i) => i.provider.toLowerCase() == 'google') ?? false);
-
-          final successMsg = isGoogle
-              ? Localization.t('auth.google_login_success')
-              : Localization.t('auth.login_success');
-
           _controller.showSnackBar(
             context,
-            successMsg,
+            Localization.t('auth.google_login_success'),
             Colors.greenAccent,
           );
           widget.onLoginSuccess?.call();
@@ -98,194 +70,13 @@ class _AuthPageState extends State<AuthPage>
   @override
   void dispose() {
     _authSub?.cancel();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _nameController.dispose();
-    _confirmPasswordController.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    _nameFocusNode.dispose();
-    _confirmPasswordFocusNode.dispose();
     _animController.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Navigator.canPop(context)
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white),
-                onPressed: () => Navigator.pop(context),
-              )
-            : null,
-      ),
-      body: Stack(
-        children: [
-          const AuthBackground(),
-          const AuthDecorativeCircles(),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              physics: const BouncingScrollPhysics(),
-              child: FadeTransition(
-                opacity: _opacityAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const AuthLogo(),
-                      const SizedBox(height: 20),
-                      AuthTitle(subtitle: _controller.getSubtitle()),
-                      const SizedBox(height: 40),
-                      AuthGlassCard(
-                        children: [
-                          Text(
-                            _controller.getCardTitle(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          AuthGoogleButton(
-                            isLoading: _controller.isGoogleLoading,
-                            onPressed: _handleGoogleLogin,
-                          ),
-                          const SizedBox(height: 24),
-                          const AuthOrDivider(),
-                          const SizedBox(height: 24),
-                          AutofillGroup(child: _buildFormFields()),
-                          const SizedBox(height: 24),
-                          AuthSubmitButton(
-                            label: _controller.getSubmitButtonText(),
-                            isLoading: _controller.isLoading,
-                            onPressed: () => _controller.isLoginMode
-                                ? _handleLogin()
-                                : _handleRegister(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      AuthModeToggle(
-                        message: _controller.getModeToggleText(),
-                        buttonText: _controller.getModeToggleButtonText(),
-                        onToggle: () =>
-                            setState(() => _controller.toggleMode()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFormFields() {
-    return Column(
-      children: [
-        if (!_controller.isLoginMode) ...[
-          AuthGlassTextField(
-            controller: _nameController,
-            focusNode: _nameFocusNode,
-            icon: Icons.person_rounded,
-            hintText: Localization.t('auth.name'),
-            autofillHints: const [AutofillHints.name],
-            textInputAction: TextInputAction.next,
-            onSubmitted: (_) =>
-                FocusScope.of(context).requestFocus(_emailFocusNode),
-          ),
-          const SizedBox(height: 20),
-        ],
-        AuthGlassTextField(
-          controller: _emailController,
-          focusNode: _emailFocusNode,
-          icon: Icons.email_rounded,
-          hintText: Localization.t('auth.email'),
-          autofillHints: const [AutofillHints.email],
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          onSubmitted: (_) =>
-              FocusScope.of(context).requestFocus(_passwordFocusNode),
-        ),
-        const SizedBox(height: 20),
-        AuthGlassTextField(
-          controller: _passwordController,
-          focusNode: _passwordFocusNode,
-          icon: Icons.lock_rounded,
-          hintText: Localization.t('auth.password'),
-          obscureText: true,
-          obscurePassword: _controller.obscurePassword,
-          autofillHints: const [AutofillHints.password],
-          textInputAction: _controller.isLoginMode
-              ? TextInputAction.done
-              : TextInputAction.next,
-          onTogglePassword: () =>
-              setState(() => _controller.togglePasswordVisibility()),
-          onSubmitted: (_) {
-            if (_controller.isLoginMode) {
-              _handleLogin();
-            } else {
-              FocusScope.of(context).requestFocus(_confirmPasswordFocusNode);
-            }
-          },
-        ),
-        if (_controller.isLoginMode)
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _showForgotPasswordDialog,
-              style: TextButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                minimumSize: const Size(0, 30),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                Localization.t('auth.forgot_password'),
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        if (!_controller.isLoginMode) ...[
-            const SizedBox(height: 20),
-            AuthGlassTextField(
-              controller: _confirmPasswordController,
-              focusNode: _confirmPasswordFocusNode,
-              icon: Icons.lock_outline_rounded,
-              hintText: Localization.t('auth.confirm_password'),
-              obscureText: true,
-              obscurePassword: _controller.obscurePassword,
-              autofillHints: const [AutofillHints.password],
-              textInputAction: TextInputAction.done,
-              onTogglePassword: () =>
-                  setState(() => _controller.togglePasswordVisibility()),
-              onSubmitted: (_) => _handleRegister(),
-            ),
-          ],
-      ],
-    );
   }
 
   Future<void> _handleGoogleLogin() async {
     if (_isHandlingAuth || _hasNavigated) return;
     _isHandlingAuth = true;
-    _controller.unfocusAndFinishAutofill(context);
     setState(() => _controller.isGoogleLoading = true);
 
     try {
@@ -322,107 +113,215 @@ class _AuthPageState extends State<AuthPage>
     }
   }
 
-  Future<void> _handleLogin() async {
-    if (_isHandlingAuth || _hasNavigated) return;
-    _isHandlingAuth = true;
-    _controller.unfocusAndFinishAutofill(context);
-    setState(() => _controller.isLoading = true);
-
-    try {
-      final result = await _controller.handleLogin(
-        _emailController.text,
-        _passwordController.text,
-      );
-
-      if (!mounted) return;
-      setState(() => _controller.isLoading = false);
-
-      if (result.isSuccess) {
-        if (!_hasNavigated) {
-          _hasNavigated = true;
-          _controller.showSnackBar(context, result.message, Colors.greenAccent);
-          widget.onLoginSuccess?.call();
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (!mounted) return;
-          _controller.navigateToHome(context);
-        }
-      } else {
-        _isHandlingAuth = false;
-        _controller.showSnackBar(context, result.message, Colors.redAccent);
-      }
-    } catch (_) {
-      if (mounted) {
-        setState(() => _controller.isLoading = false);
-        _isHandlingAuth = false;
-      }
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
+      ),
+      body: Stack(
+        children: [
+          const AuthBackground(),
+          const AuthDecorativeCircles(),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              physics: const BouncingScrollPhysics(),
+              child: FadeTransition(
+                opacity: _opacityAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const AuthLogo(),
+                      const SizedBox(height: 16),
+                      AuthTitle(subtitle: Localization.t('auth.login_subtitle')),
+                      const SizedBox(height: 32),
+                      AuthGlassCard(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.lock_open_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                Localization.t('auth.login'),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            Localization.t('auth.login_prompt'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 13.5,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _AuthFeatureItem(
+                            icon: Icons.emoji_events_rounded,
+                            iconColor: const Color(0xFFFFB74D),
+                            title: Localization.t('auth.feature_leaderboard_title'),
+                            description: Localization.t('auth.feature_leaderboard_desc'),
+                          ),
+                          _AuthFeatureItem(
+                            icon: Icons.cloud_done_rounded,
+                            iconColor: const Color(0xFF4FC3F7),
+                            title: Localization.t('auth.feature_cloud_sync_title'),
+                            description: Localization.t('auth.feature_cloud_sync_desc'),
+                          ),
+                          _AuthFeatureItem(
+                            icon: Icons.bolt_rounded,
+                            iconColor: const Color(0xFF81C784),
+                            title: Localization.t('auth.feature_instant_title'),
+                            description: Localization.t('auth.feature_instant_desc'),
+                          ),
+                          const SizedBox(height: 24),
+                          AuthGoogleButton(
+                            isLoading: _controller.isGoogleLoading,
+                            onPressed: _handleGoogleLogin,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      TextButton(
+                        onPressed: () {
+                          if (Navigator.canPop(context)) {
+                            Navigator.pop(context);
+                          } else {
+                            _controller.navigateToHome(context);
+                          }
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              Localization.t('auth.continue_as_guest'),
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.75),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 16,
+                              color: Colors.white.withValues(alpha: 0.75),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
+}
 
-  Future<void> _handleRegister() async {
-    if (_isHandlingAuth || _hasNavigated) return;
-    _isHandlingAuth = true;
-    FocusScope.of(context).unfocus();
-    setState(() => _controller.isLoading = true);
+class _AuthFeatureItem extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String description;
 
-    try {
-      final result = await _controller.handleRegister(
-        email: _emailController.text,
-        password: _passwordController.text,
-        name: _nameController.text,
-        confirmPassword: _confirmPasswordController.text,
-      );
+  const _AuthFeatureItem({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.description,
+  });
 
-      if (!mounted) return;
-      setState(() => _controller.isLoading = false);
-
-      if (result.isSuccess) {
-        if (!_hasNavigated) {
-          _hasNavigated = true;
-          _controller.showSnackBar(context, result.message, Colors.greenAccent);
-          widget.onLoginSuccess?.call();
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (!mounted) return;
-          _controller.navigateToHome(context);
-        }
-      } else {
-        _isHandlingAuth = false;
-        _controller.showSnackBar(context, result.message, Colors.redAccent);
-      }
-    } catch (_) {
-      if (mounted) {
-        setState(() => _controller.isLoading = false);
-        _isHandlingAuth = false;
-      }
-    }
-  }
-
-  void _showForgotPasswordDialog() {
-    final resetEmailController =
-        TextEditingController(text: _emailController.text);
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AuthForgotPasswordDialog(
-        emailController: resetEmailController,
-        onSend: () async {
-          final email = resetEmailController.text.trim();
-          if (email.isEmpty) return;
-
-          Navigator.pop(dialogContext);
-          setState(() => _controller.isLoading = true);
-
-          final result = await _controller.sendPasswordReset(email);
-
-          if (!mounted) return;
-          setState(() => _controller.isLoading = false);
-
-          if (result.isSuccess) {
-            _controller.showSnackBar(
-                context, result.message, Colors.greenAccent);
-          } else {
-            _controller.showSnackBar(context, result.message, Colors.redAccent);
-          }
-        },
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.08),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.65),
+                    fontSize: 11.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

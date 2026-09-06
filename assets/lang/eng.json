@@ -12,7 +12,9 @@
     "error": "Error",
     "send": "Send",
     "field_required": "This field is required",
-    "site_error": "Site could not be opened. {0}"
+    "site_error": "Site could not be opened. {0}",
+    "close": "Close",
+    "confirm": "Confirm"
   },
   "nav": {
     "games": "Games",
@@ -73,7 +75,14 @@
     "or_divider": "or",
     "google_login_success": "Successfully signed in with Google!",
     "error_google_cancelled": "Google sign-in was cancelled.",
-    "error_google_sign_in": "Could not sign in with Google. Please try again."
+    "error_google_sign_in": "Could not sign in with Google. Please try again.",
+    "continue_as_guest": "Continue as Guest",
+    "feature_cloud_sync_title": "Cloud Sync",
+    "feature_cloud_sync_desc": "Safely store your scores and progress",
+    "feature_leaderboard_title": "Leaderboard",
+    "feature_leaderboard_desc": "Compete with players worldwide",
+    "feature_instant_title": "One-Tap Sign In",
+    "feature_instant_desc": "Passwordless, fast and secure access"
   },
   "game_common": {
     "input_hint": "Type country name...",
@@ -198,7 +207,21 @@
       "antarctica": "Countries in Antarctica"
     },
     "guest": "Guest",
-    "edit_profile": "Edit Profile"
+    "child_mode": "Child Mode",
+    "child_mode_desc": "Hides leaderboard and side menu",
+    "child_mode_enable_title": "Enable Child Mode",
+    "child_mode_enable_desc": "When Child Mode is active, the leaderboard and side menu links are disabled. Set a 4-digit PIN to lock and unlock this mode.",
+    "child_mode_disable_title": "Disable Child Mode",
+    "child_mode_disable_desc": "Enter your 4-digit PIN to disable Child Mode.",
+    "child_mode_pin_hint": "Enter 4-digit PIN",
+    "child_mode_pin_confirm_hint": "Confirm your PIN",
+    "child_mode_pin_mismatch": "PIN codes do not match!",
+    "child_mode_pin_length_error": "PIN must be exactly 4 digits!",
+    "child_mode_wrong_pin": "Incorrect PIN code! Please try again.",
+    "child_mode_enabled_msg": "Child Mode enabled.",
+    "child_mode_disabled_msg": "Child Mode disabled.",
+    "child_mode_leaderboard_disabled_title": "Child Mode Active",
+    "child_mode_leaderboard_disabled_desc": "The leaderboard is disabled in Child Mode. You can turn it off in Settings using your PIN."
   },
   "profile": {
     "title": "Profile",
@@ -214,15 +237,6 @@
     "borderline": "Borderline",
     "borderpath": "Border Path",
     "findmap": "Find Map"
-  },
-  "edit_profile": {
-    "edit_title": "Edit Profile",
-    "personal_info": "Personal Information",
-    "display_name": "Display Name",
-    "update_success": "Profile updated successfully",
-    "name_too_long": "Name must be at most 20 characters",
-    "name_invalid_chars": "Name can only contain letters, numbers, spaces and underscores",
-    "name_inappropriate": "This name contains inappropriate content"
   },
   "leaderboard": {
     "title": "Leaderboard",

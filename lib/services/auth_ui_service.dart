@@ -64,7 +64,7 @@ class AuthUIService {
     }
     final nameFilterError = NameFilterService.validate(name);
     if (nameFilterError != null) {
-      return Localization.t('edit_profile.$nameFilterError');
+      return Localization.t('auth.$nameFilterError');
     }
     if (!isValidPassword(password)) {
       return Localization.t('auth.password_too_short');
@@ -90,56 +90,6 @@ class AuthUIService {
   // AUTH İŞLEMLERİ (Wrapper)
   // ============================================================================
 
-  /// Login işlemi sonucu
-  static Future<AuthResult> performLogin(String email, String password) async {
-    // Validasyon
-    final validationError = validateLoginForm(email, password);
-    if (validationError != null) {
-      return AuthResult.failure(validationError);
-    }
-
-    // Auth işlemi
-    final String? error = await AuthService.signIn(email, password);
-
-    if (error == null) {
-      debugPrint('✅ Login successful');
-      return AuthResult.success(Localization.t('auth.login_success'));
-    } else {
-      debugPrint('❌ Login failed: $error');
-      return AuthResult.failure(error);
-    }
-  }
-
-  /// Register işlemi sonucu
-  static Future<AuthResult> performRegister({
-    required String email,
-    required String password,
-    required String name,
-    required String confirmPassword,
-  }) async {
-    // Validasyon
-    final validationError = validateRegisterForm(
-      email: email,
-      password: password,
-      name: name,
-      confirmPassword: confirmPassword,
-    );
-    if (validationError != null) {
-      return AuthResult.failure(validationError);
-    }
-
-    // Auth işlemi
-    final String? error = await AuthService.signUp(email, password, name);
-
-    if (error == null) {
-      debugPrint('✅ Registration successful');
-      return AuthResult.success(Localization.t('auth.register_success'));
-    } else {
-      debugPrint('❌ Registration failed: $error');
-      return AuthResult.failure(error);
-    }
-  }
-
   /// Google ile giriş işlemi sonucu
   static Future<AuthResult> performGoogleSignIn() async {
     final String? error = await AuthService.signInWithGoogle();
@@ -149,26 +99,6 @@ class AuthUIService {
       return AuthResult.success(Localization.t('auth.google_login_success'));
     } else {
       debugPrint('❌ Google Sign-In failed: $error');
-      return AuthResult.failure(error);
-    }
-  }
-
-  /// Şifre sıfırlama email gönderimi
-  static Future<AuthResult> sendPasswordReset(String email) async {
-    // Validasyon
-    final validationError = validateResetEmail(email);
-    if (validationError != null) {
-      return AuthResult.failure(validationError);
-    }
-
-    // Email gönderimi
-    final String? error = await AuthService.sendPasswordResetEmail(email);
-
-    if (error == null) {
-      debugPrint('✅ Password reset email sent');
-      return AuthResult.success(Localization.t('auth.link_sent'));
-    } else {
-      debugPrint('❌ Password reset failed: $error');
       return AuthResult.failure(error);
     }
   }

@@ -12,7 +12,9 @@
     "error": "Hata",
     "send": "Gönder",
     "field_required": "Bu alan zorunludur",
-    "site_error": "Site açılamadı. {0}"
+    "site_error": "Site açılamadı. {0}",
+    "close": "Kapat",
+    "confirm": "Onayla"
   },
   "nav": {
     "games": "Oyunlar",
@@ -73,7 +75,14 @@
     "or_divider": "veya",
     "google_login_success": "Google ile giriş başarılı!",
     "error_google_cancelled": "Google girişi iptal edildi.",
-    "error_google_sign_in": "Google ile giriş yapılamadı. Lütfen tekrar deneyin."
+    "error_google_sign_in": "Google ile giriş yapılamadı. Lütfen tekrar deneyin.",
+    "continue_as_guest": "Misafir Olarak Devam Et",
+    "feature_cloud_sync_title": "Bulut Kaydı",
+    "feature_cloud_sync_desc": "Skorlarını ve ilerlemeni güvenle kaydet",
+    "feature_leaderboard_title": "Liderlik Tablosu",
+    "feature_leaderboard_desc": "Dünya çapındaki oyuncularla yarış",
+    "feature_instant_title": "Tek Tıkla Giriş",
+    "feature_instant_desc": "Şifresiz, hızlı ve güvenli oturum açma"
   },
   "game_common": {
     "input_hint": "Ülke ismini yazın...",
@@ -198,7 +207,21 @@
       "antarctica": "Antartika Kıtasında Olan Ülkeler"
     },
     "guest": "Misafir",
-    "edit_profile": "Profili Düzenle"
+    "child_mode": "Çocuk Modu",
+    "child_mode_desc": "Sıralama tablosunu ve menüyü gizler",
+    "child_mode_enable_title": "Çocuk Modunu Etkinleştir",
+    "child_mode_enable_desc": "Çocuk modu açıkken sıralama tablosu ve menü bağlantıları kapatılır. Bu modu kapatabilmek için 4 haneli bir PIN belirleyin.",
+    "child_mode_disable_title": "Çocuk Modunu Kapat",
+    "child_mode_disable_desc": "Çocuk modunu devre dışı bırakmak için belirlediğiniz 4 haneli PIN kodunu girin.",
+    "child_mode_pin_hint": "4 haneli PIN girin",
+    "child_mode_pin_confirm_hint": "PIN kodunu tekrar girin",
+    "child_mode_pin_mismatch": "PIN kodları birbiriyle eşleşmiyor!",
+    "child_mode_pin_length_error": "PIN tam 4 haneli bir sayı olmalıdır!",
+    "child_mode_wrong_pin": "Hatalı PIN kodu! Lütfen tekrar deneyin.",
+    "child_mode_enabled_msg": "Çocuk modu etkinleştirildi.",
+    "child_mode_disabled_msg": "Çocuk modu kapatıldı.",
+    "child_mode_leaderboard_disabled_title": "Çocuk Modu Aktif",
+    "child_mode_leaderboard_disabled_desc": "Sıralama tablosu çocuk modunda kapalıdır. Ayarlar menüsünden PIN ile kapatabilirsiniz."
   },
   "profile": {
     "title": "Profil",
@@ -214,15 +237,6 @@
     "borderline": "Sınır hattı",
     "borderpath": "Sınır yolu",
     "findmap": "Haritada Bulma"
-  },
-  "edit_profile": {
-    "edit_title": "Profili Düzenle",
-    "personal_info": "Kişisel Bilgiler",
-    "display_name": "Görünen İsim",
-    "update_success": "Profil başarıyla güncellendi",
-    "name_too_long": "İsim en fazla 20 karakter olabilir",
-    "name_invalid_chars": "İsim sadece harf, rakam, boşluk ve alt çizgi içerebilir",
-    "name_inappropriate": "Bu isim uygunsuz içerik barındırıyor"
   },
   "leaderboard": {
     "title": "Sıralama",

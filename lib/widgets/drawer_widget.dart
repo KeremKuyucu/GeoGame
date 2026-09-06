@@ -6,12 +6,16 @@ import 'package:geogame/widgets/feedback_dialog.dart';
 import 'package:geogame/services/localization_service.dart';
 
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (SettingsController.isChildMode) {
+      return const SizedBox.shrink();
+    }
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Drawer(

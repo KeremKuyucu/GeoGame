@@ -5,6 +5,7 @@ import 'package:geogame/widgets/mainscreen_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/auth_service.dart';
 
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/screens/mainscreen/main_screen_controller.dart';
 
 class MainScreen extends StatefulWidget {
@@ -55,7 +56,9 @@ class _MainScreenState extends State<MainScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      drawer: const DrawerWidget(),
+      drawer: SettingsController.isChildMode
+          ? null
+          : const DrawerWidget(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
