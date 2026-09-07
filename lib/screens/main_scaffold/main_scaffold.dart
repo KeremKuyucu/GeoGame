@@ -27,12 +27,18 @@ class _MainScaffoldState extends State<MainScaffold> {
   void initState() {
     super.initState();
     AppState.childModeNotifier.addListener(_onChildModeChanged);
+    AppState.userNotifier.addListener(_onUserChanged);
   }
 
   @override
   void dispose() {
     AppState.childModeNotifier.removeListener(_onChildModeChanged);
+    AppState.userNotifier.removeListener(_onUserChanged);
     super.dispose();
+  }
+
+  void _onUserChanged() {
+    if (mounted) setState(() {});
   }
 
   void _onChildModeChanged() {

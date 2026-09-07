@@ -10,7 +10,13 @@ class AppState extends ChangeNotifier {
   static final ValueNotifier<bool> childModeNotifier =
       ValueNotifier<bool>(false);
 
-  static UserProfile user = UserProfile.anonymous();
+  static final ValueNotifier<UserProfile> userNotifier =
+      ValueNotifier<UserProfile>(UserProfile.anonymous());
+
+  static UserProfile get user => userNotifier.value;
+  static set user(UserProfile profile) {
+    userNotifier.value = profile;
+  }
   static Country targetCountry = Country.empty();
   static Country tempCountry = Country.empty();
   static List<Country> allCountries = [];

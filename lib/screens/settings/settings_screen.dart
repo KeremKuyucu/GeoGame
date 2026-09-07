@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/settings_widgets.dart';
@@ -15,6 +16,22 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final SettingsController _controller = SettingsController();
+
+  @override
+  void initState() {
+    super.initState();
+    AppState.userNotifier.addListener(_onUserChanged);
+  }
+
+  @override
+  void dispose() {
+    AppState.userNotifier.removeListener(_onUserChanged);
+    super.dispose();
+  }
+
+  void _onUserChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
