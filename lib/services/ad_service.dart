@@ -41,12 +41,22 @@ class AdService {
   static bool _isInterstitialLoading = false;
 
   /// SDK'yı başlatır ve ilk interstitial reklamı yükler.
+  /// Teacher Approved / Families Policy: tagForChildDirectedTreatment aktif.
   static Future<void> initialize() async {
     if (!isSupported) return;
 
     try {
+      // Google Play Families Policy & Teacher Approved uyumu:
+      // Kişiselleştirilmiş reklam kapatılır, reklam kimliği (AD_ID) kullanılmaz.
+      MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(
+          tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
+          tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes,
+          maxAdContentRating: MaxAdContentRating.g,
+        ),
+      );
       await MobileAds.instance.initialize();
-      debugPrint('AdService: MobileAds SDK başlatıldı');
+      debugPrint('AdService: MobileAds SDK başlatıldı (çocuk modu aktif)');
       _loadInterstitialAd();
     } catch (e) {
       debugPrint('AdService: SDK başlatma hatası: $e');
