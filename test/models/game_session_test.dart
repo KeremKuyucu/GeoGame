@@ -326,4 +326,145 @@ void main() {
       expect(buttons.every((b) => b.isActive), true);
     });
   });
+
+  // ===========================================================================
+  // GAME SESSION — submitWrong
+  // ===========================================================================
+
+  group('GameSession.submitWrong', () {
+    late GameSession session;
+
+    setUp(() {
+      session = GameSession();
+      session.reset(startScore: 50, minScore: 20);
+    });
+
+    test('yanlış cevap verildiğinde wrongCount artar ve puan azalır', () {
+      expect(session.wrongCount, 0);
+      expect(session.currentQuestionScore, 50);
+
+      session.submitWrong();
+      expect(session.wrongCount, 1);
+      expect(session.currentQuestionScore, 40);
+
+      session.submitWrong();
+      expect(session.wrongCount, 2);
+      expect(session.currentQuestionScore, 30);
+    });
+
+    test('currentQuestionScore minScore altına inemez', () {
+      session.submitWrong(); // 40
+      session.submitWrong(); // 30
+      session.submitWrong(); // 20 (minScore)
+      expect(session.currentQuestionScore, 20);
+
+      session.submitWrong(); // hala 20 kalmalı
+      expect(session.currentQuestionScore, 20);
+      expect(session.wrongCount, 4);
+    });
+  });
+
+  // ===========================================================================
+  // APP SETTINGS — GENİŞLETİLMİŞ
+  // ===========================================================================
+
+  group('AppSettings (genişletilmiş)', () {
+    test('telemetryEnabled varsayılan true olmalı', () {
+      final settings = AppSettings();
+      expect(settings.telemetryEnabled, true);
+    });
+
+    test('fromMap telemetryEnabled false olarak ayarlanabilmeli', () {
+      final settings = AppSettings.fromMap({'telemetryEnabled': false});
+      expect(settings.telemetryEnabled, false);
+    });
+
+    test('toMap → fromMap roundtrip tutarlı olmalı', () {
+      final original = AppSettings(
+        darkTheme: false,
+        language: 'tur',
+        telemetryEnabled: false,
+        childMode: true,
+        childModePin: '9876',
+      );
+      final map = original.toMap();
+      final restored = AppSettings.fromMap(map);
+
+      expect(restored.darkTheme, original.darkTheme);
+      expect(restored.language, original.language);
+      expect(restored.telemetryEnabled, original.telemetryEnabled);
+      expect(restored.childMode, original.childMode);
+      expect(restored.childModePin, original.childModePin);
+    });
+
+    test('childMode null güvenliği — null verilince false olmalı', () {
+      final settings = AppSettings.fromMap({'childMode': null});
+      expect(settings.childMode, false);
+    });
+
+    test('childModePin null güvenliği — null verilince boş string olmalı', () {
+      final settings = AppSettings.fromMap({'childModePin': null});
+      expect(settings.childModePin, '');
+    });
+
+    test('toMap tüm alanları içermeli', () {
+      final map = AppSettings().toMap();
+
+      expect(map.containsKey('darkTheme'), true);
+      expect(map.containsKey('language'), true);
+      expect(map.containsKey('telemetryEnabled'), true);
+      expect(map.containsKey('childMode'), true);
+      expect(map.containsKey('childModePin'), true);
+    });
+  });
+
+  // ===========================================================================
+  // GAME FILTER — GENİŞLETİLMİŞ
+  // ===========================================================================
+
+  group('GameFilter (genişletilmiş)', () {
+    test('toMap → fromMap → toMap tutarlılığı', () {
+      final original = GameFilter(
+        europe: false,
+        asia: true,
+        africa: false,
+        northAmerica: true,
+        southAmerica: false,
+        oceania: true,
+        antarctic: false,
+        isButtonMode: false,
+        includeNonUN: true,
+      );
+
+      final map1 = original.toMap();
+      final restored = GameFilter.fromMap(map1);
+      final map2 = restored.toMap();
+
+      // İki map aynı olmalı
+      expect(map2['europe'], map1['europe']);
+      expect(map2['asia'], map1['asia']);
+      expect(map2['africa'], map1['africa']);
+      expect(map2['northAmerica'], map1['northAmerica']);
+      expect(map2['southAmerica'], map1['southAmerica']);
+      expect(map2['oceania'], map1['oceania']);
+      expect(map2['antarctic'], map1['antarctic']);
+      expect(map2['isButtonMode'], map1['isButtonMode']);
+      expect(map2['includeNonUN'], map1['includeNonUN']);
+    });
+
+    test('fromMap eksik anahtarlarda varsayılan kullanılmalı', () {
+      final filter = GameFilter.fromMap({});
+
+      expect(filter.europe, true);
+      expect(filter.asia, true);
+      expect(filter.africa, true);
+      expect(filter.northAmerica, true);
+      expect(filter.southAmerica, true);
+      expect(filter.oceania, true);
+      expect(filter.antarctic, true);
+      expect(filter.isButtonMode, true);
+      expect(filter.includeNonUN, false);
+    });
+  });
 }
+

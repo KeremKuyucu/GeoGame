@@ -385,7 +385,7 @@ class GameScaffold extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: GameAppBar(title: title),
-      drawer: const DrawerWidget(),
+      drawer: SettingsController.isChildMode ? null : const DrawerWidget(),
       body: GameBackground(
         colors: backgroundColors,
         child: SafeArea(

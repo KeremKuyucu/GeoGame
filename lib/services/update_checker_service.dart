@@ -9,7 +9,8 @@ class UpdateService {
   static const String repoOwner = 'KeremKuyucu';
   static const String repoName = 'GeoGame';
 
-  static bool _isNewVersionAvailable(String local, String remote) {
+  @visibleForTesting
+  static bool isNewVersionAvailable(String local, String remote) {
     try {
       final List<int> localParts = local.split('.').map(int.parse).toList();
       final List<int> remoteParts = remote.split('.').map(int.parse).toList();
@@ -45,7 +46,7 @@ class UpdateService {
             .replaceAll(RegExp(r'^v'), '');
         final updateNotes = data['body'] ?? '';
 
-        if (_isNewVersionAvailable(localVersion, remoteVersion)) {
+        if (isNewVersionAvailable(localVersion, remoteVersion)) {
           if (!context.mounted) return;
           _showUpdateDialog(
             context,

@@ -4,87 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/services/name_filter_service.dart';
 
 /// Auth UI mantığını yöneten servis.
 /// Validasyon, form kontrolü ve auth işlemlerini yönetir.
 /// AuthService (Supabase işlemleri) ile UI arasında köprü görevi görür.
 class AuthUIService {
-  // ============================================================================
-  // FORM VALIDASYON
-  // ============================================================================
-
-  /// Email formatını kontrol eder
-  static bool isValidEmail(String email) {
-    if (email.isEmpty) return false;
-    final emailRegex =
-        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
-
-  /// Şifre gücünü kontrol eder
-  static bool isValidPassword(String password) {
-    return password.length >= 6;
-  }
-
-  /// İsim kontrolü
-  static bool isValidName(String name) {
-    return name.trim().length >= 2;
-  }
-
-  /// Login form validasyonu
-  static String? validateLoginForm(String email, String password) {
-    if (email.isEmpty || password.isEmpty) {
-      return Localization.t('common.field_required');
-    }
-    if (!isValidEmail(email)) {
-      return Localization.t('auth.invalid_email');
-    }
-    return null; // Valid
-  }
-
-  /// Register form validasyonu
-  static String? validateRegisterForm({
-    required String email,
-    required String password,
-    required String name,
-    required String confirmPassword,
-  }) {
-    if (email.isEmpty ||
-        password.isEmpty ||
-        name.isEmpty ||
-        confirmPassword.isEmpty) {
-      return Localization.t('common.field_required');
-    }
-    if (!isValidEmail(email)) {
-      return Localization.t('auth.invalid_email');
-    }
-    if (!isValidName(name)) {
-      return Localization.t('auth.name_too_short');
-    }
-    final nameFilterError = NameFilterService.validate(name);
-    if (nameFilterError != null) {
-      return Localization.t('auth.$nameFilterError');
-    }
-    if (!isValidPassword(password)) {
-      return Localization.t('auth.password_too_short');
-    }
-    if (password != confirmPassword) {
-      return Localization.t('auth.password_mismatch');
-    }
-    return null; // Valid
-  }
-
-  /// Şifre sıfırlama email validasyonu
-  static String? validateResetEmail(String email) {
-    if (email.isEmpty) {
-      return Localization.t('common.field_required');
-    }
-    if (!isValidEmail(email)) {
-      return Localization.t('auth.invalid_email');
-    }
-    return null;
-  }
 
   // ============================================================================
   // AUTH İŞLEMLERİ (Wrapper)

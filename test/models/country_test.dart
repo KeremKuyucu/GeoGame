@@ -243,5 +243,73 @@ void main() {
         expect(turkey.borders.length, 8);
       });
     });
+
+    // =========================================================================
+    // AREA FIELD
+    // =========================================================================
+
+    group('area', () {
+      test('area değeri doğru olmalı', () {
+        expect(turkey.area, 783562);
+        expect(germany.area, 357114);
+      });
+
+      test('fromJson area doğru parse edilmeli', () {
+        final json = {
+          'cca2': 'JP',
+          'cca3': 'JPN',
+          'name': {'common': 'Japan'},
+          'continents': ['Asia'],
+          'area': 377975.0,
+        };
+
+        final country = Country.fromJson(json);
+        expect(country.area, 377975.0);
+      });
+
+      test('fromJson area null ise 0 olmalı', () {
+        final json = {
+          'cca2': 'XX',
+          'cca3': 'XXX',
+          'name': {'common': 'Test'},
+        };
+
+        final country = Country.fromJson(json);
+        expect(country.area, 0.0);
+      });
+    });
+
+    // =========================================================================
+    // checkAnswer — EDGE CASE'LER
+    // =========================================================================
+
+    group('checkAnswer (edge cases)', () {
+      test('boş translations ile sadece İngilizce fallback çalışmalı', () {
+        final noTranslations = Country(
+          iso3: 'TST',
+          iso2: 'TS',
+          englishName: 'TestCountry',
+          translations: {},
+          flagEmoji: '',
+          flagUrl: '',
+          capital: '',
+          continents: [],
+          isUNMember: false,
+          latitude: 0,
+          longitude: 0,
+          borders: [],
+          area: 0,
+        );
+
+        expect(noTranslations.checkAnswer('TestCountry', 'tur'), true);
+        expect(noTranslations.checkAnswer('testcountry', 'xyz'), true);
+        expect(noTranslations.checkAnswer('WrongName', 'tur'), false);
+      });
+
+      test('sadece boşluk girildiğinde false dönmeli', () {
+        expect(turkey.checkAnswer('   ', 'eng'), false);
+      });
+    });
   });
 }
+

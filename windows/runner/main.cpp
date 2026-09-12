@@ -68,7 +68,7 @@ bool CheckAndForwardToExistingInstance() {
     if (argc >= 2) {
       for (int i = 1; i < argc; ++i) {
         std::wstring arg = argv[i];
-        if (arg.rfind(L"io.supabase.geogame:", 0) == 0 || arg.find(L"://") != std::wstring::npos) {
+        if (arg.rfind(L"com.keremkuyucu.geogame:", 0) == 0 || arg.find(L"://") != std::wstring::npos) {
           int size_needed = WideCharToMultiByte(CP_UTF8, 0, arg.c_str(), -1, nullptr, 0, nullptr, nullptr);
           if (size_needed > 0) {
             std::string utf8_link(size_needed, 0);

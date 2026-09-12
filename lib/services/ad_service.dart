@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 /// Merkezi reklam yönetim servisi.
 /// Banner ve interstitial reklamları yönetir.
@@ -41,25 +42,44 @@ class AdService {
   static bool _isInterstitialLoading = false;
 
   /// SDK'yı başlatır ve ilk interstitial reklamı yükler.
-  /// Teacher Approved / Families Policy: tagForChildDirectedTreatment aktif.
+  /// Ebeveyn kilidi / Çocuk modu durumuna göre reklam yapılandırmasını ayarlar.
   static Future<void> initialize() async {
     if (!isSupported) return;
 
     try {
-      // Google Play Families Policy & Teacher Approved uyumu:
-      // Kişiselleştirilmiş reklam kapatılır, reklam kimliği (AD_ID) kullanılmaz.
-      MobileAds.instance.updateRequestConfiguration(
-        RequestConfiguration(
-          tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
-          tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes,
-          maxAdContentRating: MaxAdContentRating.g,
-        ),
-      );
+      updateChildMode(SettingsController.isChildMode);
       await MobileAds.instance.initialize();
-      debugPrint('AdService: MobileAds SDK başlatıldı (çocuk modu aktif)');
+      debugPrint(
+          'AdService: MobileAds SDK başlatıldı (Çocuk Modu: ${SettingsController.isChildMode})');
       _loadInterstitialAd();
     } catch (e) {
       debugPrint('AdService: SDK başlatma hatası: $e');
+    }
+  }
+
+  /// Ebeveyn moduna (Çocuk Modu) göre AdMob reklam yapılandırmasını günceller.
+  /// Çocuk modu açıkken: tagForChildDirectedTreatment=yes, G rating (kişiselleştirilmemiş, çocuklara uygun reklamlar).
+  /// Çocuk modu kapalıyken: tagForChildDirectedTreatment=no, Teen rating (kişiselleştirilmiş normal reklamlar).
+  static void updateChildMode(bool isChildMode) {
+    if (!isSupported) return;
+
+    try {
+      MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(
+          tagForChildDirectedTreatment: isChildMode
+              ? TagForChildDirectedTreatment.yes
+              : TagForChildDirectedTreatment.no,
+          tagForUnderAgeOfConsent: isChildMode
+              ? TagForUnderAgeOfConsent.yes
+              : TagForUnderAgeOfConsent.no,
+          maxAdContentRating:
+              isChildMode ? MaxAdContentRating.g : MaxAdContentRating.t,
+        ),
+      );
+      debugPrint(
+          'AdService: Reklam yapılandırması güncellendi (Çocuk Modu: $isChildMode)');
+    } catch (e) {
+      debugPrint('AdService: Reklam yapılandırma hatası: $e');
     }
   }
 

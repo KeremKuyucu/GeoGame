@@ -348,4 +348,90 @@ void main() {
       expect(result.any((c) => c.iso3 == 'TWN'), true);
     });
   });
+
+  // ===========================================================================
+  // BORDER PATH SKOR — EDGE CASE'LER
+  // ===========================================================================
+
+  group('GameService.calculateBorderPathScore (edge cases)', () {
+    test('moves < optimal → yine 100 dönmeli (negatif penalty yok)', () {
+      // Bu durum normalde olmamalı ama defensive coding
+      expect(GameService.calculateBorderPathScore(2, 3), 100);
+    });
+
+    test('moves == 0, optimal == 0 → 100 dönmeli', () {
+      expect(GameService.calculateBorderPathScore(0, 0), 100);
+    });
+
+    test('1 hamle farkla skor tam 90 olmalı', () {
+      expect(GameService.calculateBorderPathScore(5, 4), 90);
+    });
+
+    test('8 fazla hamle → minimum 20 puan', () {
+      expect(GameService.calculateBorderPathScore(11, 3), 20);
+    });
+  });
+
+  // ===========================================================================
+  // PERFORMANS METNİ — SINIR DEĞERLER
+  // ===========================================================================
+
+  group('GameService.getBorderPathPerformanceKey (sınır değerler)', () {
+    test('0 puan → "perf_try_harder"', () {
+      expect(GameService.getBorderPathPerformanceKey(0),
+          'game_borderpath.perf_try_harder');
+    });
+
+    test('59 puan → "perf_try_harder"', () {
+      expect(GameService.getBorderPathPerformanceKey(59),
+          'game_borderpath.perf_try_harder');
+    });
+
+    test('60 puan → "perf_good" (sınır)', () {
+      expect(GameService.getBorderPathPerformanceKey(60),
+          'game_borderpath.perf_good');
+    });
+
+    test('79 puan → "perf_good"', () {
+      expect(GameService.getBorderPathPerformanceKey(79),
+          'game_borderpath.perf_good');
+    });
+
+    test('80 puan → "perf_great" (sınır)', () {
+      expect(GameService.getBorderPathPerformanceKey(80),
+          'game_borderpath.perf_great');
+    });
+
+    test('99 puan → "perf_great"', () {
+      expect(GameService.getBorderPathPerformanceKey(99),
+          'game_borderpath.perf_great');
+    });
+  });
+
+  // ===========================================================================
+  // LIST RANDOM — EDGE CASE'LER
+  // ===========================================================================
+
+  group('ListRandomExtension (edge cases)', () {
+    test('tek elemanlı listede pickRandom o elemanı dönmeli', () {
+      final list = [42];
+      final random = math.Random(42);
+      expect(list.pickRandom(random), 42);
+    });
+
+    test('pickRandomCount count=0 boş liste dönmeli', () {
+      final list = [1, 2, 3];
+      final random = math.Random(42);
+      expect(list.pickRandomCount(0, random), isEmpty);
+    });
+
+    test('pickRandomCount count=1 tek elemanlı liste dönmeli', () {
+      final list = [1, 2, 3, 4, 5];
+      final random = math.Random(42);
+      final result = list.pickRandomCount(1, random);
+      expect(result.length, 1);
+      expect(list, contains(result.first));
+    });
+  });
 }
+

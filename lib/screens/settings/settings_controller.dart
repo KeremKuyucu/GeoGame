@@ -5,6 +5,7 @@ import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
+import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/widgets/restart_widget.dart';
 
 class SettingsController {
@@ -100,7 +101,7 @@ class SettingsController {
   void setTelemetryEnabled(bool value) =>
       _save(() => settings.telemetryEnabled = value);
 
-  void setChildMode(bool value, {String? pin}) {
+  Future<void> setChildMode(bool value, {String? pin, BuildContext? context}) async {
     _save(() {
       settings.childMode = value;
       if (pin != null && pin.isNotEmpty) {
@@ -108,6 +109,10 @@ class SettingsController {
       }
     });
     AppState.childModeNotifier.value = value;
+    AdService.updateChildMode(value);
+    if (context != null && context.mounted) {
+      await restartApp(context);
+    }
   }
   Future<void> changeLanguage(String code, BuildContext context) async {
     if (code == language) return;

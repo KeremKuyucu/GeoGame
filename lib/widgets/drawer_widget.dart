@@ -188,22 +188,22 @@ class DrawerWidget extends StatelessWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Material(
         color: iconColor.withValues(alpha: 0.05),
-      ),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        leading: Icon(icon, color: iconColor, size: 28),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          leading: Icon(icon, color: iconColor, size: 28),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          ),
+          trailing: const Icon(Icons.chevron_right_rounded,
+              size: 20, color: Colors.grey),
+          onTap: onTap,
         ),
-        trailing: const Icon(Icons.chevron_right_rounded,
-            size: 20, color: Colors.grey),
-        onTap: onTap,
       ),
     );
   }

@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-/// Windows platformunda Supabase OAuth deep linking (`io.supabase.geogame://`)
+/// Windows platformunda Supabase OAuth deep linking (`com.keremkuyucu.geogame://`)
 /// protokolünün Windows Kayıt Defteri'ne (Registry) kaydedilmesini sağlar.
 class WindowsAuthService {
-  static const String customScheme = 'io.supabase.geogame';
+  static const String customScheme = 'com.keremkuyucu.geogame';
 
-  /// Windows üzerinde `io.supabase.geogame://` URI şemasını mevcut çalışan exe'ye kaydeder.
+  /// Windows üzerinde `com.keremkuyucu.geogame://` URI şemasını mevcut çalışan exe'ye kaydeder.
   /// Bu sayede Google OAuth tarayıcıdan uygulamaya başarıyla döner.
   static Future<void> registerProtocolHandler() async {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) return;

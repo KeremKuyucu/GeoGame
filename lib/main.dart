@@ -65,7 +65,6 @@ class Geogame extends StatelessWidget {
           onGenerateRoute: (settings) {
             if (settings.name != null &&
                 (settings.name!.contains('login-callback') ||
-                    settings.name!.startsWith('io.supabase.geogame') ||
                     settings.name!.startsWith('com.keremkuyucu.geogame'))) {
               return MaterialPageRoute(
                   builder: (context) => const SplashScreen());

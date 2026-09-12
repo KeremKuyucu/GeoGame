@@ -4,29 +4,46 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 import 'package:geogame/screens/settings/settings_controller.dart';
+import 'package:geogame/services/auth_service.dart';
 
 class TelemetryService {
   static const String _uidKey = 'app_unique_id';
   static const String _logApiUrl = 'https://keremkk.com.tr/api/logs';
   static const Duration _requestTimeout = Duration(seconds: 5);
 
+  /// Aktif UID'yi döndürür:
+  /// 1. Supabase'e giriş yapılmışsa doğrudan Supabase kullanıcı UID'si
+  /// 2. Giriş yapılmamışsa (misafir) SharedPreferences'taki kalıcı cihaz/misafir ID'si
+  static Future<String> getEffectiveUid([String? explicitUid]) async {
+    if (explicitUid != null && explicitUid.isNotEmpty) {
+      return explicitUid;
+    }
+
+    try {
+      final supabaseUid = AuthService.currentUserId;
+      if (supabaseUid != null && supabaseUid.isNotEmpty) {
+        return supabaseUid;
+      }
+    } catch (e) {
+      debugPrint('TelemetryService Supabase UID alınamadı: $e');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    String? localUid = prefs.getString(_uidKey);
+    if (localUid == null) {
+      localUid = const Uuid().v4();
+      await prefs.setString(_uidKey, localUid);
+    }
+    return localUid;
+  }
+
   /// Uygulama açılışında arka planda çağrılacak telemetri metodu (her açılışta gönderilir)
   static Future<void> init() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-
-      // 1. UID kontrolü ve ataması
-      String? uid = prefs.getString(_uidKey);
-      if (uid == null) {
-        uid = const Uuid().v4();
-        await prefs.setString(_uidKey, uid);
-      }
-
-      // 2. Telemetri açık mı kontrolü
       final isTelemetryEnabled = SettingsController.settings.telemetryEnabled;
       if (!isTelemetryEnabled) return;
 
-      // 3. Açılış telemetri olayını gönder
+      final uid = await getEffectiveUid();
       await sendEvent('app_opened', uid: uid);
     } catch (e) {
       debugPrint('TelemetryService init hatası: $e');
@@ -42,8 +59,7 @@ class TelemetryService {
     try {
       if (!SettingsController.settings.telemetryEnabled) return;
 
-      final prefs = await SharedPreferences.getInstance();
-      final effectiveUid = uid ?? prefs.getString(_uidKey) ?? 'unknown';
+      final effectiveUid = await getEffectiveUid(uid);
 
       final String platform = kIsWeb
           ? 'web'

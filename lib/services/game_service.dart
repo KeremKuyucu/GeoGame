@@ -411,7 +411,7 @@ class GameService {
 }
 
 // ============================================================================
-// HELPER EXTENSIONS (CLEAN CODE)
+// HELPER EXTENSIONS 
 // ============================================================================
 
 extension ListRandomExtension<T> on List<T> {
@@ -429,7 +429,3 @@ extension ListRandomExtension<T> on List<T> {
     return temp.take(count).toList();
   }
 }
-
-// ============================================================================
-// MODELS (Moved to bottom for single-file structure)
-// ============================================================================

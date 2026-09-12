@@ -118,42 +118,46 @@ class LeaderboardUserCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)
         ],
       ),
-      child: ListTile(
-        onTap: () => controller.navigateToProfile(context, user),
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '${index + 1}',
-              style: TextStyle(
-                fontWeight: FontWeight.w900,
-                color: Colors.grey.shade400,
-                fontSize: 16,
+      child: Material(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(15),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          onTap: () => controller.navigateToProfile(context, user),
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${index + 1}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  color: Colors.grey.shade400,
+                  fontSize: 16,
+                ),
               ),
-            ),
-            const SizedBox(width: 15),
-            CircleAvatar(backgroundImage: NetworkImage(user['avatar_url'])),
-          ],
+              const SizedBox(width: 15),
+              CircleAvatar(backgroundImage: NetworkImage(user['avatar_url'])),
+            ],
+          ),
+          title: Text(user['name'],
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Row(
+            children: [
+              const Icon(Icons.star, size: 14, color: Colors.amber),
+              const SizedBox(width: 4),
+              Text(
+                '${user['total_score']} ${Localization.t('leaderboard.score')}',
+                style: const TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
+          trailing: const Icon(Icons.chevron_right_rounded),
         ),
-        title: Text(user['name'],
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Row(
-          children: [
-            const Icon(Icons.star, size: 14, color: Colors.amber),
-            const SizedBox(width: 4),
-            Text(
-              '${user['total_score']} ${Localization.t('leaderboard.score')}',
-              style: const TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
-        trailing: const Icon(Icons.chevron_right_rounded),
       ),
     );
   }

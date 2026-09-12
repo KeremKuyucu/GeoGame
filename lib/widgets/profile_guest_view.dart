@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/screens/profiles/profiles_controller.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 
 /// Guest view widget'ı
 class ProfilesGuestView extends StatelessWidget {
@@ -23,7 +24,7 @@ class ProfilesGuestView extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      drawer: const DrawerWidget(),
+      drawer: SettingsController.isChildMode ? null : const DrawerWidget(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

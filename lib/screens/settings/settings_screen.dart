@@ -178,48 +178,23 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
+                onTap: () async {
+                  if (_controller.isTelemetryEnabled) {
+                    final shouldDisable =
+                        await _showTelemetryConfirmDialog(context, isDark);
+                    if (shouldDisable == true) {
+                      setState(() => _controller.setTelemetryEnabled(false));
+                    }
+                  } else {
+                    setState(() => _controller.setTelemetryEnabled(true));
+                  }
+                },
                 trailing: Switch.adaptive(
                   value: _controller.isTelemetryEnabled,
                   onChanged: (v) async {
                     if (!v) {
-                      final shouldDisable = await showDialog<bool>(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          backgroundColor:
-                              isDark ? const Color(0xFF2C2C2E) : Colors.white,
-                          title: Text(
-                            'Emin misiniz?',
-                            style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black87),
-                          ),
-                          content: Text(
-                            'Bu veri sizinle asla ilişkilendirilemez. Tek amacı uygulamanın günlük kullanım sayısını öğrenmektir.\n\nGönderilen örnek ping:\n{\n  "uid": "123e4567-e89b-12d3...",\n  "timestamp": "2026-05-25T14:30:00",\n  "app": "geogame",\n  "event": "app_opened_daily",\n  "platform": "mobile" // veya "web"\n}',
-                            style: TextStyle(
-                              color:
-                                  isDark ? Colors.grey[400] : Colors.grey[600],
-                              fontSize: 13,
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx, true),
-                              child: const Text(
-                                'Yine de Kapat',
-                                style: TextStyle(color: Colors.redAccent),
-                              ),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal,
-                                foregroundColor: Colors.white,
-                              ),
-                              onPressed: () => Navigator.pop(ctx, false),
-                              child: const Text('Açık Kalsın'),
-                            ),
-                          ],
-                        ),
-                      );
-
+                      final shouldDisable =
+                          await _showTelemetryConfirmDialog(context, isDark);
                       if (shouldDisable != true) return;
                     }
 
@@ -349,6 +324,49 @@ class _SettingsPageState extends State<SettingsPage> {
           // Versiyon bilgisi
           SettingsVersionInfo(isDark: isDark, version: _controller.appVersion),
           const SizedBox(height: 30),
+        ],
+      ),
+    );
+  Future<bool?> _showTelemetryConfirmDialog(
+      BuildContext context, bool isDark) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          Localization.t('settings.telemetry_dialog_title'),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          Localization.t('settings.telemetry_dialog_message'),
+          style: TextStyle(
+            color: isDark ? Colors.grey[300] : Colors.grey[700],
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              Localization.t('settings.telemetry_cancel'),
+              style: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(Localization.t('settings.telemetry_disable')),
+          ),
         ],
       ),
     );
@@ -488,7 +506,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     final pin = pinController.text.trim();
                     final confirm = confirmPinController.text.trim();
 
@@ -508,13 +526,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
 
                     Navigator.pop(dialogContext);
-                    _controller.setChildMode(true, pin: pin);
-                    _controller.showSnackBar(
-                      context,
-                      Localization.t('settings.child_mode_enabled_msg'),
-                      Colors.green,
-                    );
-                    setState(() {});
+                    await _controller.setChildMode(true, pin: pin, context: context);
                   },
                   child: Text(Localization.t('common.confirm')),
                 ),
@@ -628,19 +640,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       final enteredPin = pinController.text.trim();
                       final savedPin = SettingsController.childModePin;
 
                       if (enteredPin == savedPin) {
                         Navigator.pop(dialogContext);
-                        _controller.setChildMode(false);
-                        _controller.showSnackBar(
-                          context,
-                          Localization.t('settings.child_mode_disabled_msg'),
-                          Colors.green,
-                        );
-                        setState(() {});
+                        await _controller.setChildMode(false, context: context);
                       } else {
                         setDialogState(() {
                           errorMessage =

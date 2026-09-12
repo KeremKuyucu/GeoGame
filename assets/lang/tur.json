@@ -195,8 +195,11 @@
     "multiple_choice_mode": "Çoktan Seçmeli Mod",
     "continent_title": "Kıta Seçenekleri",
     "un_members": "BM Üyeliği Olmayan Ülkeler",
-    "no_continent_active": "Hiçbir kıta aktif değil.",
-    "use_anonymous_data": "Anonim Kullanım Verisi (Ping) Gönder",
+    "use_anonymous_data": "Kullanım Verilerini Paylaş",
+    "telemetry_dialog_title": "Kullanım Verilerini Kapat",
+    "telemetry_dialog_message": "Bu ayarı kapattığınızda, hata teşhisleri ve geliştirme istatistikleri geliştiriciye iletilmez. Yine de kapatmak istiyor musunuz?",
+    "telemetry_disable": "Kapat",
+    "telemetry_cancel": "Vazgeç",
     "continents": {
       "south_america": "Güney Amerika Kıtasında Olan Ülkeler",
       "north_america": "Kuzey Amerika Kıtasında Olan Ülkeler",

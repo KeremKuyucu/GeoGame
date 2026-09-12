@@ -53,7 +53,7 @@ Filename: "{app}\geogame.exe"; Description: "GeoGame'i Başlat"; Flags: nowait p
 ; ===============================
 
 [Registry]
-Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame"; ValueType: string; ValueName: ""; ValueData: "URL:GeoGame Protocol"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
-Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\geogame.exe,0"
-Root: HKCU; Subkey: "Software\Classes\io.supabase.geogame\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\geogame.exe"" ""%1"""
+Root: HKCU; Subkey: "Software\Classes\com.keremkuyucu.geogame"; ValueType: string; ValueName: ""; ValueData: "URL:GeoGame Protocol"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\com.keremkuyucu.geogame"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\com.keremkuyucu.geogame\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\geogame.exe,0"
+Root: HKCU; Subkey: "Software\Classes\com.keremkuyucu.geogame\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\geogame.exe"" ""%1"""

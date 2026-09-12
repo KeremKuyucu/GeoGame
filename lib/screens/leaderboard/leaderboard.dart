@@ -68,7 +68,8 @@ class _LeaderboardState extends State<Leaderboard> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  Localization.t('settings.child_mode_leaderboard_disabled_title'),
+                  Localization.t(
+                      'settings.child_mode_leaderboard_disabled_title'),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -77,7 +78,8 @@ class _LeaderboardState extends State<Leaderboard> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  Localization.t('settings.child_mode_leaderboard_disabled_desc'),
+                  Localization.t(
+                      'settings.child_mode_leaderboard_disabled_desc'),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -112,7 +114,7 @@ class _LeaderboardState extends State<Leaderboard> {
           ),
         ],
       ),
-      drawer: SettingsController.isChildMode ? null : const DrawerWidget(),
+      drawer: const DrawerWidget(),
       body: _controller.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
