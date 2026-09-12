@@ -327,6 +327,8 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
+  }
+
   Future<bool?> _showTelemetryConfirmDialog(
       BuildContext context, bool isDark) {
     return showDialog<bool>(

@@ -16,10 +16,17 @@
   * **Game Scaffolds Protected:** Side drawer (`DrawerWidget`) is now conditionally hidden in `GameScaffold` across all active game sessions when Child Mode is enabled.
   * **Component Refactoring:** Renamed `profiles_widgets.dart` to `profile_guest_view.dart` for clear architectural responsibility, and applied drawer suppression to guest profiles.
 
+* **Platform Standardization & Modern Android Support:**
+  * **Unified OAuth Deep Linking:** Standardized the protocol scheme to `com.keremkuyucu.geogame` across Android Manifest, Windows Registry, C++ Runner, and Inno Setup installer.
+  * **Predictive Back Navigation:** Enabled `android:enableOnBackInvokedCallback` on Android for smoother system back gestures.
+  * **Enhanced Telemetry & Localization:** Linked user telemetry to effective Supabase IDs (with persistent device fallback for guests) and fully localized the telemetry confirmation dialog.
+  * **Micro-UI Polish:** Enforced Material clipping on drawer items and leaderboard cards for cleaner ripple animations.
+
 ### 🧹 Code Cleanups & Improvements
 
 * Removed obsolete, unused profile update methods (`updatePassword`, `updateEmail`, `updateProfileMetadata`) from `AuthService`.
-* Verified all 74 unit tests and resolved static analysis warnings across all platforms.
+* Purged unused legacy services (`AuthUiService`, `NameFilterService`).
+* Expanded test suite: Verified all **99 unit tests** and resolved static analysis warnings across all platforms.
 
 ---
 
@@ -41,7 +48,14 @@
   * **Oyun İçi Çekmece Koruması:** `GameScaffold` bileşeni güncellenerek Çocuk Modu aktifken oyun içi yan menü (Drawer) erişimi devre dışı bırakıldı.
   * **Bileşen Sadeleştirmesi:** Yanıltıcı isimlendirmeye sahip `profiles_widgets.dart` dosyası amaca uygun olarak `profile_guest_view.dart` şeklinde yeniden adlandırıldı ve yan menü ebeveyn kilidine uyarlandı.
 
+* **Platform Standardizasyonu ve Modern Android Desteği:**
+  * **Birleşik OAuth Deep Link:** Kimlik doğrulama protokol şeması Android Manifest, Windows Registry, C++ Runner ve Inno Setup üzerinde `com.keremkuyucu.geogame` olarak eşitlendi.
+  * **Tahmini Geri Jestleri:** Android'de daha akıcı sistem geri geçişleri için `android:enableOnBackInvokedCallback` etkinleştirildi.
+  * **Gelişmiş Telemetri ve Yerelleştirme:** Telemetri verisi Supabase kullanıcı kimlikleriyle (misafirler için kalıcı cihaz kimliğiyle) ilişkilendirildi; telemetri onay iletişim penceresi Türkçe ve İngilizce dil desteğine kavuşturuldu.
+  * **Arayüz Dokunma İyileştirmeleri:** Çekmece ve sıralama kartlarındaki dokunma/dalgalanma (ripple) efektleri yuvarlatılmış köşelere uyumlu hale getirildi.
+
 ### 🧹 Kod Temizliği ve İyileştirmeler
 
 * `AuthService` içindeki kullanılmayan eski profil güncelleme metodları (`updatePassword`, `updateEmail`, `updateProfileMetadata`) temizlendi.
-* 74 birim testinin tamamı başarıyla doğrulandı ve statik analiz uyarıları giderildi.
+* Atıl kalan eski servisler (`AuthUiService`, `NameFilterService`) projeden kaldırıldı.
+* Test kapsamı genişletildi: **99 birim testinin tamamı** başarıyla doğrulandı ve statik analiz uyarıları sıfırlandı.
