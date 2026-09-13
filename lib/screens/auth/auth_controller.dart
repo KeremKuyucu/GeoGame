@@ -16,12 +16,8 @@ class AuthController {
   }
 
   void navigateToHome(BuildContext context) {
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    } else {
-      AppState.selectedIndex = 0;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-    }
+    AppState.selectedIndex = 0;
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
   void showSnackBar(BuildContext context, String message, Color color) {

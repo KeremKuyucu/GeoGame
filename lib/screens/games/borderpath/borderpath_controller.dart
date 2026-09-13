@@ -138,7 +138,11 @@ class BorderPathGameController {
   }
 
   void completeGame() {
-    GameService.completeBorderPathGame(movesCount, optimalPathLength);
+    GameService.completeBorderPathGame(
+      movesCount,
+      optimalPathLength,
+      targetCountry: targetCountry,
+    );
   }
 
   int getScore() {

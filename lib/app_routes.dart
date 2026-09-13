@@ -34,9 +34,5 @@ class AppRoutes {
     '/settings': (context) => const SettingsPage(),
 
     '/auth': (context) => const AuthPage(),
-
-    // Deep link callbacks
-    '/login-callback': (context) => const SplashScreen(),
-    'login-callback': (context) => const SplashScreen(),
   };
 }

@@ -98,6 +98,8 @@ class GameButtonModeUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = SettingsController.settings.darkTheme;
+
     return Column(
       children: [
         Row(
@@ -122,10 +124,13 @@ class GameButtonModeUI extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           Localization.t('game_common.options_hint'),
-          style: const TextStyle(
-            color: Colors.white70,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black87,
             fontSize: 12,
-            shadows: [Shadow(blurRadius: 2, color: Colors.black45)],
+            shadows: isDark
+                ? const [Shadow(blurRadius: 2, color: Colors.black45)]
+                : null,
           ),
         ),
       ],

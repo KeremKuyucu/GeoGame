@@ -12,21 +12,19 @@ import 'package:geogame/services/ad_service.dart';
 
 import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/widgets/restart_widget.dart';
+import 'package:geogame/models/app_context.dart';
 
-import 'package:geogame/services/windows_auth_service.dart';
 import 'package:geogame/env.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  WindowsAuthService.registerProtocolHandler();
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
-  AuthService.initAuthStateListener();
   await PreferencesService.loadConfig();
+  await Localization.init();
   TelemetryService.init();
   AdService.initialize();
-
-  await Localization.init();
+  AuthService.initAuthStateListener();
 
   runApp(
     const RestartWidget(
@@ -43,6 +41,7 @@ class Geogame extends StatelessWidget {
     return ThemeModeBuilder(
       builder: (BuildContext context, ThemeMode themeMode) {
         return MaterialApp(
+          scaffoldMessengerKey: AppState.scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           title: 'GeoGame',
           themeMode: themeMode,
@@ -66,8 +65,14 @@ class Geogame extends StatelessWidget {
             if (settings.name != null &&
                 (settings.name!.contains('login-callback') ||
                     settings.name!.startsWith('com.keremkuyucu.geogame'))) {
-              return MaterialPageRoute(
-                  builder: (context) => const SplashScreen());
+              if (AppState.allCountries.isEmpty) {
+                return MaterialPageRoute(
+                    builder: (context) => const SplashScreen());
+              }
+              return PageRouteBuilder(
+                pageBuilder: (context, _, __) => const SizedBox.shrink(),
+                transitionDuration: Duration.zero,
+              );
             }
             return null;
           },

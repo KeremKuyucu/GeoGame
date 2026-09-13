@@ -58,7 +58,7 @@ class SettingsController {
       return '';
     }
   }
-  String get appVersion => AppState.version;
+
   bool get europeEnabled => gameFilter.europe;
   bool get asiaEnabled => gameFilter.asia;
   bool get africaEnabled => gameFilter.africa;
@@ -101,7 +101,8 @@ class SettingsController {
   void setTelemetryEnabled(bool value) =>
       _save(() => settings.telemetryEnabled = value);
 
-  Future<void> setChildMode(bool value, {String? pin, BuildContext? context}) async {
+  Future<void> setChildMode(bool value,
+      {String? pin, BuildContext? context}) async {
     _save(() {
       settings.childMode = value;
       if (pin != null && pin.isNotEmpty) {
@@ -114,6 +115,7 @@ class SettingsController {
       await restartApp(context);
     }
   }
+
   Future<void> changeLanguage(String code, BuildContext context) async {
     if (code == language) return;
     settings.language = code;
@@ -162,8 +164,8 @@ class AppSettings {
   set childModePin(String? value) => _childModePin = value ?? '';
 
   AppSettings({
-    this.darkTheme = true,
-    this.language = 'eng',
+    this.darkTheme = false,
+    this.language = '',
     this.telemetryEnabled = true,
     bool childMode = false,
     String childModePin = '',
@@ -171,10 +173,8 @@ class AppSettings {
         _childModePin = childModePin;
 
   factory AppSettings.fromMap(Map<String, dynamic> map) => AppSettings(
-        darkTheme: map['darkTheme'] ?? true,
-        language: map['language']?.toString().isNotEmpty == true
-            ? map['language']
-            : 'eng',
+        darkTheme: map['darkTheme'] ?? false,
+        language: map['language']?.toString() ?? '',
         telemetryEnabled: map['telemetryEnabled'] ?? true,
         childMode: map['childMode'] == true,
         childModePin: map['childModePin']?.toString() ?? '',

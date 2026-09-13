@@ -237,8 +237,8 @@ void main() {
     test('varsayılan değerler doğru olmalı', () {
       final settings = AppSettings();
 
-      expect(settings.darkTheme, true);
-      expect(settings.language, 'eng');
+      expect(settings.darkTheme, false);
+      expect(settings.language, '');
       expect(settings.childMode, false);
       expect(settings.childModePin, '');
     });
@@ -262,9 +262,9 @@ void main() {
       final settings2 = AppSettings.fromMap({'language': null});
       final settings3 = AppSettings.fromMap({});
 
-      expect(settings1.language, 'eng');
-      expect(settings2.language, 'eng');
-      expect(settings3.language, 'eng');
+      expect(settings1.language, '');
+      expect(settings2.language, '');
+      expect(settings3.language, '');
     });
   });
 

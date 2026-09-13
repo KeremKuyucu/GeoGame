@@ -22,14 +22,14 @@ class AdService {
   // Yayında gerçek ID'ler ile değiştirilmeli
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-4674396016131447/1324822353'; // Android test banner
+      return 'ca-app-pub-4674396016131447/1324822353';
     }
     return '';
   }
 
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-4674396016131447/3683287187'; // Android test interstitial
+      return 'ca-app-pub-4674396016131447/3683287187';
     }
     return '';
   }

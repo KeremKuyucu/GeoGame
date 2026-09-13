@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
 import 'package:geogame/models/app_context.dart';
@@ -129,6 +129,10 @@ class GameService {
         .checkAnswer(answer.trim(), SettingsController.settings.language);
 
     if (isCorrect) {
+      final countryName = AppState.targetCountry
+          .getLocalizedName(SettingsController.settings.language);
+      showCorrectSnackBar(countryName);
+
       GameLogService.submitCorrect();
       // await ekleyerek log işleminin bitmesini garantiye alıyoruz
       await GameLogService.saveProgress(AppState.getGameModeKey(type));
@@ -193,6 +197,10 @@ class GameService {
     final isCorrect = guessedCountry.iso3 == target.iso3;
 
     if (isCorrect) {
+      final countryName =
+          target.getLocalizedName(SettingsController.settings.language);
+      showCorrectSnackBar(countryName);
+
       GameLogService.submitCorrect();
       await startNewRound();
       await GameLogService.saveProgress('distance');
@@ -287,7 +295,15 @@ class GameService {
   }
 
   static Future<void> completeBorderPathGame(
-      int moves, int optimalMoves) async {
+      int moves, int optimalMoves,
+      {Country? targetCountry}) async {
+    final country = targetCountry ?? AppState.targetCountry;
+    final countryName =
+        country.getLocalizedName(SettingsController.settings.language);
+    if (countryName.isNotEmpty) {
+      showCorrectSnackBar(countryName);
+    }
+
     GameLogService.submitCorrect();
 
     final penalty = math.max(0, moves - optimalMoves);
@@ -296,6 +312,46 @@ class GameService {
     }
 
     await GameLogService.saveProgress('borderpath');
+  }
+
+  /// Doğru cevap verildiğinde alttan yeşil bildirim (SnackBar) gösterir.
+  static void showCorrectSnackBar(String countryName) {
+    final messenger = AppState.scaffoldMessengerKey.currentState;
+    if (messenger == null) return;
+
+    final message = countryName.isNotEmpty
+        ? Localization.t('game_common.correct_msg', args: [countryName])
+        : Localization.t('game_common.congratulations');
+
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF4CAF50),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   // --------------------------------------------------------------------------

@@ -4,7 +4,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/services/localization_service.dart';
 
 /// Profiles için veri ve iş mantığı controller'ı
 class ProfilesController {
@@ -18,11 +17,7 @@ class ProfilesController {
   bool get isAuthenticated => AuthService.isAuthenticated;
 
   /// Kullanıcı adı
-  String get userName {
-    return AppState.user.name.isNotEmpty
-        ? AppState.user.name
-        : Localization.t('settings.guest');
-  }
+  String get userName => AppState.user.name;
 
   /// Kullanıcı avatar URL'si
   String get userAvatar => AppState.user.avatarUrl;
@@ -44,8 +39,6 @@ class ProfilesController {
       isLoading = false;
       return;
     }
-
-    await AuthService.checkSession();
 
     isLoading = true;
     errorMessage = null;

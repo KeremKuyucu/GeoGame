@@ -19,7 +19,7 @@ class _AuthPageState extends State<AuthPage>
     with SingleTickerProviderStateMixin {
   final AuthController _controller = AuthController();
   StreamSubscription<AuthState>? _authSub;
-  bool _isHandlingAuth = false;
+  bool _isLoading = false;
   bool _hasNavigated = false;
 
   late AnimationController _animController;
@@ -42,25 +42,20 @@ class _AuthPageState extends State<AuthPage>
       CurvedAnimation(parent: _animController, curve: Curves.easeOutQuart),
     );
 
-    // Harici OAuth deep link dönüşlerini dinle
-    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+    // initAuthStateListener zaten syncUserData'yı hallediyor.
+    // Bu dinleyici YALNIZCA yönlendirme yapar.
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedIn && mounted && !_hasNavigated) {
-        final user = data.session?.user;
-        if (user != null) {
-          _hasNavigated = true;
-          await AuthService.syncUserData(user);
-          if (!mounted) return;
-
-          _controller.showSnackBar(
-            context,
-            Localization.t('auth.google_login_success'),
-            Colors.greenAccent,
-          );
-          widget.onLoginSuccess?.call();
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (!mounted) return;
-          _controller.navigateToHome(context);
-        }
+        _hasNavigated = true;
+        _controller.showSnackBar(
+          context,
+          Localization.t('auth.google_login_success'),
+          Colors.greenAccent,
+        );
+        widget.onLoginSuccess?.call();
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) _controller.navigateToHome(context);
+        });
       }
     });
 
@@ -75,41 +70,24 @@ class _AuthPageState extends State<AuthPage>
   }
 
   Future<void> _handleGoogleLogin() async {
-    if (_isHandlingAuth || _hasNavigated) return;
-    _isHandlingAuth = true;
-    setState(() => _controller.isGoogleLoading = true);
+    if (_isLoading || _hasNavigated) return;
+    setState(() => _isLoading = true);
 
     try {
-      final result = await _controller.handleGoogleLogin();
-
+      final error = await AuthService.signInWithGoogle();
       if (!mounted) return;
-      setState(() => _controller.isGoogleLoading = false);
 
-      if (result.isSuccess) {
-        if (AuthService.isAuthenticated) {
-          if (!_hasNavigated) {
-            _hasNavigated = true;
-            _controller.showSnackBar(context, result.message, Colors.greenAccent);
-            widget.onLoginSuccess?.call();
-            await Future.delayed(const Duration(milliseconds: 300));
-            if (!mounted) return;
-            _controller.navigateToHome(context);
-          }
-        } else {
-          // Harici OAuth tarayıcı akışı başlatıldı, deep link bekleniyor
-          _isHandlingAuth = false;
-        }
-      } else {
-        _isHandlingAuth = false;
-        if (result.message != Localization.t('auth.error_google_cancelled')) {
-          _controller.showSnackBar(context, result.message, Colors.redAccent);
+      if (error != null) {
+        // Kullanıcı tarayıcıyı kapattı ya da iptal etti
+        setState(() => _isLoading = false);
+        if (error != Localization.t('auth.error_google_cancelled')) {
+          _controller.showSnackBar(context, error, Colors.redAccent);
         }
       }
+      // Başarılıysa: Supabase signedIn eventi _authSub'ı tetikleyecek,
+      // yönlendirme ve bildirim oradan gelecek. Buton yüklenmeye devam eder.
     } catch (_) {
-      if (mounted) {
-        setState(() => _controller.isGoogleLoading = false);
-        _isHandlingAuth = false;
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -208,7 +186,7 @@ class _AuthPageState extends State<AuthPage>
                           ),
                           const SizedBox(height: 24),
                           AuthGoogleButton(
-                            isLoading: _controller.isGoogleLoading,
+                            isLoading: _isLoading,
                             onPressed: _handleGoogleLogin,
                           ),
                         ],

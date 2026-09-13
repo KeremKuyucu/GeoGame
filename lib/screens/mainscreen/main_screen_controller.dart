@@ -3,7 +3,6 @@ import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/services/update_checker_service.dart';
 import 'package:geogame/widgets/game_intro_screen.dart';
 
 /// MainScreen için controller sınıfı
@@ -12,11 +11,6 @@ class MainScreenController {
   final BuildContext context;
 
   MainScreenController(this.context);
-
-  /// Uygulama başlangıcında güncelleme kontrolü yapar
-  void checkForUpdates() {
-    UpdateService.check(context);
-  }
 
   /// Oyun başlatma işlemi
   /// Önce intro ekranını gösterir, ardından oyun sayfasına yönlendirir

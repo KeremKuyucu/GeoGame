@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import 'package:geogame/widgets/feedback_dialog.dart';
-
 import 'package:geogame/services/localization_service.dart';
-
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -74,25 +70,17 @@ class DrawerWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 15),
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'GeoGame',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 26,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.2,
-                ),
-              ),
-              Text(
-                Localization.t('drawer.version_text', args: [AppState.version]),
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
                 ),
               )
             ],

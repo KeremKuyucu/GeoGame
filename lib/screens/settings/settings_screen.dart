@@ -35,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isDark = _controller.isDarkTheme;
     final Color backgroundColor =
         isDark ? const Color(0xFF000000) : const Color(0xFFF2F2F7);
 
@@ -147,13 +147,13 @@ class _SettingsPageState extends State<SettingsPage> {
               SettingsDivider(isDark: isDark),
               SettingsTile(
                 title: Localization.t('settings.selected_theme',
-                    args: [_controller.isDarkTheme ? 'Dark' : 'Light']),
+                    args: [isDark ? 'Dark' : 'Light']),
                 icon:
                     isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
                 iconColor: isDark ? Colors.amber : Colors.orange,
                 isDark: isDark,
                 isSwitch: true,
-                switchValue: _controller.isDarkTheme,
+                switchValue: isDark,
                 onSwitchChanged: (v) =>
                     setState(() => _controller.setDarkTheme(v)),
               ),
@@ -319,18 +319,12 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
-          const SizedBox(height: 40),
-
-          // Versiyon bilgisi
-          SettingsVersionInfo(isDark: isDark, version: _controller.appVersion),
-          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  Future<bool?> _showTelemetryConfirmDialog(
-      BuildContext context, bool isDark) {
+  Future<bool?> _showTelemetryConfirmDialog(BuildContext context, bool isDark) {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -528,7 +522,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     }
 
                     Navigator.pop(dialogContext);
-                    await _controller.setChildMode(true, pin: pin, context: context);
+                    await _controller.setChildMode(true,
+                        pin: pin, context: context);
                   },
                   child: Text(Localization.t('common.confirm')),
                 ),

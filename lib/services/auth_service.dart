@@ -52,14 +52,6 @@ class AuthService {
       if (profileData != null) {
         name = profileData['full_name']?.toString().trim() ?? '';
         avatar = profileData['avatar_url']?.toString().trim() ?? '';
-
-        if (name.isEmpty) {
-          name = Localization.t('settings.guest');
-        }
-
-        if (avatar.isEmpty) {
-          avatar = 'https://robohash.org/${authUser.id}';
-        }
       }
 
       // 3. Profil yoksa Supabase user metadata'dan oluştur
@@ -103,9 +95,11 @@ class AuthService {
       final AuthChangeEvent event = data.event;
       final Session? session = data.session;
       debugPrint('🔔 Supabase Auth State Changed: $event');
+      // Yalnızca ilk oturum açma ve yeni oturumda senkronize et.
+      // tokenRefreshed / userUpdated kasıtlı olarak hariç tutuldu:
+      // bunlar periyodik olarak tetiklenerek gereksiz Supabase sorgusu ve
+      // UI rebuild döngüsüne yol açıyor.
       if (event == AuthChangeEvent.signedIn ||
-          event == AuthChangeEvent.userUpdated ||
-          event == AuthChangeEvent.tokenRefreshed ||
           event == AuthChangeEvent.initialSession) {
         if (session?.user != null) {
           await syncUserData(session!.user);

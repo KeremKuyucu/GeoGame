@@ -1,12 +1,14 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
 
 class AppState extends ChangeNotifier {
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   static int selectedIndex = 0;
-  static String version = '';
   static final ValueNotifier<bool> childModeNotifier =
       ValueNotifier<bool>(false);
 
@@ -40,13 +42,13 @@ class UserProfile {
 
   factory UserProfile.anonymous() => UserProfile(
         name: Localization.t('settings.guest'),
-        avatarUrl: 'https://robohash.org/',
+        avatarUrl: 'https://robohash.org/naber',
       );
 
   Map<String, dynamic> toMap() => {'name': name, 'avatarUrl': avatarUrl};
 
   factory UserProfile.fromMap(Map<String, dynamic> map) => UserProfile(
         name: map['name'] ?? Localization.t('settings.guest'),
-        avatarUrl: map['avatarUrl'] ?? 'https://robohash.org/',
+        avatarUrl: map['avatarUrl'] ?? 'https://robohash.org/naber',
       );
 }

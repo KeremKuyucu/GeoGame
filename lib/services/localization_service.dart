@@ -1,21 +1,26 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 class Localization {
   static const Map<String, String> languages = {
     'eng': 'English',
     'tur': 'Türkçe',
+    'deu': 'Deutsch',
+    'spa': 'Español',
+    'fra': 'Français',
+    'por': 'Português',
+    'rus': 'Русский',
     /* Eklenebilecek diller:
     'fin': 'Suomi',
     'jpn': '日本語',
     'ara': 'العربية',
     'bre': 'Brezhoneg',
     'ces': 'Čeština',
-    'deu': 'Deutsch',
     'est': 'Eesti',
-    'fra': 'Français',
     'hrv': 'Hrvatski',
     'hun': 'Magyar',
     'ita': 'Italiano',
@@ -23,10 +28,7 @@ class Localization {
     'nld': 'Nederlands',
     'per': 'فارسی',
     'pol': 'Polski',
-    'por': 'Português',
-    'rus': 'Русский',
     'slk': 'Slovenčina',
-    'spa': 'Español',
     'srp': 'Srpski',
     'swe': 'Svenska',
     'urd': 'اردو',
@@ -34,15 +36,56 @@ class Localization {
      */
   };
 
+  static const Map<String, String> _iso2ToIso3 = {
+    'en': 'eng',
+    'tr': 'tur',
+    'fi': 'fin',
+    'ja': 'jpn',
+    'ar': 'ara',
+    'br': 'bre',
+    'cs': 'ces',
+    'de': 'deu',
+    'et': 'est',
+    'fr': 'fra',
+    'hr': 'hrv',
+    'hu': 'hun',
+    'it': 'ita',
+    'ko': 'kor',
+    'nl': 'nld',
+    'fa': 'per',
+    'pl': 'pol',
+    'pt': 'por',
+    'ru': 'rus',
+    'sk': 'slk',
+    'es': 'spa',
+    'sr': 'srp',
+    'sv': 'swe',
+    'ur': 'urd',
+    'zh': 'zho',
+  };
+
   static Map<String, dynamic>? _localizedStrings;
-  static String _currentLanguage = 'eng';
+  static String _currentLanguage = '';
   static List<String> get supportedLanguages => languages.keys.toList();
   static String get currentLanguage => _currentLanguage;
-  static String get currentLanguageName =>
-      languages[_currentLanguage] ?? 'English';
 
+  static String getDisplayName(String iso3Code) =>
+      languages[iso3Code] ?? iso3Code;
+        
   static Future<void> init() async {
-    await changeLanguage(SettingsController.settings.language);
+    String language = SettingsController.settings.language;
+
+    if (language.isEmpty) {
+      final systemLanguage = PlatformDispatcher.instance.locale.languageCode;
+
+      language = _iso2ToIso3[systemLanguage] ?? 'eng';
+
+      SettingsController.settings.language = language;
+
+      await PreferencesService.saveConfig();
+    }
+
+    await changeLanguage(language);
   }
 
   /// Çalışma anında dil değiştirme
@@ -99,7 +142,4 @@ class Localization {
 
     return text.replaceAll('\\n', '\n');
   }
-
-  static String getDisplayName(String iso3Code) =>
-      languages[iso3Code] ?? iso3Code;
 }

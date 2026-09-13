@@ -308,42 +308,6 @@ class SettingsDivider extends StatelessWidget {
   }
 }
 
-/// Versiyon bilgisi
-class SettingsVersionInfo extends StatelessWidget {
-  final bool isDark;
-  final String version;
-
-  const SettingsVersionInfo({
-    super.key,
-    required this.isDark,
-    required this.version,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Text(
-            'GeoGame',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.grey[600] : Colors.grey[400],
-            ),
-          ),
-          Text(
-            'v$version',
-            style: TextStyle(
-              color: isDark ? Colors.grey[700] : Colors.grey[400],
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Dil seçici widget'ı
 class SettingsLanguageTile extends StatelessWidget {
   final SettingsController controller;
@@ -381,7 +345,7 @@ class SettingsLanguageTile extends StatelessWidget {
         ),
       ),
       trailing: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 120),
+        constraints: const BoxConstraints(maxWidth: 130),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(

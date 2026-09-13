@@ -1,7 +1,7 @@
 name: geogame
 description: "A location guessing game based on maps, available on both mobile, PC and web"
 publish_to: none
-version: 1.6.6+9
+version: 1.6.7+10
 environment:
   sdk: '>=3.4.3 <4.0.0'
 
@@ -11,7 +11,6 @@ dependencies:
   theme_mode_builder: ^2.0.0
   salomon_bottom_bar: ^3.3.2
   http: ^1.5.0
-  package_info_plus: ^10.1.0
   supabase_flutter: ^2.12.4
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2
