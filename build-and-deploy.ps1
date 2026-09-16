@@ -53,6 +53,10 @@ try {
     $pfxPath            = Join-Path $imzaDir "KeremKuyucu.pfx"
     $pfxPropertiesPath  = Join-Path $imzaDir "pfx.properties"
 
+    # Google Play Console / API
+    $playPackageName   = "com.keremkuyucu.geogame"
+    $playUploadScript  = Join-Path $projectRoot "scripts\upload_play_store.py"
+
     # Inno installer ciktisindaki dosya adi ipucu (OutputBaseFilename ile eslessin)
     $installerNameHint = "GeoGame"
     $timestampServers  = @(
@@ -158,6 +162,50 @@ try {
             Remove-Job -Id $stdoutEvent.Id -Force -ErrorAction SilentlyContinue
             Remove-Job -Id $stderrEvent.Id -Force -ErrorAction SilentlyContinue
             $proc.Dispose()
+        }
+    }
+
+    function Invoke-AgyReleaseNotes ([string]$ver) {
+        <#
+        .SYNOPSIS
+            Antigravity CLI (agy) kullanarak git degisikliklerinden surum notlarini otomatik olusturur.
+        #>
+        $agyCmd = Get-Command "agy" -ErrorAction SilentlyContinue
+        if (-not $agyCmd) {
+            Write-Warn "Antigravity CLI ('agy') sistemde bulunamadi. Surum notlari otomatik olusturulamadi."
+            return $false
+        }
+
+        Write-Step "Antigravity CLI (agy) ile Surum Notlari Olusturuluyor (v$ver)..."
+        Write-Info "Son commit loglari ve degisiklikler inceleniyor..."
+
+        $agyPrompt = "GeoGame projesinin v$ver surumu icin surum notlarini olustur. " +
+            "1. Git commit loglarini ve son degisiklikleri incele. " +
+            "2. RELEASE_TEMPLATE.md sablonuna birebir uyarak 'RELEASE_$ver.md' dosyasini olustur. " +
+            "3. RELEASE_TEMPLATE_PLAYSTORE.md sablonuna birebir uyarak (her dil icin max 500 karakter, <locale> etiketleri ile) 'RELEASE_PLAY_STORE_$ver.md' dosyasini olustur. " +
+            "Dosyalari dogrudan proje kok dizininde olustur."
+
+        try {
+            $exitCode = Run-Exe -FilePath "agy" -ArgumentList @(
+                "-p", $agyPrompt,
+                "--add-dir", $projectRoot,
+                "--dangerously-skip-permissions"
+            ) -WorkingDirectory $projectRoot -AllowNonZero
+
+            $ghNotes   = Join-Path $projectRoot "RELEASE_$ver.md"
+            $playNotes = Join-Path $projectRoot "RELEASE_PLAY_STORE_$ver.md"
+
+            if (Test-Path $ghNotes) {
+                Write-Ok "GitHub surum notu hazir: RELEASE_$ver.md"
+            }
+            if (Test-Path $playNotes) {
+                Write-Ok "Play Store surum notu hazir: RELEASE_PLAY_STORE_$ver.md"
+            }
+            return ($exitCode -eq 0)
+        }
+        catch {
+            Write-Warn "Antigravity CLI calistirilirken hata olustu: $($_.Exception.Message)"
+            return $false
         }
     }
 
@@ -468,7 +516,27 @@ try {
         Write-Ok "Web deploy tamamlandi (Vercel production)."
     }
 
-    # -- 7) GitHub Release (Opsiyonel) ---------------------------------------------
+    # -- 7) Surum Notlari (Antigravity CLI) -----------------------------------------
+    $ghNotesFile   = Join-Path $projectRoot "RELEASE_$currentVersion.md"
+    $playNotesFile = Join-Path $projectRoot "RELEASE_PLAY_STORE_$currentVersion.md"
+    $notesMissing  = (-not (Test-Path $ghNotesFile)) -or (-not (Test-Path $playNotesFile))
+
+    Write-Host ""
+    Write-Host "-- Surum Notlari (Antigravity CLI) --" -ForegroundColor Cyan
+    if ($notesMissing) {
+        $genNotes = Read-Host "   Surum notlari eksik. Antigravity CLI (agy) ile otomatik olusturulsun mu? (E/h)"
+        if ($genNotes -notmatch '^[Hh]$') {
+            [void](Invoke-AgyReleaseNotes -ver $currentVersion)
+        }
+    }
+    else {
+        $regenNotes = Read-Host "   Surum notlari mevcut. Antigravity CLI (agy) ile yeniden olusturulsun mu? (e/H)"
+        if ($regenNotes -match '^[Ee]$') {
+            [void](Invoke-AgyReleaseNotes -ver $currentVersion)
+        }
+    }
+
+    # -- 8) GitHub Release (Opsiyonel) ---------------------------------------------
     Write-Host ""
     Write-Host "-- GitHub Release --" -ForegroundColor Cyan
     $createRelease = Read-Host "   GitHub Release olusturulsun mu? (e/H)"
@@ -542,6 +610,123 @@ try {
             }
             finally {
                 Pop-Location
+            }
+        }
+    }
+
+    # -- 9) Google Play Console Deploy (AAB - Opsiyonel) ---------------------------
+    if ($selectedNames -contains "AAB") {
+        Write-Host ""
+        Write-Host "-- Google Play Console (AAB) --" -ForegroundColor Cyan
+        $uploadToPlay = Read-Host "   AAB Google Play Console'a yuklensin mi? (e/H)"
+
+        if ($uploadToPlay -match '^[Ee]$') {
+            $swPlay = [System.Diagnostics.Stopwatch]::StartNew()
+            try {
+                # 1. AAB dosyasini bul
+                $aabFile = Get-ChildItem -Path $distPath -Filter "*.aab" -ErrorAction SilentlyContinue |
+                    Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+                if (-not $aabFile) {
+                    throw "Yuklenecek AAB dosyasi cikti klasorunde bulunamadi: $distPath"
+                }
+
+                # 2. Service Account JSON bul
+                $serviceAccountFile = $null
+                $saCandidates = @(Get-ChildItem -Path $imzaDir -Filter "*.json" -ErrorAction SilentlyContinue)
+
+                if ($saCandidates.Count -eq 1) {
+                    $serviceAccountFile = $saCandidates[0].FullName
+                    Write-Info "Service Account bulundu: $($saCandidates[0].Name)"
+                }
+                elseif ($saCandidates.Count -gt 1) {
+                    $match = $saCandidates | Where-Object { $_.Name -match "(play|service|account|google|api)" } | Select-Object -First 1
+                    if ($match) {
+                        $serviceAccountFile = $match.FullName
+                        Write-Info "Service Account secildi: $($match.Name)"
+                    }
+                    else {
+                        $serviceAccountFile = $saCandidates[0].FullName
+                        Write-Info "Service Account secildi: $($saCandidates[0].Name)"
+                    }
+                }
+
+                if ([string]::IsNullOrWhiteSpace($serviceAccountFile) -or -not (Test-Path $serviceAccountFile)) {
+                    Write-Warn "Service Account JSON dosyasi '$imzaDir' klasorunde bulunamadi."
+                    $userInputSa = Read-Host "   Lutfen Service Account JSON tam dosya yolunu girin (veya iptal icin Enter)"
+                    if ([string]::IsNullOrWhiteSpace($userInputSa) -or -not (Test-Path $userInputSa.Trim())) {
+                        throw "Gecerli bir Service Account JSON dosyasi olmadan Play Store yuklemesi yapilamaz."
+                    }
+                    $serviceAccountFile = $userInputSa.Trim()
+                }
+
+                # 3. Yayin Kanali (Track)
+                Write-Host "`n   Yayin Kanali Secin:" -ForegroundColor DarkGray
+                Write-Host "     [1] internal   - Dahili Test (Onerilen / Guvenli)" -ForegroundColor DarkGray
+                Write-Host "     [2] alpha      - Kapali Test" -ForegroundColor DarkGray
+                Write-Host "     [3] beta       - Acik Test" -ForegroundColor DarkGray
+                Write-Host "     [4] production - Uretim (Canli)" -ForegroundColor DarkGray
+                $trackInput = Read-Host "   Kanal (1-4, Varsayilan: 1)"
+                $selectedTrack = switch ($trackInput.Trim()) {
+                    "2" { "alpha" }
+                    "3" { "beta" }
+                    "4" { "production" }
+                    default { "internal" }
+                }
+
+                # 4. Yayin Durumu (Status)
+                Write-Host "`n   Yayin Durumu Secin:" -ForegroundColor DarkGray
+                Write-Host "     [1] completed  - Dogrudan yayina al (%100 rollout)" -ForegroundColor DarkGray
+                Write-Host "     [2] draft      - Taslak olarak yukle (Play Console'dan incelemek icin)" -ForegroundColor DarkGray
+                $statusInput = Read-Host "   Durum (1-2, Varsayilan: 1)"
+                $selectedStatus = switch ($statusInput.Trim()) {
+                    "2" { "draft" }
+                    default { "completed" }
+                }
+
+                # 5. Play Store Surum Notu
+                $playNotesFile = Join-Path $projectRoot "RELEASE_PLAY_STORE_$currentVersion.md"
+
+                Write-Step "AAB Google Play Console'a Yukleniyor ($selectedTrack / $selectedStatus)..."
+                Write-Info "Paket: $playPackageName"
+                Write-Info "Dosya: $($aabFile.Name)"
+                Write-Info "Kimlik: $(Split-Path $serviceAccountFile -Leaf)"
+
+                $pyArgs = @(
+                    $playUploadScript,
+                    "--aab", $aabFile.FullName,
+                    "--service-account", $serviceAccountFile,
+                    "--package-name", $playPackageName,
+                    "--track", $selectedTrack,
+                    "--status", $selectedStatus
+                )
+
+                if (Test-Path $playNotesFile) {
+                    $pyArgs += @("--release-notes", $playNotesFile)
+                    Write-Info "Surum notlari eklendi: $(Split-Path $playNotesFile -Leaf)"
+                }
+                else {
+                    Write-Warn "Play Store surum notu dosyasi bulunamadi: RELEASE_PLAY_STORE_$currentVersion.md"
+                }
+
+                Run-Exe -FilePath "python" -ArgumentList $pyArgs -WorkingDirectory $projectRoot
+
+                $swPlay.Stop()
+                $buildResults["PlayStore"] = [pscustomobject]@{
+                    Elapsed = $swPlay.Elapsed
+                    Success = $true
+                    Error   = $null
+                }
+                Write-Ok "Google Play Console yuklemesi tamamlandi - $(Format-Elapsed $swPlay.Elapsed)"
+            }
+            catch {
+                $swPlay.Stop()
+                $buildResults["PlayStore"] = [pscustomobject]@{
+                    Elapsed = $swPlay.Elapsed
+                    Success = $false
+                    Error   = $_.Exception.Message
+                }
+                Write-Err "Google Play Console yuklemesi basarisiz: $($_.Exception.Message)"
             }
         }
     }

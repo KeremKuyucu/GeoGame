@@ -1,4 +1,4 @@
-# 📱 Play Store Release Notes Template
+**# 📱 Play Store Release Notes Template**
 
 Bu dosya, Google Play Console'a girilecek **What's new / Sürüm notları** metnini hazırlamak için kullanılır.
 
@@ -7,6 +7,9 @@ Dosya adı:
 `RELEASE_PLAY_STORE_X.X.X.md`
 
 Her dil, Google Play'in locale etiketiyle `<locale>` ve `</locale>` etiketleri arasında yazılmalıdır.
+
+**Her dil için maksimum 500 Unicode karakter kullanılmalıdır.**
+Bu sınır yalnızca `<locale>` etiketleri arasındaki sürüm notu metni için geçerlidir.
 
 Desteklenen diller:
 
@@ -21,29 +24,29 @@ Desteklenen diller:
 ---
 
 <en-US>
-[English release notes]
+[English release notes — max. 500 characters]
 </en-US>
 
 <tr-TR>
-[Türkçe sürüm notları]
+[Türkçe sürüm notları — max. 500 karakter]
 </tr-TR>
 
 <de-DE>
-[Deutsche Versionshinweise]
+[Deutsche Versionshinweise — max. 500 Zeichen]
 </de-DE>
 
 <fr-FR>
-[Notes de version en français]
+[Notes de version en français — 500 caractères maximum]
 </fr-FR>
 
 <pt-PT>
-[Notas de versão em português]
+[Notas de versão em português — máximo de 500 caracteres]
 </pt-PT>
 
 <ru-RU>
-[Примечания к выпуску на русском языке]
+[Примечания к выпуску — максимум 500 символов]
 </ru-RU>
 
 <es-ES>
-[Notas de la versión en español]
+[Notas de la versión — máximo 500 caracteres]
 </es-ES>
