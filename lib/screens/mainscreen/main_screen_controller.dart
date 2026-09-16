@@ -15,7 +15,10 @@ class MainScreenController {
   /// Oyun başlatma işlemi
   /// Önce intro ekranını gösterir, ardından oyun sayfasına yönlendirir
   void startGame(GameMetadata metadata) {
-    if (SettingsController.filteredCountries.length < 4) {
+    final available = SettingsController.filteredCountries;
+    if (available.length < 4) {
+      debugPrint(
+          '⚠️ [MainScreenController] Yetersiz ülke sayısı (${available.length} < 4). Uyarı gösteriliyor.');
       showNoContinentWarning();
       return;
     }
@@ -70,7 +73,7 @@ class MainScreenController {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                Localization.t('settings.no_continent_active'),
+                Localization.t('settings.no_continents_active'),
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),

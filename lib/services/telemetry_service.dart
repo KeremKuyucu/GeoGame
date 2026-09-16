@@ -69,7 +69,7 @@ class TelemetryService {
 
       final bodyData = {
         'uid': effectiveUid,
-        'timestamp': DateTime.now().toIso8601String(),
+        'timestamp': DateTime.now().toUtc().toIso8601String(),
         'app': 'geogame',
         'event': eventName,
         'platform': platform,
@@ -85,9 +85,11 @@ class TelemetryService {
           .timeout(_requestTimeout);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('✅ Telemetri başarıyla gönderildi: $eventName ($effectiveUid)');
+        debugPrint(
+            '✅ Telemetri başarıyla gönderildi: $eventName ($effectiveUid)');
       } else {
-        debugPrint('⚠️ Telemetri gönderilemedi. Status: ${response.statusCode}');
+        debugPrint(
+            '⚠️ Telemetri gönderilemedi. Status: ${response.statusCode}');
       }
     } catch (e) {
       // İnternet yoksa, sunucuya ulaşılamazsa veya zaman aşımında sessizce devam et

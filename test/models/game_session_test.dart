@@ -60,18 +60,19 @@ void main() {
     });
 
     test('submitCorrect sonrası soru puanı sıfırlanmalı (startScore)', () {
-      session.submitWrong(); // 50 -> 40
+      session.submitWrong(); // 50 -> 40 (penalty=10)
       session.submitCorrect(); // 40 puan kazanılır, sıfırlanır
 
       expect(session.totalScore, 40);
       expect(session.currentQuestionScore, 50); // Sıfırlandı
     });
 
+
     // =========================================================================
     // YANLIŞ CEVAP
     // =========================================================================
 
-    test('submitWrong soru puanını 10 düşürmeli', () {
+    test('submitWrong soru puanını %20 düşürmeli (start=50 → penalty=10)', () {
       session.submitWrong();
 
       expect(session.wrongCount, 1);
@@ -79,16 +80,17 @@ void main() {
     });
 
     test('submitWrong minimum puanın altına düşmemeli', () {
-      // 50 -> 40 -> 30 -> 20 -> 20 -> 20
+      // start=50, penalty=10: 50->40->30->20->20->20
       session.submitWrong();
       session.submitWrong();
       session.submitWrong();
-      session.submitWrong(); // Zaten 20, daha fazla düşmemeli
+      session.submitWrong(); // Zaten 20 (minScore), daha fazla düşmemeli
       session.submitWrong();
 
       expect(session.currentQuestionScore, 20); // minScore
       expect(session.wrongCount, 5);
     });
+
 
     test('submitWrong toplam skoru etkilememeli', () {
       session.submitWrong();
@@ -115,7 +117,7 @@ void main() {
     // =========================================================================
 
     test('karma senaryo: doğru + yanlış + pas', () {
-      // Soru 1: 2 yanlış + doğru
+      // Soru 1: 2 yanlış (penalty=10) + doğru
       session.submitWrong(); // 50 -> 40
       session.submitWrong(); // 40 -> 30
       session.submitCorrect(); // +30 puan
@@ -132,27 +134,83 @@ void main() {
       expect(session.passCount, 1);
     });
 
+
     // =========================================================================
-    // DISTANCE GAME SKORU
+    // DISTANCE GAME SKORU & MAX WRONG PENALTY
     // =========================================================================
 
-    test('distance oyunu başlangıç skoru 300 olmalı', () {
-      session.reset(startScore: 300, minScore: 100);
+    test('distance oyunu başlangıç skoru 300 ve ceza tavanı 20 olmalı', () {
+      session.reset(startScore: 300, minScore: 100, maxWrongPenalty: 20);
 
       expect(session.currentQuestionScore, 300);
 
-      session.submitWrong(); // 300 -> 290
-      expect(session.currentQuestionScore, 290);
+      // Normalde %20 = 60 puan ceza olurdu, ancak maxWrongPenalty=20 ile tavan 20 olmalı
+      session.submitWrong(); // 300 -> 280
+      expect(session.currentQuestionScore, 280);
+
+      session.submitWrong(); // 280 -> 260
+      expect(session.currentQuestionScore, 260);
     });
 
-    test('distance oyunu minimum skoru 100 olmalı', () {
-      session.reset(startScore: 300, minScore: 100);
+    test('distance oyunu minimum skoru 100 olmalı (20 ceza ile)', () {
+      session.reset(startScore: 300, minScore: 100, maxWrongPenalty: 20);
 
-      for (int i = 0; i < 25; i++) {
+      // penalty=20, (300 - 100) / 20 = 10 yanlışta 100'e iner
+      for (int i = 0; i < 12; i++) {
         session.submitWrong();
       }
 
-      expect(session.currentQuestionScore, 100); // Minimum
+      expect(session.currentQuestionScore, 100); // Minimum 100
+      expect(session.wrongCount, 12);
+    });
+
+    test('maxWrongPenalty belirtilmediğinde orantılı (%20) ceza uygulanmalı', () {
+      session.reset(startScore: 300, minScore: 100);
+
+      // %20 = 60 ceza
+      session.submitWrong();
+      expect(session.currentQuestionScore, 240);
+    });
+
+    test('orantılı ceza maxWrongPenalty\'den küçükse orantılı ceza uygulanmalı', () {
+      session.reset(startScore: 80, minScore: 20, maxWrongPenalty: 20);
+
+      // (80 * 0.2) = 16 < 20, ceza 16 olmalı
+      session.submitWrong();
+      expect(session.currentQuestionScore, 64); // 80 - 16
+    });
+
+    // =========================================================================
+    // SORU BAZLI TAKİP & QUESTION LOGS
+    // =========================================================================
+
+    test('soru bazlı yanlış sayısı ve puan doğru takip edilmeli', () {
+      session.reset(startScore: 50, minScore: 20);
+      expect(session.currentQuestionWrongCount, 0);
+
+      // 1. Soru: 2 yanlış + doğru
+      session.submitWrong();
+      session.submitWrong();
+      expect(session.currentQuestionWrongCount, 2);
+      expect(session.wrongCount, 2);
+
+      session.submitCorrect();
+      expect(session.lastQuestionScoreEarned, 30); // 50 - 10 - 10
+      expect(session.lastQuestionWrongCount, 2);
+      expect(session.totalScore, 30);
+
+      // 2. Soru: startNewQuestion sonrası soru sayacı sıfırlanmalı
+      session.startNewQuestion();
+      expect(session.currentQuestionWrongCount, 0);
+      expect(session.currentQuestionScore, 50);
+
+      session.submitWrong();
+      expect(session.currentQuestionWrongCount, 1);
+      expect(session.wrongCount, 3); // Seans toplamı: 2 + 1 = 3
+
+      session.submitPass();
+      expect(session.lastQuestionScoreEarned, 0);
+      expect(session.lastQuestionWrongCount, 1);
     });
   });
 
@@ -343,6 +401,7 @@ void main() {
       expect(session.wrongCount, 0);
       expect(session.currentQuestionScore, 50);
 
+      // penalty = (50 * 0.2).round() = 10
       session.submitWrong();
       expect(session.wrongCount, 1);
       expect(session.currentQuestionScore, 40);
@@ -353,6 +412,7 @@ void main() {
     });
 
     test('currentQuestionScore minScore altına inemez', () {
+      // 50->40->30->20 (minScore)
       session.submitWrong(); // 40
       session.submitWrong(); // 30
       session.submitWrong(); // 20 (minScore)
@@ -363,6 +423,7 @@ void main() {
       expect(session.wrongCount, 4);
     });
   });
+
 
   // ===========================================================================
   // APP SETTINGS — GENİŞLETİLMİŞ

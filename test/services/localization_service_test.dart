@@ -182,7 +182,7 @@ const Set<String> kUsedKeys = {
   'settings.child_mode_wrong_pin',
   'settings.child_mode_leaderboard_disabled_title',
   'settings.child_mode_leaderboard_disabled_desc',
-  'settings.no_continent_active',
+  'settings.no_continents_active',
 
   // profile (dinamik: profile.$prefix — tüm alt alanlar potential olarak kullanılır)
   'profile.title',

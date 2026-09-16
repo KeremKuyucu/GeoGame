@@ -10,6 +10,7 @@ import 'package:geogame/models/game/border_path_data.dart';
 import 'package:geogame/models/game_metadata.dart';
 
 import 'package:geogame/services/game_log_service.dart';
+import 'package:geogame/services/achievement_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
@@ -20,6 +21,7 @@ import 'package:geogame/screens/settings/settings_controller.dart';
 class GameService {
   static final math.Random _random = math.Random();
   static List<GameButton> _buttons = [];
+  static final List<String> _distanceGuesses = [];
 
   static GameButton buttonAt(int index) => _buttons[index];
   static int get buttonCount => _buttons.length;
@@ -37,10 +39,17 @@ class GameService {
   // --------------------------------------------------------------------------
 
   static Future<void> initializeGame(GameType type) async {
-    final scores = _getInitialScores(type);
+    final multiplier = _poolMultiplier();
+    final scores = getInitialScores(type, multiplier);
+    debugPrint(
+        '🎯 Havuz çarpanı: ${multiplier.toStringAsFixed(2)}x '
+        '(${AppState.activePool.length}/${AppState.allCountries.length} ülke) '
+        '→ start=${scores['start']}, min=${scores['min']}, maxPenalty=${scores['maxPenalty']}');
+
     GameLogService.resetSession(
       startScore: scores['start']!,
       minScore: scores['min']!,
+      maxWrongPenalty: scores['maxPenalty'],
     );
 
     // Cache'i temizle veya güncelle (Eğer ülke listesi değişmişse diye)
@@ -51,14 +60,39 @@ class GameService {
     }
   }
 
-  static Map<String, int> _getInitialScores(GameType type) {
+  /// Seçilen ülke havuzunun büyüklüğüne göre bir puan çarpanı döner.
+  ///
+  /// Formül: multiplier = (ratio × 0.7 + 0.3).clamp(0.3, 1.0)
+  /// - Tüm dünya seçili (195/195) → 1.0x (tam puan)
+  /// - Yarı havuz (97/195)        → ~0.65x
+  /// - Çok küçük havuz (10/195)   → ~0.34x
+  /// - Minimum sınır              → 0.3x
+  static double _poolMultiplier() {
+    final total = AppState.allCountries.length;
+    final pool  = AppState.activePool.length;
+    if (total == 0) return 1.0;
+    final ratio = pool / total;
+    return (ratio * 0.7 + 0.3).clamp(0.3, 1.0);
+  }
+
+  static Map<String, int> getInitialScores(GameType type, double multiplier) {
     switch (type) {
       case GameType.distance:
-        return {'start': 300, 'min': 100};
+        return {
+          'start': (300 * multiplier).round().clamp(60, 300),
+          'min':   (100 * multiplier).round().clamp(20, 100),
+          'maxPenalty': 20,
+        };
       case GameType.borderpath:
-        return {'start': 100, 'min': 40};
-      default:
-        return {'start': 50, 'min': 20};
+        return {
+          'start': (100 * multiplier).round().clamp(20, 100),
+          'min':   (40  * multiplier).round().clamp(8,  40),
+        };
+      default: // capital, flag, borderline, findmap
+        return {
+          'start': (50  * multiplier).round().clamp(10, 50),
+          'min':   (20  * multiplier).round().clamp(4,  20),
+        };
     }
   }
 
@@ -85,6 +119,8 @@ class GameService {
     // Seçenekleri oluştur ve karıştır
     final options = [AppState.targetCountry, ...distractors]..shuffle(_random);
     _buttons = GameButton.createButtons(options);
+
+    GameLogService.startNewQuestion();
   }
 
   /// Optimize edilmiş çeldirici algoritması
@@ -133,9 +169,23 @@ class GameService {
           .getLocalizedName(SettingsController.settings.language);
       showCorrectSnackBar(countryName);
 
+      final scoreEarned = GameLogService.currentQuestionScore;
+      final wrongCount = GameLogService.currentQuestionWrongCount;
+      final startTime = GameLogService.currentQuestionStartTime;
+      final options = _buttons.map((b) => b.country.iso3).toList();
+      final correctAnswer = AppState.targetCountry.iso3;
+
       GameLogService.submitCorrect();
-      // await ekleyerek log işleminin bitmesini garantiye alıyoruz
-      await GameLogService.saveProgress(AppState.getGameModeKey(type));
+      await GameLogService.logQuestion(
+        gameType: AppState.getGameModeKey(type),
+        correctAnswer: correctAnswer,
+        options: options,
+        wrongCount: wrongCount,
+        scoreEarned: scoreEarned,
+        questionStartTime: startTime,
+      );
+      // TODO: Başarım kontrolü henüz aktif değil.
+      // AchievementService.checkAchievements();
       await startNewRound();
       return true;
     } else {
@@ -154,6 +204,7 @@ class GameService {
   }
 
   static Future<String> handlePass() async {
+    _distanceGuesses.clear();
     GameLogService.submitPass();
     final passCountryName = AppState.targetCountry
         .getLocalizedName(SettingsController.settings.language);
@@ -176,6 +227,7 @@ class GameService {
     }
 
     AppState.tempCountry = guessedCountry;
+    _distanceGuesses.add(guessedCountry.iso3);
 
     final target = AppState.targetCountry;
 
@@ -201,9 +253,25 @@ class GameService {
           target.getLocalizedName(SettingsController.settings.language);
       showCorrectSnackBar(countryName);
 
+      final scoreEarned = GameLogService.currentQuestionScore;
+      final wrongCount = GameLogService.currentQuestionWrongCount;
+      final startTime = GameLogService.currentQuestionStartTime;
+      final correctAnswer = target.iso3;
+      final options = List<String>.from(_distanceGuesses);
+      _distanceGuesses.clear();
+
       GameLogService.submitCorrect();
+      await GameLogService.logQuestion(
+        gameType: 'distance',
+        correctAnswer: correctAnswer,
+        options: options,
+        wrongCount: wrongCount,
+        scoreEarned: scoreEarned,
+        questionStartTime: startTime,
+      );
+      // TODO: Başarım kontrolü henüz aktif değil.
+      // AchievementService.checkAchievements();
       await startNewRound();
-      await GameLogService.saveProgress('distance');
     } else {
       GameLogService.submitWrong();
     }
@@ -296,7 +364,7 @@ class GameService {
 
   static Future<void> completeBorderPathGame(
       int moves, int optimalMoves,
-      {Country? targetCountry}) async {
+      {Country? targetCountry, Country? startCountry}) async {
     final country = targetCountry ?? AppState.targetCountry;
     final countryName =
         country.getLocalizedName(SettingsController.settings.language);
@@ -304,14 +372,29 @@ class GameService {
       showCorrectSnackBar(countryName);
     }
 
-    GameLogService.submitCorrect();
+    final scoreEarned = calculateBorderPathScore(moves, optimalMoves);
+    final wrongCount = math.max(0, moves - optimalMoves);
+    final startTime = GameLogService.currentQuestionStartTime;
+    final correctAnswer = country.iso3;
+    final options = startCountry != null
+        ? [startCountry.iso3, country.iso3]
+        : [country.iso3];
 
-    final penalty = math.max(0, moves - optimalMoves);
-    if (penalty > 0) {
-      GameLogService.addWrongAnswers(penalty);
+    GameLogService.submitCorrect();
+    if (wrongCount > 0) {
+      GameLogService.addWrongAnswers(wrongCount);
     }
 
-    await GameLogService.saveProgress('borderpath');
+    await GameLogService.logQuestion(
+      gameType: 'borderpath',
+      correctAnswer: correctAnswer,
+      options: options,
+      wrongCount: wrongCount,
+      scoreEarned: scoreEarned,
+      questionStartTime: startTime,
+    );
+    // TODO: Başarım kontrolü henüz aktif değil.
+    // AchievementService.checkAchievements();
   }
 
   /// Doğru cevap verildiğinde alttan yeşil bildirim (SnackBar) gösterir.
@@ -394,9 +477,14 @@ class GameService {
   }
 
   /// Border Path skoru hesaplar.
-  static int calculateBorderPathScore(int moves, int optimalMoves) {
+  ///
+  /// Havuz çarpanı uygulanır: küçük havuzda tam skor bile düşük kalır.
+  static int calculateBorderPathScore(int moves, int optimalMoves,
+      {double? multiplier}) {
+    final m = multiplier ?? _poolMultiplier();
     final int wrongCount = (moves - optimalMoves).clamp(0, 1000);
-    return (100 - wrongCount * 10).clamp(20, 100);
+    final rawScore = (100 - wrongCount * 10).clamp(20, 100);
+    return (rawScore * m).round().clamp((20 * m).round(), 100);
   }
 
   /// Border Path performans metnini döner.

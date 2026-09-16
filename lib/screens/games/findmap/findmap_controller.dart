@@ -8,6 +8,7 @@ import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/game_log_service.dart';
+import 'package:geogame/services/achievement_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 class FindMapGameController {
@@ -122,6 +123,8 @@ class FindMapGameController {
     } else {
       targetCountry = possibleTargets[Random().nextInt(possibleTargets.length)];
     }
+
+    GameLogService.startNewQuestion();
   }
 
   Matrix4 mapMatrix = Matrix4.identity();
@@ -217,10 +220,27 @@ class FindMapGameController {
   }
 
   Future<void> handleCorrectAnswer({bool hintUsed = false}) async {
-    if (!hintUsed) {
-      GameLogService.submitCorrect();
+    final target = targetCountry;
+    if (target != null) {
+      final scoreEarned = hintUsed ? 0 : GameLogService.currentQuestionScore;
+      final wrongCount = GameLogService.currentQuestionWrongCount;
+      final startTime = GameLogService.currentQuestionStartTime;
+
+      if (!hintUsed) {
+        GameLogService.submitCorrect();
+      }
+
+      await GameLogService.logQuestion(
+        gameType: 'findmap',
+        correctAnswer: target.iso3,
+        options: [target.iso3],
+        wrongCount: wrongCount,
+        scoreEarned: scoreEarned,
+        questionStartTime: startTime,
+      );
+      // TODO: Başarım kontrolü henüz aktif değil.
+      // AchievementService.checkAchievements();
     }
-    await GameLogService.saveProgress('findmap');
     startNewRound();
   }
 

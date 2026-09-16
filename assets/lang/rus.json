@@ -164,6 +164,7 @@
     "general_title": "Основные настройки",
     "selected_theme": "Выбранная тема: {0}",
     "lang": "Выбранный язык: ",
+    "no_continents_active": "Выбрано недостаточно стран",
     "multiple_choice_mode": "Режим выбора варианта",
     "continent_title": "Параметры континентов",
     "un_members": "Страны без членства в ООН",

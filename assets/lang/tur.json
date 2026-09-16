@@ -164,6 +164,7 @@
     "general_title": "Genel Ayarlar",
     "selected_theme": "Seçilen Tema: {0}",
     "lang": "Seçilen Dil: ",
+    "no_continents_active": "Yeterli Ülke Seçilmedi",
     "multiple_choice_mode": "Çoktan Seçmeli Mod",
     "continent_title": "Kıta Seçenekleri",
     "un_members": "BM Üyeliği Olmayan Ülkeler",

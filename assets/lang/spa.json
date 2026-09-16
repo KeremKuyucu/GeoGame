@@ -164,6 +164,7 @@
     "general_title": "Ajustes generales",
     "selected_theme": "Tema seleccionado: {0}",
     "lang": "Idioma seleccionado: ",
+    "no_continents_active": "No hay suficientes países seleccionados",
     "multiple_choice_mode": "Modo opción múltiple",
     "continent_title": "Opciones de continentes",
     "un_members": "Países sin membresía en la ONU",

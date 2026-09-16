@@ -38,52 +38,24 @@ class AuthService {
 
   static Future<void> syncUserData(User authUser) async {
     try {
-      // 1. Önce profiles tablosuna bak
       final profileData = await _supabase
           .from('profiles')
           .select('full_name, avatar_url')
           .eq('uid', authUser.id)
           .maybeSingle();
 
-      String name;
-      String avatar;
+      final String name = profileData?['full_name']?.toString().trim() ??
+          Localization.t('settings.guest');
 
-      // 2. Profil zaten varsa SADECE profiles kullan
-      if (profileData != null) {
-        name = profileData['full_name']?.toString().trim() ?? '';
-        avatar = profileData['avatar_url']?.toString().trim() ?? '';
-      }
+      final String avatar = profileData?['avatar_url']?.toString().trim() ??
+          'https://robohash.org/${authUser.id}';
 
-      // 3. Profil yoksa Supabase user metadata'dan oluştur
-      else {
-        final metadata = authUser.userMetadata ?? {};
-
-        name = metadata['full_name']?.toString().trim() ??
-            metadata['name']?.toString().trim() ??
-            authUser.email?.split('@').first ??
-            Localization.t('settings.guest');
-
-        avatar = metadata['avatar_url']?.toString().trim() ??
-            metadata['picture']?.toString().trim() ??
-            'https://robohash.org/${authUser.id}';
-
-        // 4. İlk giriş → profiles'a kaydet
-        await _supabase.from('profiles').insert({
-          'uid': authUser.id,
-          'full_name': name,
-          'avatar_url': avatar,
-        });
-      }
-
-      // 5. Uygulamadaki kullanıcıyı güncelle
       AppState.user = UserProfile(
         name: name,
         avatarUrl: avatar,
       );
 
-      debugPrint(
-        '✅ User synced: $name, Avatar: $avatar',
-      );
+      debugPrint('✅ User synced: $name, Avatar: $avatar');
     } catch (e) {
       debugPrint('❌ Profile sync error: $e');
     }

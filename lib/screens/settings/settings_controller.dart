@@ -22,9 +22,10 @@ class SettingsController {
             !f.europe &&
             !f.oceania &&
             !f.antarctic)) {
+      debugPrint('🌍 [SettingsController] Hiçbir kıta seçili değil veya ülke listesi boş (0 ülke).');
       return [];
     }
-    return AppState.allCountries.where((c) {
+    final countries = AppState.allCountries.where((c) {
       if (!f.includeNonUN && !c.isUNMember) return false;
       return (f.europe && c.continents.contains('Europe')) ||
           (f.asia && c.continents.contains('Asia')) ||
@@ -32,8 +33,11 @@ class SettingsController {
           (f.oceania && c.continents.contains('Oceania')) ||
           (f.northAmerica && c.continents.contains('North America')) ||
           (f.southAmerica && c.continents.contains('South America')) ||
-          (f.antarctic && c.continents.contains('Antarctic'));
+          (f.antarctic &&
+              (c.continents.contains('Antarctica') ||
+                  c.continents.contains('Antarctic')));
     }).toList();
+    return countries;
   }
 
   bool get isAuthenticated => AuthService.isAuthenticated;

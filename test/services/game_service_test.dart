@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
@@ -68,26 +69,27 @@ void main() {
 
   group('GameService.calculateBorderPathScore', () {
     test('optimal hamle = oyuncu hamlesi → 100 puan', () {
-      expect(GameService.calculateBorderPathScore(3, 3), 100);
+      expect(GameService.calculateBorderPathScore(3, 3, multiplier: 1.0), 100);
     });
 
     test('1 fazla hamle → 90 puan', () {
-      expect(GameService.calculateBorderPathScore(4, 3), 90);
+      expect(GameService.calculateBorderPathScore(4, 3, multiplier: 1.0), 90);
     });
 
     test('2 fazla hamle → 80 puan', () {
-      expect(GameService.calculateBorderPathScore(5, 3), 80);
+      expect(GameService.calculateBorderPathScore(5, 3, multiplier: 1.0), 80);
     });
 
     test('çok fazla hamle → minimum 20 puan', () {
-      expect(GameService.calculateBorderPathScore(20, 3), 20);
+      expect(GameService.calculateBorderPathScore(20, 3, multiplier: 1.0), 20);
     });
 
     test('minimum skor 20 altına düşmemeli', () {
-      final score = GameService.calculateBorderPathScore(100, 3);
+      final score = GameService.calculateBorderPathScore(100, 3, multiplier: 1.0);
       expect(score, greaterThanOrEqualTo(20));
     });
   });
+
 
   // ===========================================================================
   // BORDER PATH PERFORMANS METNİ
@@ -347,6 +349,39 @@ void main() {
       expect(result.length, 5); // Taiwan dahil
       expect(result.any((c) => c.iso3 == 'TWN'), true);
     });
+
+    test('sadece Antarktika ve nonUN açıkken Antarktika ülkeleri dönmeli', () {
+      AppState.allCountries.add(Country(
+        iso3: 'ATA',
+        iso2: 'AQ',
+        englishName: 'Antarctica',
+        translations: {},
+        flagEmoji: '',
+        flagUrl: '',
+        capital: '',
+        continents: ['Antarctica'],
+        isUNMember: false,
+        latitude: -90,
+        longitude: 0,
+        borders: [],
+        area: 14000000,
+      ));
+
+      SettingsController.gameFilter = GameFilter(
+        europe: false,
+        asia: false,
+        africa: false,
+        northAmerica: false,
+        southAmerica: false,
+        oceania: false,
+        antarctic: true,
+        includeNonUN: true,
+      );
+
+      final result = SettingsController.filteredCountries;
+      expect(result.length, 1);
+      expect(result.first.iso3, 'ATA');
+    });
   });
 
   // ===========================================================================
@@ -355,22 +390,29 @@ void main() {
 
   group('GameService.calculateBorderPathScore (edge cases)', () {
     test('moves < optimal → yine 100 dönmeli (negatif penalty yok)', () {
-      // Bu durum normalde olmamalı ama defensive coding
-      expect(GameService.calculateBorderPathScore(2, 3), 100);
+      expect(
+          GameService.calculateBorderPathScore(2, 5, multiplier: 1.0), 100);
     });
 
     test('moves == 0, optimal == 0 → 100 dönmeli', () {
-      expect(GameService.calculateBorderPathScore(0, 0), 100);
+      expect(
+          GameService.calculateBorderPathScore(0, 0, multiplier: 1.0), 100);
     });
 
     test('1 hamle farkla skor tam 90 olmalı', () {
-      expect(GameService.calculateBorderPathScore(5, 4), 90);
+      expect(
+          GameService.calculateBorderPathScore(4, 3, multiplier: 1.0), 90);
     });
 
     test('8 fazla hamle → minimum 20 puan', () {
-      expect(GameService.calculateBorderPathScore(11, 3), 20);
+      final score =
+          GameService.calculateBorderPathScore(11, 3, multiplier: 1.0);
+      expect(score, equals(20));
     });
   });
+
+
+
 
   // ===========================================================================
   // PERFORMANS METNİ — SINIR DEĞERLER
@@ -433,5 +475,47 @@ void main() {
       expect(list, contains(result.first));
     });
   });
+
+  // ===========================================================================
+  // GET INITIAL SCORES (BAŞLANGIÇ PUANLARI & CEZA TAVANI)
+  // ===========================================================================
+
+  group('GameService.getInitialScores', () {
+    test('distance oyunu 1.0 çarpanında start=300, min=100, maxPenalty=20 dönmeli', () {
+      final scores = GameService.getInitialScores(GameType.distance, 1.0);
+
+      expect(scores['start'], 300);
+      expect(scores['min'], 100);
+      expect(scores['maxPenalty'], 20);
+    });
+
+    test('distance oyunu 0.5 çarpanında start=150, min=50, maxPenalty=20 dönmeli', () {
+      final scores = GameService.getInitialScores(GameType.distance, 0.5);
+
+      expect(scores['start'], 150);
+      expect(scores['min'], 50);
+      expect(scores['maxPenalty'], 20);
+    });
+
+    test('standart oyunlar (capital, flag vs.) maxPenalty içermemeli', () {
+      final capitalScores = GameService.getInitialScores(GameType.capital, 1.0);
+      expect(capitalScores['start'], 50);
+      expect(capitalScores['min'], 20);
+      expect(capitalScores.containsKey('maxPenalty'), false);
+
+      final flagScores = GameService.getInitialScores(GameType.flag, 1.0);
+      expect(flagScores['start'], 50);
+      expect(flagScores['min'], 20);
+      expect(flagScores.containsKey('maxPenalty'), false);
+    });
+
+    test('borderpath oyunu 1.0 çarpanında start=100, min=40 dönmeli', () {
+      final scores = GameService.getInitialScores(GameType.borderpath, 1.0);
+      expect(scores['start'], 100);
+      expect(scores['min'], 40);
+      expect(scores.containsKey('maxPenalty'), false);
+    });
+  });
 }
+
 
