@@ -95,8 +95,17 @@ class DrawerWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildListTile(
-          icon: Icons.bug_report_rounded,
+          icon: Icons.star_rate_rounded,
           iconColor: Colors.amber.shade700,
+          title: Localization.t('drawer.rate_play_store'),
+          onTap: () {
+            Navigator.pop(context);
+            _launchPlayStore();
+          },
+        ),
+        _buildListTile(
+          icon: Icons.bug_report_rounded,
+          iconColor: Colors.deepOrangeAccent,
           title: Localization.t('drawer.report_bug'),
           onTap: () {
             Navigator.pop(context);
@@ -118,6 +127,24 @@ class DrawerWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _launchPlayStore() async {
+    final Uri marketUri =
+        Uri.parse('market://details?id=com.keremkuyucu.geogame');
+    final Uri webUri = Uri.parse(
+        'https://play.google.com/store/apps/details?id=com.keremkuyucu.geogame');
+
+    try {
+      if (await canLaunchUrl(marketUri)) {
+        await launchUrl(marketUri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Play Store linki açılamadı: $e');
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    }
   }
 
   Future<void> _launchURL(String urlString) async {

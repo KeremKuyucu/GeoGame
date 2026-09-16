@@ -8,7 +8,7 @@ import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/game_log_service.dart';
-import 'package:geogame/services/achievement_service.dart';
+import 'package:geogame/services/haptic_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 class FindMapGameController {
@@ -220,6 +220,7 @@ class FindMapGameController {
   }
 
   Future<void> handleCorrectAnswer({bool hintUsed = false}) async {
+    HapticService.correct();
     final target = targetCountry;
     if (target != null) {
       final scoreEarned = hintUsed ? 0 : GameLogService.currentQuestionScore;
@@ -238,13 +239,12 @@ class FindMapGameController {
         scoreEarned: scoreEarned,
         questionStartTime: startTime,
       );
-      // TODO: Başarım kontrolü henüz aktif değil.
-      // AchievementService.checkAchievements();
     }
     startNewRound();
   }
 
   void handleWrongAnswer() {
+    HapticService.wrong();
     GameLogService.submitWrong();
   }
 

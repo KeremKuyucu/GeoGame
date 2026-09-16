@@ -8,7 +8,7 @@ import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/services/ad_service.dart';
+import 'package:geogame/services/haptic_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 class BorderPathGameController {
@@ -116,9 +116,11 @@ class BorderPathGameController {
     movesCount++;
 
     if (country.iso3 == targetCountry!.iso3) {
+      HapticService.correct();
       gameWon = true;
       return true;
     } else {
+      HapticService.selection();
       updateAvailableNeighbors();
       textController.clear();
       return false;
@@ -127,6 +129,7 @@ class BorderPathGameController {
 
   void undoLastMove() {
     if (currentPath.length <= 1 || gameWon) return;
+    HapticService.selection();
 
     final newPath = List<Country>.from(currentPath);
     newPath.removeLast();
@@ -188,12 +191,6 @@ class BorderPathGameController {
         Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
       ],
     );
-  }
-
-  void navigateHome(BuildContext context) {
-    AdService.showInterstitialAd();
-    GameLogService.syncPendingLogs();
-    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
   void dispose() {

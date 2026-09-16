@@ -168,7 +168,7 @@
     "multiple_choice_mode": "Modo opción múltiple",
     "continent_title": "Opciones de continentes",
     "un_members": "Países sin membresía en la ONU",
-    "use_anonymous_data": "Compartir datos de uso anónimos",
+    "use_anonymous_data": "Compartir datos de uso y diagnóstico",
     "telemetry_dialog_title": "Desactivar datos de uso",
     "telemetry_dialog_message": "Al desactivar este ajuste, no se enviarán informes de diagnóstico ni estadísticas de uso al desarrollador. ¿Seguro que deseas desactivarlo?",
     "telemetry_disable": "Desactivar",
@@ -221,6 +221,7 @@
     "load_error": "No se pudo cargar la clasificación. Comprueba tu conexión a internet."
   },
   "drawer": {
+    "rate_play_store": "Calificar en Play Store",
     "report_bug": "Informar de un error",
     "feedback_note": "Puedes enviar tus quejas o sugerencias pulsando el botón de arriba.",
     "my_website": "Mi sitio web",

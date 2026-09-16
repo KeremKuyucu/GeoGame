@@ -168,7 +168,7 @@
     "multiple_choice_mode": "Multiple Choice Mode",
     "continent_title": "Continent Options",
     "un_members": "Countries without UN Membership",
-    "use_anonymous_data": "Share Anonymous Usage Data",
+    "use_anonymous_data": "Share Usage & Diagnostic Data",
     "telemetry_dialog_title": "Disable Usage Data",
     "telemetry_dialog_message": "When this setting is disabled, diagnostic reports and usage statistics will not be sent to the developer. Are you sure you want to disable it?",
     "telemetry_disable": "Disable",
@@ -221,7 +221,8 @@
     "load_error": "Leaderboard could not be loaded. Please check your internet connection."
   },
   "drawer": {
-    "report_bug": "Report a Bug",
+    "rate_play_store": "Rate on Play Store",
+    "report_bug": "Report Bug",
     "feedback_note": "You can send your complaints or suggestions by clicking the button above.",
     "my_website": "My Website",
     "geogame_website": "GeoGame Website",

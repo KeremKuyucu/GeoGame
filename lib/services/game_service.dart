@@ -10,8 +10,8 @@ import 'package:geogame/models/game/border_path_data.dart';
 import 'package:geogame/models/game_metadata.dart';
 
 import 'package:geogame/services/game_log_service.dart';
-import 'package:geogame/services/achievement_service.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/haptic_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
 // ============================================================================
@@ -165,6 +165,7 @@ class GameService {
         .checkAnswer(answer.trim(), SettingsController.settings.language);
 
     if (isCorrect) {
+      HapticService.correct();
       final countryName = AppState.targetCountry
           .getLocalizedName(SettingsController.settings.language);
       showCorrectSnackBar(countryName);
@@ -184,11 +185,10 @@ class GameService {
         scoreEarned: scoreEarned,
         questionStartTime: startTime,
       );
-      // TODO: Başarım kontrolü henüz aktif değil.
-      // AchievementService.checkAchievements();
       await startNewRound();
       return true;
     } else {
+      HapticService.wrong();
       GameLogService.submitWrong();
       _disableButton(buttonIndex);
       return false;
@@ -204,6 +204,7 @@ class GameService {
   }
 
   static Future<String> handlePass() async {
+    HapticService.pass();
     _distanceGuesses.clear();
     GameLogService.submitPass();
     final passCountryName = AppState.targetCountry
@@ -249,6 +250,7 @@ class GameService {
     final isCorrect = guessedCountry.iso3 == target.iso3;
 
     if (isCorrect) {
+      HapticService.correct();
       final countryName =
           target.getLocalizedName(SettingsController.settings.language);
       showCorrectSnackBar(countryName);
@@ -269,10 +271,9 @@ class GameService {
         scoreEarned: scoreEarned,
         questionStartTime: startTime,
       );
-      // TODO: Başarım kontrolü henüz aktif değil.
-      // AchievementService.checkAchievements();
       await startNewRound();
     } else {
+      HapticService.wrong();
       GameLogService.submitWrong();
     }
 
@@ -393,8 +394,6 @@ class GameService {
       scoreEarned: scoreEarned,
       questionStartTime: startTime,
     );
-    // TODO: Başarım kontrolü henüz aktif değil.
-    // AchievementService.checkAchievements();
   }
 
   /// Doğru cevap verildiğinde alttan yeşil bildirim (SnackBar) gösterir.

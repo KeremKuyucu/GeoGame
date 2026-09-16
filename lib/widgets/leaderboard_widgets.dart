@@ -18,12 +18,20 @@ class LeaderboardPodium extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          LeaderboardPodiumItem(controller: controller, index: 1, height: 100),
-          LeaderboardPodiumItem(controller: controller, index: 0, height: 130),
-          LeaderboardPodiumItem(controller: controller, index: 2, height: 90),
+          Expanded(
+            child: LeaderboardPodiumItem(
+                controller: controller, index: 1, height: 100),
+          ),
+          Expanded(
+            child: LeaderboardPodiumItem(
+                controller: controller, index: 0, height: 130),
+          ),
+          Expanded(
+            child: LeaderboardPodiumItem(
+                controller: controller, index: 2, height: 90),
+          ),
         ],
       ),
     );
@@ -85,10 +93,15 @@ class LeaderboardPodiumItem extends StatelessWidget {
               ),
             ],
           ),
-          Text(
-            user['name'],
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-            overflow: TextOverflow.ellipsis,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              user['name'],
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+            ),
           ),
           Text(
             '${user['total_score']} P',

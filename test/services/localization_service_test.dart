@@ -198,6 +198,7 @@ const Set<String> kUsedKeys = {
   'leaderboard.load_error',
 
   // drawer
+  'drawer.rate_play_store',
   'drawer.report_bug',
   'drawer.feedback_note',
   'drawer.my_website',

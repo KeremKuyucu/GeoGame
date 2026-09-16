@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:theme_mode_builder/theme_mode_builder/theme_mode_builder.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,30 @@ import 'package:geogame/env.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Global hata yakalama (Flutter UI & Framework hataları)
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    TelemetryService.sendError(
+      event: 'flutter_uncaught_error',
+      message: details.exceptionAsString(),
+      stackTrace: details.stack,
+      metadata: {
+        'library': details.library,
+        if (details.context != null) 'context': details.context.toString(),
+      },
+    );
+  };
+
+  // Asenkron ve platform seviyesi yakalanmamış hatalar
+  PlatformDispatcher.instance.onError = (error, stack) {
+    TelemetryService.sendError(
+      event: 'platform_uncaught_error',
+      message: error.toString(),
+      stackTrace: stack,
+    );
+    return false;
+  };
 
   await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   await PreferencesService.loadConfig();

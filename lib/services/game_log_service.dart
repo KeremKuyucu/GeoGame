@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:geogame/services/auth_service.dart';
+import 'package:geogame/services/telemetry_service.dart';
 
 class GameLogService {
   static final _supabase = Supabase.instance.client;
@@ -73,27 +74,40 @@ class GameLogService {
   }) async {
     if (!AuthService.isAuthenticated) return;
 
-    final startTime = questionStartTime ?? _session.currentQuestionStartTime;
-    final questionId = generateQuestionId(
-      question: correctAnswer,
-      timestamp: startTime,
-      gameType: gameType,
-    );
+    try {
+      final startTime = questionStartTime ?? _session.currentQuestionStartTime;
+      final questionId = generateQuestionId(
+        question: correctAnswer,
+        timestamp: startTime,
+        gameType: gameType,
+      );
 
-    final log = {
-      'game_type': gameType,
-      'question_id': questionId,
-      'options': options,
-      'correct_answer': correctAnswer,
-      'wrong_count': wrongCount,
-      'score_earned': scoreEarned,
-      'played_at': startTime.toIso8601String(),
-    };
+      final log = {
+        'game_type': gameType,
+        'question_id': questionId,
+        'options': options,
+        'correct_answer': correctAnswer,
+        'wrong_count': wrongCount,
+        'score_earned': scoreEarned,
+        'played_at': startTime.toIso8601String(),
+      };
 
-    final prefs = await SharedPreferences.getInstance();
-    final List<String> rawList = prefs.getStringList(_unsentLogsKey) ?? [];
-    rawList.add(jsonEncode(log));
-    await prefs.setStringList(_unsentLogsKey, rawList);
+      final prefs = await SharedPreferences.getInstance();
+      final List<String> rawList = prefs.getStringList(_unsentLogsKey) ?? [];
+      rawList.add(jsonEncode(log));
+      await prefs.setStringList(_unsentLogsKey, rawList);
+    } catch (e, stack) {
+      debugPrint('❌ logQuestion hatası: $e');
+      await TelemetryService.sendError(
+        event: 'log_question_error',
+        message: e.toString(),
+        stackTrace: stack,
+        metadata: {
+          'game_type': gameType,
+          'correct_answer': correctAnswer,
+        },
+      );
+    }
   }
 
   /// Geriye dönük uyumluluk
@@ -113,8 +127,6 @@ class GameLogService {
 
     debugPrint('🔄 Sync: ${rawList.length} question log gönderiliyor');
 
-    final List<Map<String, dynamic>> payload = [];
-
     for (final item in rawList) {
       final log = jsonDecode(item);
 
@@ -131,14 +143,44 @@ class GameLogService {
 
       try {
         await _supabase.from('question_logs').insert(payload);
-      } on PostgrestException catch (e) {
+      } on PostgrestException catch (e, stack) {
         if (e.code == '23505') {
           // Zaten DB'de var → bu kaydı başarılı kabul et
           continue;
         }
 
-        // Gerçek hata → queue'yu koru
+        // Gerçek Postgrest hatası → queue korunur ve Discord'a bildirilir
         debugPrint('❌ Question log sync hatası: $e');
+        await TelemetryService.sendError(
+          event: 'question_log_postgrest_error',
+          message: 'PostgrestException (${e.code}): ${e.message}',
+          stackTrace: stack,
+          metadata: {
+            'code': e.code,
+            'details': e.details,
+            'hint': e.hint,
+            'game_type': log['game_type'],
+            'question_id': log['question_id'],
+          },
+        );
+        return;
+      } catch (e, stack) {
+        // Ağ vb. genel hata → queue korunur ve Discord'a bildirilir
+        debugPrint('❌ Question log sync hatası: $e');
+        await TelemetryService.sendError(
+          event: 'question_log_sync_error',
+          message: e.toString(),
+          stackTrace: stack,
+          metadata: {
+            'game_type': log['game_type'],
+            'question_id': log['question_id'],
+            'options': log['options'],
+            'correct_answer': log['correct_answer'],
+            'wrong_count': log['wrong_count'],
+            'score_earned': log['score_earned'],
+            'played_at': log['played_at'],
+          },
+        );
         return;
       }
     }

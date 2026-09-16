@@ -7,7 +7,6 @@ import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/flag_loader.dart';
 import 'package:geogame/widgets/ad_banner_widget.dart';
 
@@ -36,25 +35,14 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+        onPressed: () => GameScaffold.handleGameExit(context),
       ),
       actions: [
         IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
-          onPressed: () {
-            // Interstitial reklam göster (fire-and-forget)
-            AdService.showInterstitialAd();
-            GameLogService.syncPendingLogs();
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/home',
-              (route) => false,
-            );
-          },
+          onPressed: () => GameScaffold.handleGameExit(context),
         ),
       ],
     );
@@ -385,20 +373,37 @@ class GameScaffold extends StatelessWidget {
     required this.body,
   });
 
+  /// Oyunlardan çıkış mantığı (Hem AppBar Geri/Home tuşları hem de cihazın Geri tuşu için ortak)
+  static void handleGameExit(BuildContext context) {
+    AdService.showInterstitialAd();
+    GameLogService.syncPendingLogs();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/home',
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: GameAppBar(title: title),
-      drawer: SettingsController.isChildMode ? null : const DrawerWidget(),
-      body: GameBackground(
-        colors: backgroundColors,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(child: body),
-              const AdBannerWidget(),
-            ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop) return;
+        handleGameExit(context);
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: GameAppBar(title: title),
+        body: GameBackground(
+          colors: backgroundColors,
+          child: SafeArea(
+            child: Column(
+              children: [
+                Expanded(child: body),
+                const AdBannerWidget(),
+              ],
+            ),
           ),
         ),
       ),

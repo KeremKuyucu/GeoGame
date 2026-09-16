@@ -63,7 +63,7 @@ class _BorderPathGameState extends State<BorderPathGame> {
         performanceColor: _controller.getPerformanceColor(),
         onMainMenu: () {
           Navigator.of(context).pop();
-          _controller.navigateHome(context);
+          GameScaffold.handleGameExit(context);
         },
         onNewGame: () {
           Navigator.of(context).pop();

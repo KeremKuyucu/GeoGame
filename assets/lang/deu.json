@@ -168,7 +168,7 @@
     "multiple_choice_mode": "Multiple-Choice-Modus",
     "continent_title": "Kontinent-Optionen",
     "un_members": "Länder ohne UN-Mitgliedschaft",
-    "use_anonymous_data": "Anonyme Nutzungsdaten teilen",
+    "use_anonymous_data": "Nutzungs- und Diagnosedaten teilen",
     "telemetry_dialog_title": "Nutzungsdaten deaktivieren",
     "telemetry_dialog_message": "Wenn diese Einstellung deaktiviert ist, werden keine Diagnoseberichte und Nutzungsstatistiken an den Entwickler gesendet. Möchtest du sie wirklich deaktivieren?",
     "telemetry_disable": "Deaktivieren",
@@ -221,6 +221,7 @@
     "load_error": "Bestenliste konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung."
   },
   "drawer": {
+    "rate_play_store": "Im Play Store bewerten",
     "report_bug": "Fehler melden",
     "feedback_note": "Du kannst Beschwerden oder Vorschläge senden, indem du auf die Schaltfläche oben klickst.",
     "my_website": "Meine Webseite",

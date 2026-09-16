@@ -9,7 +9,9 @@ import 'package:geogame/services/auth_service.dart';
 class TelemetryService {
   static const String _uidKey = 'app_unique_id';
   static const String _logApiUrl = 'https://keremkk.com.tr/api/logs';
+  static const String _errorLogApiUrl = 'https://keremkk.com.tr/api/error-logs';
   static const Duration _requestTimeout = Duration(seconds: 5);
+  static bool _isSendingError = false;
 
   /// Aktif UID'yi döndürür:
   /// 1. Supabase'e giriş yapılmışsa doğrudan Supabase kullanıcı UID'si
@@ -40,8 +42,7 @@ class TelemetryService {
   /// Uygulama açılışında arka planda çağrılacak telemetri metodu (her açılışta gönderilir)
   static Future<void> init() async {
     try {
-      final isTelemetryEnabled = SettingsController.settings.telemetryEnabled;
-      if (!isTelemetryEnabled) return;
+      if (!SettingsController.settings.telemetryEnabled) return;
 
       final uid = await getEffectiveUid();
       await sendEvent('app_opened', uid: uid);
@@ -92,8 +93,79 @@ class TelemetryService {
             '⚠️ Telemetri gönderilemedi. Status: ${response.statusCode}');
       }
     } catch (e) {
-      // İnternet yoksa, sunucuya ulaşılamazsa veya zaman aşımında sessizce devam et
       debugPrint('Telemetri gönderim hatası: $e');
+    }
+  }
+
+  /// Hata kayıtlarını 'https://keremkk.com.tr/api/error-logs' uç noktasına gönderir.
+  /// Discord Botu üzerinden anlık bildirim olarak iletilir.
+  ///
+  /// Örnek Kullanım:
+  /// ```dart
+  /// try {
+  ///   await gameService.loadCountryData();
+  /// } catch (e, stack) {
+  ///   await TelemetryService.sendError(
+  ///     event: 'country_load_failed',
+  ///     message: e.toString(),
+  ///     stackTrace: stack,
+  ///     metadata: {
+  ///       'game_mode': 'distance',
+  ///       'target_country': 'TUR',
+  ///     },
+  ///   );
+  /// }
+  /// ```
+  static Future<void> sendError({
+    required String event,
+    required String message,
+    dynamic stackTrace,
+    String? uid,
+    Map<String, dynamic>? metadata,
+  }) async {
+    if (_isSendingError) return; // Sonsuz döngü önlemi
+    _isSendingError = true;
+
+    try {
+      if (!SettingsController.settings.telemetryEnabled) return;
+
+      final effectiveUid = await getEffectiveUid(uid);
+
+      final String platform = kIsWeb
+          ? 'web'
+          : (defaultTargetPlatform == TargetPlatform.windows
+              ? 'windows'
+              : 'mobile');
+
+      final bodyData = {
+        'uid': effectiveUid,
+        'timestamp': DateTime.now().toUtc().toIso8601String(),
+        'app': 'geogame',
+        'event': event,
+        'platform': platform,
+        'message': message,
+        if (stackTrace != null) 'stackTrace': stackTrace.toString(),
+        if (metadata != null) 'metadata': metadata,
+      };
+
+      final response = await http
+          .post(
+            Uri.parse(_errorLogApiUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(bodyData),
+          )
+          .timeout(_requestTimeout);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('✅ Hata kaydı başarıyla iletildi: $event ($effectiveUid)');
+      } else {
+        debugPrint('⚠️ Hata kaydı iletilemedi. Status: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Hata gönderimi sırasında oluşan hatalar sessizce geçilir (asla recursive çağrı yapılmaz)
+      debugPrint('Hata kaydı gönderme hatası: $e');
+    } finally {
+      _isSendingError = false;
     }
   }
 }

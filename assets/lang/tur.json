@@ -168,7 +168,7 @@
     "multiple_choice_mode": "Çoktan Seçmeli Mod",
     "continent_title": "Kıta Seçenekleri",
     "un_members": "BM Üyeliği Olmayan Ülkeler",
-    "use_anonymous_data": "Anonim Kullanım Verilerini Paylaş",
+    "use_anonymous_data": "Kullanım ve Teşhis Verilerini Paylaş",
     "telemetry_dialog_title": "Kullanım Verilerini Kapat",
     "telemetry_dialog_message": "Bu ayarı kapattığınızda, hata teşhisleri ve geliştirme istatistikleri geliştiriciye iletilmez. Yine de kapatmak istiyor musunuz?",
     "telemetry_disable": "Kapat",
@@ -221,6 +221,7 @@
     "load_error": "Sıralama yüklenemedi. Lütfen internetinizi kontrol edin."
   },
   "drawer": {
+    "rate_play_store": "Play Store'da Değerlendir",
     "report_bug": "Hata Bildir",
     "feedback_note": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
     "my_website": "Benim Websitem",
