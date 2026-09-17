@@ -7,7 +7,7 @@ import 'package:geogame/main.dart' as app;
 /// GeoGame Otomatik Ekran Görüntüsü Alma Testi
 ///
 /// Çalıştırmak için:
-/// flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_screenshots_test.dart -d <cihaz_id_veya_windows>
+/// `flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_screenshots_test.dart -d <cihaz_id_veya_windows>`
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 

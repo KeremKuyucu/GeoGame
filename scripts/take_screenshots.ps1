@@ -70,7 +70,7 @@ if (-not $device) {
     exit 1
 }
 
-function Capture-Screen ([string]$fileName, [string]$label) {
+function Save-ScreenCapture ([string]$fileName, [string]$label) {
     $destPath = Join-Path $screenshotsDir $fileName
     Write-Info "[$label] cekiliyor..."
 
@@ -158,7 +158,7 @@ while ($true) {
             Write-Host ">> ($($i+1)/$($screenItems.Count)) Lutfen '$($item.Label)' ekranini acin." -ForegroundColor Yellow
             $null = Read-Host "   Hazir oldugunuzda Enter'a basin (Atlamak icin 's' yazin)"
             if ($null -notmatch '^[Ss]$') {
-                Capture-Screen -fileName $item.Name -label $item.Label
+                Save-ScreenCapture -fileName $item.Name -label $item.Label
             } else {
                 Write-Info "Atlandi."
             }
@@ -170,13 +170,13 @@ while ($true) {
     elseif ($secim -match '^[Cc]$') {
         $customName = Read-Host "Dosya adi (Orn: settings.png)"
         if (-not $customName.EndsWith(".png")) { $customName += ".png" }
-        Capture-Screen -fileName $customName -label "Ozel Ekran"
+        Save-ScreenCapture -fileName $customName -label "Ozel Ekran"
         Start-Sleep -Seconds 1
     }
     else {
         $match = $screenItems | Where-Object { $_.Key -eq $secim }
         if ($match) {
-            Capture-Screen -fileName $match.Name -label $match.Label
+            Save-ScreenCapture -fileName $match.Name -label $match.Label
             Start-Sleep -Seconds 1
         } else {
             Write-Warn "Gecersiz secim!"
