@@ -77,7 +77,7 @@
     "start_game": "Oyuna Başla"
   },
   "game_capital": {
-    "title": "Başşehir",
+    "title": "Başkent Avı",
     "description": "Başkentten ülkeyi tanıyın.",
     "content": "Tahmin edilecek ülkenin başkenti:",
     "input_hint": "Hangi ülkenin başkenti?",
