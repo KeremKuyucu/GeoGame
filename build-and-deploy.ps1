@@ -569,7 +569,7 @@ try {
         $searchPaths = @()
         if (Test-Path $distPath) { $searchPaths += $distPath }
         if (Test-Path $innoOutPath) { $searchPaths += $innoOutPath }
-        if (Test-Path $outputsRoot -and -not ($searchPaths -contains $outputsRoot)) { $searchPaths += $outputsRoot }
+        if ((Test-Path $outputsRoot) -and -not ($searchPaths -contains $outputsRoot)) { $searchPaths += $outputsRoot }
 
         $installerExe = $null
 
