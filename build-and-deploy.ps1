@@ -54,6 +54,7 @@ try {
     $imzaDir            = if (Test-Path (Join-Path $projectsParent "imza-bilgileri")) { Join-Path $projectsParent "imza-bilgileri" } else { "C:\Users\Kerem\Projects\imza-bilgileri" }
     $pfxPath            = Join-Path $imzaDir "KeremKuyucu.pfx"
     $pfxPropertiesPath  = Join-Path $imzaDir "pfx.properties"
+    $pfxPassPlain       = $null
     $vercelTokenPath    = Join-Path $imzaDir "geogame.vercel"
     $vercelToken        = $null
 
@@ -297,15 +298,28 @@ try {
     $selectedNames = @($selectedPlatforms | ForEach-Object { $_.Name })
     Write-Ok "Secilen platformlar: $($selectedNames -join ', ')"
 
-    # -- Vercel Token & Oturum On-Kontrolu (Web Secildiyse) -------------------------
+    # -- 2.1) Sistem & Bagimlilik On-Kontrolleri (Pre-flight Checks) -----------------
+    Write-Host ""
+    Write-Host "+=======================================================+" -ForegroundColor Cyan
+    Write-Host "|    Sistem & On-Ucus Kontrolleri (Pre-flight Checks)   |" -ForegroundColor Cyan
+    Write-Host "+=======================================================+" -ForegroundColor Cyan
+
+    # A) Temel Flutter Kontrolu
+    $flutterCheck = Get-Command "flutter" -ErrorAction SilentlyContinue
+    if (-not $flutterCheck) {
+        throw "Flutter SDK sistemde bulunamadi! PATH ortam degiskeninizi kontrol edin."
+    }
+    Write-Ok "Flutter SDK hazir: $($flutterCheck.Source)"
+
+    # B) Web Kontrolleri (Web secildiyse)
     if ($selectedNames -contains "Web") {
-        Write-Step "Vercel Token & Oturumu Kontrol Ediliyor"
+        Write-Step "[Web] Vercel CLI & Proje Tokeni Kontrol Ediliyor"
         $vercelCheck = Get-Command $vercelCmd -ErrorAction SilentlyContinue
         if (-not $vercelCheck) {
             throw "Vercel CLI bulunamadi. Kurmak icin: npm i -g vercel"
         }
 
-        # 1) Token Yukleme: VERCEL_TOKEN env var -> imza-bilgileri\vercel.token
+        # Token Yukleme: VERCEL_TOKEN env var -> imza-bilgileri\geogame.vercel
         if (-not [string]::IsNullOrWhiteSpace($env:VERCEL_TOKEN)) {
             $vercelToken = $env:VERCEL_TOKEN.Trim()
             Write-Info "Vercel token ortam degiskeninden (VERCEL_TOKEN) alindi."
@@ -332,37 +346,136 @@ try {
             }
         }
 
-        # 2) Token ile whoami kontrolu
-        $tokenParam = if ($vercelToken) { "--token $vercelToken" } else { "" }
-        $whoamiRaw = (& cmd.exe /c "$vercelCmd whoami $tokenParam" 2>&1 | Out-String).Trim()
-        $whoamiExit = $LASTEXITCODE
-
-        if ($whoamiExit -ne 0 -or $whoamiRaw -match "Not authorized" -or [string]::IsNullOrWhiteSpace($whoamiRaw)) {
-            Write-Warn "Vercel oturumu dogrulanamadi: $whoamiRaw"
-            $reToken = Read-Host "Token gecersiz veya suresi dolmus olabilir. Lutfen yeni Token yapistirin (veya Bos birakarak tarayicidan login deneyin)"
-            if (-not [string]::IsNullOrWhiteSpace($reToken)) {
-                $vercelToken = $reToken.Trim()
-                $env:VERCEL_TOKEN = $vercelToken
-                Ensure-Dir (Split-Path -Parent $vercelTokenPath)
-                Set-Content -Path $vercelTokenPath -Value $vercelToken -Force -Encoding UTF8
-                $tokenParam = "--token $vercelToken"
+        # Token / API Kontrolu
+        $tokenValid = $false
+        if (-not [string]::IsNullOrWhiteSpace($vercelToken)) {
+            Write-Info "Proje tokeni Vercel API uzerinden dogrulaniyor..."
+            $httpCode = (curl.exe -s -o NUL -w "%{http_code}" -H "Authorization: Bearer $vercelToken" "https://api.vercel.com/v9/projects/geogame-web-build").Trim()
+            if ($httpCode -eq "200") {
+                $tokenValid = $true
+                Write-Ok "Vercel proje tokeni dogrulandi: geogame-web-build (HTTP 200 OK)"
             } else {
-                Write-Step "Vercel Girisi Baslatiliyor (vercel login)..."
-                & cmd.exe /c "$vercelCmd login"
-                $tokenParam = ""
-            }
-
-            $whoamiRaw = (& cmd.exe /c "$vercelCmd whoami $tokenParam" 2>&1 | Out-String).Trim()
-            $whoamiExit = $LASTEXITCODE
-            if ($whoamiExit -ne 0 -or $whoamiRaw -match "Not authorized" -or [string]::IsNullOrWhiteSpace($whoamiRaw)) {
-                throw "Vercel oturumu dogrulanamadi! Derleme surecleri baslatilmadan islem durduruldu."
+                Write-Warn "Vercel API tokeni reddetti (HTTP $httpCode)."
             }
         }
 
-        $whoamiUser = ($whoamiRaw -split "[\r\n]+" | Where-Object { $_ -notmatch 'Vercel CLI' -and $_ -notmatch '^\s*$' } | Select-Object -Last 1)
-        if ([string]::IsNullOrWhiteSpace($whoamiUser)) { $whoamiUser = $whoamiRaw }
-        Write-Ok "Vercel oturumu aktif: $whoamiUser (Token ile yetkilendirildi)"
+        # Eger proje tokeni gecersizse veya yoksa kullanici oturumu kontrol et
+        if (-not $tokenValid) {
+            $whoamiExit = Run-Exe -FilePath "cmd.exe" -ArgumentList @("/c", "$vercelCmd whoami") -AllowNonZero
+            if ($whoamiExit -ne 0) {
+                Write-Warn "Vercel oturumu dogrulanamadi."
+                Write-Step "Vercel Girisi Baslatiliyor (vercel login)..."
+                Run-Exe -FilePath "cmd.exe" -ArgumentList @("/c", "$vercelCmd login")
+                $whoamiExit = Run-Exe -FilePath "cmd.exe" -ArgumentList @("/c", "$vercelCmd whoami") -AllowNonZero
+                if ($whoamiExit -ne 0) {
+                    throw "Vercel oturumu dogrulanamadi! Derleme surecleri baslatilmadan islem durduruldu."
+                }
+            }
+            Write-Ok "Vercel kullanici oturumu aktif."
+        }
     }
+
+    # C) Windows Kontrolleri (Windows secildiyse)
+    if ($selectedNames -contains "Windows") {
+        Write-Step "[Windows] Inno Setup, SignTool & Sertifika Kontrol Ediliyor"
+        if (-not (Test-Path $innoSetupPath)) {
+            throw "Inno Setup Compiler (ISCC.exe) bulunamadi: $innoSetupPath"
+        }
+        Write-Ok "Inno Setup Compiler (ISCC.exe) hazir."
+
+        if (-not (Test-Path $issFilePath)) {
+            throw "Inno Setup script dosyasi bulunamadi: $issFilePath"
+        }
+        Write-Ok "Inno Setup Scripti ($issFilePath) hazir."
+
+        if (-not (Test-Path $signtool)) {
+            throw "SignTool bulunamadi: $signtool"
+        }
+        Write-Ok "SignTool (signtool.exe) hazir."
+
+        if (-not (Test-Path $pfxPath)) {
+            throw "Windows PFX sertifikasi bulunamadi: $pfxPath"
+        }
+        Write-Ok "PFX sertifikasi hazir ($pfxPath)."
+
+        # PFX sifresi on-kontrolu
+        if (Test-Path $pfxPropertiesPath) {
+            $propLine = Get-Content $pfxPropertiesPath | Select-String "^\s*password\s*="
+            if ($propLine) {
+                $pfxPassPlain = ($propLine.ToString().Split("=", 2)[1]).Trim()
+                Write-Ok "PFX sifresi pfx.properties dosyasindan okundu."
+            }
+        }
+        if ([string]::IsNullOrWhiteSpace($pfxPassPlain)) {
+            Write-Warn "pfx.properties bulunamadi veya password satiri yok."
+            $pfxPassSecure = Read-Host "Lutfen PFX sertifika sifresini girin (guvenli)" -AsSecureString
+            $bstr          = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($pfxPassSecure)
+            $pfxPassPlain  = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+            [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+            if ([string]::IsNullOrWhiteSpace($pfxPassPlain)) {
+                throw "PFX sifresi olmadan Windows installer imzalanamaz!"
+            }
+            Write-Ok "PFX sifresi alindi."
+        }
+    }
+
+    # D) Android Kontrolleri (APK veya AAB secildiyse)
+    if ($selectedNames -contains "APK" -or $selectedNames -contains "AAB") {
+        Write-Step "[Android] Imza (Keystore) Yapilandirmasi Kontrol Ediliyor"
+        $keyPropsFile = Join-Path $imzaDir "key.properties"
+        if (Test-Path $keyPropsFile) {
+            Write-Ok "Android imza yapilandirmasi hazir: $keyPropsFile"
+        } else {
+            Write-Warn "Android key.properties dosyasi '$imzaDir' altinda bulunamadi."
+        }
+    }
+
+    # E) Dagitim & Opsiyonel Araclar Kontrolleri
+    Write-Step "[Dagitim & Opsiyonel Araclar] Kontrol Ediliyor"
+
+    # Python & Google Play Store upload
+    $pythonCmd = Get-Command "python" -ErrorAction SilentlyContinue
+    if ($pythonCmd) {
+        Write-Ok "Python hazir: $($pythonCmd.Source)"
+    } elseif ($selectedNames -contains "AAB") {
+        Write-Warn "Python bulunamadi! Google Play Console yuklemesi calismayabilir."
+    }
+
+    # Service Account JSON (AAB secildiyse)
+    if ($selectedNames -contains "AAB") {
+        $saFiles = @(Get-ChildItem -Path $imzaDir -Filter "*.json" -ErrorAction SilentlyContinue)
+        if ($saFiles.Count -gt 0) {
+            Write-Ok "Play Store Service Account JSON hazir: $($saFiles[0].Name)"
+        } else {
+            Write-Warn "Service Account JSON dosyasi '$imzaDir' altinda bulunamadi."
+        }
+    }
+
+    # GitHub CLI
+    $ghCmd = Get-Command "gh" -ErrorAction SilentlyContinue
+    if ($ghCmd) {
+        $ghStatus = (& cmd.exe /c "gh auth status" 2>&1 | Out-String).Trim()
+        if ($LASTEXITCODE -eq 0) {
+            $ghUserLine = ($ghStatus -split "[\r\n]+" | Where-Object { $_ -match "account" } | Select-Object -First 1)
+            $ghUser = if ($ghUserLine) { $ghUserLine.Trim() } else { "Giris yapilmis" }
+            Write-Ok "GitHub CLI hazir ($ghUser)."
+        } else {
+            Write-Warn "GitHub CLI oturumu kapali (Opsiyonel GitHub Release atlanabilir)."
+        }
+    } else {
+        Write-Info "GitHub CLI ('gh') kurulu degil (Opsiyonel GitHub Release atlanabilir)."
+    }
+
+    # Antigravity CLI (agy)
+    $agyCmd = Get-Command "agy" -ErrorAction SilentlyContinue
+    if ($agyCmd) {
+        Write-Ok "Antigravity CLI (agy) hazir."
+    } else {
+        Write-Info "Antigravity CLI ('agy') sistemde bulunamadi (Surum notlari manuel olusturulacak)."
+    }
+
+    Write-Host "+=======================================================+" -ForegroundColor Cyan
+    Write-Ok "Tum on-kontroller basarili! Derleme hazirligina geciliyor."
 
     # -- Flutter Clean (Opsiyonel) -------------------------------------------------
     $doClean = Read-Host "`nOnce 'flutter clean' calistirilsin mi? (e/H)"

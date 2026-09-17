@@ -92,6 +92,13 @@
     "rule_how_to_play": "Wähle aus den Optionen oder tippe den Ländernamen im Tastaturmodus ein. Rate weiter, bis du die richtige Antwort findest.",
     "rule_tip": "Tipp: Achte auf ähnliche Flaggen! (z. B. Rumänien-Tschad, Monaco-Indonesien)"
   },
+  "game_coatofarms": {
+    "title": "Wappen-Jagd",
+    "description": "Erkenne das Land anhand seines Wappens.",
+    "rule_welcome": "Ein Staatswappen wird angezeigt. Finde heraus, zu welchem Land es gehört.",
+    "rule_how_to_play": "Wähle aus den Optionen oder tippe den Ländernamen im Tastaturmodus ein. Rate weiter, bis du die richtige Antwort findest.",
+    "rule_tip": "Tipp: Symbole, Tiere und Farben im Wappen spiegeln oft Geschichte und Geografie wider!"
+  },
   "game_distance": {
     "title": "Distanz-Jagd",
     "description": "Errate das Land anhand von Entfernung und Himmelsrichtung.",
@@ -212,7 +219,8 @@
     "capital": "Hauptstadt",
     "borderline": "Grenzlinie",
     "borderpath": "Grenzpfad",
-    "findmap": "Auf der Karte finden"
+    "findmap": "Auf Karte finden",
+    "coatofarms": "Wappen"
   },
   "leaderboard": {
     "title": "Bestenliste",

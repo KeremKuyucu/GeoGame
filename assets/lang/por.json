@@ -92,6 +92,13 @@
     "rule_how_to_play": "Escolha entre as opções ou escreva o nome do país no modo teclado. Continue a tentar até acertar.",
     "rule_tip": "Dica: Cuidado com bandeiras parecidas! (ex.: Roménia-Chade, Mónaco-Indonésia)"
   },
+  "game_coatofarms": {
+    "title": "Caça aos Brasões",
+    "description": "Identifique o país pelo seu brasão de armas.",
+    "rule_welcome": "Será mostrado o brasão oficial de um país. Descubra a que país pertence.",
+    "rule_how_to_play": "Escolha entre as opções ou escreva o nome do país no modo teclado. Continue a tentar até acertar.",
+    "rule_tip": "Dica: Os símbolos, animais e cores dos brasões refletem a história e a cultura da nação!"
+  },
   "game_distance": {
     "title": "Caça à Distância",
     "description": "Adivinhe o país com base na distância e direção.",
@@ -212,7 +219,8 @@
     "capital": "Capital",
     "borderline": "Linha de fronteira",
     "borderpath": "Caminho de fronteiras",
-    "findmap": "Encontrar no mapa"
+    "findmap": "Encontrar no mapa",
+    "coatofarms": "Brasões"
   },
   "leaderboard": {
     "title": "Classificação",

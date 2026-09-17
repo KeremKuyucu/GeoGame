@@ -34,11 +34,14 @@ class GameService {
     return _cachedCountryMap!;
   }
 
+  static GameType _currentGameType = GameType.flag;
+
   // --------------------------------------------------------------------------
   // GAME INITIALIZATION
   // --------------------------------------------------------------------------
 
   static Future<void> initializeGame(GameType type) async {
+    _currentGameType = type;
     final multiplier = _poolMultiplier();
     final scores = getInitialScores(type, multiplier);
     debugPrint(
@@ -88,7 +91,7 @@ class GameService {
           'start': (100 * multiplier).round().clamp(20, 100),
           'min':   (40  * multiplier).round().clamp(8,  40),
         };
-      default: // capital, flag, borderline, findmap
+      default: // capital, flag, borderline, findmap, coatofarms
         return {
           'start': (50  * multiplier).round().clamp(10, 50),
           'min':   (20  * multiplier).round().clamp(4,  20),
@@ -103,7 +106,19 @@ class GameService {
   static Future<void> startNewRound() async {
     debugPrint('🔄 Yeni soru seçiliyor...');
 
-    final available = AppState.activePool;
+    List<Country> available;
+    if (_currentGameType == GameType.coatofarms) {
+      final pool =
+          AppState.activePool.where((c) => c.coatOfArmsUrl.isNotEmpty).toList();
+      available = pool.length >= 4
+          ? pool
+          : AppState.allCountries
+              .where((c) => c.coatOfArmsUrl.isNotEmpty)
+              .toList();
+    } else {
+      available = AppState.activePool;
+    }
+
     if (available.length < 4) {
       debugPrint('⚠️ Yetersiz havuz boyutu: ${available.length}');
       // Fallback: Tüm ülkeleri kullan veya hata fırlat

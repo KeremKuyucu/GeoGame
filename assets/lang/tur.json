@@ -92,6 +92,13 @@
     "rule_how_to_play": "Şıklardan birini seçin veya klavye modunda ülke ismini yazın. Doğru cevabı bulana kadar tahmin yapabilirsiniz.",
     "rule_tip": "İpucu: Benzer bayrakları karıştırmamaya dikkat edin! (Örn: Romanya-Çad, Monako-Endonezya)"
   },
+  "game_coatofarms": {
+    "title": "Arma Avı",
+    "description": "Armadan ülkeyi tanıyın.",
+    "rule_welcome": "Ekranda bir ülkenin resmi arması gösterilecek. Bu armanın hangi ülkeye ait olduğunu bulmanız gerekiyor.",
+    "rule_how_to_play": "Şıklardan birini seçin veya klavye modunda ülke ismini yazın. Doğru cevabı bulana kadar tahmin yapabilirsiniz.",
+    "rule_tip": "İpucu: Armalardaki figürler, semboller ve renkler ülkenin tarihi veya coğrafyası hakkında ipucu verir!"
+  },
   "game_distance": {
     "title": "Mesafe Avı",
     "description": "Mesafe ve yön bilgisine göre ülkeleri tahmin edin.",
@@ -209,10 +216,11 @@
     "success_label": "Başarı: {0}%",
     "distance": "Mesafe",
     "flag": "Bayrak",
-    "capital": "Başşehir",
+    "capital": "Başkent",
     "borderline": "Sınır hattı",
     "borderpath": "Sınır yolu",
-    "findmap": "Haritada Bulma"
+    "findmap": "Haritada Bulma",
+    "coatofarms": "Arma Avı"
   },
   "leaderboard": {
     "title": "Sıralama",

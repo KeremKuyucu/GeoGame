@@ -95,6 +95,10 @@ const Set<String> kUsedKeys = {
   'game_flag.title',
   'game_flag.rule_welcome',
 
+  // game_coatofarms
+  'game_coatofarms.title',
+  'game_coatofarms.rule_welcome',
+
   // game_distance
   'game_distance.title',
   'game_distance.rule_welcome',
@@ -311,6 +315,7 @@ void main() {
         'directions.', // directions.${sectors[index]}
         'game_capital.', // ${metadata.titleKey}.title / .description
         'game_flag.',
+        'game_coatofarms.',
         'game_distance.',
         'game_borderline.',
         'game_borderpath.',

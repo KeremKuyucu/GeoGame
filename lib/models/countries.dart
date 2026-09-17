@@ -20,6 +20,8 @@ class Country {
   final double longitude;
   final List<String> borders;
   final double area;
+  final String coatOfArmsUrl;
+  final int population;
 
   Country({
     required this.iso3,
@@ -35,6 +37,8 @@ class Country {
     required this.longitude,
     required this.borders,
     required this.area,
+    this.coatOfArmsUrl = '',
+    this.population = 0,
   });
 
   factory Country.empty() => Country(
@@ -51,6 +55,8 @@ class Country {
         longitude: 0.0,
         borders: [],
         area: 0.0,
+        coatOfArmsUrl: '',
+        population: 0,
       );
 
   factory Country.fromJson(Map<String, dynamic> json) {
@@ -59,6 +65,12 @@ class Country {
       capitalData = json['capital'][0].toString();
     } else if (json['capital'] is String) {
       capitalData = json['capital'];
+    }
+
+    final coatOfArmsData = json['coatOfArms'];
+    String coatUrl = '';
+    if (coatOfArmsData is Map<String, dynamic>) {
+      coatUrl = (coatOfArmsData['png'] ?? coatOfArmsData['svg'] ?? '').toString();
     }
 
     return Country(
@@ -78,6 +90,8 @@ class Country {
 
       borders: List<String>.from(json['borders'] ?? []),
       area: (json['area'] as num?)?.toDouble() ?? 0.0,
+      coatOfArmsUrl: coatUrl,
+      population: (json['population'] as num?)?.toInt() ?? 0,
     );
   }
 

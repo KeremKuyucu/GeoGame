@@ -13,6 +13,7 @@ extension GameTypeUI on GameType {
       GameType.borderline => Icons.border_all,
       GameType.borderpath => Icons.route,
       GameType.findmap => Icons.explore,
+      GameType.coatofarms => Icons.shield,
     };
   }
 
@@ -24,6 +25,7 @@ extension GameTypeUI on GameType {
       GameType.borderline => Colors.pinkAccent,
       GameType.borderpath => Colors.blueAccent,
       GameType.findmap => Colors.greenAccent,
+      GameType.coatofarms => Colors.amberAccent,
     };
   }
 }

@@ -31,6 +31,7 @@ class AppState extends ChangeNotifier {
         GameType.borderline => 'borderline',
         GameType.borderpath => 'borderpath',
         GameType.findmap => 'findmap',
+        GameType.coatofarms => 'coatofarms',
       };
 }
 

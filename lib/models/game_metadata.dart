@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum GameType { flag, capital, distance, borderline, borderpath, findmap }
+enum GameType { flag, capital, distance, borderline, borderpath, findmap, coatofarms }
 
 /// Oyun kural bilgilerini tutan sınıf
 class GameRule {
@@ -133,6 +133,25 @@ final List<GameMetadata> gameMetadataList = [
       GameRule(icon: Icons.touch_app, textKey: 'game_findmap.rule_how_to_play'),
       GameRule(
           icon: Icons.star_border, textKey: 'game_common.score_system_generic'),
+    ],
+  ),
+  const GameMetadata(
+    type: GameType.coatofarms,
+    titleKey: 'game_coatofarms',
+    descKey: 'game_coatofarms',
+    img: 'assets/images/coatofarms.webp',
+    color: Color(0xFF7B1FA2),
+    route: '/game/coatofarms',
+    iconData: Icons.shield,
+    rules: [
+      GameRule(icon: Icons.shield, textKey: 'game_coatofarms.rule_welcome'),
+      GameRule(
+          icon: Icons.videogame_asset,
+          textKey: 'game_coatofarms.rule_how_to_play'),
+      GameRule(
+          icon: Icons.star_border, textKey: 'game_common.score_system_generic'),
+      GameRule(
+          icon: Icons.lightbulb_outline, textKey: 'game_coatofarms.rule_tip'),
     ],
   )
 ];

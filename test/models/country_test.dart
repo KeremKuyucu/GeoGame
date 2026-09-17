@@ -136,6 +136,8 @@ void main() {
         expect(empty.latitude, 0.0);
         expect(empty.longitude, 0.0);
         expect(empty.isUNMember, false);
+        expect(empty.coatOfArmsUrl, '');
+        expect(empty.population, 0);
       });
     });
 
@@ -161,6 +163,8 @@ void main() {
           'detailed_lng': 32.8597,
           'borders': ['ARM', 'GRC'],
           'area': 783562,
+          'coatOfArms': {'png': 'https://mainfacts.com/media/images/coats_of_arms/tr.png'},
+          'population': 85000000,
         };
 
         final country = Country.fromJson(json);
@@ -174,6 +178,8 @@ void main() {
         expect(country.isUNMember, true);
         expect(country.latitude, closeTo(39.93, 0.01));
         expect(country.borders, ['ARM', 'GRC']);
+        expect(country.coatOfArmsUrl, 'https://mainfacts.com/media/images/coats_of_arms/tr.png');
+        expect(country.population, 85000000);
       });
 
       test('capital List ise ilk elemanı almalı', () {

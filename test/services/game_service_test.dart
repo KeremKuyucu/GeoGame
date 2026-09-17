@@ -497,7 +497,7 @@ void main() {
       expect(scores['maxPenalty'], 20);
     });
 
-    test('standart oyunlar (capital, flag vs.) maxPenalty içermemeli', () {
+    test('standart oyunlar (capital, flag, coatofarms vs.) maxPenalty içermemeli', () {
       final capitalScores = GameService.getInitialScores(GameType.capital, 1.0);
       expect(capitalScores['start'], 50);
       expect(capitalScores['min'], 20);
@@ -507,6 +507,11 @@ void main() {
       expect(flagScores['start'], 50);
       expect(flagScores['min'], 20);
       expect(flagScores.containsKey('maxPenalty'), false);
+
+      final coatScores = GameService.getInitialScores(GameType.coatofarms, 1.0);
+      expect(coatScores['start'], 50);
+      expect(coatScores['min'], 20);
+      expect(coatScores.containsKey('maxPenalty'), false);
     });
 
     test('borderpath oyunu 1.0 çarpanında start=100, min=40 dönmeli', () {

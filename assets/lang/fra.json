@@ -92,6 +92,13 @@
     "rule_how_to_play": "Choisissez parmi les options ou tapez le nom du pays en mode clavier. Continuez à deviner jusqu'à trouver la bonne réponse.",
     "rule_tip": "Astuce : Attention aux drapeaux similaires ! (ex. Roumanie-Tchad, Monaco-Indonésie)"
   },
+  "game_coatofarms": {
+    "title": "Chasse aux Armoiries",
+    "description": "Identifiez le pays d'après ses armoiries.",
+    "rule_welcome": "Les armoiries nationales d'un pays s'affichent. Trouvez à quel pays elles appartiennent.",
+    "rule_how_to_play": "Choisissez parmi les options ou tapez le nom du pays en mode clavier. Continuez à deviner jusqu'à trouver la bonne réponse.",
+    "rule_tip": "Astuce : Les symboles, animaux et motifs héraldiques évoquent l'histoire et la géographie de la nation !"
+  },
   "game_distance": {
     "title": "Chasse à la Distance",
     "description": "Devinez le pays grâce à la distance et la direction.",
@@ -210,9 +217,10 @@
     "distance": "Distance",
     "flag": "Drapeau",
     "capital": "Capitale",
-    "borderline": "Frontières",
+    "borderline": "Ligne frontière",
     "borderpath": "Chemin frontalier",
-    "findmap": "Trouver sur la carte"
+    "findmap": "Trouver sur la carte",
+    "coatofarms": "Armoiries"
   },
   "leaderboard": {
     "title": "Classement",

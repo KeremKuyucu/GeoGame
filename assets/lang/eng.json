@@ -92,6 +92,13 @@
     "rule_how_to_play": "Select from the options or type the country name in keyboard mode. Keep guessing until you find the correct answer.",
     "rule_tip": "Tip: Watch out for similar flags! (e.g., Romania-Chad, Monaco-Indonesia)"
   },
+  "game_coatofarms": {
+    "title": "Coat of Arms Hunt",
+    "description": "Identify the country by its coat of arms.",
+    "rule_welcome": "A national coat of arms will be shown. Find which country this coat of arms belongs to.",
+    "rule_how_to_play": "Select from the options or type the country name in keyboard mode. Keep guessing until you find the correct answer.",
+    "rule_tip": "Tip: Emblems, animals, and symbols on coats of arms reflect national history and geography!"
+  },
   "game_distance": {
     "title": "Distance Hunt",
     "description": "Guess the country based on distance and direction.",
@@ -212,7 +219,8 @@
     "capital": "Capital",
     "borderline": "Borderline",
     "borderpath": "Border Path",
-    "findmap": "Find Map"
+    "findmap": "Find Map",
+    "coatofarms": "Coat of Arms"
   },
   "leaderboard": {
     "title": "Leaderboard",

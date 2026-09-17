@@ -92,6 +92,13 @@
     "rule_how_to_play": "Elige entre las opciones o escribe el nombre del país en modo teclado. Sigue intentándolo hasta acertar.",
     "rule_tip": "Consejo: ¡Cuidado con las banderas similares! (ej., Rumanía-Chad, Mónaco-Indonesia)"
   },
+  "game_coatofarms": {
+    "title": "Caza de Escudos",
+    "description": "Identifica el país por su escudo de armas.",
+    "rule_welcome": "Se mostrará el escudo nacional de un país. Adivina a qué país pertenece.",
+    "rule_how_to_play": "Elige entre las opciones o escribe el nombre del país en modo teclado. Sigue intentándolo hasta acertar.",
+    "rule_tip": "Consejo: ¡Los símbolos, animales y colores de los escudos revelan la historia y geografía del país!"
+  },
   "game_distance": {
     "title": "Caza de Distancia",
     "description": "Adivina el país según la distancia y la dirección.",
@@ -212,7 +219,8 @@
     "capital": "Capital",
     "borderline": "Línea fronteriza",
     "borderpath": "Ruta fronteriza",
-    "findmap": "Buscar en el mapa"
+    "findmap": "Buscar en el mapa",
+    "coatofarms": "Escudos"
   },
   "leaderboard": {
     "title": "Clasificación",

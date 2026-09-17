@@ -7,6 +7,7 @@ import 'package:geogame/screens/games/capital/capital_screen.dart';
 import 'package:geogame/screens/games/distance/distance_screen.dart';
 import 'package:geogame/screens/games/flag/flag_screen.dart';
 import 'package:geogame/screens/games/findmap/findmap_screen.dart';
+import 'package:geogame/screens/games/coat_of_arms/coat_of_arms_screen.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold.dart';
 import 'package:geogame/screens/mainscreen/main_screen.dart';
 import 'package:geogame/screens/leaderboard/leaderboard.dart';
@@ -27,6 +28,7 @@ class AppRoutes {
     '/game/borderline': (context) => const BorderLineGame(),
     '/game/borderpath': (context) => const BorderPathGame(),
     '/game/findmap': (context) => const FindMapGame(),
+    '/game/coatofarms': (context) => const CoatOfArmsGame(),
 
     '/games': (context) => const MainScreen(),
     '/leaderboard': (context) => const Leaderboard(),
