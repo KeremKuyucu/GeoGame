@@ -37,7 +37,9 @@ try {
     Set-Location $projectRoot
 
     $projectsParent = Split-Path -Parent $projectRoot
-    $distPath      = if (Test-Path (Join-Path $projectsParent "Outputs")) { Join-Path $projectsParent "Outputs" } else { "C:\Users\Kerem\Projects\Outputs" }
+    $outputsRoot   = if (Test-Path (Join-Path $projectsParent "Outputs")) { Join-Path $projectsParent "Outputs" } else { "C:\Users\Kerem\Projects\Outputs" }
+    $appName       = "GeoGame"
+    $distPath      = $outputsRoot
     $innoSetupPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
     $issFilePath   = Join-Path $projectRoot "InnoSetup.iss"
     $innoOutPath   = Join-Path $projectRoot "Output"
@@ -52,6 +54,8 @@ try {
     $imzaDir            = if (Test-Path (Join-Path $projectsParent "imza-bilgileri")) { Join-Path $projectsParent "imza-bilgileri" } else { "C:\Users\Kerem\Projects\imza-bilgileri" }
     $pfxPath            = Join-Path $imzaDir "KeremKuyucu.pfx"
     $pfxPropertiesPath  = Join-Path $imzaDir "pfx.properties"
+    $vercelTokenPath    = Join-Path $imzaDir "geogame.vercel"
+    $vercelToken        = $null
 
     # Google Play Console / API
     $playPackageName   = "com.keremkuyucu.geogame"
@@ -229,6 +233,9 @@ try {
         $currentVersion = $userInput.Trim()
     }
 
+    # Cikti klasorunu uygulamaya ve surume gore yapilandir: Outputs\GeoGame\v1.6.9
+    $verFolder = if ($currentVersion -match '^v') { $currentVersion } else { "v$currentVersion" }
+    $distPath  = Join-Path (Join-Path $outputsRoot $appName) $verFolder
     Ensure-Dir $distPath
 
     $verPadded = $currentVersion.PadRight(14)
@@ -236,6 +243,7 @@ try {
     Write-Host "+=======================================================+" -ForegroundColor Cyan
     Write-Host "|   GeoGame Build & Deploy  -  Versiyon $verPadded   |" -ForegroundColor Cyan
     Write-Host "+=======================================================+" -ForegroundColor Cyan
+    Write-Info "Cikti Dizini: $distPath"
 
     # -- 2) Platform Secim Menusu --------------------------------------------------
     function Show-PlatformMenu {
@@ -288,6 +296,73 @@ try {
 
     $selectedNames = @($selectedPlatforms | ForEach-Object { $_.Name })
     Write-Ok "Secilen platformlar: $($selectedNames -join ', ')"
+
+    # -- Vercel Token & Oturum On-Kontrolu (Web Secildiyse) -------------------------
+    if ($selectedNames -contains "Web") {
+        Write-Step "Vercel Token & Oturumu Kontrol Ediliyor"
+        $vercelCheck = Get-Command $vercelCmd -ErrorAction SilentlyContinue
+        if (-not $vercelCheck) {
+            throw "Vercel CLI bulunamadi. Kurmak icin: npm i -g vercel"
+        }
+
+        # 1) Token Yukleme: VERCEL_TOKEN env var -> imza-bilgileri\vercel.token
+        if (-not [string]::IsNullOrWhiteSpace($env:VERCEL_TOKEN)) {
+            $vercelToken = $env:VERCEL_TOKEN.Trim()
+            Write-Info "Vercel token ortam degiskeninden (VERCEL_TOKEN) alindi."
+        }
+        elseif (Test-Path $vercelTokenPath) {
+            $rawToken = (Get-Content $vercelTokenPath -Raw).Trim()
+            if (-not [string]::IsNullOrWhiteSpace($rawToken)) {
+                $vercelToken = $rawToken
+                $env:VERCEL_TOKEN = $vercelToken
+                Write-Info "Vercel token '$vercelTokenPath' dosyasindan okundu."
+            }
+        }
+
+        # Eger token hala yoksa kullanicidan iste ve imza klasorune kalici kaydet
+        if ([string]::IsNullOrWhiteSpace($vercelToken)) {
+            Write-Warn "Vercel token bulunamadi."
+            $userInputToken = Read-Host "Lutfen Vercel Access Token'inizi yapistirin (imza klasorune kaydedilecek)"
+            if (-not [string]::IsNullOrWhiteSpace($userInputToken)) {
+                $vercelToken = $userInputToken.Trim()
+                $env:VERCEL_TOKEN = $vercelToken
+                Ensure-Dir (Split-Path -Parent $vercelTokenPath)
+                Set-Content -Path $vercelTokenPath -Value $vercelToken -Force -Encoding UTF8
+                Write-Ok "Vercel token '$vercelTokenPath' dosyasina kaydedildi."
+            }
+        }
+
+        # 2) Token ile whoami kontrolu
+        $tokenParam = if ($vercelToken) { "--token $vercelToken" } else { "" }
+        $whoamiRaw = (& cmd.exe /c "$vercelCmd whoami $tokenParam" 2>&1 | Out-String).Trim()
+        $whoamiExit = $LASTEXITCODE
+
+        if ($whoamiExit -ne 0 -or $whoamiRaw -match "Not authorized" -or [string]::IsNullOrWhiteSpace($whoamiRaw)) {
+            Write-Warn "Vercel oturumu dogrulanamadi: $whoamiRaw"
+            $reToken = Read-Host "Token gecersiz veya suresi dolmus olabilir. Lutfen yeni Token yapistirin (veya Bos birakarak tarayicidan login deneyin)"
+            if (-not [string]::IsNullOrWhiteSpace($reToken)) {
+                $vercelToken = $reToken.Trim()
+                $env:VERCEL_TOKEN = $vercelToken
+                Ensure-Dir (Split-Path -Parent $vercelTokenPath)
+                Set-Content -Path $vercelTokenPath -Value $vercelToken -Force -Encoding UTF8
+                $tokenParam = "--token $vercelToken"
+            } else {
+                Write-Step "Vercel Girisi Baslatiliyor (vercel login)..."
+                & cmd.exe /c "$vercelCmd login"
+                $tokenParam = ""
+            }
+
+            $whoamiRaw = (& cmd.exe /c "$vercelCmd whoami $tokenParam" 2>&1 | Out-String).Trim()
+            $whoamiExit = $LASTEXITCODE
+            if ($whoamiExit -ne 0 -or $whoamiRaw -match "Not authorized" -or [string]::IsNullOrWhiteSpace($whoamiRaw)) {
+                throw "Vercel oturumu dogrulanamadi! Derleme surecleri baslatilmadan islem durduruldu."
+            }
+        }
+
+        $whoamiUser = ($whoamiRaw -split "[\r\n]+" | Where-Object { $_ -notmatch 'Vercel CLI' -and $_ -notmatch '^\s*$' } | Select-Object -Last 1)
+        if ([string]::IsNullOrWhiteSpace($whoamiUser)) { $whoamiUser = $whoamiRaw }
+        Write-Ok "Vercel oturumu aktif: $whoamiUser (Token ile yetkilendirildi)"
+    }
 
     # -- Flutter Clean (Opsiyonel) -------------------------------------------------
     $doClean = Read-Host "`nOnce 'flutter clean' calistirilsin mi? (e/H)"
@@ -376,11 +451,12 @@ try {
         if (-not (Test-Path $issFilePath))   { throw "ISS dosyasi bulunamadi: $issFilePath" }
 
         Write-Step "Inno Setup Calistiriliyor"
-        Run-Exe -FilePath $innoSetupPath -ArgumentList @($issFilePath) -WorkingDirectory $projectRoot
+        Run-Exe -FilePath $innoSetupPath -ArgumentList @("/O$distPath", $issFilePath) -WorkingDirectory $projectRoot
 
         $searchPaths = @()
+        if (Test-Path $distPath) { $searchPaths += $distPath }
         if (Test-Path $innoOutPath) { $searchPaths += $innoOutPath }
-        if (-not ($searchPaths -contains $distPath)) { $searchPaths += $distPath }
+        if (Test-Path $outputsRoot -and -not ($searchPaths -contains $outputsRoot)) { $searchPaths += $outputsRoot }
 
         $installerExe = $null
 
@@ -502,9 +578,33 @@ try {
         # `vercel --prod` komutu projeyi production ortamina deploy eder.
         # Proje ilk kez deploy ediliyorsa `vercel link` ile baglanti kurulmus olmalidir.
         # `--yes` bayragi interaktif sorulari atlar.
-        Run-Exe -FilePath "cmd.exe" `
-            -ArgumentList @("/c", "vercel --prod --yes") `
-            -WorkingDirectory $webBuildSrc
+        $tokenDeployArg = if ($vercelToken) { "--token $vercelToken" } else { "" }
+        $deployCmdStr = "$vercelCmd --prod --yes $tokenDeployArg".Trim()
+
+        $deployExit = Run-Exe -FilePath "cmd.exe" `
+            -ArgumentList @("/c", $deployCmdStr) `
+            -WorkingDirectory $webBuildSrc `
+            -AllowNonZero
+
+        if ($deployExit -ne 0) {
+            Write-Warn "Vercel deploy basarisiz oldu (ExitCode=$deployExit). Oturum / token yenileme deneniyor..."
+            $newTok = Read-Host "Lutfen yeni Vercel Access Token girin (veya Bos birakarak tarayicidan login deneyin)"
+            if (-not [string]::IsNullOrWhiteSpace($newTok)) {
+                $vercelToken = $newTok.Trim()
+                $env:VERCEL_TOKEN = $vercelToken
+                Ensure-Dir (Split-Path -Parent $vercelTokenPath)
+                Set-Content -Path $vercelTokenPath -Value $vercelToken -Force -Encoding UTF8
+                $tokenDeployArg = "--token $vercelToken"
+            } else {
+                & cmd.exe /c "$vercelCmd login"
+                $tokenDeployArg = ""
+            }
+            $deployCmdStr = "$vercelCmd --prod --yes $tokenDeployArg".Trim()
+            Write-Step "Vercel Deploy Tekrar Deneniyor..."
+            Run-Exe -FilePath "cmd.exe" `
+                -ArgumentList @("/c", $deployCmdStr) `
+                -WorkingDirectory $webBuildSrc
+        }
 
         # Vercel baglanti yapilandirmasini gelecekteki build'ler icin yedekle
         $buildProjectJson = Join-Path $vercelDestDir "project.json"

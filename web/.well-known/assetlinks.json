@@ -1,0 +1,17 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.keremkuyucu.geogame",
+      "sha256_cert_fingerprints": [
+        "DD:A1:66:BE:4F:9A:1F:05:52:37:A4:32:54:8C:6F:1E:40:F5:23:17:D4:3F:D9:12:B0:D6:1B:9E:1A:88:AB:A8",
+        "1E:EE:56:DD:EE:EF:94:16:62:A8:4C:93:D6:78:59:1C:5F:D3:66:8A:4D:08:7A:04:65:F2:85:A2:E2:27:24:E1",
+        "B3:B0:5B:B5:2A:3E:10:A0:CB:71:42:57:E0:4B:59:B4:E6:8F:1F:D8:3F:7D:01:F7:33:66:2B:E0:C8:D0:1B:85"
+      ]
+    }
+  }
+]
