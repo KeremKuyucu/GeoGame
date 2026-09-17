@@ -45,6 +45,32 @@ function Get-ConnectedDevice {
     return $null
 }
 
+function Enable-ImmersiveMode {
+    Write-Info "Tam ekran modu etkinlestiriliyor..."
+
+    try {
+        adb -s $device shell settings put global policy_control immersive.full=*
+        Start-Sleep -Milliseconds 500
+        Write-Ok "Status bar ve navigation bar gizlendi."
+    }
+    catch {
+        Write-Warn "Tam ekran modu etkinlestirilemedi: $($_.Exception.Message)"
+    }
+}
+
+function Disable-ImmersiveMode {
+    Write-Info "Tam ekran modu kapatiliyor..."
+
+    try {
+        adb -s $device shell settings put global policy_control null
+        Start-Sleep -Milliseconds 500
+        Write-Ok "Normal ekran modu geri yuklendi."
+    }
+    catch {
+        Write-Warn "Normal ekran modu geri yuklenemedi."
+    }
+}
+
 $device = Get-ConnectedDevice
 if (-not $device) {
     Write-Header "Cihaz / Emulator Aranıyor"
@@ -109,18 +135,19 @@ function Save-ScreenCapture ([string]$fileName, [string]$label) {
 }
 
 $screenItems = @(
-    [pscustomobject]@{ Key = "1"; Name = "mainlobi.png"; Label = "Ana Menü / Lobi" }
-    [pscustomobject]@{ Key = "2"; Name = "coatofarms_game.png"; Label = "Arma Avı (Coat of Arms)" }
-    [pscustomobject]@{ Key = "3"; Name = "flag_game.png"; Label = "Bayrak Avı (Flag Quiz)" }
-    [pscustomobject]@{ Key = "4"; Name = "capital_game.png"; Label = "Başkent Avı (Capital Quiz)" }
-    [pscustomobject]@{ Key = "5"; Name = "distance_game.png"; Label = "Mesafe Avı (Distance Game)" }
-    [pscustomobject]@{ Key = "6"; Name = "borderpath_game.png"; Label = "Sınır Yolu (Border Path)" }
-    [pscustomobject]@{ Key = "7"; Name = "borderline_game.png"; Label = "Sınır Hattı (Borderline)" }
+    [pscustomobject]@{ Key = "1"; Name = "mainlobi.png"; Label = "Ana Menu / Lobi" }
+    [pscustomobject]@{ Key = "2"; Name = "coatofarms_game.png"; Label = "Arma Avi (Coat of Arms)" }
+    [pscustomobject]@{ Key = "3"; Name = "flag_game.png"; Label = "Bayrak Avi (Flag Quiz)" }
+    [pscustomobject]@{ Key = "4"; Name = "capital_game.png"; Label = "Baskent Avi (Capital Quiz)" }
+    [pscustomobject]@{ Key = "5"; Name = "distance_game.png"; Label = "Mesafe Avi (Distance Game)" }
+    [pscustomobject]@{ Key = "6"; Name = "borderpath_game.png"; Label = "Sinir Yolu (Border Path)" }
+    [pscustomobject]@{ Key = "7"; Name = "borderline_game.png"; Label = "Sinir Hatti (Borderline)" }
     [pscustomobject]@{ Key = "8"; Name = "findmap_game.png"; Label = "Haritada Bul (Find Map)" }
     [pscustomobject]@{ Key = "9"; Name = "leaderboard.png"; Label = "Liderlik Tablosu (Leaderboard)" }
-    [pscustomobject]@{ Key = "10"; Name = "profile.png"; Label = "Profil & İstatistikler" }
+    [pscustomobject]@{ Key = "10"; Name = "profile.png"; Label = "Profil & Istatistikler" }
+    [pscustomobject]@{ Key = "11"; Name = "settings.png"; Label = "Ayarlar" }
 )
-
+Enable-ImmersiveMode
 while ($true) {
     Write-Header "GeoGame Ekran Goruntusu Araci"
     Write-Ok "Aktif Cihaz: $device"
@@ -132,7 +159,6 @@ while ($true) {
         Write-Host "   $($keyStr.PadRight(5)) $($item.Label.PadRight(32)) -> $($item.Name)" -ForegroundColor Cyan
     }
     Write-Host "   [A]   TUMUNU SIRAYLA CEK (Rehberli Adim Adim)" -ForegroundColor Yellow
-    Write-Host "   [F]   TAM OTOMATIK FLUTTER DRIVE (Test ile Otopilot)" -ForegroundColor Green
     Write-Host "   [C]   Ozel Isimle Cek" -ForegroundColor DarkGray
     Write-Host "   [Q]   Cikis" -ForegroundColor Red
     Write-Host ""
@@ -141,13 +167,6 @@ while ($true) {
 
     if ($secim -match '^[Qq]$') {
         break
-    }
-    elseif ($secim -match '^[Ff]$') {
-        Write-Header "Otomatik Flutter Drive Testi Baslatiliyor"
-        Write-Info "Komut: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_screenshots_test.dart -d $device"
-        & flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_screenshots_test.dart -d $device
-        Write-Ok "Flutter Drive tamamlandi. Screenshots klasorunu kontrol edebilirsiniz."
-        Start-Sleep -Seconds 2
     }
     elseif ($secim -match '^[Aa]$') {
         Write-Header "Adim Adim Tum Ekranlari Cekme Modu"
@@ -159,7 +178,8 @@ while ($true) {
             $null = Read-Host "   Hazir oldugunuzda Enter'a basin (Atlamak icin 's' yazin)"
             if ($null -notmatch '^[Ss]$') {
                 Save-ScreenCapture -fileName $item.Name -label $item.Label
-            } else {
+            }
+            else {
                 Write-Info "Atlandi."
             }
             Write-Host ""
@@ -178,11 +198,13 @@ while ($true) {
         if ($match) {
             Save-ScreenCapture -fileName $match.Name -label $match.Label
             Start-Sleep -Seconds 1
-        } else {
+        }
+        else {
             Write-Warn "Gecersiz secim!"
             Start-Sleep -Milliseconds 600
         }
     }
 }
 
+Disable-ImmersiveMode
 Write-Ok "Screenshots klasoru: $screenshotsDir"

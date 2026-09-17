@@ -33,7 +33,7 @@ try {
     $scriptStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # -- 0) Yapilandirma -----------------------------------------------------------
-    $projectRoot = $PSScriptRoot
+    $projectRoot = Split-Path -Parent $PSScriptRoot
     Set-Location $projectRoot
 
     $projectsParent = Split-Path -Parent $projectRoot

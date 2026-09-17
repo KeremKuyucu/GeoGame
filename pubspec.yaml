@@ -25,20 +25,18 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
 
-flutter_icons:
-  android: {
-    "generate": true
-  }
-  web: {
-    "generate": true
-  }
-  windows: {
-    "generate": true
-  }
+flutter_launcher_icons:
+  android: true
+  web:
+    generate: true
+    image_path: "assets/images/logo.png"
+  windows:
+    generate: true
+    image_path: "assets/images/logo.png"
   image_path: "assets/images/logo.png"
+  adaptive_icon_background: "assets/images/logo_background.png"
+  adaptive_icon_foreground: "assets/images/logo_foreground.png"
 # flutter pub run flutter_launcher_icons:main
 
 flutter:
