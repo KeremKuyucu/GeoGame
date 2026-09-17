@@ -1,7 +1,7 @@
 # 🌍 GeoGame
 
 <p align="center">
-  <img src="assets/images/logo.png" alt="GeoGame Logo" width="200"/>
+  <img src="assets/images/logo.webp" alt="GeoGame Logo" width="200"/>
 </p>
 
 <p align="center">
@@ -30,14 +30,14 @@
 ## 🖼️ Screenshots
 
 ### Gameplay Experience
-| Capital Quiz | Flag Quiz | Distance Game |
-| :---: | :---: | :---: |
-| <img src="Resimler/capital_game.png" width="180"/> | <img src="Resimler/flag_game.png" width="180"/> | <img src="Resimler/distance_game.png" width="180"/> |
+| Coat of Arms Quiz | Capital Quiz | Flag Quiz | Distance Game |
+| :---: | :---: | :---: | :---: |
+| <img src="screenshots/coatofarms_game.png" width="160"/> | <img src="screenshots/capital_game.png" width="160"/> | <img src="screenshots/flag_game.png" width="160"/> | <img src="screenshots/distance_game.png" width="160"/> |
 
 ### Interface & Social
 | Main Lobby | Leaderboard | Profile & Settings |
 | :---: | :---: | :---: |
-| <img src="Resimler/mainlobi.png" width="180"/> | <img src="Resimler/leaderboard.png" width="180"/> | <img src="Resimler/profile.png" width="180"/> |
+| <img src="screenshots/mainlobi.png" width="180"/> | <img src="screenshots/leaderboard.png" width="180"/> | <img src="screenshots/profile.png" width="180"/> |
 
 ---
 
