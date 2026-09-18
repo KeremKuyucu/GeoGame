@@ -65,20 +65,25 @@ class AuthLogo extends StatelessWidget {
     return Hero(
       tag: 'app_logo',
       child: Container(
+        width: 100,
+        height: 100,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.35),
               blurRadius: 20,
               offset: const Offset(0, 10),
-            )
+            ),
           ],
         ),
-        child: Image.asset(
-          'assets/images/logo.webp',
-          height: 100,
-          fit: BoxFit.contain,
+        child: ClipOval(
+          child: Image.asset(
+            'assets/images/logo.webp',
+            width: 100,
+            height: 100,
+            fit: BoxFit.cover,
+          ),
         ),
       ),
     );

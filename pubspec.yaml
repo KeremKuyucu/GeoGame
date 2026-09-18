@@ -37,7 +37,6 @@ flutter_launcher_icons:
   image_path: "assets/images/logo.png"
   adaptive_icon_background: "assets/images/logo_background.png"
   adaptive_icon_foreground: "assets/images/logo_foreground.png"
-# flutter pub run flutter_launcher_icons:main
 
 flutter:
   uses-material-design: true
