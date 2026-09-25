@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/screens/games/borderline/borderline_screen.dart';
 import 'package:geogame/screens/games/borderpath/borderpath_screen.dart';
@@ -17,9 +18,6 @@ import 'package:geogame/screens/auth/auth_screen.dart';
 
 class AppRoutes {
   static final Map<String, WidgetBuilder> routes = {
-    // Başlangıç ekranı
-    '/': (context) => const SplashScreen(),
-
     '/home': (context) => const MainScaffold(),
 
     '/game/capital': (context) => const CapitalGame(),
@@ -37,4 +35,51 @@ class AppRoutes {
 
     '/auth': (context) => const AuthPage(),
   };
+
+  static Route<dynamic>? generateRoute(RouteSettings settings) {
+    final name = settings.name;
+    if (name == null) return null;
+
+    // '/' → Her zaman normal SplashScreen
+    if (name == '/') {
+      return MaterialPageRoute(
+        builder: (context) => const SplashScreen(),
+      );
+    }
+
+    // Login callback (OAuth deep link)
+    final isLoginCallback = name.contains('login-callback') ||
+        name.startsWith('com.keremkuyucu.geogame');
+
+    if (isLoginCallback) {
+      if (AppState.allCountries.isEmpty) {
+        return MaterialPageRoute(
+          builder: (context) => const SplashScreen(),
+        );
+      }
+      return PageRouteBuilder(
+        pageBuilder: (context, _, __) => const SizedBox.shrink(),
+        transitionDuration: Duration.zero,
+      );
+    }
+
+    // Uygulama henüz başlatılmamışsa → Splash önce, sonra hedefe git
+    if (AppState.allCountries.isEmpty) {
+      return MaterialPageRoute(
+        builder: (context) => SplashScreen(
+          onInitialized: () {
+            Navigator.of(context).pushReplacementNamed(name);
+          },
+        ),
+      );
+    }
+
+    // Uygulama hazır → doğrudan aç
+    final builder = routes[name];
+    if (builder != null) {
+      return MaterialPageRoute(builder: builder);
+    }
+
+    return null;
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:geogame/models/app_context.dart';
@@ -5,6 +7,7 @@ import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/ad_service.dart';
+import 'package:geogame/services/bonus_service.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/widgets/flag_loader.dart';
@@ -40,16 +43,189 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => GameScaffold.handleGameExit(context),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
-          onPressed: () => GameScaffold.handleGameExit(context),
-        ),
+        if (!kIsWeb)
+          ValueListenableBuilder<bool>(
+            valueListenable: AppState.childModeNotifier,
+            builder: (context, isChild, _) {
+              if (isChild) return const SizedBox.shrink();
+              return const _BonusButton();
+            },
+          ),
       ],
     );
   }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+/// 2x Puan Bonusu butonu (Ödüllü reklam izletir, 5 dk 2x verir, stacklenebilir)
+class _BonusButton extends StatefulWidget {
+  const _BonusButton();
+
+  @override
+  State<_BonusButton> createState() => _BonusButtonState();
+}
+
+class _BonusButtonState extends State<_BonusButton> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    BonusService.bonusEndTimeNotifier.addListener(_onBonusChanged);
+    _checkTimer();
+  }
+
+  @override
+  void dispose() {
+    BonusService.bonusEndTimeNotifier.removeListener(_onBonusChanged);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _onBonusChanged() {
+    _checkTimer();
+    if (mounted) setState(() {});
+  }
+
+  void _checkTimer() {
+    if (BonusService.isActive) {
+      _timer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!BonusService.isActive) {
+          timer.cancel();
+          _timer = null;
+        }
+        if (mounted) setState(() {});
+      });
+    } else {
+      _timer?.cancel();
+      _timer = null;
+    }
+  }
+
+  Future<void> _handleTap() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final shown = await AdService.showRewardedAd(
+      onRewarded: () {
+        BonusService.activate();
+        if (mounted) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: const Text(
+                '🎉 2x Puan Bonusu Aktif! (+5 dakika eklendi)',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Colors.amber.shade800,
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+      },
+    );
+
+    if (!shown && mounted) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Reklam hazırlanıyor, lütfen birazdan tekrar deneyin.',
+          ),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = BonusService.isActive;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: Tooltip(
+          message: isActive
+              ? '2x Puan Bonusu Aktif! Süreyi uzatmak için dokun (+5 dk)'
+              : 'Ödüllü reklam izle, 5 dakika 2x puan kazan!',
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: _handleTap,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: isActive
+                      ? const LinearGradient(
+                          colors: [Color(0xFFFF8F00), Color(0xFFFF3D00)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [
+                            Colors.amber.shade600,
+                            Colors.orange.shade800,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isActive
+                        ? Colors.amberAccent
+                        : Colors.amber.shade200.withValues(alpha: 0.6),
+                    width: isActive ? 1.5 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isActive ? Colors.deepOrange : Colors.amber)
+                          .withValues(alpha: 0.45),
+                      blurRadius: isActive ? 8 : 4,
+                      spreadRadius: isActive ? 1 : 0,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isActive
+                          ? Icons.bolt_rounded
+                          : Icons.play_circle_fill_rounded,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isActive
+                          ? '2x ${BonusService.formattedRemainingTime}'
+                          : '2x BONUS',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Oyun arka plan gradient'i

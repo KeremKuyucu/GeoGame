@@ -579,9 +579,62 @@ class WorldMapPainter extends CustomPainter {
     }
 
     // Küçük ülkeler için marker çizimi
-    // Zaten sadece küçük ülkelerin keyleri smallCountryCenters içinde var
-    for (var center in smallCountryCenters.values) {
-      canvas.drawCircle(center, markerRadius, markerPaint);
+    // Hedef ülke küçük bir ülke ise sarı ve yanıp sönen efekt ile öne çıkar
+    Offset? targetSmallCenter;
+
+    for (var entry in smallCountryCenters.entries) {
+      final iso = entry.key;
+      final center = entry.value;
+
+      if (showHint && targetIso != null && iso == targetIso) {
+        // Hedef küçük ülkenin merkezini kaydet (tüm normal markerların en üstünde çizmek için)
+        targetSmallCenter = center;
+      } else {
+        canvas.drawCircle(center, markerRadius, markerPaint);
+      }
+    }
+
+    // Hedef küçük ülke için yanıp sönen (pulse) sarı marker efekti
+    if (targetSmallCenter != null) {
+      final double pulse = pulseAnimation?.value ?? 0.5;
+      final Color activeYellow =
+          isDark ? Colors.amberAccent : Colors.amber.shade700;
+
+      // 1. Dış yanıp sönen dalga / radar aurası (pulse efekti)
+      final double auraRadius = markerRadius + (4.0 + pulse * 8.0) / scale;
+      final Paint auraPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(1.5, 2.5 / scale)
+        ..color = activeYellow.withValues(
+          alpha: (0.9 - pulse * 0.7).clamp(0.0, 1.0),
+        );
+      canvas.drawCircle(targetSmallCenter, auraRadius, auraPaint);
+
+      // 2. Hafif dış ışıma dolgusu
+      final Paint glowPaint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = activeYellow.withValues(
+          alpha: (0.15 + pulse * 0.25).clamp(0.0, 1.0),
+        );
+      canvas.drawCircle(targetSmallCenter, auraRadius, glowPaint);
+
+      // 3. Merkez sarı daire (yanıp sönen canlı sarı dolgu)
+      final double activeCenterRadius = markerRadius * (1.2 + pulse * 0.3);
+      final Paint activeCenterPaint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = activeYellow.withValues(
+          alpha: (0.85 + pulse * 0.15).clamp(0.0, 1.0),
+        );
+      canvas.drawCircle(
+          targetSmallCenter, activeCenterRadius, activeCenterPaint);
+
+      // 4. Belirginleştirici beyaz sınır çizgisi (kontrast için)
+      final Paint activeBorderPaint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = max(1.0, 1.6 / scale)
+        ..color = Colors.white.withValues(alpha: 0.95);
+      canvas.drawCircle(
+          targetSmallCenter, activeCenterRadius, activeBorderPaint);
     }
   }
 

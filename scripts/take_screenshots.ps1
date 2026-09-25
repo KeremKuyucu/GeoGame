@@ -1,4 +1,4 @@
-#requires -version 5.1
+﻿#requires -version 5.1
 <#
 .SYNOPSIS
     GeoGame - Otomatik Ekran Goruntusu Yakalayici (Screenshots Tool)

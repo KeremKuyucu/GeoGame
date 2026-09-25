@@ -189,22 +189,7 @@
       "oceania": "Océanie",
       "antarctica": "Antarctique"
     },
-    "guest": "Invité",
-    "child_mode": "Mode enfant",
-    "child_mode_desc": "Masque le classement et le menu latéral",
-    "child_mode_enable_title": "Activer le mode enfant",
-    "child_mode_enable_desc": "Lorsque le mode enfant est actif, le classement et les liens du menu latéral sont désactivés. Définissez un code PIN à 4 chiffres pour verrouiller et déverrouiller ce mode.",
-    "child_mode_disable_title": "Désactiver le mode enfant",
-    "child_mode_disable_desc": "Entrez votre code PIN à 4 chiffres pour désactiver le mode enfant.",
-    "child_mode_pin_hint": "Entrez un code PIN à 4 chiffres",
-    "child_mode_pin_confirm_hint": "Confirmez votre code PIN",
-    "child_mode_pin_mismatch": "Les codes PIN ne correspondent pas !",
-    "child_mode_pin_length_error": "Le code PIN doit comporter exactement 4 chiffres !",
-    "child_mode_wrong_pin": "Code PIN incorrect ! Veuillez réessayer.",
-    "child_mode_enabled_msg": "Mode enfant activé.",
-    "child_mode_disabled_msg": "Mode enfant désactivé.",
-    "child_mode_leaderboard_disabled_title": "Mode enfant actif",
-    "child_mode_leaderboard_disabled_desc": "Le classement est désactivé en mode enfant. Vous pouvez le désactiver dans les paramètres avec votre code PIN."
+    "guest": "Invité"
   },
   "profile": {
     "title": "Profil",

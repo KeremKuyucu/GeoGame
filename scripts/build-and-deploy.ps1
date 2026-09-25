@@ -1,4 +1,4 @@
-#requires -version 5.1
+﻿#requires -version 5.1
 <#
 .SYNOPSIS
     GeoGame - Otomatik Build, Imzala ve Dagit (Web / APK / AAB / Windows)

@@ -189,22 +189,7 @@
       "oceania": "Ozeanien",
       "antarctica": "Antarktis"
     },
-    "guest": "Gast",
-    "child_mode": "Kindermodus",
-    "child_mode_desc": "Blendet Bestenliste und Seitenmenü aus",
-    "child_mode_enable_title": "Kindermodus aktivieren",
-    "child_mode_enable_desc": "Wenn der Kindermodus aktiv ist, sind die Bestenliste und Seitenmenü-Links deaktiviert. Lege eine 4-stellige PIN fest, um diesen Modus zu sperren und zu entsperren.",
-    "child_mode_disable_title": "Kindermodus deaktivieren",
-    "child_mode_disable_desc": "Gib deine 4-stellige PIN ein, um den Kindermodus zu deaktivieren.",
-    "child_mode_pin_hint": "4-stellige PIN eingeben",
-    "child_mode_pin_confirm_hint": "PIN bestätigen",
-    "child_mode_pin_mismatch": "PIN-Codes stimmen nicht überein!",
-    "child_mode_pin_length_error": "PIN muss genau 4 Ziffern lang sein!",
-    "child_mode_wrong_pin": "Falsche PIN! Bitte erneut versuchen.",
-    "child_mode_enabled_msg": "Kindermodus aktiviert.",
-    "child_mode_disabled_msg": "Kindermodus deaktiviert.",
-    "child_mode_leaderboard_disabled_title": "Kindermodus aktiv",
-    "child_mode_leaderboard_disabled_desc": "Die Bestenliste ist im Kindermodus deaktiviert. Du kannst sie in den Einstellungen mit deiner PIN ausschalten."
+    "guest": "Gast"
   },
   "profile": {
     "title": "Profil",

@@ -189,22 +189,7 @@
       "oceania": "Oceania",
       "antarctica": "Antarctica"
     },
-    "guest": "Guest",
-    "child_mode": "Child Mode",
-    "child_mode_desc": "Hides leaderboard and side menu",
-    "child_mode_enable_title": "Enable Child Mode",
-    "child_mode_enable_desc": "When Child Mode is active, the leaderboard and side menu links are disabled. Set a 4-digit PIN to lock and unlock this mode.",
-    "child_mode_disable_title": "Disable Child Mode",
-    "child_mode_disable_desc": "Enter your 4-digit PIN to disable Child Mode.",
-    "child_mode_pin_hint": "Enter 4-digit PIN",
-    "child_mode_pin_confirm_hint": "Confirm your PIN",
-    "child_mode_pin_mismatch": "PIN codes do not match!",
-    "child_mode_pin_length_error": "PIN must be exactly 4 digits!",
-    "child_mode_wrong_pin": "Incorrect PIN code! Please try again.",
-    "child_mode_enabled_msg": "Child Mode enabled.",
-    "child_mode_disabled_msg": "Child Mode disabled.",
-    "child_mode_leaderboard_disabled_title": "Child Mode Active",
-    "child_mode_leaderboard_disabled_desc": "The leaderboard is disabled in Child Mode. You can turn it off in Settings using your PIN."
+    "guest": "Guest"
   },
   "profile": {
     "title": "Profile",

@@ -16,10 +16,7 @@ class TelemetryService {
   /// Aktif UID'yi döndürür:
   /// 1. Supabase'e giriş yapılmışsa doğrudan Supabase kullanıcı UID'si
   /// 2. Giriş yapılmamışsa (misafir) SharedPreferences'taki kalıcı cihaz/misafir ID'si
-  static Future<String> getEffectiveUid([String? explicitUid]) async {
-    if (explicitUid != null && explicitUid.isNotEmpty) {
-      return explicitUid;
-    }
+  static Future<String> getEffectiveUid() async {
 
     try {
       final supabaseUid = AuthService.currentUserId;
@@ -39,13 +36,33 @@ class TelemetryService {
     return localUid;
   }
 
+  /// Aktif çalışma ortamının platform bilgisini standart ve detaylı biçimde döndürür:
+  /// - Web: 'web'
+  /// - Mobil/Masaüstü: 'android', 'ios', 'windows', 'macos', 'linux', 'fuchsia'
+  static String get platformName {
+    if (kIsWeb) return 'web';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'android';
+      case TargetPlatform.iOS:
+        return 'ios';
+      case TargetPlatform.windows:
+        return 'windows';
+      case TargetPlatform.macOS:
+        return 'macos';
+      case TargetPlatform.linux:
+        return 'linux';
+      case TargetPlatform.fuchsia:
+        return 'fuchsia';
+    }
+  }
+
   /// Uygulama açılışında arka planda çağrılacak telemetri metodu (her açılışta gönderilir)
   static Future<void> init() async {
     try {
       if (!SettingsController.settings.telemetryEnabled) return;
 
-      final uid = await getEffectiveUid();
-      await sendEvent('app_opened', uid: uid);
+      await sendEvent('app_opened');
     } catch (e) {
       debugPrint('TelemetryService init hatası: $e');
     }
@@ -54,26 +71,19 @@ class TelemetryService {
   /// Genel telemetri olayı gönderme metodu (Genişletilebilir event mimarisi)
   static Future<void> sendEvent(
     String eventName, {
-    String? uid,
     Map<String, dynamic>? additionalData,
   }) async {
     try {
       if (!SettingsController.settings.telemetryEnabled) return;
 
-      final effectiveUid = await getEffectiveUid(uid);
-
-      final String platform = kIsWeb
-          ? 'web'
-          : (defaultTargetPlatform == TargetPlatform.windows
-              ? 'windows'
-              : 'mobile');
+      final effectiveUid = await getEffectiveUid();
 
       final bodyData = {
         'uid': effectiveUid,
         'timestamp': DateTime.now().toUtc().toIso8601String(),
         'app': 'geogame',
         'event': eventName,
-        'platform': platform,
+        'platform': platformName,
         if (additionalData != null) ...additionalData,
       };
 
@@ -120,7 +130,6 @@ class TelemetryService {
     required String event,
     required String message,
     dynamic stackTrace,
-    String? uid,
     Map<String, dynamic>? metadata,
   }) async {
     if (_isSendingError) return; // Sonsuz döngü önlemi
@@ -129,20 +138,14 @@ class TelemetryService {
     try {
       if (!SettingsController.settings.telemetryEnabled) return;
 
-      final effectiveUid = await getEffectiveUid(uid);
-
-      final String platform = kIsWeb
-          ? 'web'
-          : (defaultTargetPlatform == TargetPlatform.windows
-              ? 'windows'
-              : 'mobile');
+      final effectiveUid = await getEffectiveUid();
 
       final bodyData = {
         'uid': effectiveUid,
         'timestamp': DateTime.now().toUtc().toIso8601String(),
         'app': 'geogame',
         'event': event,
-        'platform': platform,
+        'platform': platformName,
         'message': message,
         if (stackTrace != null) 'stackTrace': stackTrace.toString(),
         if (metadata != null) 'metadata': metadata,

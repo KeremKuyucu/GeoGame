@@ -7,6 +7,7 @@ import 'package:geogame/services/telemetry_service.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:geogame/services/auth_service.dart';
+import 'package:geogame/services/bonus_service.dart';
 
 class GameLogService {
   static final _supabase = Supabase.instance.client;
@@ -204,10 +205,11 @@ class GameSession {
   void submitCorrect() {
     correctCount++;
 
-    lastQuestionScoreEarned = currentQuestionScore;
+    final multiplied = currentQuestionScore * BonusService.scoreMultiplier;
+    lastQuestionScoreEarned = multiplied;
     lastQuestionWrongCount = currentQuestionWrongCount;
 
-    totalScore += currentQuestionScore;
+    totalScore += multiplied;
 
     currentQuestionScore = _startScore;
   }

@@ -5,7 +5,6 @@ import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
-import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/widgets/restart_widget.dart';
 
 class SettingsController {
@@ -47,21 +46,6 @@ class SettingsController {
   bool get isButtonMode => gameFilter.isButtonMode;
   String get currentLanguage => language;
   bool get isTelemetryEnabled => settings.telemetryEnabled;
-  static bool get isChildMode {
-    try {
-      return settings.childMode;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  static String get childModePin {
-    try {
-      return settings.childModePin;
-    } catch (_) {
-      return '';
-    }
-  }
 
   bool get europeEnabled => gameFilter.europe;
   bool get asiaEnabled => gameFilter.asia;
@@ -104,21 +88,6 @@ class SettingsController {
 
   void setTelemetryEnabled(bool value) =>
       _save(() => settings.telemetryEnabled = value);
-
-  Future<void> setChildMode(bool value,
-      {String? pin, BuildContext? context}) async {
-    _save(() {
-      settings.childMode = value;
-      if (pin != null && pin.isNotEmpty) {
-        settings.childModePin = pin;
-      }
-    });
-    AppState.childModeNotifier.value = value;
-    AdService.updateChildMode(value);
-    if (context != null && context.mounted) {
-      await restartApp(context);
-    }
-  }
 
   Future<void> changeLanguage(String code, BuildContext context) async {
     if (code == language) return;

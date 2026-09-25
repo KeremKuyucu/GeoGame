@@ -7,7 +7,6 @@ import 'package:geogame/widgets/profile_view_widget.dart';
 import 'package:geogame/widgets/profile_guest_view.dart';
 
 import 'package:geogame/screens/profiles/profiles_controller.dart';
-import 'package:geogame/screens/settings/settings_controller.dart';
 
 class Profiles extends StatefulWidget {
   const Profiles({super.key});
@@ -73,9 +72,7 @@ class _ProfilesState extends State<Profiles> {
           ),
         ],
       ),
-      drawer: SettingsController.isChildMode
-          ? null
-          : const DrawerWidget(),
+      drawer: const DrawerWidget(),
       body: _controller.isLoading
           ? const Center(child: CircularProgressIndicator())
           : ProfileViewWidget(

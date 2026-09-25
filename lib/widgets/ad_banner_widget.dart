@@ -27,11 +27,22 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
 
     _bannerAd = AdService.createBannerAd(
       onAdLoaded: (ad) {
+        debugPrint('AdBannerWidget: Banner yüklendi');
+
         if (mounted) {
-          setState(() => _isLoaded = true);
+          setState(() {
+            _isLoaded = true;
+          });
         }
       },
       onAdFailedToLoad: (ad, error) {
+        debugPrint(
+          'AdBannerWidget: Banner yüklenemedi: '
+          'code=${error.code}, '
+          'domain=${error.domain}, '
+          'message=${error.message}',
+        );
+
         if (mounted) {
           setState(() {
             _isLoaded = false;
@@ -40,6 +51,8 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
         }
       },
     );
+
+    debugPrint('AdBannerWidget: Banner yükleniyor...');
 
     _bannerAd!.load();
   }

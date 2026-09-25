@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:theme_mode_builder/theme_mode_builder/theme_mode_builder.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:theme_mode_builder/theme_mode_builder.dart';
 
 import 'package:geogame/app_routes.dart';
 
@@ -44,9 +44,10 @@ void main() async {
     return false;
   };
 
-  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+  await Supabase.initialize(url: Env.supabaseUrl, publishableKey: Env.publishableKey);
   await PreferencesService.loadConfig();
   await Localization.init();
+
   TelemetryService.init();
   AdService.initialize();
   AuthService.initAuthStateListener();
@@ -85,28 +86,13 @@ class Geogame extends StatelessWidget {
             useMaterial3: true,
           ),
           initialRoute: '/',
-          routes: AppRoutes.routes,
-          onGenerateRoute: (settings) {
-            if (settings.name != null &&
-                (settings.name!.contains('login-callback') ||
-                    settings.name!.startsWith('com.keremkuyucu.geogame'))) {
-              if (AppState.allCountries.isEmpty) {
-                return MaterialPageRoute(
-                    builder: (context) => const SplashScreen());
-              }
-              return PageRouteBuilder(
-                pageBuilder: (context, _, __) => const SizedBox.shrink(),
-                transitionDuration: Duration.zero,
-              );
-            }
-            return null;
-          },
-          onUnknownRoute: (settings) {
-            return MaterialPageRoute(
-                builder: (context) => const SplashScreen());
-          },
+          onGenerateRoute: AppRoutes.generateRoute,
+          onUnknownRoute: (_) => MaterialPageRoute(
+            builder: (context) => const SplashScreen(),
+          ),
         );
       },
     );
   }
 }
+

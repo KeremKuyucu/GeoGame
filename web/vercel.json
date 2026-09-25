@@ -5,10 +5,6 @@
       "destination": "/api/health"
     },
     {
-      "source": "/app-ads.txt",
-      "destination": "/app-ads.txt"
-    },
-    {
       "source": "/.well-known/assetlinks.json",
       "destination": "/.well-known/assetlinks.json"
     },
@@ -38,6 +34,15 @@
     },
     {
       "source": "/app-ads.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/ads.txt",
       "headers": [
         {
           "key": "Content-Type",

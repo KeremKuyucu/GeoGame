@@ -189,22 +189,7 @@
       "oceania": "Океания",
       "antarctica": "Антарктида"
     },
-    "guest": "Гость",
-    "child_mode": "Детский режим",
-    "child_mode_desc": "Скрывает таблицу лидеров и боковое меню",
-    "child_mode_enable_title": "Включить детский режим",
-    "child_mode_enable_desc": "В детском режиме таблица лидеров и ссылки бокового меню отключены. Установите 4-значный PIN-код для включения и выключения режима.",
-    "child_mode_disable_title": "Выключить детский режим",
-    "child_mode_disable_desc": "Введите 4-значный PIN-код, чтобы отключить детский режим.",
-    "child_mode_pin_hint": "Введите 4-значный PIN",
-    "child_mode_pin_confirm_hint": "Подтвердите свой PIN",
-    "child_mode_pin_mismatch": "PIN-коды не совпадают!",
-    "child_mode_pin_length_error": "PIN-код должен состоять ровно из 4 цифр!",
-    "child_mode_wrong_pin": "Неверный PIN-код! Попробуйте снова.",
-    "child_mode_enabled_msg": "Детский режим включен.",
-    "child_mode_disabled_msg": "Детский режим выключен.",
-    "child_mode_leaderboard_disabled_title": "Детский режим активен",
-    "child_mode_leaderboard_disabled_desc": "Таблица лидеров отключена в детском режиме. Вы можете отключить его в настройках с помощью своего PIN-кода."
+    "guest": "Гость"
   },
   "profile": {
     "title": "Профиль",

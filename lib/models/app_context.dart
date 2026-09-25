@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game_metadata.dart';
-import 'package:geogame/services/localization_service.dart';
 
 class AppState extends ChangeNotifier {
   static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -19,6 +18,7 @@ class AppState extends ChangeNotifier {
   static set user(UserProfile profile) {
     userNotifier.value = profile;
   }
+
   static Country targetCountry = Country.empty();
   static Country tempCountry = Country.empty();
   static List<Country> allCountries = [];
@@ -42,14 +42,14 @@ class UserProfile {
   UserProfile({required this.name, required this.avatarUrl});
 
   factory UserProfile.anonymous() => UserProfile(
-        name: Localization.t('settings.guest'),
-        avatarUrl: 'https://robohash.org/naber',
+        name: '',
+        avatarUrl: '',
       );
 
   Map<String, dynamic> toMap() => {'name': name, 'avatarUrl': avatarUrl};
 
   factory UserProfile.fromMap(Map<String, dynamic> map) => UserProfile(
-        name: map['name'] ?? Localization.t('settings.guest'),
-        avatarUrl: map['avatarUrl'] ?? 'https://robohash.org/naber',
+        name: map['name'],
+        avatarUrl: map['avatarUrl'],
       );
 }

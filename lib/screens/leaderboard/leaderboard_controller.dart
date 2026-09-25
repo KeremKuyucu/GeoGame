@@ -45,12 +45,10 @@ class LeaderboardController {
 
       final Map<String, dynamic> userMap = {
         'rank': _toInt(row['rank']),
-        'uid': row['uid']?.toString() ?? '',
-        'name':
-            row['full_name']?.toString() ?? Localization.t('settings.guest'),
-        'avatar_url': row['avatar_url']?.toString() ?? 'https://robohash.org/',
+        'uid': row['uid']?.toString(),
+        'name': row['full_name']?.toString(),
+        'avatar_url': row['avatar_url']?.toString(),
         'total_score': _toInt(row['total_score']),
-        // total_correct ve total_wrong view'da yoksa hesaplayacağız
       };
 
       int calcTotalCorrect = 0;
@@ -121,14 +119,13 @@ class LeaderboardController {
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: Text(user['name'] ?? ''),
+            title: Text(user['name']),
             centerTitle: true,
           ),
           body: ProfileViewWidget(
-            name: user['name'] ?? Localization.t('settings.guest'),
-            avatarUrl: user['avatar_url'] ??
-                'https://robohash.org/kaplan.png?set=set4',
-            totalScore: user['total_score'] ?? 0,
+            name: user['name'],
+            avatarUrl: user['avatar_url'],
+            totalScore: user['total_score'],
             stats: user,
           ),
         ),

@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/screens/settings/settings_controller.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -17,8 +16,6 @@ class CustomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isChildMode = SettingsController.isChildMode;
-
     return SalomonBottomBar(
       currentIndex: currentIndex,
       selectedItemColor: const Color(0xff6200ee),
@@ -30,12 +27,11 @@ class CustomNavBar extends StatelessWidget {
           title: Text(Localization.t('nav.games')),
           selectedColor: const Color(0xff6200ee),
         ),
-        if (!isChildMode)
-          SalomonBottomBarItem(
-            icon: const Icon(Icons.leaderboard),
-            title: Text(Localization.t('nav.rank')),
-            selectedColor: Colors.pink,
-          ),
+        SalomonBottomBarItem(
+          icon: const Icon(Icons.leaderboard),
+          title: Text(Localization.t('nav.rank')),
+          selectedColor: Colors.pink,
+        ),
         SalomonBottomBarItem(
           icon: const Icon(Icons.person),
           title: Text(Localization.t('nav.profile')),

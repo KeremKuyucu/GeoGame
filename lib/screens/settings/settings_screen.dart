@@ -54,36 +54,25 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        leading: Navigator.canPop(context)
-            ? IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: isDark ? Colors.white : Colors.black87,
-                  size: 20,
-                ),
-                onPressed: () => Navigator.pop(context),
-              )
-            : (SettingsController.isChildMode
-                ? null
-                : Builder(
-                    builder: (context) => IconButton(
-                      icon: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[800] : Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.menu_rounded,
-                          color: isDark ? Colors.white : Colors.black87,
-                          size: 20,
-                        ),
-                      ),
-                      onPressed: () => Scaffold.of(context).openDrawer(),
+        leading: Builder(
+                builder: (context) => IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey[800] : Colors.white,
+                      shape: BoxShape.circle,
                     ),
-                  )),
+                    child: Icon(
+                      Icons.menu_rounded,
+                      color: isDark ? Colors.white : Colors.black87,
+                      size: 20,
+                    ),
+                  ),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+              ),
       ),
-      drawer: SettingsController.isChildMode ? null : const DrawerWidget(),
+      drawer: const DrawerWidget(),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -210,16 +199,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 onLanguageChanged: () => setState(() {}),
               ),
               SettingsDivider(isDark: isDark),
-              SettingsTile(
-                title: Localization.t('settings.child_mode'),
-                subtitle: Localization.t('settings.child_mode_desc'),
-                icon: Icons.child_care_rounded,
-                iconColor: Colors.pinkAccent,
-                isDark: isDark,
-                isSwitch: true,
-                switchValue: SettingsController.isChildMode,
-                onSwitchChanged: (v) => _handleChildModeToggle(v, isDark),
-              ),
             ],
           ),
           const SizedBox(height: 25),
@@ -365,298 +344,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-    );
-  }
-
-  Future<void> _handleChildModeToggle(bool targetValue, bool isDark) async {
-    if (targetValue) {
-      await _showEnableChildModeDialog(isDark);
-    } else {
-      await _showDisableChildModeDialog(isDark);
-    }
-  }
-
-  Future<void> _showEnableChildModeDialog(bool isDark) async {
-    final pinController = TextEditingController();
-    final confirmPinController = TextEditingController();
-    String? errorMessage;
-
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.pinkAccent.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.child_care_rounded,
-                        color: Colors.pinkAccent),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      Localization.t('settings.child_mode_enable_title'),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      Localization.t('settings.child_mode_enable_desc'),
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        color: isDark ? Colors.grey[300] : Colors.grey[700],
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: pinController,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: 4,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87,
-                        letterSpacing: 8,
-                        fontSize: 18,
-                      ),
-                      decoration: InputDecoration(
-                        labelText:
-                            Localization.t('settings.child_mode_pin_hint'),
-                        labelStyle:
-                            const TextStyle(letterSpacing: 0, fontSize: 14),
-                        counterText: '',
-                        prefixIcon: const Icon(Icons.lock_outline_rounded),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: confirmPinController,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: 4,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87,
-                        letterSpacing: 8,
-                        fontSize: 18,
-                      ),
-                      decoration: InputDecoration(
-                        labelText: Localization.t(
-                            'settings.child_mode_pin_confirm_hint'),
-                        labelStyle:
-                            const TextStyle(letterSpacing: 0, fontSize: 14),
-                        counterText: '',
-                        prefixIcon: const Icon(Icons.lock_rounded),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    if (errorMessage != null) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        errorMessage!,
-                        style: const TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: Text(
-                    Localization.t('common.cancel'),
-                    style: TextStyle(
-                        color: isDark ? Colors.grey[400] : Colors.grey[600]),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pinkAccent,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () async {
-                    final pin = pinController.text.trim();
-                    final confirm = confirmPinController.text.trim();
-
-                    if (pin.length != 4 || !RegExp(r'^\d{4}$').hasMatch(pin)) {
-                      setDialogState(() {
-                        errorMessage = Localization.t(
-                            'settings.child_mode_pin_length_error');
-                      });
-                      return;
-                    }
-                    if (pin != confirm) {
-                      setDialogState(() {
-                        errorMessage =
-                            Localization.t('settings.child_mode_pin_mismatch');
-                      });
-                      return;
-                    }
-
-                    Navigator.pop(dialogContext);
-                    await _controller.setChildMode(true,
-                        pin: pin, context: context);
-                  },
-                  child: Text(Localization.t('common.confirm')),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<void> _showDisableChildModeDialog(bool isDark) async {
-    final pinController = TextEditingController();
-    String? errorMessage;
-
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.lock_rounded, color: Colors.amber),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      Localization.t('settings.child_mode_disable_title'),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      Localization.t('settings.child_mode_disable_desc'),
-                      style: TextStyle(
-                        fontSize: 13.5,
-                        color: isDark ? Colors.grey[300] : Colors.grey[700],
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: pinController,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: 4,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black87,
-                        letterSpacing: 8,
-                        fontSize: 18,
-                      ),
-                      decoration: InputDecoration(
-                        labelText:
-                            Localization.t('settings.child_mode_pin_hint'),
-                        labelStyle:
-                            const TextStyle(letterSpacing: 0, fontSize: 14),
-                        counterText: '',
-                        prefixIcon: const Icon(Icons.pin_rounded),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                    if (errorMessage != null) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        errorMessage!,
-                        style: const TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: Text(
-                    Localization.t('common.cancel'),
-                    style: TextStyle(
-                        color: isDark ? Colors.grey[400] : Colors.grey[600]),
-                  ),
-                ),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () async {
-                      final enteredPin = pinController.text.trim();
-                      final savedPin = SettingsController.childModePin;
-
-                      if (enteredPin == savedPin) {
-                        Navigator.pop(dialogContext);
-                        await _controller.setChildMode(false, context: context);
-                      } else {
-                        setDialogState(() {
-                          errorMessage =
-                              Localization.t('settings.child_mode_wrong_pin');
-                        });
-                      }
-                    },
-                    child: Text(Localization.t('common.close'))),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }
