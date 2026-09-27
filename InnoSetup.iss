@@ -4,7 +4,7 @@
 
 [Setup]
 AppName=GeoGame
-AppVersion=1.6.5
+AppVersion=1.6.14
 AppPublisher=Kerem Kuyucu
 
 PrivilegesRequired=lowest
