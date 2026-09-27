@@ -22,7 +22,7 @@ class _LeaderboardState extends State<Leaderboard> {
     _controller.fetchLeaderboard().then((_) {
       if (!mounted) return;
       setState(() {});
-      if (_controller.errorMessage != null) {
+      if (_controller.errorMessage != null && !_controller.isOffline) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(_controller.errorMessage!)),
         );
@@ -60,8 +60,14 @@ class _LeaderboardState extends State<Leaderboard> {
                 await _controller.fetchLeaderboard();
                 if (mounted) setState(() {});
               },
-              child: _controller.users.isEmpty
-                  ? const LeaderboardEmptyState()
+              child: _controller.isOffline && _controller.users.isEmpty
+                  ? LeaderboardOfflineView(
+                      onRetry: () => _controller.fetchLeaderboard().then((_) {
+                        if (mounted) setState(() {});
+                      }),
+                    )
+                  : _controller.users.isEmpty
+                      ? const LeaderboardEmptyState()
                   : CustomScrollView(
                       slivers: [
                         if (_controller.hasPodium)

@@ -26,6 +26,7 @@ const Set<String> kUsedKeys = {
   'common.close',
   'common.confirm',
   'common.field_required',
+  'common.retry',
 
   // nav
   'nav.games',
@@ -194,12 +195,18 @@ const Set<String> kUsedKeys = {
   'profile.total_score',
   'profile.correct_label',
   'profile.wrong_label',
+  'profile.offline_title',
+  'profile.offline_desc',
+  'profile.offline_scores_safe_title',
+  'profile.offline_scores_safe_desc',
 
   // leaderboard
   'leaderboard.title',
   'leaderboard.no_data',
   'leaderboard.score',
   'leaderboard.load_error',
+  'leaderboard.offline_title',
+  'leaderboard.offline_desc',
 
   // drawer
   'drawer.rate_play_store',

@@ -14,7 +14,8 @@
     "field_required": "Dieses Feld ist erforderlich",
     "site_error": "Webseite konnte nicht geöffnet werden. {0}",
     "close": "Schließen",
-    "confirm": "Bestätigen"
+    "confirm": "Bestätigen",
+    "retry": "Wiederholen"
   },
   "nav": {
     "games": "Spiele",
@@ -205,13 +206,19 @@
     "borderline": "Grenzlinie",
     "borderpath": "Grenzpfad",
     "findmap": "Auf Karte finden",
-    "coatofarms": "Wappen"
+    "coatofarms": "Wappen",
+    "offline_title": "Keine Internetverbindung",
+    "offline_desc": "Eine aktive Internetverbindung ist erforderlich, um Ihre detaillierten Profilstatistiken und Erfolge anzuzeigen.",
+    "offline_scores_safe_title": "Ihre Punkte sind sicher!",
+    "offline_scores_safe_desc": "Alle offline gespielten Spiele und gesammelten Punkte werden sicher auf Ihrem Gerät gespeichert. Sobald eine Internetverbindung verfügbar ist oder Sie das Spiel starten, werden Ihre Punkte automatisch mit dem Server synchronisiert."
   },
   "leaderboard": {
     "title": "Bestenliste",
     "no_data": "Noch keine Bestenlistendaten vorhanden.",
     "score": "Punkte",
-    "load_error": "Bestenliste konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung."
+    "load_error": "Bestenliste konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung.",
+    "offline_title": "Keine Internetverbindung",
+    "offline_desc": "Eine aktive Internetverbindung ist erforderlich, um die globale Bestenliste und Live-Ranglisten anzuzeigen. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
   },
   "drawer": {
     "rate_play_store": "Im Play Store bewerten",

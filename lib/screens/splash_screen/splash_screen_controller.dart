@@ -10,17 +10,36 @@ import 'package:geogame/services/game_log_service.dart';
 
 class SplashScreenController {
   Future<void> initialize() async {
-    await Country.loadCountries();
-    AppState.activePool = SettingsController.filteredCountries;
+    try {
+      await Country.loadCountries();
+      AppState.activePool = SettingsController.filteredCountries;
 
-    await AuthService.checkSession();
-    await BonusService.loadBonus();
-    GameLogService.syncPendingLogs();
+      // İnternet olmasa bile uygulamanın açılışını engellememesi için timeout ve hata koruması
+      await AuthService.checkSession().timeout(
+        const Duration(seconds: 2),
+        onTimeout: () {
+          debugPrint('⚠️ AuthService.checkSession timeout (offline mode)');
+        },
+      ).catchError((e) {
+        debugPrint('⚠️ AuthService.checkSession error: $e');
+      });
 
-    if (SettingsController.settings.darkTheme) {
-      ThemeModeBuilderConfig.setDark();
-    } else {
-      ThemeModeBuilderConfig.setLight();
+      await BonusService.loadBonus().catchError((e) {
+        debugPrint('⚠️ BonusService.loadBonus error: $e');
+      });
+
+      // Arka planda log senkronizasyonu (açılışı bloklamaz)
+      GameLogService.syncPendingLogs().catchError((e) {
+        debugPrint('⚠️ GameLogService.syncPendingLogs error: $e');
+      });
+
+      if (SettingsController.settings.darkTheme) {
+        ThemeModeBuilderConfig.setDark();
+      } else {
+        ThemeModeBuilderConfig.setLight();
+      }
+    } catch (e) {
+      debugPrint('❌ SplashScreenController initialize error: $e');
     }
   }
 

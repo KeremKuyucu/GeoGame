@@ -14,7 +14,8 @@
     "field_required": "This field is required",
     "site_error": "Site could not be opened. {0}",
     "close": "Close",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "retry": "Retry"
   },
   "nav": {
     "games": "Games",
@@ -205,13 +206,19 @@
     "borderline": "Borderline",
     "borderpath": "Border Path",
     "findmap": "Find Map",
-    "coatofarms": "Coat of Arms"
+    "coatofarms": "Coat of Arms",
+    "offline_title": "No Internet Connection",
+    "offline_desc": "An active internet connection is required to view your detailed profile statistics and achievements.",
+    "offline_scores_safe_title": "Your Scores Are Safe!",
+    "offline_scores_safe_desc": "All games played offline and earned points are safely stored on your device. Once an internet connection is available or you launch the game, your points will be automatically synchronized with the server."
   },
   "leaderboard": {
     "title": "Leaderboard",
     "no_data": "No leaderboard data yet.",
     "score": "Score",
-    "load_error": "Leaderboard could not be loaded. Please check your internet connection."
+    "load_error": "Leaderboard could not be loaded. Please check your internet connection.",
+    "offline_title": "No Internet Connection",
+    "offline_desc": "An active internet connection is required to view the global leaderboard and live rankings. Please check your connection and try again."
   },
   "drawer": {
     "rate_play_store": "Rate on Play Store",

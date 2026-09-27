@@ -14,7 +14,8 @@
     "field_required": "Este campo es obligatorio",
     "site_error": "No se pudo abrir el sitio web. {0}",
     "close": "Cerrar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "retry": "Reintentar"
   },
   "nav": {
     "games": "Juegos",
@@ -205,13 +206,19 @@
     "borderline": "Línea fronteriza",
     "borderpath": "Ruta fronteriza",
     "findmap": "Buscar en el mapa",
-    "coatofarms": "Escudos"
+    "coatofarms": "Escudos",
+    "offline_title": "Sin Conexión a Internet",
+    "offline_desc": "Se requiere una conexión a Internet activa para ver las estadísticas detalladas de su perfil y sus logros.",
+    "offline_scores_safe_title": "¡Tus Puntuaciones Están Seguras!",
+    "offline_scores_safe_desc": "Todos los juegos jugados sin conexión y los puntos obtenidos se guardan de forma segura en tu dispositivo. En cuanto haya conexión a Internet o inicies el juego, tus puntos se sincronizarán automáticamente con el servidor."
   },
   "leaderboard": {
     "title": "Clasificación",
     "no_data": "Aún no hay datos de clasificación.",
     "score": "Puntuación",
-    "load_error": "No se pudo cargar la clasificación. Comprueba tu conexión a internet."
+    "load_error": "No se pudo cargar la clasificación. Comprueba tu conexión a internet.",
+    "offline_title": "Sin Conexión a Internet",
+    "offline_desc": "Se requiere una conexión a Internet activa para ver la tabla de clasificación mundial y las puntuaciones en vivo. Comprueba tu conexión e inténtalo de nuevo."
   },
   "drawer": {
     "rate_play_store": "Calificar en Play Store",

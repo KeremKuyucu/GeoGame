@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/localization_service.dart';
 
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
+  static const String _cachedUserNameKey = 'cached_user_name';
+  static const String _cachedUserAvatarKey = 'cached_user_avatar';
 
   static String get redirectUrl {
     if (kIsWeb) {
@@ -36,13 +39,43 @@ class AuthService {
     }
   }
 
+  /// Çevrimdışı durumlar için yerel olarak saklanan profil bilgilerini yükler
+  static Future<void> loadCachedUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final name = prefs.getString(_cachedUserNameKey);
+      final avatar = prefs.getString(_cachedUserAvatarKey);
+      if (name != null && name.isNotEmpty) {
+        AppState.user = UserProfile(
+          name: name,
+          avatarUrl: avatar ?? '',
+        );
+        debugPrint('📦 Cached user loaded: $name');
+      }
+    } catch (e) {
+      debugPrint('Error loading cached user: $e');
+    }
+  }
+
+  /// Profil bilgilerini yerel SharedPreferences'a önbelleğe alır
+  static Future<void> _cacheUserProfile(String name, String avatar) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_cachedUserNameKey, name);
+      await prefs.setString(_cachedUserAvatarKey, avatar);
+    } catch (e) {
+      debugPrint('Error caching user profile: $e');
+    }
+  }
+
   static Future<void> syncUserData(User authUser) async {
     try {
       final profileData = await _supabase
           .from('profiles')
           .select('full_name, avatar_url')
           .eq('uid', authUser.id)
-          .maybeSingle();
+          .maybeSingle()
+          .timeout(const Duration(seconds: 2));
 
       final String name = profileData?['full_name']?.toString().trim() ??
           Localization.t('settings.guest');
@@ -55,9 +88,12 @@ class AuthService {
         avatarUrl: avatar,
       );
 
+      await _cacheUserProfile(name, avatar);
+
       debugPrint('✅ User synced: $name, Avatar: $avatar');
     } catch (e) {
-      debugPrint('❌ Profile sync error: $e');
+      debugPrint('❌ Profile sync error (offline?): $e');
+      await loadCachedUser();
     }
   }
 
@@ -88,6 +124,11 @@ class AuthService {
     } catch (e) {
       debugPrint('Supabase exit error: $e');
     }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_cachedUserNameKey);
+      await prefs.remove(_cachedUserAvatarKey);
+    } catch (_) {}
     AppState.user = UserProfile.anonymous();
   }
 
@@ -98,6 +139,9 @@ class AuthService {
   static Future<void> checkSession() async {
     final session = _supabase.auth.currentSession;
     if (session != null) {
+      // Önce yerel önbellekteki veriyi anında yükle
+      await loadCachedUser();
+      // Ardından internet bağlantısı varsa arka planda/timeout ile güncelle
       await syncUserData(session.user);
     }
   }

@@ -11,6 +11,7 @@ class ProfilesController {
 
   Map<String, dynamic>? userStats;
   bool isLoading = true;
+  bool isOffline = false;
   String? errorMessage;
 
   /// Kullanıcı giriş yapmış mı?
@@ -35,20 +36,34 @@ class ProfilesController {
   Future<void> fetchUserProfile() async {
     final String? currentId = AuthService.currentUserId;
 
+    isLoading = true;
+    errorMessage = null;
+    isOffline = false;
+
     if (currentId == null) {
+      // Misafir için de internet bağlantısını kontrol et
+      try {
+        await _supabase
+            .from('leaderboard_v2')
+            .select('uid')
+            .limit(1)
+            .timeout(const Duration(seconds: 3));
+        isOffline = false;
+      } catch (e) {
+        debugPrint('❌ Misafir profil çevrimdışı: $e');
+        isOffline = true;
+      }
       isLoading = false;
       return;
     }
-
-    isLoading = true;
-    errorMessage = null;
 
     try {
       final data = await _supabase
           .from('leaderboard_v2')
           .select()
           .eq('uid', currentId)
-          .maybeSingle();
+          .maybeSingle()
+          .timeout(const Duration(seconds: 4));
 
       if (data != null) {
         userStats = _parseProfileData(data);
@@ -58,6 +73,7 @@ class ProfilesController {
       isLoading = false;
     } catch (e) {
       debugPrint('❌ Profil yükleme hatası: $e');
+      isOffline = true;
       errorMessage = 'Hata: $e';
       isLoading = false;
     }

@@ -19,7 +19,14 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    _controller.initialize().then((_) {
+    _controller.initialize().timeout(
+      const Duration(seconds: 3),
+      onTimeout: () {
+        debugPrint('⚠️ Splash initialize timeout, navigating to home');
+      },
+    ).catchError((e) {
+      debugPrint('⚠️ Splash initialize error: $e');
+    }).whenComplete(() {
       if (!mounted) return;
 
       if (widget.onInitialized != null) {

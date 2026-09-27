@@ -14,7 +14,8 @@
     "field_required": "Bu alan zorunludur",
     "site_error": "Site açılamadı. {0}",
     "close": "Kapat",
-    "confirm": "Onayla"
+    "confirm": "Onayla",
+    "retry": "Tekrar Dene"
   },
   "nav": {
     "games": "Oyunlar",
@@ -205,13 +206,19 @@
     "borderline": "Sınır hattı",
     "borderpath": "Sınır yolu",
     "findmap": "Haritada Bulma",
-    "coatofarms": "Arma Avı"
+    "coatofarms": "Arma Avı",
+    "offline_title": "İnternet Bağlantısı Yok",
+    "offline_desc": "Profil istatistiklerinizi ve başarılarınızı güncel olarak görüntülemek için aktif bir internet bağlantısı gereklidir.",
+    "offline_scores_safe_title": "Puanlarınız Güvende!",
+    "offline_scores_safe_desc": "Çevrimdışı oynadığınız tüm oyunlar ve puanlarınız cihazınızda güvenle saklanmaktadır. İnternet bağlantınız sağlandığında veya oyunu açtığınızda puanlarınız otomatik olarak sunucuyla senkronize edilecektir."
   },
   "leaderboard": {
     "title": "Sıralama",
     "no_data": "Henüz sıralama verisi yok.",
     "score": "Puan",
-    "load_error": "Sıralama yüklenemedi. Lütfen internetinizi kontrol edin."
+    "load_error": "Sıralama yüklenemedi. Lütfen internetinizi kontrol edin.",
+    "offline_title": "İnternet Bağlantısı Yok",
+    "offline_desc": "Liderlik sıralamasını ve anlık skorları görüntülemek için internet bağlantısı gereklidir. Lütfen bağlantınızı kontrol edip tekrar deneyin."
   },
   "drawer": {
     "rate_play_store": "Play Store'da Değerlendir",

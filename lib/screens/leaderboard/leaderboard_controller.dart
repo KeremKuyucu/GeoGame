@@ -12,16 +12,21 @@ class LeaderboardController {
 
   List<Map<String, dynamic>> users = [];
   bool isLoading = true;
+  bool isOffline = false;
   String? errorMessage;
 
   /// Leaderboard verisini Supabase'den çeker
   Future<void> fetchLeaderboard() async {
     isLoading = true;
     errorMessage = null;
+    isOffline = false;
 
     try {
-      final response =
-          await _supabase.from('leaderboard_v2').select().limit(100);
+      final response = await _supabase
+          .from('leaderboard_v2')
+          .select()
+          .limit(100)
+          .timeout(const Duration(seconds: 4));
 
       if ((response as List).isEmpty) {
         users = [];
@@ -33,6 +38,7 @@ class LeaderboardController {
       isLoading = false;
     } catch (e) {
       debugPrint('❌ Leaderboard Error: $e');
+      isOffline = true;
       errorMessage = Localization.t('leaderboard.load_error');
       isLoading = false;
     }

@@ -14,7 +14,8 @@
     "field_required": "Este campo é obrigatório",
     "site_error": "Não foi possível abrir o site. {0}",
     "close": "Fechar",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "retry": "Tentar Novamente"
   },
   "nav": {
     "games": "Jogos",
@@ -205,13 +206,19 @@
     "borderline": "Linha de fronteira",
     "borderpath": "Caminho de fronteiras",
     "findmap": "Encontrar no mapa",
-    "coatofarms": "Brasões"
+    "coatofarms": "Brasões",
+    "offline_title": "Sem Conexão com a Internet",
+    "offline_desc": "É necessária uma conexão ativa com a Internet para visualizar suas estatísticas detalhadas de perfil e conquistas.",
+    "offline_scores_safe_title": "Suas Pontuações Estão Seguras!",
+    "offline_scores_safe_desc": "Todos os jogos offline e pontos conquistados são salvos com segurança no seu dispositivo. Assim que a conexão com a Internet for restabelecida ou você abrir o jogo, seus pontos serão sincronizados automaticamente com o servidor."
   },
   "leaderboard": {
     "title": "Classificação",
     "no_data": "Ainda sem dados de classificação.",
     "score": "Pontuação",
-    "load_error": "Não foi possível carregar a classificação. Verifique a sua ligação à Internet."
+    "load_error": "Não foi possível carregar a classificação. Verifique a sua ligação à Internet.",
+    "offline_title": "Sem Conexão com a Internet",
+    "offline_desc": "É necessária uma conexão ativa com a Internet para visualizar a tabela de classificação global e as pontuações ao vivo. Verifique sua conexão e tente novamente."
   },
   "drawer": {
     "rate_play_store": "Avaliar na Play Store",

@@ -113,7 +113,10 @@ class GameLogService {
       };
 
       try {
-        await _supabase.from('question_logs').insert(payload);
+        await _supabase
+            .from('question_logs')
+            .insert(payload)
+            .timeout(const Duration(seconds: 4));
       } on PostgrestException catch (e) {
         if (e.code == '23505') {
           // Kayıt zaten varsa başarılı kabul et.

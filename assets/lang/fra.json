@@ -14,7 +14,8 @@
     "field_required": "Ce champ est obligatoire",
     "site_error": "Impossible d'ouvrir le site. {0}",
     "close": "Fermer",
-    "confirm": "Confirmer"
+    "confirm": "Confirmer",
+    "retry": "Réessayer"
   },
   "nav": {
     "games": "Jeux",
@@ -205,13 +206,19 @@
     "borderline": "Ligne frontière",
     "borderpath": "Chemin frontalier",
     "findmap": "Trouver sur la carte",
-    "coatofarms": "Armoiries"
+    "coatofarms": "Armoiries",
+    "offline_title": "Pas de connexion Internet",
+    "offline_desc": "Une connexion Internet active est requise pour afficher vos statistiques de profil détaillées et vos réussites.",
+    "offline_scores_safe_title": "Vos scores sont en sécurité !",
+    "offline_scores_safe_desc": "Tous les jeux joués hors ligne et vos points gagnés sont enregistrés en toute sécurité sur votre appareil. Dès qu'une connexion Internet sera disponible ou à l'ouverture du jeu, vos points seront automatiquement synchronisés avec le serveur."
   },
   "leaderboard": {
     "title": "Classement",
     "no_data": "Aucune donnée de classement pour l'instant.",
     "score": "Score",
-    "load_error": "Impossible de charger le classement. Veuillez vérifier votre connexion Internet."
+    "load_error": "Impossible de charger le classement. Veuillez vérifier votre connexion Internet.",
+    "offline_title": "Pas de connexion Internet",
+    "offline_desc": "Une connexion Internet active est requise pour afficher le classement mondial et les scores en direct. Veuillez vérifier votre connexion et réessayer."
   },
   "drawer": {
     "rate_play_store": "Évaluer sur le Play Store",
