@@ -194,3 +194,4 @@ secrets.properties
 # Temporary CI files
 /tmp/*.json
 installer_output/
+RELEASE_*.md
