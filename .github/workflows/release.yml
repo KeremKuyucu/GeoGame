@@ -321,6 +321,8 @@ jobs:
       # ── Sign installer (SHA-256 + timestamp) ─────────────
       - name: Sign installer
         shell: pwsh
+        env:
+          WINDOWS_PFX_PASSWORD: ${{ secrets.WINDOWS_PFX_PASSWORD }}
         run: |
           $timestampServers = @(
             "http://timestamp.sectigo.com",
@@ -330,7 +332,8 @@ jobs:
           )
 
           $pfxPath      = "${{ github.workspace }}\signing.pfx"
-          $pfxPassword  = $env:WINDOWS_PFX_PASSWORD.Trim()
+          $pfxPassword  = if ($env:WINDOWS_PFX_PASSWORD) { $env:WINDOWS_PFX_PASSWORD.Trim() } else { "" }
+          if (-not $pfxPassword) { throw "WINDOWS_PFX_PASSWORD secret is missing or empty." }
           $installer    = "${{ env.INSTALLER_PATH }}"
           $signtool     = "${{ env.SIGNTOOL_PATH }}"
 
