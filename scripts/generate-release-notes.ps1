@@ -34,7 +34,7 @@ param (
 
     [string]$Version = "",
 
-    [switch]$OpenFiles = $true
+    [switch]$OpenFiles
 )
 
 $ErrorActionPreference = "Stop"

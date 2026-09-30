@@ -15,6 +15,13 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 def get_current_version() -> str:
@@ -111,7 +118,13 @@ Respond ONLY with a valid JSON object with exactly two keys (no surrounding text
 }}
 """
 
-    models = ["gemini-2.5-flash", "gemini-1.5-flash"]
+    models = [
+        "gemini-3.5-flash-lite",  # 500 RPD, 15 RPM
+        "gemini-3.1-flash-lite",  # 500 RPD, 15 RPM
+        "gemini-3.5-flash",       # 20 RPD, 5 RPM
+        "gemini-2.5-flash",       # 20 RPD, 5 RPM
+        "gemini-flash-lite-latest"
+    ]
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -172,7 +185,7 @@ def validate_play_store_notes(content: str) -> bool:
         if match:
             text = match.group(1).strip()
             char_count = len(text)
-            status = "✓ OK" if char_count <= 500 else "✗ EXCEEDED"
+            status = "OK" if char_count <= 500 else "EXCEEDED"
             if char_count > 500:
                 all_ok = False
             print(f"    - {loc}: {char_count} chars [{status}]")
