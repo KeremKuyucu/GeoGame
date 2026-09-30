@@ -405,6 +405,32 @@ jobs:
       # ── Checkout (for release notes files) ───────────────
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── Set up Python ─────────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ── Generate release notes via Gemini API if missing ───
+      - name: Generate release notes (Gemini API)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          VERSION="${{ needs.android.outputs.version }}"
+          NOTES_FILE="RELEASE_${VERSION}.md"
+          PLAY_NOTES="RELEASE_PLAY_STORE_${VERSION}.md"
+
+          if [ -f "$NOTES_FILE" ] && [ -f "$PLAY_NOTES" ]; then
+            echo "Release notes already exist in repository: $NOTES_FILE and $PLAY_NOTES"
+          elif [ -n "$GEMINI_API_KEY" ]; then
+            echo "Release notes missing or incomplete. Generating automatically with Gemini API for v${VERSION}..."
+            python scripts/generate_release_notes.py --engine gemini --version "$VERSION"
+          else
+            echo "GEMINI_API_KEY not configured and release notes not present; using standard release info."
+          fi
 
       # ── Determine version & tag ───────────────────────────
       - name: Determine release metadata
@@ -476,14 +502,6 @@ jobs:
           name: android-aab-${{ needs.android.outputs.version }}
           path: play-assets/
 
-      # ── Python setup ──────────────────────────────────────
-      - name: Set up Python
-        if: >
-          github.event_name == 'push' ||
-          github.event.inputs.upload_to_play == 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
 
       - name: Install Google API Python libraries
         if: >
