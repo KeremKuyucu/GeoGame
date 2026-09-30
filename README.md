@@ -92,7 +92,8 @@ To build and run the project locally:
 
 4. **Useful Scripts (`scripts/`):**
    * `scripts/take_screenshots.ps1`: Interactive ADB tool to take full-screen device screenshots into `screenshots/`.
-   * `scripts/build-and-deploy.ps1`: Automated build pipeline for Web (Vercel), Windows (Inno Setup + SignTool), APK, and AAB.
+   * `scripts/generate-release-notes.ps1`: Automated release notes generator with Gemini API.
+   * `scripts/upload_play_store.py`: Resumable AAB upload tool for Google Play Console.
 
 ---
 
