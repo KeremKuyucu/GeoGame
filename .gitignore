@@ -162,7 +162,7 @@ app.*.symbols
 .gclient_previous_custom_vars
 .gclient_previous_sync_commits
 lib/env.dart
-.vercel_backup/
+
 
 # ── CI/CD & Signing secrets (NEVER commit these) ──────────────────────────
 # Android keystore & signing properties (kept outside repo in imza-bilgileri/)
