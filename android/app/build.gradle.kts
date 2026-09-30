@@ -39,10 +39,14 @@ android {
         versionName = flutter.versionName
     }
 
-    // Keystore configuration (Supports Vault path, relative path, and legacy path)
+    // Keystore configuration (Priority order):
+    //   1. android/key.properties          – CI/CD (written by GitHub Actions workflow)
+    //   2. ../../imza-bilgileri/key.properties – Local vault (relative to android/)
+    //   3. Absolute fallback for local development
     val possibleKeyFiles = listOf(
-        rootProject.projectDir.parentFile.parentFile.resolve("imza-bilgileri/key.properties"),
-        file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
+        rootProject.file("key.properties"),                                                       // android/key.properties (CI)
+        rootProject.projectDir.parentFile.parentFile.resolve("imza-bilgileri/key.properties"),   // local vault
+        file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")                       // absolute fallback
     )
     val keystorePropertiesFile = possibleKeyFiles.firstOrNull { it.exists() } ?: file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
     val keystoreProperties = Properties()

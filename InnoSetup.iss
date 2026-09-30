@@ -1,10 +1,26 @@
 ; ===============================
 ; GeoGame Inno Setup Script
 ; ===============================
+;
+; Preprocessor defines (can be overridden via command-line /D flags for CI):
+;   ProjectRoot  – absolute path to the Flutter project root
+;   OutputDir    – directory where the installer .exe will be written
+;   AppVersion   – version string (e.g. 1.6.14)
+;
+; Local defaults (used when no /D flag is passed):
+#ifndef ProjectRoot
+  #define ProjectRoot "C:\Users\Kerem\Projects\geogame-flutter"
+#endif
+#ifndef OutputDir
+  #define OutputDir "C:\Users\Kerem\Projects\Outputs"
+#endif
+#ifndef AppVersion
+  #define AppVersion "1.6.14"
+#endif
 
 [Setup]
 AppName=GeoGame
-AppVersion=1.6.14
+AppVersion={#AppVersion}
 AppPublisher=Kerem Kuyucu
 
 PrivilegesRequired=lowest
@@ -12,7 +28,7 @@ PrivilegesRequired=lowest
 DefaultDirName={localappdata}\GeoGame
 DefaultGroupName=GeoGame
 
-OutputDir=C:\Users\Kerem\Projects\Outputs
+OutputDir={#OutputDir}
 OutputBaseFilename=GeoGame_Installer
 Compression=lzma
 SolidCompression=yes
@@ -26,8 +42,8 @@ ArchitecturesInstallIn64BitMode=x64compatible
 ; ===============================
 
 [Files]
-Source: "C:\Users\Kerem\Projects\geogame-flutter\assets\images\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Kerem\Projects\geogame-flutter\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+Source: "{#ProjectRoot}\assets\images\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ProjectRoot}\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 ; ===============================
 ; SHORTCUTS

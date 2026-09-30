@@ -163,3 +163,34 @@ app.*.symbols
 .gclient_previous_sync_commits
 lib/env.dart
 .vercel_backup/
+
+# ── CI/CD & Signing secrets (NEVER commit these) ──────────────────────────
+# Android keystore & signing properties (kept outside repo in imza-bilgileri/)
+android/key.properties
+android/app/keystore.jks
+android/app/*.jks
+android/app/*.keystore
+*.keystore
+
+# Windows code-signing certificate
+*.pfx
+signing.pfx
+
+# Google Play Store service account
+play-service-account.json
+*service-account*.json
+*service_account*.json
+
+# Vercel token file (local auth helper)
+geogame.vercel
+*.vercel.token
+
+# PFX password file
+pfx.properties
+
+# Any secret properties files
+secrets.properties
+
+# Temporary CI files
+/tmp/*.json
+installer_output/
