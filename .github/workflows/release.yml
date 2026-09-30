@@ -492,7 +492,7 @@ jobs:
           prerelease: false
           generate_release_notes: ${{ steps.meta.outputs.has_notes != 'true' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       # ── Download AAB (Play Store only) ────────────────────
       - name: Download AAB artifact
