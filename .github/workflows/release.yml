@@ -103,15 +103,16 @@ jobs:
       # The Gradle script checks for android/key.properties first (relative path),
       # then falls back to the imza-bilgileri path (local only).
       - name: Set up Android signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | tr -d '\r\n ' | base64 --decode > android/app/keystore.jks
+          echo "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 --decode > android/app/keystore.jks
 
-          cat > android/key.properties << 'EOF'
-          storeFile=../app/keystore.jks
-          storePassword=${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
-          EOF
+          printf 'storeFile=../app/keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
 
           echo "Keystore configured."
 
@@ -179,16 +180,14 @@ jobs:
         run: flutter build web --release
 
       # ── Deploy to Vercel (production) ──────────────────────
-      # web/.vercel/project.json is committed → flutter build web copies it to build/web/.vercel/
-      # Uses: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets
+      # Copies project.json to build/web/.vercel and deploys via official Vercel CLI
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./build/web
-          vercel-args: '--prod'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          mkdir -p build/web/.vercel
+          cp web/.vercel/project.json build/web/.vercel/project.json
+          npx --yes vercel deploy ./build/web --prod --yes --token "$VERCEL_TOKEN"
 
   # ============================================================
   # JOB: windows
@@ -282,8 +281,11 @@ jobs:
       # ── Write PFX certificate from secret ─────────────────
       - name: Write PFX certificate
         shell: pwsh
+        env:
+          WINDOWS_PFX_BASE64: ${{ secrets.WINDOWS_PFX_BASE64 }}
         run: |
-          $pfxBytes = [Convert]::FromBase64String("${{ secrets.WINDOWS_PFX_BASE64 }}")
+          $clean = ($env:WINDOWS_PFX_BASE64 -replace '\s+', '')
+          $pfxBytes = [Convert]::FromBase64String($clean)
           [IO.File]::WriteAllBytes("${{ github.workspace }}\signing.pfx", $pfxBytes)
           Write-Host "PFX written."
 
@@ -328,7 +330,7 @@ jobs:
           )
 
           $pfxPath      = "${{ github.workspace }}\signing.pfx"
-          $pfxPassword  = "${{ secrets.WINDOWS_PFX_PASSWORD }}"
+          $pfxPassword  = $env:WINDOWS_PFX_PASSWORD.Trim()
           $installer    = "${{ env.INSTALLER_PATH }}"
           $signtool     = "${{ env.SIGNTOOL_PATH }}"
 
@@ -482,8 +484,10 @@ jobs:
         if: >
           github.event_name == 'push' ||
           github.event.inputs.upload_to_play == 'true'
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
-          printf '%s' '${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}' > /tmp/play-service-account.json
+          printf '%s' "$SERVICE_ACCOUNT_JSON" > /tmp/play-service-account.json
           echo "Service account JSON written."
 
       # ── Upload AAB to Play Store ───────────────────────────
