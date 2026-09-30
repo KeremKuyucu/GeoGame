@@ -178,16 +178,8 @@ jobs:
       - name: Build Flutter web (release)
         run: flutter build web --release
 
-      # ── Copy Vercel project config into build output ───────
-      # .vercel_backup/project.json is committed (non-secret project/org IDs).
-      # Vercel CLI / action needs .vercel/project.json to find the project.
-      - name: Copy Vercel project config
-        run: |
-          mkdir -p build/web/.vercel
-          cp .vercel_backup/project.json build/web/.vercel/project.json
-          echo "Vercel project.json copied."
-
       # ── Deploy to Vercel (production) ──────────────────────
+      # web/.vercel/project.json is committed → flutter build web copies it to build/web/.vercel/
       # Uses: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID secrets
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
