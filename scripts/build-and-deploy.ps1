@@ -1,4 +1,4 @@
-﻿#requires -version 5.1
+#requires -version 5.1
 <#
 .SYNOPSIS
     GeoGame - Otomatik Build, Imzala ve Dagit (Web / APK / AAB / Windows)
@@ -186,8 +186,8 @@ try {
 
         $agyPrompt = "GeoGame projesinin v$ver surumu icin surum notlarini olustur. " +
             "1. Git commit loglarini ve son degisiklikleri incele. " +
-            "2. RELEASE_TEMPLATE.md sablonuna birebir uyarak 'RELEASE_$ver.md' dosyasini olustur. " +
-            "3. RELEASE_TEMPLATE_PLAYSTORE.md sablonuna birebir uyarak (her dil icin max 500 karakter, <locale> etiketleri ile) 'RELEASE_PLAY_STORE_$ver.md' dosyasini olustur. " +
+            "2. .github/RELEASE_TEMPLATE.md sablonuna birebir uyarak 'RELEASE_$ver.md' dosyasini olustur. " +
+            "3. .github/RELEASE_TEMPLATE_PLAYSTORE.md sablonuna birebir uyarak (her dil icin max 500 karakter, <locale> etiketleri ile) 'RELEASE_PLAY_STORE_$ver.md' dosyasini olustur. " +
             "Dosyalari dogrudan proje kok dizininde olustur."
 
         try {

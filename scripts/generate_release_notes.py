@@ -157,8 +157,8 @@ def generate_with_agy(version: str) -> tuple[str, str]:
     agy_prompt = (
         f"GeoGame projesinin v{version} surumu icin surum notlarini olustur. "
         "1. Git commit loglarini ve son degisiklikleri incele. "
-        f"2. RELEASE_TEMPLATE.md sablonuna birebir uyarak 'RELEASE_{version}.md' dosyasini olustur. "
-        f"3. RELEASE_TEMPLATE_PLAYSTORE.md sablonuna birebir uyarak (her dil icin max 500 karakter, <locale> etiketleri ile) 'RELEASE_PLAY_STORE_{version}.md' dosyasini olustur. "
+        f"2. .github/RELEASE_TEMPLATE.md sablonuna birebir uyarak 'RELEASE_{version}.md' dosyasini olustur. "
+        f"3. .github/RELEASE_TEMPLATE_PLAYSTORE.md sablonuna birebir uyarak (her dil icin max 500 karakter, <locale> etiketleri ile) 'RELEASE_PLAY_STORE_{version}.md' dosyasini olustur. "
         "Dosyalari dogrudan proje kok dizininde olustur."
     )
 
