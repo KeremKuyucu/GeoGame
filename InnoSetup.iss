@@ -15,7 +15,7 @@
   #define OutputDir "C:\Users\Kerem\Projects\Outputs"
 #endif
 #ifndef AppVersion
-  #define AppVersion "1.6.14"
+  #define AppVersion "1.6.15"
 #endif
 
 [Setup]
