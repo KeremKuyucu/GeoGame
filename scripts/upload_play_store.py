@@ -75,7 +75,7 @@ def upload_aab(
     service_account_path: str,
     package_name: str,
     aab_path: str,
-    track: str = "internal",
+    track: str = "production",
     status: str = "completed",
     release_notes_path: Optional[str] = None,
     user_fraction: Optional[float] = None,
@@ -278,9 +278,9 @@ def main():
     )
     parser.add_argument(
         "--track",
-        default="internal",
+        default="production",
         choices=["internal", "alpha", "beta", "production"],
-        help="Yayın kanalı: internal, alpha, beta, production (Varsayılan: internal)"
+        help="Yayın kanalı: internal, alpha, beta, production (Varsayılan: production)"
     )
     parser.add_argument(
         "--status",

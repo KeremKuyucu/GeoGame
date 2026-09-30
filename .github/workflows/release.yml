@@ -531,7 +531,7 @@ jobs:
           github.event.inputs.upload_to_play == 'true'
         run: |
           VERSION="${{ needs.android.outputs.version }}"
-          TRACK="${{ github.event.inputs.play_track || 'internal' }}"
+          TRACK="${{ github.event.inputs.play_track || 'production' }}"
           NOTES_FILE="RELEASE_PLAY_STORE_${VERSION}.md"
           NOTES_ARG=""
           if [ -f "$NOTES_FILE" ]; then
