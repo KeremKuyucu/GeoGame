@@ -34,44 +34,87 @@ def get_current_version() -> str:
         raise ValueError("Could not extract version from pubspec.yaml")
     return match.group(1).strip()
 
-def get_git_context() -> tuple[str, str]:
-    """Returns (last_tag, commit_log)"""
+def get_git_context(version: str) -> tuple[str, str, str]:
+    """
+    Hedef sürümden önceki son tag'i ve iki sürüm arasındaki
+    detaylı commit geçmişini ve dosya diff istatistiklerini döndürür.
+    Returns: (last_tag, commit_log, diff_stat)
+    """
+    last_tag = ""
+    target_tags = {f"v{version}", version}
+
     try:
-        last_tag = subprocess.check_output(
-            ["git", "describe", "--tags", "--abbrev=0"],
+        # Tarihe göre sıralı tag listesini al
+        all_tags = subprocess.check_output(
+            ["git", "tag", "--sort=-creatordate"],
             cwd=PROJECT_ROOT,
             stderr=subprocess.DEVNULL,
             text=True
-        ).strip()
+        ).strip().splitlines()
+
+        # Hedef sürüm tag'i hariç en güncel önceki tag'i bul
+        for t in all_tags:
+            t = t.strip()
+            if t and t not in target_tags:
+                last_tag = t
+                break
     except Exception:
-        last_tag = ""
+        pass
+
+    if not last_tag:
+        try:
+            # Fallback: HEAD'in bir önceki ebeveynine göre en yakın tag
+            last_tag = subprocess.check_output(
+                ["git", "describe", "--tags", "--abbrev=0", "HEAD^"],
+                cwd=PROJECT_ROOT,
+                stderr=subprocess.DEVNULL,
+                text=True
+            ).strip()
+        except Exception:
+            last_tag = ""
 
     if last_tag:
         rev_range = f"{last_tag}..HEAD"
-        print(f"[*] Last tag detected: {last_tag}")
+        print(f"[*] Previous release tag detected: {last_tag}")
+        print(f"[*] Revision range: {rev_range}")
     else:
         rev_range = "HEAD~15..HEAD"
-        print("[*] No previous tag detected; inspecting recent commits")
+        print("[*] No previous tag detected; inspecting recent commits (HEAD~15..HEAD)")
 
+    # 1. Commit Log (Başlık + gövde açıklamaları)
     try:
         commit_log = subprocess.check_output(
-            ["git", "log", rev_range, "--oneline", "--no-merges"],
+            ["git", "log", rev_range, "--format=- %s%n  %b", "--no-merges"],
             cwd=PROJECT_ROOT,
             stderr=subprocess.DEVNULL,
             text=True
         ).strip()
     except Exception:
-        commit_log = subprocess.check_output(
-            ["git", "log", "-n", "10", "--oneline", "--no-merges"],
+        try:
+            commit_log = subprocess.check_output(
+                ["git", "log", "-n", "15", "--format=- %s%n  %b", "--no-merges"],
+                cwd=PROJECT_ROOT,
+                stderr=subprocess.DEVNULL,
+                text=True
+            ).strip()
+        except Exception:
+            commit_log = ""
+
+    # 2. Dosya Diff İstatistikleri (Hangi dosyalarda ne kadar değişiklik yapıldı)
+    try:
+        diff_stat = subprocess.check_output(
+            ["git", "diff", "--stat", rev_range],
             cwd=PROJECT_ROOT,
             stderr=subprocess.DEVNULL,
             text=True
         ).strip()
+    except Exception:
+        diff_stat = ""
 
     if not commit_log:
-        commit_log = "Maintenance and general bug fixes."
+        commit_log = "- General improvements and routine maintenance."
 
-    return last_tag, commit_log
+    return last_tag, commit_log, diff_stat
 
 def find_gemini_api_key(explicit_key: str = None) -> str:
     if explicit_key:
@@ -88,42 +131,93 @@ def find_gemini_api_key(explicit_key: str = None) -> str:
 
     return ""
 
-def generate_with_gemini(api_key: str, version: str, last_tag: str, commit_log: str) -> tuple[str, str]:
+def load_templates() -> tuple[str, str]:
+    gh_tpl = PROJECT_ROOT / ".github" / "RELEASE_TEMPLATE.md"
+    play_tpl = PROJECT_ROOT / ".github" / "RELEASE_TEMPLATE_PLAYSTORE.md"
+
+    gh_content = gh_tpl.read_text(encoding="utf-8") if gh_tpl.exists() else ""
+    play_content = play_tpl.read_text(encoding="utf-8") if play_tpl.exists() else ""
+
+    return gh_content, play_content
+
+def generate_with_gemini(
+    api_key: str,
+    version: str,
+    last_tag: str,
+    commit_log: str,
+    diff_stat: str,
+    gh_template: str,
+    play_template: str
+) -> tuple[str, str]:
     print(f"[*] Requesting release notes from Gemini API for v{version}...")
 
-    prompt = f"""You are a professional release manager and copywriter for a Flutter mobile & desktop game called "GeoGame" (a world/geography quiz and map exploration game).
+    prompt = f"""You are a principal release manager and technical copywriter for "GeoGame" (a modern cross-platform Flutter geography quiz & world map exploration game).
 
-Generate two separate release notes documents based on the following git changes for version {version}:
+Generate two comprehensive, accurate, and highly professional release notes documents for version {version}.
 
-GIT COMMITS (since {last_tag or 'previous release'}):
+============================================================
+ACTUAL GIT CHANGES (since previous version: {last_tag or 'initial commit'}):
+============================================================
+
+COMMIT HISTORY:
 {commit_log}
 
-REQUIREMENT 1: GitHub Release Notes
-- Follow this structure:
-  - English section with: Version, Short Title, Changes (Feature/Fix Name with short description), Bug Fixes (bullet points), Breaking Changes (if any).
-  - Turkish section with: Sürüm, Kısa Başlık, Değişiklikler, Hata Düzeltmeleri.
-  - Professional, clean markdown format.
+MODIFIED FILES & STATS:
+{diff_stat}
 
-REQUIREMENT 2: Google Play Store Release Notes
-- Must contain exactly 7 localized release notes using `<locale>` tags:
-  <en-US>, <tr-TR>, <de-DE>, <fr-FR>, <pt-PT>, <ru-RU>, <es-ES>
-- CRITICAL CONSTRAINT: Each language's text inside its `<locale>` and `</locale>` tag MUST BE UNDER 500 CHARACTERS (Google Play Console hard limit).
-- Focus on user-facing benefits and improvements, clear and concise tone.
+============================================================
+REQUIREMENT 1: GitHub Release Notes (RELEASE_{version}.md)
+============================================================
+You MUST strictly follow the format, style, and tone of this official repository template:
 
-OUTPUT FORMAT:
-Respond ONLY with a valid JSON object with exactly two keys (no surrounding text or markdown formatting except the JSON):
+{gh_template}
+
+Strict Rules for GitHub Notes:
+1. English Section First:
+   - Header format: "## 📦 Version {version} – <Concise, Impactful Title Highlighting Key Additions>"
+   - "### 🚀 Changes":
+     - Group into bold topic categories (e.g., "**Feature or System Name:**").
+     - Include detailed sub-bullets explaining the technical architecture, key classes/files, and user impact.
+     - DO NOT invent generic filler (such as "minor UI glitches" or "routine maintenance") if specific features or workflows were added in the commits!
+   - "### 🐛 Bug Fixes": Specific bug fixes with brief cause and resolution. If none, write "* None."
+   - "### ⚠️ Breaking Changes (if any)": If none, write "* None."
+2. Separator line: "---"
+3. Turkish Section Second:
+   - Header format: "## 📦 Sürüm {version} – <Türkçe Açıklayıcı Başlık>"
+   - "### 🚀 Değişiklikler": Match the English section bullet-for-bullet in rich, fluent, natural Turkish.
+   - "### 🐛 Hata Düzeltmeleri": Açıklayıcı hata düzeltmeleri listesi. Yoksa "* Yok."
+   - "### ⚠️ Kırıcı Değişiklikler (varsa)": Yoksa "* Yok."
+
+============================================================
+REQUIREMENT 2: Google Play Store Release Notes (RELEASE_PLAY_STORE_{version}.md)
+============================================================
+You MUST follow this template and provide exactly 7 localized release notes using <locale>...</locale> tags:
+
+{play_template}
+
+Locales required:
+<en-US>, <tr-TR>, <de-DE>, <fr-FR>, <pt-PT>, <ru-RU>, <es-ES>
+
+CRITICAL PLAY STORE CONSTRAINTS:
+- HARD LIMIT: Each language's text inside <locale> and </locale> MUST BE UNDER 500 CHARACTERS (Google Play Console strictly rejects anything over 500).
+- User-facing, engaging, highlighting the most exciting features and stability improvements.
+
+============================================================
+RESPONSE FORMAT:
+============================================================
+Respond ONLY with a valid JSON object with exactly two keys:
 {{
-  "github_notes": "# ... markdown content for RELEASE_{version}.md ...",
+  "github_notes": "<markdown content for RELEASE_{version}.md>",
   "play_store_notes": "<en-US>\\n...\\n</en-US>\\n\\n<tr-TR>\\n...\\n</tr-TR>\\n\\n..."
 }}
 """
 
     models = [
-        "gemini-3.5-flash-lite",  # 500 RPD, 15 RPM
-        "gemini-3.1-flash-lite",  # 500 RPD, 15 RPM
-        "gemini-3.5-flash",       # 20 RPD, 5 RPM
-        "gemini-2.5-flash",       # 20 RPD, 5 RPM
-        "gemini-flash-lite-latest"
+        "models/gemini-3.5-flash-lite",
+        "models/gemini-flash-latest",
+        "models/gemini-flash-lite-latest",
+        "models/gemini-2.5-flash",
+        "models/gemini-3.5-flash"
     ]
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -134,7 +228,7 @@ Respond ONLY with a valid JSON object with exactly two keys (no surrounding text
 
     last_error = None
     for model in models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/{model}:generateContent?key={api_key}"
         req = urllib.request.Request(
             url,
             data=json.dumps(payload).encode("utf-8"),
@@ -204,8 +298,10 @@ def main():
     version = args.version or get_current_version()
     print(f"=== GeoGame Release Notes Generator (v{version}) ===")
 
-    last_tag, commit_log = get_git_context()
+    last_tag, commit_log, diff_stat = get_git_context(version)
     print(f"[*] Commits to summarize:\n{commit_log}\n")
+    if diff_stat:
+        print(f"[*] Diff stat summary:\n{diff_stat}\n")
 
     api_key = find_gemini_api_key(args.api_key)
     engine = args.engine
@@ -224,7 +320,16 @@ def main():
             print("    Provide it via --api-key, GEMINI_API_KEY environment variable,")
             print("    or save it to C:/Users/kerem/Projects/imza-bilgileri/gemini.key")
             sys.exit(1)
-        gh_notes, play_notes = generate_with_gemini(api_key, version, last_tag, commit_log)
+        gh_template, play_template = load_templates()
+        gh_notes, play_notes = generate_with_gemini(
+            api_key=api_key,
+            version=version,
+            last_tag=last_tag,
+            commit_log=commit_log,
+            diff_stat=diff_stat,
+            gh_template=gh_template,
+            play_template=play_template
+        )
     elif engine == "agy":
         gh_notes, play_notes = generate_with_agy(version)
     else:

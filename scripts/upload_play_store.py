@@ -11,7 +11,9 @@ belirlenen kanala (internal, alpha, beta, production) dağıtır.
 import argparse
 import os
 import re
+import socket
 import sys
+import time
 from typing import List, Dict, Optional
 
 try:
@@ -25,6 +27,8 @@ except ImportError as e:
     sys.exit(1)
 
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
+DEFAULT_TIMEOUT_SECONDS = 300  # 5 dakika (varsayılan 60s yerine)
+DEFAULT_CHUNK_SIZE_MB = 8      # 8 MB (256 KB'nin katı, HTTP gidiş-dönüş sayısını 4 kat azaltır)
 
 
 def parse_release_notes(notes_file: str) -> List[Dict[str, str]]:
@@ -74,10 +78,15 @@ def upload_aab(
     track: str = "internal",
     status: str = "completed",
     release_notes_path: Optional[str] = None,
-    user_fraction: Optional[float] = None
+    user_fraction: Optional[float] = None,
+    chunk_size_mb: int = DEFAULT_CHUNK_SIZE_MB,
+    timeout: int = DEFAULT_TIMEOUT_SECONDS,
+    max_retries: int = 5
 ) -> int:
     """
     AAB dosyasını Google Play Console'a yükler ve sürüm notlarıyla birlikte yayınlar.
+    Ağ kesintilerine ve socket zaman aşımlarına karşı otomatik kaldığı yerden devam (resumable)
+    ve üstel geri çekilme (exponential backoff) mekanizmasına sahiptir.
     """
     if not os.path.isfile(service_account_path):
         print(f"[X] HATA: Service account dosyası bulunamadı: {service_account_path}", file=sys.stderr)
@@ -86,6 +95,9 @@ def upload_aab(
     if not os.path.isfile(aab_path):
         print(f"[X] HATA: AAB dosyası bulunamadı: {aab_path}", file=sys.stderr)
         return 1
+
+    # Soket zaman aşımını genişlet (60s yerine 300s)
+    socket.setdefaulttimeout(timeout)
 
     print(">> Google Play Console Bağlantısı Kuruluyor...")
     try:
@@ -103,19 +115,20 @@ def upload_aab(
         # 1. Yeni bir edit oluştur
         print(f"   [i] Edit oluşturuluyor: Paket = {package_name}")
         edit_request = service.edits().insert(packageName=package_name, body={})
-        edit_response = edit_request.execute()
+        edit_response = edit_request.execute(num_retries=3)
         edit_id = edit_response["id"]
         print(f"   [OK] Edit ID: {edit_id}")
 
         # 2. AAB dosyasını yükle (Resumable Upload)
         file_size_mb = os.path.getsize(aab_path) / (1024 * 1024)
-        print(f">> AAB Yükleniyor: {os.path.basename(aab_path)} ({file_size_mb:.2f} MB)...")
+        chunksize_bytes = max(1, chunk_size_mb) * 1024 * 1024  # 256KB katı garantilenir
+        print(f">> AAB Yükleniyor: {os.path.basename(aab_path)} ({file_size_mb:.2f} MB, {chunk_size_mb} MB parçalar)...")
 
         media = MediaFileUpload(
             aab_path,
             mimetype="application/octet-stream",
             resumable=True,
-            chunksize=1024 * 1024 * 2  # 2MB chunks
+            chunksize=chunksize_bytes
         )
 
         upload_req = service.edits().bundles().upload(
@@ -126,15 +139,48 @@ def upload_aab(
 
         response = None
         last_pct = -1
-        while response is None:
-            upload_status, response = upload_req.next_chunk()
-            if upload_status:
-                pct = int(upload_status.progress() * 100)
-                if pct != last_pct and pct % 10 == 0:
-                    print(f"   ... Yükleme: %{pct}")
-                    last_pct = pct
+        retry_count = 0
+        base_delay = 5  # saniye
 
-        version_code = response.get("versionCode")
+        while response is None:
+            try:
+                upload_status, response = upload_req.next_chunk(num_retries=3)
+                if upload_status:
+                    pct = int(upload_status.progress() * 100)
+                    if pct != last_pct:
+                        uploaded_mb = getattr(upload_status, 'resumable_progress', 0) / (1024 * 1024)
+                        if uploaded_mb > 0:
+                            print(f"   ... Yükleme: %{pct} ({uploaded_mb:.1f} / {file_size_mb:.1f} MB)", flush=True)
+                        else:
+                            print(f"   ... Yükleme: %{pct}", flush=True)
+                        last_pct = pct
+                # Başarılı chunk sonrasında retry sayacını sıfırla
+                retry_count = 0
+            except HttpError as e:
+                # Kalıcı HTTP istemci hatalarında doğrudan sonlandır
+                if e.resp.status in [400, 401, 403, 404]:
+                    raise
+                retry_count += 1
+                if retry_count > max_retries:
+                    print(f"\n[X] Maksimum yeniden deneme sayısına ({max_retries}) ulaşıldı.", flush=True)
+                    raise
+                sleep_sec = base_delay * (2 ** (retry_count - 1))
+                print(f"\n   [!] Geçici API Hatası (HTTP {e.resp.status}). {sleep_sec}s sonra tekrar deneniyor... ({retry_count}/{max_retries})", flush=True)
+                time.sleep(sleep_sec)
+            except Exception as e:
+                # Socket timeout ("The read operation timed out"), SSL EOF, ağ kopması vb.
+                retry_count += 1
+                if retry_count > max_retries:
+                    print(f"\n[X] Maksimum yeniden deneme sayısına ({max_retries}) ulaşıldı.", flush=True)
+                    raise
+                sleep_sec = base_delay * (2 ** (retry_count - 1))
+                print(f"\n   [!] Ağ / Zaman aşımı hatası: {e}. {sleep_sec}s sonra kaldığı yerden tekrar deneniyor... ({retry_count}/{max_retries})", flush=True)
+                time.sleep(sleep_sec)
+
+        if last_pct < 100:
+            print(f"   ... Yükleme: %100 ({file_size_mb:.1f} / {file_size_mb:.1f} MB)", flush=True)
+
+        version_code = response.get("versionCode") if isinstance(response, dict) else None
         print(f"   [OK] AAB başarıyla yüklendi! Sürüm Kodu (VersionCode): {version_code}")
 
         # 3. Sürüm notlarını hazırla
@@ -166,7 +212,7 @@ def upload_aab(
             editId=edit_id,
             track=track,
             body=track_body
-        ).execute()
+        ).execute(num_retries=3)
         print(f"   [OK] '{track}' kanalı güncellendi.")
 
         # 5. Değişiklikleri onayla (Commit)
@@ -175,7 +221,7 @@ def upload_aab(
             packageName=package_name,
             editId=edit_id
         )
-        commit_request.execute()
+        commit_request.execute(num_retries=3)
         edit_id = None  # Başarıyla commit edildi, delete çağrısına gerek yok
 
         print(f"\n[OK] TEBRİKLER! v{version_code} başarıyla Google Play Console '{track}' kanalına yüklendi!")
@@ -251,6 +297,24 @@ def main():
         type=float,
         help="Kademeli dağıtım oranı (0.0 - 1.0) - yalnızca inProgress durumu için"
     )
+    parser.add_argument(
+        "--chunk-size-mb",
+        type=int,
+        default=DEFAULT_CHUNK_SIZE_MB,
+        help=f"Yükleme parçası boyutu MB cinsinden (Varsayılan: {DEFAULT_CHUNK_SIZE_MB} MB)"
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=DEFAULT_TIMEOUT_SECONDS,
+        help=f"Ağ zaman aşımı süresi saniye cinsinden (Varsayılan: {DEFAULT_TIMEOUT_SECONDS} sn)"
+    )
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=5,
+        help="Geçici ağ/zaman aşımı hatalarında yeniden deneme sayısı (Varsayılan: 5)"
+    )
 
     args = parser.parse_args()
 
@@ -261,7 +325,10 @@ def main():
         track=args.track,
         status=args.status,
         release_notes_path=args.release_notes,
-        user_fraction=args.user_fraction
+        user_fraction=args.user_fraction,
+        chunk_size_mb=args.chunk_size_mb,
+        timeout=args.timeout,
+        max_retries=args.max_retries
     )
     sys.exit(exit_code)
 
