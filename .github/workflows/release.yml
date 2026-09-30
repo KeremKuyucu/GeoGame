@@ -104,7 +104,7 @@ jobs:
       # then falls back to the imza-bilgileri path (local only).
       - name: Set up Android signing
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | tr -d '\r\n ' | base64 --decode > android/app/keystore.jks
 
           cat > android/key.properties << 'EOF'
           storeFile=../app/keystore.jks

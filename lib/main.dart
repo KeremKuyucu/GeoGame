@@ -15,7 +15,7 @@ import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/widgets/restart_widget.dart';
 import 'package:geogame/models/app_context.dart';
 
-import 'package:geogame/env.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +44,10 @@ void main() async {
     return false;
   };
 
-  await Supabase.initialize(url: Env.supabaseUrl, publishableKey: Env.publishableKey);
+  await Supabase.initialize(
+    url: 'https://brgwnlbgasameiuuoxte.supabase.co',
+    publishableKey: 'sb_publishable_dYkNlqj0PL3jZsq2Kt0Yyg_pi1gyIdl',
+  );
   await PreferencesService.loadConfig();
   await Localization.init();
 
