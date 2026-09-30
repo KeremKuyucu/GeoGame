@@ -399,6 +399,8 @@ jobs:
       github.event_name == 'push' ||
       github.event.inputs.create_github_release == 'true' ||
       github.event.inputs.upload_to_play == 'true'
+    permissions:
+      contents: write
     environment: production
 
     steps:
