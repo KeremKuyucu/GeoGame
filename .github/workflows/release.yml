@@ -521,8 +521,31 @@ jobs:
         env:
           SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: |
-          printf '%s' "$SERVICE_ACCOUNT_JSON" > /tmp/play-service-account.json
-          echo "Service account JSON written."
+          python -c "
+          import os, sys, json, base64
+
+          raw = os.environ.get('SERVICE_ACCOUNT_JSON', '').strip().lstrip('\ufeff')
+          if not raw:
+              print('[X] HATA: PLAY_SERVICE_ACCOUNT_JSON secret boş veya tanımlı değil!', file=sys.stderr)
+              sys.exit(1)
+
+          if not raw.startswith('{'):
+              try:
+                  decoded = base64.b64decode(raw).decode('utf-8-sig', errors='replace').strip().lstrip('\ufeff')
+                  if decoded.startswith('{'):
+                      raw = decoded
+              except Exception:
+                  pass
+
+          try:
+              data = json.loads(raw)
+              with open('/tmp/play-service-account.json', 'w', encoding='utf-8') as f:
+                  json.dump(data, f, indent=2)
+              print(f'[OK] Service account JSON doğrulandı ve yazıldı: {data.get(\"client_email\", \"bilinmiyor\")}')
+          except Exception as e:
+              print(f'[X] HATA: Service account JSON ayrıştırılamadı: {e}', file=sys.stderr)
+              sys.exit(1)
+          "
 
       # ── Upload AAB to Play Store ───────────────────────────
       - name: Upload AAB to Play Store
