@@ -39,16 +39,10 @@ android {
         versionName = flutter.versionName
     }
 
-    // Keystore configuration (Priority order):
-    //   1. android/key.properties          – CI/CD (written by GitHub Actions workflow)
-    //   2. ../../imza-bilgileri/key.properties – Local vault (relative to android/)
-    //   3. Absolute fallback for local development
-    val possibleKeyFiles = listOf(
-        rootProject.file("key.properties"),                                                       // android/key.properties (CI)
-        rootProject.projectDir.parentFile.parentFile.resolve("imza-bilgileri/key.properties"),   // local vault
-        file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")                       // absolute fallback
-    )
-    val keystorePropertiesFile = possibleKeyFiles.firstOrNull { it.exists() } ?: file("C:\\Users\\kerem\\Projects\\imza-bilgileri\\key.properties")
+    // Keystore configuration:
+    // In CI/CD (GitHub Actions), android/key.properties is created from GitHub Secrets.
+    // In local development, if key.properties does not exist, builds fall back to debug signing.
+    val keystorePropertiesFile = rootProject.file("key.properties")
     val keystoreProperties = Properties()
     val hasValidKeystore = if (keystorePropertiesFile.exists()) {
         keystoreProperties.load(FileInputStream(keystorePropertiesFile))
@@ -66,7 +60,7 @@ android {
                 storeFile = when {
                     storeF.exists() -> storeF
                     storeInKeystoreDir.exists() -> storeInKeystoreDir
-                    else -> keystorePropertiesFile.parentFile.resolve("ksk.jks")
+                    else -> rootProject.file(configuredStore)
                 }
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
