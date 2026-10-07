@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Merkezi reklam yönetim servisi.
@@ -61,12 +62,63 @@ class AdService {
 
   static bool _isRewardedLoading = false;
 
+  static bool _isMobileAdsInitialized = false;
+
   // --- SDK Başlatma ---
 
-  /// Google Mobile Ads SDK'sını başlatır ve reklamları
-  /// arka planda yüklemeye başlar.
+  /// Google Mobile Ads SDK'sını, UMP rıza akışını ve hedeflenmiş reklam
+  /// yapılandırmasını başlatır.
   static Future<void> initialize() async {
     if (!isSupported) return;
+
+    try {
+      // Kişiselleştirilmiş/hedeflenmiş reklamlar için çocuk/yaş kısıtlamalarını devre dışı bırak
+      await MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(
+          tagForChildDirectedTreatment: TagForChildDirectedTreatment.no,
+          tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.no,
+        ),
+      );
+
+      // Google UMP (User Messaging Platform) rıza formu ve hedeflenmiş reklam izni akışı
+      final params = ConsentRequestParameters();
+      ConsentInformation.instance.requestConsentInfoUpdate(
+        params,
+        () async {
+          ConsentForm.loadAndShowConsentFormIfRequired((loadAndShowError) async {
+            if (loadAndShowError != null) {
+              debugPrint(
+                'AdService: Rıza formu hatası: ${loadAndShowError.message}',
+              );
+            }
+            if (await ConsentInformation.instance.canRequestAds()) {
+              await _initializeMobileAds();
+            }
+          });
+        },
+        (FormError error) async {
+          debugPrint(
+            'AdService: Rıza bilgi güncelleme hatası: ${error.message}',
+          );
+          await _initializeMobileAds();
+        },
+      );
+
+      // Önceden izin verilmişse veya izin gerekmiyorsa doğrudan başlat
+      if (await ConsentInformation.instance.canRequestAds()) {
+        await _initializeMobileAds();
+      }
+    } catch (e) {
+      debugPrint(
+        'AdService: SDK başlatma hatası: $e',
+      );
+      await _initializeMobileAds();
+    }
+  }
+
+  static Future<void> _initializeMobileAds() async {
+    if (_isMobileAdsInitialized) return;
+    _isMobileAdsInitialized = true;
 
     try {
       await MobileAds.instance.initialize();
@@ -79,7 +131,38 @@ class AdService {
       _loadRewardedAd();
     } catch (e) {
       debugPrint(
-        'AdService: SDK başlatma hatası: $e',
+        'AdService: MobileAds SDK başlatma hatası: $e',
+      );
+    }
+  }
+
+  /// Kullanıcının hedeflenmiş reklam ve gizlilik tercihlerini açar.
+  static void showPrivacyOptionsForm(BuildContext context) {
+    if (!isSupported) return;
+
+    try {
+      ConsentForm.showPrivacyOptionsForm((FormError? formError) {
+        if (formError != null) {
+          debugPrint(
+            'AdService: Gizlilik formu hatası: ${formError.message}',
+          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(formError.message),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        } else {
+          debugPrint(
+            'AdService: Gizlilik tercihleri güncellendi.',
+          );
+        }
+      });
+    } catch (e) {
+      debugPrint(
+        'AdService: showPrivacyOptionsForm hatası: $e',
       );
     }
   }

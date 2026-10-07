@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/settings_widgets.dart';
@@ -198,6 +199,44 @@ class _SettingsPageState extends State<SettingsPage> {
                 isDark: isDark,
                 onLanguageChanged: () => setState(() {}),
               ),
+              if (AdService.isSupported) ...[
+                SettingsDivider(isDark: isDark),
+                ListTile(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  leading: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.ads_click_rounded,
+                        color: Colors.white, size: 20),
+                  ),
+                  title: Text(
+                    Localization.t('settings.ad_preferences'),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(
+                    Localization.t('settings.ad_preferences_desc'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right_rounded,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                  onTap: () {
+                    AdService.showPrivacyOptionsForm(context);
+                  },
+                ),
+              ],
               SettingsDivider(isDark: isDark),
             ],
           ),

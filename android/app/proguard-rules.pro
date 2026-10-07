@@ -1,4 +1,4 @@
-# Flutter ProGuard Rules
+# Flutter ProGuard / R8 Rules
 
 # Keep Flutter wrapper classes
 -keep class io.flutter.app.** { *; }
@@ -8,8 +8,23 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
-# Keep Supabase / GoTrue related classes
+# Google Mobile Ads (AdMob) & UMP Rules (Kişiselleştirilmiş / Hedeflenmiş Reklamlar)
+-keep public class com.google.android.gms.ads.** {
+   public *;
+}
+-keep public class com.google.ads.** {
+   public *;
+}
+-keep class com.google.android.gms.ads.identifier.** { *; }
+-keep class com.google.android.ump.** { *; }
+-dontwarn com.google.android.gms.ads.**
+
+# Keep Supabase / GoTrue / OkHttp related classes
 -keep class io.supabase.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
 
 # Keep annotations
 -keepattributes *Annotation*
@@ -24,3 +39,7 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**
+-dontwarn javax.annotation.**
+-dontwarn org.checkerframework.**
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn kotlin.reflect.**

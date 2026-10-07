@@ -172,6 +172,8 @@
     "general_title": "Genel Ayarlar",
     "selected_theme": "Seçilen Tema: {0}",
     "lang": "Seçilen Dil: ",
+    "ad_preferences": "Reklam & Gizlilik Tercihleri",
+    "ad_preferences_desc": "Hedeflenmiş reklam ve veri izinlerini yönetin",
     "no_continents_active": "Yeterli Ülke Seçilmedi",
     "multiple_choice_mode": "Çoktan Seçmeli Mod",
     "continent_title": "Kıta Seçenekleri",

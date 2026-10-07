@@ -172,6 +172,8 @@
     "general_title": "General Settings",
     "selected_theme": "Selected Theme: {0}",
     "lang": "Selected Language: ",
+    "ad_preferences": "Ad & Privacy Preferences",
+    "ad_preferences_desc": "Manage targeted ads and data consent",
     "no_continents_active": "Not Enough Countries Selected",
     "multiple_choice_mode": "Multiple Choice Mode",
     "continent_title": "Continent Options",
