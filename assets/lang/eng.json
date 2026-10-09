@@ -42,14 +42,14 @@
     "reset_password_title": "Reset Password",
     "reset_password_desc": "Enter your email to receive a reset link.",
     "send_link": "Send Link",
-    "warning_no_account": "You don't have an account, your scores will not be saved.",
+    "warning_no_account": "You are in Traveler mode. Sign in to save your scores to the leaderboard.",
     "error_login_failed": "Login failed.",
     "google_sign_in": "Sign in with Google",
     "or_divider": "or",
     "google_login_success": "Successfully signed in with Google!",
     "error_google_cancelled": "Google sign-in was cancelled.",
     "error_google_sign_in": "Could not sign in with Google. Please try again.",
-    "continue_as_guest": "Continue as Guest",
+    "continue_as_guest": "Continue as Traveler",
     "feature_cloud_sync_title": "Cloud Sync",
     "feature_cloud_sync_desc": "Safely store your scores and progress",
     "feature_leaderboard_title": "Leaderboard",
@@ -170,6 +170,10 @@
   "settings": {
     "title": "Settings",
     "general_title": "General Settings",
+    "theme": "Theme",
+    "theme_system": "System",
+    "theme_dark": "Dark",
+    "theme_light": "Light",
     "selected_theme": "Selected Theme: {0}",
     "lang": "Selected Language: ",
     "ad_preferences": "Ad & Privacy Preferences",
@@ -192,7 +196,7 @@
       "oceania": "Oceania",
       "antarctica": "Antarctica"
     },
-    "guest": "Guest"
+    "guest": "Traveler"
   },
   "profile": {
     "title": "Profile",
@@ -212,7 +216,18 @@
     "offline_title": "No Internet Connection",
     "offline_desc": "An active internet connection is required to view your detailed profile statistics and achievements.",
     "offline_scores_safe_title": "Your Scores Are Safe!",
-    "offline_scores_safe_desc": "All games played offline and earned points are safely stored on your device. Once an internet connection is available or you launch the game, your points will be automatically synchronized with the server."
+    "offline_scores_safe_desc": "All games played offline and earned points are safely stored on your device. Once an internet connection is available or you launch the game, your points will be automatically synchronized with the server.",
+    "total_correct": "Correct",
+    "total_wrong": "Wrong",
+    "accuracy": "Accuracy",
+    "discovered_countries": "Discovered",
+    "tab_modes": "Game Modes",
+    "tab_countries": "Country Mastery",
+    "top_countries": "Top Mastered Countries",
+    "weak_countries": "Needs Practice",
+    "all_countries": "All Countries",
+    "search_country": "Search country...",
+    "no_country_stats": "No country statistics yet. As you play, countries you encounter will be analyzed here."
   },
   "leaderboard": {
     "title": "Leaderboard",

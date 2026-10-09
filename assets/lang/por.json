@@ -42,14 +42,14 @@
     "reset_password_title": "Repor Palavra-passe",
     "reset_password_desc": "Introduza o seu e-mail para receber uma ligação de reposição.",
     "send_link": "Enviar Ligação",
-    "warning_no_account": "Não tem conta, as suas pontuações não serão guardadas.",
+    "warning_no_account": "Está no modo Viajante. Inicie sessão para guardar as suas pontuações na tabela de classificação.",
     "error_login_failed": "Falha ao iniciar sessão.",
     "google_sign_in": "Iniciar sessão com o Google",
     "or_divider": "ou",
     "google_login_success": "Sessão iniciada com o Google com sucesso!",
     "error_google_cancelled": "O início de sessão com o Google foi cancelado.",
     "error_google_sign_in": "Não foi possível iniciar sessão com o Google. Tente novamente.",
-    "continue_as_guest": "Continuar como Convidado",
+    "continue_as_guest": "Continuar como Viajante",
     "feature_cloud_sync_title": "Sincronização na Nuvem",
     "feature_cloud_sync_desc": "Guarde as suas pontuações e progresso com segurança",
     "feature_leaderboard_title": "Classificação",
@@ -170,8 +170,14 @@
   "settings": {
     "title": "Definições",
     "general_title": "Definições Gerais",
+    "theme": "Tema",
+    "theme_system": "Sistema",
+    "theme_dark": "Escuro",
+    "theme_light": "Claro",
     "selected_theme": "Tema Selecionado: {0}",
     "lang": "Idioma Selecionado: ",
+    "ad_preferences": "Preferências de anúncios e privacidade",
+    "ad_preferences_desc": "Gerenciar anúncios direcionados e consentimento de dados",
     "no_continents_active": "Países Insuficientes Selecionados",
     "multiple_choice_mode": "Modo de Escolha Múltipla",
     "continent_title": "Opções de Continentes",
@@ -190,7 +196,7 @@
       "oceania": "Oceânia",
       "antarctica": "Antártida"
     },
-    "guest": "Convidado"
+    "guest": "Viajante"
   },
   "profile": {
     "title": "Perfil",
@@ -210,7 +216,18 @@
     "offline_title": "Sem Conexão com a Internet",
     "offline_desc": "É necessária uma conexão ativa com a Internet para visualizar suas estatísticas detalhadas de perfil e conquistas.",
     "offline_scores_safe_title": "Suas Pontuações Estão Seguras!",
-    "offline_scores_safe_desc": "Todos os jogos offline e pontos conquistados são salvos com segurança no seu dispositivo. Assim que a conexão com a Internet for restabelecida ou você abrir o jogo, seus pontos serão sincronizados automaticamente com o servidor."
+    "offline_scores_safe_desc": "Todos os jogos offline e pontos conquistados são salvos com segurança no seu dispositivo. Assim que a conexão com a Internet for restabelecida ou você abrir o jogo, seus pontos serão sincronizados automaticamente com o servidor.",
+    "total_correct": "Correto",
+    "total_wrong": "Incorreto",
+    "accuracy": "Precisão",
+    "discovered_countries": "Descobertos",
+    "tab_modes": "Modos de jogo",
+    "tab_countries": "Domínio de países",
+    "top_countries": "Melhores países",
+    "weak_countries": "Para praticar",
+    "all_countries": "Todos os países",
+    "search_country": "Pesquisar país...",
+    "no_country_stats": "Ainda não há estatísticas de países. À medida que jogar, aparecerão aqui."
   },
   "leaderboard": {
     "title": "Classificação",

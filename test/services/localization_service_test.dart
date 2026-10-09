@@ -188,6 +188,10 @@ const Set<String> kUsedKeys = {
   'settings.child_mode_leaderboard_disabled_title',
   'settings.child_mode_leaderboard_disabled_desc',
   'settings.no_continents_active',
+  'settings.theme',
+  'settings.theme_system',
+  'settings.theme_dark',
+  'settings.theme_light',
 
   // profile (dinamik: profile.$prefix — tüm alt alanlar potential olarak kullanılır)
   'profile.title',
@@ -199,6 +203,17 @@ const Set<String> kUsedKeys = {
   'profile.offline_desc',
   'profile.offline_scores_safe_title',
   'profile.offline_scores_safe_desc',
+  'profile.total_correct',
+  'profile.total_wrong',
+  'profile.accuracy',
+  'profile.discovered_countries',
+  'profile.tab_modes',
+  'profile.tab_countries',
+  'profile.top_countries',
+  'profile.weak_countries',
+  'profile.all_countries',
+  'profile.search_country',
+  'profile.no_country_stats',
 
   // leaderboard
   'leaderboard.title',

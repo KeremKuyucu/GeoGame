@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:theme_mode_builder/theme_mode_builder.dart';
 import 'package:geogame/models/app_context.dart';
@@ -42,6 +43,7 @@ class SettingsController {
   bool get isAuthenticated => AuthService.isAuthenticated;
   String get userName => AppState.user.name;
   String get userAvatar => AppState.user.avatarUrl;
+  String get themeMode => settings.themeMode;
   bool get isDarkTheme => settings.darkTheme;
   bool get isButtonMode => gameFilter.isButtonMode;
   String get currentLanguage => language;
@@ -78,12 +80,26 @@ class SettingsController {
 
   void setButtonMode(bool value) =>
       _save(() => gameFilter.isButtonMode = value);
+
+  Future<void> setThemeMode(String value) async {
+    settings.themeMode = value;
+    switch (value) {
+      case 'dark':
+        await ThemeModeBuilderConfig.setDark();
+        break;
+      case 'light':
+        await ThemeModeBuilderConfig.setLight();
+        break;
+      case 'system':
+      default:
+        await ThemeModeBuilderConfig.setSystem();
+        break;
+    }
+    await PreferencesService.saveConfig();
+  }
+
   void setDarkTheme(bool value) {
-    settings.darkTheme = value;
-    value
-        ? ThemeModeBuilderConfig.setDark()
-        : ThemeModeBuilderConfig.setLight();
-    PreferencesService.saveConfig();
+    setThemeMode(value ? 'dark' : 'light');
   }
 
   void setTelemetryEnabled(bool value) =>
@@ -125,7 +141,7 @@ class SettingsController {
 }
 
 class AppSettings {
-  bool darkTheme;
+  String themeMode; // 'system', 'light', 'dark'
   String language;
   bool telemetryEnabled;
   bool? _childMode;
@@ -136,25 +152,51 @@ class AppSettings {
   String get childModePin => _childModePin ?? '';
   set childModePin(String? value) => _childModePin = value ?? '';
 
+  /// Geriye dönük uyumluluk ve anlık kontrol için darkTheme:
+  bool get darkTheme {
+    if (themeMode == 'dark') return true;
+    if (themeMode == 'light') return false;
+    // 'system' varsayılanında cihazın parlaklığına bakar:
+    return PlatformDispatcher.instance.platformBrightness == Brightness.dark;
+  }
+
+  set darkTheme(bool value) {
+    themeMode = value ? 'dark' : 'light';
+  }
+
   AppSettings({
-    this.darkTheme = false,
+    String themeMode = 'system',
+    bool? darkTheme,
     this.language = '',
     this.telemetryEnabled = true,
     bool childMode = false,
     String childModePin = '',
-  })  : _childMode = childMode,
+  })  : themeMode =
+            darkTheme != null ? (darkTheme ? 'dark' : 'light') : themeMode,
+        _childMode = childMode,
         _childModePin = childModePin;
 
-  factory AppSettings.fromMap(Map<String, dynamic> map) => AppSettings(
-        darkTheme: map['darkTheme'] ?? false,
-        language: map['language']?.toString() ?? '',
-        telemetryEnabled: map['telemetryEnabled'] ?? true,
-        childMode: map['childMode'] == true,
-        childModePin: map['childModePin']?.toString() ?? '',
-      );
+  factory AppSettings.fromMap(Map<String, dynamic> map) {
+    String mode = 'system';
+    if (map['themeMode'] != null && map['themeMode'].toString().isNotEmpty) {
+      mode = map['themeMode'].toString();
+    } else if (map['theme'] != null && map['theme'].toString().isNotEmpty) {
+      mode = map['theme'].toString();
+    } else if (map['darkTheme'] != null) {
+      mode = map['darkTheme'] == true ? 'dark' : 'light';
+    }
+
+    return AppSettings(
+      themeMode: mode,
+      language: map['language']?.toString() ?? '',
+      telemetryEnabled: map['telemetryEnabled'] ?? true,
+      childMode: map['childMode'] == true,
+      childModePin: map['childModePin']?.toString() ?? '',
+    );
+  }
 
   Map<String, dynamic> toMap() => {
-        'darkTheme': darkTheme,
+        'themeMode': themeMode,
         'language': language,
         'telemetryEnabled': telemetryEnabled,
         'childMode': childMode,

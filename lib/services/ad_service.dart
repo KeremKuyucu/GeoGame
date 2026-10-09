@@ -72,11 +72,10 @@ class AdService {
     if (!isSupported) return;
 
     try {
-      // Kişiselleştirilmiş/hedeflenmiş reklamlar için çocuk/yaş kısıtlamalarını devre dışı bırak
+      // Kişiselleştirilmiş/hedeflenmiş reklamlar için yaş kısıtlaması politikasını ayarla
       await MobileAds.instance.updateRequestConfiguration(
         RequestConfiguration(
-          tagForChildDirectedTreatment: TagForChildDirectedTreatment.no,
-          tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.no,
+          ageRestrictedTreatment: AgeRestrictedTreatment.unspecified,
         ),
       );
 

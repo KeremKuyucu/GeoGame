@@ -61,14 +61,6 @@ class GameCard extends StatelessWidget {
           fit: BoxFit.cover,
           color: Colors.black.withValues(alpha: 0.3),
           colorBlendMode: BlendMode.darken,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/images/errorimage.webp',
-              fit: BoxFit.cover,
-              color: Colors.black.withValues(alpha: 0.3),
-              colorBlendMode: BlendMode.darken,
-            );
-          },
         ),
       ),
     );

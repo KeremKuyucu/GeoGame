@@ -42,14 +42,14 @@
     "reset_password_title": "Şifre Sıfırlama",
     "reset_password_desc": "E-posta adresinizi girin, size sıfırlama bağlantısı gönderelim.",
     "send_link": "Bağlantı Gönder",
-    "warning_no_account": "Hesabınız yok, puanlarınız kayıt edilmeyecek.",
+    "warning_no_account": "Gezgin modundasınız. Puanlarınızı liderlik tablosuna kaydetmek için giriş yapın.",
     "error_login_failed": "Giriş yapılamadı.",
     "google_sign_in": "Google ile Giriş Yap",
     "or_divider": "veya",
     "google_login_success": "Google ile giriş başarılı!",
     "error_google_cancelled": "Google girişi iptal edildi.",
     "error_google_sign_in": "Google ile giriş yapılamadı. Lütfen tekrar deneyin.",
-    "continue_as_guest": "Misafir Olarak Devam Et",
+    "continue_as_guest": "Gezgin Olarak Devam Et",
     "feature_cloud_sync_title": "Bulut Kaydı",
     "feature_cloud_sync_desc": "Skorlarını ve ilerlemeni güvenle kaydet",
     "feature_leaderboard_title": "Liderlik Tablosu",
@@ -170,6 +170,10 @@
   "settings": {
     "title": "Ayarlar",
     "general_title": "Genel Ayarlar",
+    "theme": "Tema",
+    "theme_system": "Sistem",
+    "theme_dark": "Karanlık",
+    "theme_light": "Aydınlık",
     "selected_theme": "Seçilen Tema: {0}",
     "lang": "Seçilen Dil: ",
     "ad_preferences": "Reklam & Gizlilik Tercihleri",
@@ -192,7 +196,7 @@
       "oceania": "Okyanusya",
       "antarctica": "Antarktika"
     },
-    "guest": "Misafir"
+    "guest": "Gezgin"
   },
   "profile": {
     "title": "Profil",
@@ -212,7 +216,18 @@
     "offline_title": "İnternet Bağlantısı Yok",
     "offline_desc": "Profil istatistiklerinizi ve başarılarınızı güncel olarak görüntülemek için aktif bir internet bağlantısı gereklidir.",
     "offline_scores_safe_title": "Puanlarınız Güvende!",
-    "offline_scores_safe_desc": "Çevrimdışı oynadığınız tüm oyunlar ve puanlarınız cihazınızda güvenle saklanmaktadır. İnternet bağlantınız sağlandığında veya oyunu açtığınızda puanlarınız otomatik olarak sunucuyla senkronize edilecektir."
+    "offline_scores_safe_desc": "Çevrimdışı oynadığınız tüm oyunlar ve puanlarınız cihazınızda güvenle saklanmaktadır. İnternet bağlantınız sağlandığında veya oyunu açtığınızda puanlarınız otomatik olarak sunucuyla senkronize edilecektir.",
+    "total_correct": "Doğru",
+    "total_wrong": "Yanlış",
+    "accuracy": "Başarı",
+    "discovered_countries": "Keşfedilen",
+    "tab_modes": "Oyun Modları",
+    "tab_countries": "Ülke Analizi",
+    "top_countries": "En Başarılı Ülkeler",
+    "weak_countries": "Geliştirilmesi Gerekenler",
+    "all_countries": "Tüm Ülkeler",
+    "search_country": "Ülke ara...",
+    "no_country_stats": "Henüz ülke istatistiği oluşmadı. Oyun oynadıkça karşılaştığınız ülkeler burada analiz edilecektir."
   },
   "leaderboard": {
     "title": "Sıralama",

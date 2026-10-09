@@ -42,14 +42,14 @@
     "reset_password_title": "Réinitialiser le mot de passe",
     "reset_password_desc": "Entrez votre e-mail pour recevoir un lien de réinitialisation.",
     "send_link": "Envoyer le lien",
-    "warning_no_account": "Vous n'avez pas de compte, vos scores ne seront pas enregistrés.",
+    "warning_no_account": "Vous êtes en mode Voyageur. Connectez-vous pour enregistrer vos scores dans le classement.",
     "error_login_failed": "Échec de la connexion.",
     "google_sign_in": "Se connecter avec Google",
     "or_divider": "ou",
     "google_login_success": "Connexion avec Google réussie !",
     "error_google_cancelled": "La connexion avec Google a été annulée.",
     "error_google_sign_in": "Impossible de se connecter avec Google. Veuillez réessayer.",
-    "continue_as_guest": "Continuer en tant qu'invité",
+    "continue_as_guest": "Continuer en tant que voyageur",
     "feature_cloud_sync_title": "Synchronisation cloud",
     "feature_cloud_sync_desc": "Sauvegardez vos scores et votre progression en toute sécurité",
     "feature_leaderboard_title": "Classement",
@@ -170,8 +170,14 @@
   "settings": {
     "title": "Paramètres",
     "general_title": "Paramètres généraux",
+    "theme": "Thème",
+    "theme_system": "Système",
+    "theme_dark": "Sombre",
+    "theme_light": "Clair",
     "selected_theme": "Thème sélectionné : {0}",
     "lang": "Langue sélectionnée : ",
+    "ad_preferences": "Préférences de publicité et de confidentialité",
+    "ad_preferences_desc": "Gérer les publicités ciblées et le consentement aux données",
     "no_continents_active": "Pas assez de pays sélectionnés",
     "multiple_choice_mode": "Mode choix multiple",
     "continent_title": "Options des continents",
@@ -190,7 +196,7 @@
       "oceania": "Océanie",
       "antarctica": "Antarctique"
     },
-    "guest": "Invité"
+    "guest": "Voyageur"
   },
   "profile": {
     "title": "Profil",
@@ -210,7 +216,18 @@
     "offline_title": "Pas de connexion Internet",
     "offline_desc": "Une connexion Internet active est requise pour afficher vos statistiques de profil détaillées et vos réussites.",
     "offline_scores_safe_title": "Vos scores sont en sécurité !",
-    "offline_scores_safe_desc": "Tous les jeux joués hors ligne et vos points gagnés sont enregistrés en toute sécurité sur votre appareil. Dès qu'une connexion Internet sera disponible ou à l'ouverture du jeu, vos points seront automatiquement synchronisés avec le serveur."
+    "offline_scores_safe_desc": "Tous les jeux joués hors ligne et vos points gagnés sont enregistrés en toute sécurité sur votre appareil. Dès qu'une connexion Internet sera disponible ou à l'ouverture du jeu, vos points seront automatiquement synchronisés avec le serveur.",
+    "total_correct": "Correct",
+    "total_wrong": "Faux",
+    "accuracy": "Précision",
+    "discovered_countries": "Découverts",
+    "tab_modes": "Modes de jeu",
+    "tab_countries": "Maîtrise des pays",
+    "top_countries": "Meilleurs pays",
+    "weak_countries": "À travailler",
+    "all_countries": "Tous les pays",
+    "search_country": "Rechercher un pays...",
+    "no_country_stats": "Aucune statistique de pays pour l'instant. Vos pays rencontrés apparaîtront ici."
   },
   "leaderboard": {
     "title": "Classement",

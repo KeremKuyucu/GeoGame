@@ -42,14 +42,14 @@
     "reset_password_title": "Passwort zurücksetzen",
     "reset_password_desc": "Gib deine E-Mail-Adresse ein, um einen Link zum Zurücksetzen zu erhalten.",
     "send_link": "Link senden",
-    "warning_no_account": "Du hast kein Konto, deine Punkte werden nicht gespeichert.",
+    "warning_no_account": "Du bist im Reisender-Modus. Melde dich an, um deine Punkte in der Rangliste zu speichern.",
     "error_login_failed": "Anmeldung fehlgeschlagen.",
     "google_sign_in": "Mit Google anmelden",
     "or_divider": "oder",
     "google_login_success": "Erfolgreich mit Google angemeldet!",
     "error_google_cancelled": "Google-Anmeldung wurde abgebrochen.",
     "error_google_sign_in": "Anmeldung mit Google fehlgeschlagen. Bitte erneut versuchen.",
-    "continue_as_guest": "Als Gast fortfahren",
+    "continue_as_guest": "Als Reisender fortfahren",
     "feature_cloud_sync_title": "Cloud-Synchronisierung",
     "feature_cloud_sync_desc": "Speichere deine Punkte und deinen Fortschritt sicher",
     "feature_leaderboard_title": "Bestenliste",
@@ -170,8 +170,14 @@
   "settings": {
     "title": "Einstellungen",
     "general_title": "Allgemeine Einstellungen",
+    "theme": "Design",
+    "theme_system": "System",
+    "theme_dark": "Dunkel",
+    "theme_light": "Hell",
     "selected_theme": "Ausgewähltes Design: {0}",
     "lang": "Ausgewählte Sprache: ",
+    "ad_preferences": "Werbe- & Datenschutzeinstellungen",
+    "ad_preferences_desc": "Verwalten Sie zielgerichtete Werbung und Dateneinwilligungen",
     "no_continents_active": "Nicht genügend Länder ausgewählt",
     "multiple_choice_mode": "Multiple-Choice-Modus",
     "continent_title": "Kontinent-Optionen",
@@ -190,7 +196,7 @@
       "oceania": "Ozeanien",
       "antarctica": "Antarktis"
     },
-    "guest": "Gast"
+    "guest": "Reisender"
   },
   "profile": {
     "title": "Profil",
@@ -210,7 +216,18 @@
     "offline_title": "Keine Internetverbindung",
     "offline_desc": "Eine aktive Internetverbindung ist erforderlich, um Ihre detaillierten Profilstatistiken und Erfolge anzuzeigen.",
     "offline_scores_safe_title": "Ihre Punkte sind sicher!",
-    "offline_scores_safe_desc": "Alle offline gespielten Spiele und gesammelten Punkte werden sicher auf Ihrem Gerät gespeichert. Sobald eine Internetverbindung verfügbar ist oder Sie das Spiel starten, werden Ihre Punkte automatisch mit dem Server synchronisiert."
+    "offline_scores_safe_desc": "Alle offline gespielten Spiele und gesammelten Punkte werden sicher auf Ihrem Gerät gespeichert. Sobald eine Internetverbindung verfügbar ist oder Sie das Spiel starten, werden Ihre Punkte automatisch mit dem Server synchronisiert.",
+    "total_correct": "Richtig",
+    "total_wrong": "Falsch",
+    "accuracy": "Quote",
+    "discovered_countries": "Entdeckt",
+    "tab_modes": "Spielmodi",
+    "tab_countries": "Länderstatistik",
+    "top_countries": "Beste Länder",
+    "weak_countries": "Übungsbedarf",
+    "all_countries": "Alle Länder",
+    "search_country": "Land suchen...",
+    "no_country_stats": "Noch keine Länderstatistiken. Beim Spielen werden Länder hier analysiert."
   },
   "leaderboard": {
     "title": "Bestenliste",

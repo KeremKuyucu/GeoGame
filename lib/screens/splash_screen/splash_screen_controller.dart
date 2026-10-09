@@ -33,10 +33,17 @@ class SplashScreenController {
         debugPrint('⚠️ GameLogService.syncPendingLogs error: $e');
       });
 
-      if (SettingsController.settings.darkTheme) {
-        ThemeModeBuilderConfig.setDark();
-      } else {
-        ThemeModeBuilderConfig.setLight();
+      switch (SettingsController.settings.themeMode) {
+        case 'dark':
+          await ThemeModeBuilderConfig.setDark();
+          break;
+        case 'light':
+          await ThemeModeBuilderConfig.setLight();
+          break;
+        case 'system':
+        default:
+          await ThemeModeBuilderConfig.setSystem();
+          break;
       }
     } catch (e) {
       debugPrint('❌ SplashScreenController initialize error: $e');

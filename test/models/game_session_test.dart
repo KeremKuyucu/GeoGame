@@ -295,6 +295,7 @@ void main() {
     test('varsayılan değerler doğru olmalı', () {
       final settings = AppSettings();
 
+      expect(settings.themeMode, 'system');
       expect(settings.darkTheme, false);
       expect(settings.language, '');
       expect(settings.childMode, false);
@@ -303,16 +304,27 @@ void main() {
 
     test('fromMap doğru doldurulmalı', () {
       final settings = AppSettings.fromMap({
-        'darkTheme': false,
+        'themeMode': 'dark',
         'language': 'tur',
         'childMode': true,
         'childModePin': '1234',
       });
 
-      expect(settings.darkTheme, false);
+      expect(settings.themeMode, 'dark');
+      expect(settings.darkTheme, true);
       expect(settings.language, 'tur');
       expect(settings.childMode, true);
       expect(settings.childModePin, '1234');
+    });
+
+    test('fromMap eski darkTheme alanını geriye dönük desteklemeli', () {
+      final settings = AppSettings.fromMap({
+        'darkTheme': false,
+        'language': 'tur',
+      });
+
+      expect(settings.themeMode, 'light');
+      expect(settings.darkTheme, false);
     });
 
     test('fromMap boş/null language varsayılan olmalı', () {
@@ -442,7 +454,7 @@ void main() {
 
     test('toMap → fromMap roundtrip tutarlı olmalı', () {
       final original = AppSettings(
-        darkTheme: false,
+        themeMode: 'light',
         language: 'tur',
         telemetryEnabled: false,
         childMode: true,
@@ -451,6 +463,7 @@ void main() {
       final map = original.toMap();
       final restored = AppSettings.fromMap(map);
 
+      expect(restored.themeMode, original.themeMode);
       expect(restored.darkTheme, original.darkTheme);
       expect(restored.language, original.language);
       expect(restored.telemetryEnabled, original.telemetryEnabled);
@@ -471,7 +484,8 @@ void main() {
     test('toMap tüm alanları içermeli', () {
       final map = AppSettings().toMap();
 
-      expect(map.containsKey('darkTheme'), true);
+      expect(map.containsKey('themeMode'), true);
+      expect(map.containsKey('darkTheme'), false);
       expect(map.containsKey('language'), true);
       expect(map.containsKey('telemetryEnabled'), true);
       expect(map.containsKey('childMode'), true);

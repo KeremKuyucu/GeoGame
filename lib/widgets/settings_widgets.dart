@@ -29,7 +29,7 @@ class SettingsGuestCard extends StatelessWidget {
               color: Colors.blueAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.person_outline_rounded,
+            child: const Icon(Icons.explore_rounded,
                 size: 48, color: Colors.blueAccent),
           ),
           const SizedBox(height: 16),
@@ -377,6 +377,111 @@ class SettingsLanguageTile extends StatelessWidget {
                 if (newValue != null) {
                   await controller.changeLanguage(newValue, context);
                   onLanguageChanged();
+                }
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tema seçici widget'ı
+class SettingsThemeTile extends StatelessWidget {
+  final SettingsController controller;
+  final bool isDark;
+  final VoidCallback onThemeChanged;
+
+  const SettingsThemeTile({
+    super.key,
+    required this.controller,
+    required this.isDark,
+    required this.onThemeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String currentTheme = controller.themeMode;
+
+    IconData themeIcon;
+    Color iconBgColor;
+    if (currentTheme == 'dark') {
+      themeIcon = Icons.dark_mode_rounded;
+      iconBgColor = Colors.deepPurple;
+    } else if (currentTheme == 'light') {
+      themeIcon = Icons.light_mode_rounded;
+      iconBgColor = Colors.amber.shade700;
+    } else {
+      themeIcon = Icons.brightness_auto_rounded;
+      iconBgColor = Colors.indigo;
+    }
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: iconBgColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(themeIcon, color: Colors.white, size: 20),
+      ),
+      title: Text(
+        Localization.t('settings.theme'),
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+      ),
+      trailing: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 130),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[800] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: ['system', 'light', 'dark'].contains(currentTheme)
+                  ? currentTheme
+                  : 'system',
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+              dropdownColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+                fontWeight: FontWeight.w500,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: 'system',
+                  child: Text(
+                    Localization.t('settings.theme_system'),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'light',
+                  child: Text(
+                    Localization.t('settings.theme_light'),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                DropdownMenuItem(
+                  value: 'dark',
+                  child: Text(
+                    Localization.t('settings.theme_dark'),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+              onChanged: (String? newValue) async {
+                if (newValue != null) {
+                  await controller.setThemeMode(newValue);
+                  onThemeChanged();
                 }
               },
             ),

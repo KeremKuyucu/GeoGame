@@ -36,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = _controller.isDarkTheme;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color backgroundColor =
         isDark ? const Color(0xFF000000) : const Color(0xFFF2F2F7);
 
@@ -135,17 +135,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() => _controller.setButtonMode(v)),
               ),
               SettingsDivider(isDark: isDark),
-              SettingsTile(
-                title: Localization.t('settings.selected_theme',
-                    args: [isDark ? 'Dark' : 'Light']),
-                icon:
-                    isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                iconColor: isDark ? Colors.amber : Colors.orange,
+              SettingsThemeTile(
+                controller: _controller,
                 isDark: isDark,
-                isSwitch: true,
-                switchValue: isDark,
-                onSwitchChanged: (v) =>
-                    setState(() => _controller.setDarkTheme(v)),
+                onThemeChanged: () => setState(() {}),
               ),
               SettingsDivider(isDark: isDark),
               ListTile(

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/localization_service.dart';
 
 class AuthService {
@@ -111,6 +112,10 @@ class AuthService {
           event == AuthChangeEvent.initialSession) {
         if (session?.user != null) {
           await syncUserData(session!.user);
+          // Giriş yapıldığında yerelde biriken Gezgin loglarını hesaba aktar
+          GameLogService.syncPendingLogs().catchError((e) {
+            debugPrint('⚠️ Gezgin logları aktarılırken hata: $e');
+          });
         }
       } else if (event == AuthChangeEvent.signedOut) {
         AppState.user = UserProfile.anonymous();

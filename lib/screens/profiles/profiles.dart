@@ -67,6 +67,10 @@ class _ProfilesState extends State<Profiles> {
       );
     }
 
+    if (!_controller.isAuthenticated) {
+      return ProfilesGuestView(controller: _controller);
+    }
+
     if (_controller.isOffline) {
       return Scaffold(
         appBar: AppBar(
@@ -103,10 +107,6 @@ class _ProfilesState extends State<Profiles> {
           ),
         ),
       );
-    }
-
-    if (!_controller.isAuthenticated) {
-      return ProfilesGuestView(controller: _controller);
     }
 
     return Scaffold(
