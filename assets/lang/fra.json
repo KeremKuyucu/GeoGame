@@ -27,7 +27,8 @@
     "title": "Signaler un bug",
     "subject_hint": "Veuillez entrer le titre du bug",
     "message_hint": "Fournissez des informations détaillées sur le bug",
-    "sent_success": "Votre retour a été envoyé."
+    "sent_success": "Votre retour a été envoyé.",
+    "sent_failed": "Échec de l'envoi du retour. Veuillez réessayer plus tard."
   },
   "auth": {
     "login_required": "Veuillez d'abord vous connecter.",

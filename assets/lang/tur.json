@@ -27,7 +27,8 @@
     "title": "Hata Bildir",
     "subject_hint": "Lütfen Hata Başlığını Girin",
     "message_hint": "Hata hakkında detaylı bilgi verin",
-    "sent_success": "Geri bildiriminiz iletildi."
+    "sent_success": "Geri bildiriminiz iletildi.",
+    "sent_failed": "Geri bildirim iletilemedi. Lütfen daha sonra tekrar deneyin."
   },
   "auth": {
     "login_required": "Lütfen önce giriş yapın.",

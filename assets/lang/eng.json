@@ -27,7 +27,8 @@
     "title": "Report a Bug",
     "subject_hint": "Please Enter the Bug Title",
     "message_hint": "Provide detailed information about the bug",
-    "sent_success": "Your feedback has been sent."
+    "sent_success": "Your feedback has been sent.",
+    "sent_failed": "Could not send feedback. Please try again later."
   },
   "auth": {
     "login_required": "Please log in first.",

@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/telemetry_service.dart';
 import 'package:geogame/widgets/custom_notification.dart';
 
 class FeedbackDialog extends StatefulWidget {
@@ -74,13 +75,23 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         Localization.t('common.success'),
         Localization.t('feedback.sent_success'),
       );
-    } catch (e) {
+    } catch (e, stack) {
       if (!mounted) return;
       setState(() => _isLoading = false);
 
+      TelemetryService.sendError(
+        event: 'feedback_send_failed',
+        message: e.toString(),
+        stackTrace: stack,
+        metadata: {
+          'sebep': sebep,
+          'user_id': user.id,
+        },
+      );
+
       _showCustomNotification(
         Localization.t('common.error'),
-        'Error: $e',
+        Localization.t('feedback.sent_failed'),
       );
     }
   }

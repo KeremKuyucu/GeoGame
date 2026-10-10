@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game_metadata.dart';
 
-class AppState extends ChangeNotifier {
+abstract final class AppState {
   static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 

@@ -27,7 +27,8 @@
     "title": "Fehler melden",
     "subject_hint": "Bitte Titel des Fehlers eingeben",
     "message_hint": "Detaillierte Informationen zum Fehler angeben",
-    "sent_success": "Dein Feedback wurde gesendet."
+    "sent_success": "Dein Feedback wurde gesendet.",
+    "sent_failed": "Feedback konnte nicht gesendet werden. Bitte versuche es später erneut."
   },
   "auth": {
     "login_required": "Bitte melde dich zuerst an.",

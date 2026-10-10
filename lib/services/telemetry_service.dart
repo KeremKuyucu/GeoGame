@@ -11,21 +11,35 @@ class TelemetryService {
   static const String _logApiUrl = 'https://keremkk.com.tr/api/logs';
   static const String _errorLogApiUrl = 'https://keremkk.com.tr/api/error-logs';
   static const Duration _requestTimeout = Duration(seconds: 5);
-  static bool _isSendingError = false;
+  static const String appVersion = '1.6.18+24';
+
+  static final http.Client _client = http.Client();
+  static String? _cachedUid;
+
+  /// Güvenli metin kırpıcı (Backend payload limitlerine uyum sağlar)
+  static String? _sanitize(dynamic val, {int maxLength = 2000}) {
+    if (val == null) return null;
+    final str = val.toString();
+    if (str.length <= maxLength) return str;
+    return '${str.substring(0, maxLength)}\n...[truncated]';
+  }
 
   /// Aktif UID'yi döndürür:
   /// 1. Supabase'e giriş yapılmışsa doğrudan Supabase kullanıcı UID'si
-  /// 2. Giriş yapılmamışsa (misafir) SharedPreferences'taki kalıcı cihaz/misafir ID'si
+  /// 2. Giriş yapılmamışsa (Gezgin) SharedPreferences'taki kalıcı cihaz ID'si
+  /// Bellekte önbelleğe alınarak her log çağrısında disk I/O yapılmasını engeller.
   static Future<String> getEffectiveUid() async {
-
     try {
       final supabaseUid = AuthService.currentUserId;
       if (supabaseUid != null && supabaseUid.isNotEmpty) {
+        _cachedUid = supabaseUid;
         return supabaseUid;
       }
     } catch (e) {
       debugPrint('TelemetryService Supabase UID alınamadı: $e');
     }
+
+    if (_cachedUid != null) return _cachedUid!;
 
     final prefs = await SharedPreferences.getInstance();
     String? localUid = prefs.getString(_uidKey);
@@ -33,6 +47,7 @@ class TelemetryService {
       localUid = const Uuid().v4();
       await prefs.setString(_uidKey, localUid);
     }
+    _cachedUid = localUid;
     return localUid;
   }
 
@@ -80,14 +95,15 @@ class TelemetryService {
 
       final bodyData = {
         'uid': effectiveUid,
-        'timestamp': DateTime.now().toUtc().toIso8601String(),
         'app': 'geogame',
+        'app_version': appVersion,
+        'is_debug': kDebugMode,
         'event': eventName,
         'platform': platformName,
         if (additionalData != null) ...additionalData,
       };
 
-      final response = await http
+      final response = await _client
           .post(
             Uri.parse(_logApiUrl),
             headers: {'Content-Type': 'application/json'},
@@ -108,33 +124,12 @@ class TelemetryService {
   }
 
   /// Hata kayıtlarını 'https://keremkk.com.tr/api/error-logs' uç noktasına gönderir.
-  /// Discord Botu üzerinden anlık bildirim olarak iletilir.
-  ///
-  /// Örnek Kullanım:
-  /// ```dart
-  /// try {
-  ///   await gameService.loadCountryData();
-  /// } catch (e, stack) {
-  ///   await TelemetryService.sendError(
-  ///     event: 'country_load_failed',
-  ///     message: e.toString(),
-  ///     stackTrace: stack,
-  ///     metadata: {
-  ///       'game_mode': 'distance',
-  ///       'target_country': 'TUR',
-  ///     },
-  ///   );
-  /// }
-  /// ```
   static Future<void> sendError({
     required String event,
     required String message,
     dynamic stackTrace,
     Map<String, dynamic>? metadata,
   }) async {
-    if (_isSendingError) return; // Sonsuz döngü önlemi
-    _isSendingError = true;
-
     try {
       if (!SettingsController.settings.telemetryEnabled) return;
 
@@ -142,16 +137,18 @@ class TelemetryService {
 
       final bodyData = {
         'uid': effectiveUid,
-        'timestamp': DateTime.now().toUtc().toIso8601String(),
         'app': 'geogame',
+        'app_version': appVersion,
+        'is_debug': kDebugMode,
         'event': event,
         'platform': platformName,
-        'message': message,
-        if (stackTrace != null) 'stackTrace': stackTrace.toString(),
+        'message': _sanitize(message, maxLength: 3000) ?? message,
+        if (stackTrace != null)
+          'stackTrace': _sanitize(stackTrace, maxLength: 5000),
         if (metadata != null) 'metadata': metadata,
       };
 
-      final response = await http
+      final response = await _client
           .post(
             Uri.parse(_errorLogApiUrl),
             headers: {'Content-Type': 'application/json'},
@@ -167,8 +164,6 @@ class TelemetryService {
     } catch (e) {
       // Hata gönderimi sırasında oluşan hatalar sessizce geçilir (asla recursive çağrı yapılmaz)
       debugPrint('Hata kaydı gönderme hatası: $e');
-    } finally {
-      _isSendingError = false;
     }
   }
 }

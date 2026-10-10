@@ -9,18 +9,33 @@ import 'package:geogame/models/app_context.dart';
 /// GeoJSON dosyalarını yükleme ve Flutter Path'e dönüştürme işlemlerini
 /// yöneten servis. Tüm oyunlarda ortak olarak kullanılır.
 class GeoJsonService {
+  static final Map<String, Path> _normalPathCache = {};
+  static final Map<String, Path> _simplifiedPathCache = {};
+
+  /// Önbelleği temizler (isteğe bağlı bellek yönetimi).
+  static void clearCache() {
+    _normalPathCache.clear();
+    _simplifiedPathCache.clear();
+  }
+
   /// GeoJSON dosyasını okuyup Flutter Path nesnesine çevirir.
-  /// Önce assets'ten, başarısız olursa network'ten yükler.
+  /// Önce bellekteki önbellekten, sonra assets'ten, en son network'ten yükler.
   static Future<Path?> loadCountryPath(String isoCode) async {
+    final isoKey = isoCode.toLowerCase();
+    if (_normalPathCache.containsKey(isoKey)) {
+      return _normalPathCache[isoKey];
+    }
+
     final path = Path();
 
     // 1. Yerelden dene
     try {
       final jsonString = await rootBundle.loadString(
-        'assets/geojson/${isoCode.toLowerCase()}.geojson',
+        'assets/geojson/$isoKey.geojson',
       );
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
       _parseGeoJsonToPath(jsonData, path);
+      _normalPathCache[isoKey] = path;
       return path;
     } catch (e) {
       debugPrint('Local GeoJSON upload error ($isoCode): $e');
@@ -64,7 +79,8 @@ class GeoJsonService {
   }
 
   /// GeoJSON yapısını ayrıştırır ve Path nesnesine ekler.
-  static void _parseGeoJsonToPath(Map<String, dynamic> json, Path path) {
+  static void _parseGeoJsonToPath(Map<String, dynamic> json, Path path,
+      {bool simplify = false}) {
     if (json.isEmpty || json['type'] == null) return;
 
     final String type = json['type'];
@@ -74,22 +90,24 @@ class GeoJsonService {
         final features = json['features'] as List<dynamic>? ?? [];
         for (var feature in features) {
           if (feature is Map<String, dynamic>) {
-            _parseGeoJsonToPath(feature, path);
+            _parseGeoJsonToPath(feature, path, simplify: simplify);
           }
         }
         break;
       case 'Feature':
         final geometry = json['geometry'] as Map<String, dynamic>?;
-        if (geometry != null) _parseGeoJsonToPath(geometry, path);
+        if (geometry != null) {
+          _parseGeoJsonToPath(geometry, path, simplify: simplify);
+        }
         break;
       case 'Polygon':
         final coordinates = json['coordinates'] as List<dynamic>? ?? [];
-        _addPolygonToPath(path, coordinates);
+        _addPolygonToPath(path, coordinates, simplify: simplify);
         break;
       case 'MultiPolygon':
         final polygons = json['coordinates'] as List<dynamic>? ?? [];
         for (var polygon in polygons) {
-          _addPolygonToPath(path, polygon as List<dynamic>);
+          _addPolygonToPath(path, polygon as List<dynamic>, simplify: simplify);
         }
         break;
       default:
@@ -143,15 +161,21 @@ class GeoJsonService {
   /// GeoJSON Path'ini basitleştirilmiş modda yükler.
   /// Border Path oyunu gibi çok fazla ülke çizilecek durumlarda kullanılır.
   static Future<Path?> loadCountryPathSimplified(String isoCode) async {
+    final isoKey = isoCode.toLowerCase();
+    if (_simplifiedPathCache.containsKey(isoKey)) {
+      return _simplifiedPathCache[isoKey];
+    }
+
     final path = Path();
 
     // 1. Yerelden dene
     try {
       final String jsonString = await rootBundle.loadString(
-        'assets/geojson/${isoCode.toLowerCase()}.geojson',
+        'assets/geojson/$isoKey.geojson',
       );
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
-      _parseGeoJsonToPath(jsonData, path);
+      _parseGeoJsonToPath(jsonData, path, simplify: true);
+      _simplifiedPathCache[isoKey] = path;
       return path;
     } catch (e) {
       debugPrint('Local GeoJSON upload error ($isoCode): $e');
@@ -189,13 +213,19 @@ class GeoJsonService {
     final futures = AppState.allCountries.map((country) async {
       try {
         final iso = country.iso3;
-        final pathStr = 'assets/geojson/${iso.toLowerCase()}.geojson';
+        final isoKey = iso.toLowerCase();
 
+        if (_simplifiedPathCache.containsKey(isoKey)) {
+          return MapEntry(iso, _simplifiedPathCache[isoKey]!);
+        }
+
+        final pathStr = 'assets/geojson/$isoKey.geojson';
         final String jsonString = await rootBundle.loadString(pathStr);
         final Map<String, dynamic> json = jsonDecode(jsonString);
 
         final Path p = Path();
-        _parseGeoJsonToPath(json, p);
+        _parseGeoJsonToPath(json, p, simplify: true);
+        _simplifiedPathCache[isoKey] = p;
 
         return MapEntry(iso, p);
       } catch (e) {

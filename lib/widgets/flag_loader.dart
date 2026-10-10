@@ -6,6 +6,32 @@ import 'package:flutter/services.dart';
 /// Bayrak görsellerini yükleyen yardımcı widget.
 /// Önce assets'ten, başarısız olursa network'ten yükler.
 class FlagLoader {
+  static Set<String>? _cachedFlagAssets;
+
+  /// Manifest'i bir kez yükleyip bayrak yollarını bellekte tutar.
+  static Future<Set<String>> _getFlagAssets() async {
+    if (_cachedFlagAssets != null) return _cachedFlagAssets!;
+    try {
+      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+      _cachedFlagAssets = manifest
+          .listAssets()
+          .where((k) => k.startsWith('assets/flags/'))
+          .toSet();
+    } catch (_) {
+      _cachedFlagAssets = <String>{};
+    }
+    return _cachedFlagAssets!;
+  }
+
+  /// Manifest bellekte mi kontrolü.
+  static bool get hasCachedManifest => _cachedFlagAssets != null;
+
+  /// Senkron olarak yerel asset kontrolü (manifest önbelleklenmişse çalışır).
+  static bool isFlagCachedSync(String iso2) {
+    if (_cachedFlagAssets == null) return false;
+    return _cachedFlagAssets!.contains('assets/flags/${iso2.toLowerCase()}.webp');
+  }
+
   /// Bayrak widget'ını async olarak yükler.
   /// Önce local asset kontrol edilir, yoksa network'ten yüklenir.
   static Future<Widget> loadFlag({
@@ -16,34 +42,25 @@ class FlagLoader {
     bool circular = true,
   }) async {
     final assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
-    bool exists = false;
+    final assets = await _getFlagAssets();
+    final bool exists = assets.contains(assetPath);
 
-    try {
-      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-      exists = manifest.listAssets().contains(assetPath);
-    } catch (_) {
-      exists = false;
-    }
-
-    Widget image;
-    if (exists) {
-      image = Image.asset(
-        assetPath,
-        width: size,
-        height: size,
-        fit: fit,
-        errorBuilder: (context, error, stackTrace) =>
-            _networkImage(flagUrl, size, fit),
-      );
-    } else {
-      image = _networkImage(flagUrl, size, fit);
-    }
+    final Widget image = exists
+        ? Image.asset(
+            assetPath,
+            width: size,
+            height: size,
+            fit: fit,
+            errorBuilder: (context, error, stackTrace) =>
+                buildNetworkImage(flagUrl, size, fit),
+          )
+        : buildNetworkImage(flagUrl, size, fit);
 
     return circular ? ClipOval(child: image) : image;
   }
 
   /// Network'ten bayrak yükler (fallback).
-  static Widget _networkImage(String url, double size, BoxFit fit) {
+  static Widget buildNetworkImage(String url, double size, BoxFit fit) {
     return Image.network(
       url,
       width: size,
@@ -56,13 +73,9 @@ class FlagLoader {
 
   /// Asset'te bayrak var mı kontrol eder.
   static Future<bool> checkFlagAsset(String iso2) async {
+    final assets = await _getFlagAssets();
     final String assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
-    try {
-      final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-      return manifest.listAssets().contains(assetPath);
-    } catch (e) {
-      return false;
-    }
+    return assets.contains(assetPath);
   }
 
   /// Büyük bayrak görüntüsü widget'ı oluşturur (oyun ekranları için).
@@ -102,6 +115,7 @@ class FlagLoader {
 }
 
 /// FutureBuilder ile kullanılabilecek bayrak widget'ı.
+/// Manifest önbellekteyse FutureBuilder beklemeden anında senkron çizer.
 class FlagWidget extends StatelessWidget {
   final String iso2;
   final String flagUrl;
@@ -118,6 +132,23 @@ class FlagWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (FlagLoader.hasCachedManifest) {
+      final exists = FlagLoader.isFlagCachedSync(iso2);
+      final assetPath = 'assets/flags/${iso2.toLowerCase()}.webp';
+      final Widget image = exists
+          ? Image.asset(
+              assetPath,
+              width: size,
+              height: size,
+              fit: fit,
+              errorBuilder: (context, error, stackTrace) =>
+                  FlagLoader.buildNetworkImage(flagUrl, size, fit),
+            )
+          : FlagLoader.buildNetworkImage(flagUrl, size, fit);
+
+      return circular ? ClipOval(child: image) : image;
+    }
+
     return FutureBuilder<Widget>(
       future: FlagLoader.loadFlag(
         iso2: iso2,
@@ -140,4 +171,6 @@ class FlagWidget extends StatelessWidget {
       },
     );
   }
+
+  BoxFit get fit => BoxFit.cover;
 }

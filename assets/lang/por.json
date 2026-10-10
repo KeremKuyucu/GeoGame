@@ -27,7 +27,8 @@
     "title": "Reportar um Erro",
     "subject_hint": "Introduza o título do erro",
     "message_hint": "Forneça informações detalhadas sobre o erro",
-    "sent_success": "O seu feedback foi enviado."
+    "sent_success": "O seu feedback foi enviado.",
+    "sent_failed": "Não foi possível enviar o feedback. Tente novamente mais tarde."
   },
   "auth": {
     "login_required": "Por favor, inicie sessão primeiro.",

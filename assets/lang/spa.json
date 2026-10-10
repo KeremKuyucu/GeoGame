@@ -27,7 +27,8 @@
     "title": "Informar de un error",
     "subject_hint": "Introduce el título del error",
     "message_hint": "Proporciona información detallada sobre el error",
-    "sent_success": "Tu comentario ha sido enviado."
+    "sent_success": "Tu comentario ha sido enviado.",
+    "sent_failed": "No se pudo enviar el comentario. Inténtalo de nuevo más tarde."
   },
   "auth": {
     "login_required": "Por favor, inicia sesión primero.",

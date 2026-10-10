@@ -39,6 +39,7 @@ const Set<String> kUsedKeys = {
   'feedback.subject_hint',
   'feedback.message_hint',
   'feedback.sent_success',
+  'feedback.sent_failed',
 
   // auth (statik çağrılar)
   'auth.login_required',

@@ -65,6 +65,39 @@ void main() {
     test('Pasifken formattedRemainingTime 00:00 dönmeli', () {
       expect(BonusService.formattedRemainingTime, equals('00:00'));
     });
+
+    test('Toplam bonus süresi 30 dakikalık tavan sınırı aşmamalı', () {
+      // 10 kez üst üste çağırarak 50 dk eklemeyi dene
+      for (int i = 0; i < 10; i++) {
+        BonusService.activate();
+      }
+
+      expect(BonusService.isActive, isTrue);
+      // Süre en fazla 30 dakika olmalı
+      expect(BonusService.remainingTime.inMinutes, lessThanOrEqualTo(30));
+    });
+
+    test('clearBonus() bonusu tamamen sıfırlamalı', () async {
+      BonusService.activate();
+      expect(BonusService.isActive, isTrue);
+
+      await BonusService.clearBonus();
+
+      expect(BonusService.isActive, isFalse);
+      expect(BonusService.remainingTime, equals(Duration.zero));
+    });
+
+    test('loadBonus() manipüle edilmiş aşırı uzun süreyi tavan sınıra çekmeli', () async {
+      final prefs = await SharedPreferences.getInstance();
+      // 1 yıl sonrasına ayarlanmış manipüle edilmiş tarih simülasyonu
+      final futureTime = DateTime.now().add(const Duration(days: 365));
+      await prefs.setString('geogame_bonus_end_time', futureTime.toIso8601String());
+
+      await BonusService.loadBonus();
+
+      expect(BonusService.isActive, isTrue);
+      expect(BonusService.remainingTime.inMinutes, lessThanOrEqualTo(30));
+    });
   });
 
   group('GameSession & Bonus Entegrasyon Testleri', () {
