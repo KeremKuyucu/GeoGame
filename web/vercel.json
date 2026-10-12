@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/health",
-      "destination": "/api/health"
-    },
-    {
       "source": "/.well-known/assetlinks.json",
       "destination": "/.well-known/assetlinks.json"
     },

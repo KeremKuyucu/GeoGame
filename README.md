@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/keremkuyucu/GeoGame/releases"><img src="https://img.shields.io/github/v/release/keremkuyucu/GeoGame?style=for-the-badge&color=gold&label=Version" alt="Version"/></a>
   <a href="https://github.com/keremkuyucu/GeoGame/releases"><img src="https://img.shields.io/github/downloads/keremkuyucu/GeoGame/total?logo=github&style=for-the-badge&color=blue&label=Downloads" alt="Downloads"/></a>
-  <a href="https://geogame.keremkk.com.tr"><img src="https://img.shields.io/badge/Web_Version-Online-success?style=for-the-badge&logo=googlechrome&color=purple" alt="Web Version"/></a>
+  <a href="https://geogame.keremkuyucu.com.tr"><img src="https://img.shields.io/badge/Web_Version-Online-success?style=for-the-badge&logo=googlechrome&color=purple" alt="Web Version"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/keremkuyucu/GeoGame?style=for-the-badge&color=orange&label=License" alt="License"/></a>
 </p>
 
@@ -25,7 +25,7 @@
 
 ## 🚀 Play & Download
 
-* 🌐 [**Official Web App**](https://geogame.keremkk.com.tr) – Play instantly in your browser.
+* 🌐 [**Official Web App**](https://geogame.keremkuyucu.com.tr) – Play instantly in your browser.
 * 📦 [**GitHub Releases**](https://github.com/keremkuyucu/GeoGame/releases/latest) – Download Windows desktop installers and Android APKs.
 * 📱 [**Google Play Store**](https://play.google.com/store/apps/details?id=com.keremkuyucu.geogame) – Get it on your Android device.
 

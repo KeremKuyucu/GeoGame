@@ -158,13 +158,13 @@ class DrawerWidget extends StatelessWidget {
           icon: Icons.language_rounded,
           iconColor: const Color(0xFF5865F2),
           title: Localization.t('drawer.my_website'),
-          onTap: () => _launchURL('https://keremkk.com.tr'),
+          onTap: () => _launchURL('https://keremkuyucu.com.tr'),
         ),
         _buildListTile(
           icon: Icons.language_rounded,
           iconColor: Colors.redAccent,
           title: Localization.t('drawer.geogame_website'),
-          onTap: () => _launchURL('https://geogame.keremkk.com.tr'),
+          onTap: () => _launchURL('https://geogame.keremkuyucu.com.tr'),
         ),
         _buildListTile(
           icon: Icons.terminal_rounded,
