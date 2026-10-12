@@ -5,13 +5,34 @@ import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/services/auth_service.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class TelemetryService {
   static const String _uidKey = 'app_unique_id';
   static const String _logApiUrl = 'https://keremkuyucu.com.tr/api/logs';
   static const String _errorLogApiUrl = 'https://keremkuyucu.com.tr/api/error-logs';
   static const Duration _requestTimeout = Duration(seconds: 5);
-  static const String appVersion = '1.6.18+24';
+  static String? _cachedAppVersion;
+
+  /// package_info_plus üzerinden versiyon bilgisini (örn. '1.7.0+25') alır ve önbelleğe alır.
+  static Future<String> getAppVersion() async {
+    if (_cachedAppVersion != null) return _cachedAppVersion!;
+
+    try {
+      final info = await PackageInfo.fromPlatform();
+      final version = info.version;
+      final buildNumber = info.buildNumber;
+      _cachedAppVersion =
+          buildNumber.isNotEmpty ? '$version+$buildNumber' : version;
+      return _cachedAppVersion!;
+    } catch (e) {
+      debugPrint('TelemetryService package_info_plus hatası: $e');
+      return _cachedAppVersion ?? '1.7.0+25';
+    }
+  }
+
+  /// Senkron erişim veya geriye dönük uyumluluk için getter
+  static String get appVersion => _cachedAppVersion ?? '1.7.0+25';
 
   static final http.Client _client = http.Client();
   static String? _cachedUid;
@@ -75,6 +96,8 @@ class TelemetryService {
   /// Uygulama açılışında arka planda çağrılacak telemetri metodu (her açılışta gönderilir)
   static Future<void> init() async {
     try {
+      await getAppVersion();
+
       if (!SettingsController.settings.telemetryEnabled) return;
 
       await sendEvent('app_opened');
@@ -92,11 +115,12 @@ class TelemetryService {
       if (!SettingsController.settings.telemetryEnabled) return;
 
       final effectiveUid = await getEffectiveUid();
+      final effectiveAppVersion = await getAppVersion();
 
       final bodyData = {
         'uid': effectiveUid,
         'app': 'geogame',
-        'app_version': appVersion,
+        'app_version': effectiveAppVersion,
         'is_debug': kDebugMode,
         'event': eventName,
         'platform': platformName,
@@ -134,11 +158,12 @@ class TelemetryService {
       if (!SettingsController.settings.telemetryEnabled) return;
 
       final effectiveUid = await getEffectiveUid();
+      final effectiveAppVersion = await getAppVersion();
 
       final bodyData = {
         'uid': effectiveUid,
         'app': 'geogame',
-        'app_version': appVersion,
+        'app_version': effectiveAppVersion,
         'is_debug': kDebugMode,
         'event': event,
         'platform': platformName,
