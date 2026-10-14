@@ -12,55 +12,29 @@ class TelemetryService {
   static const String _logApiUrl = 'https://keremkuyucu.com.tr/api/logs';
   static const String _errorLogApiUrl = 'https://keremkuyucu.com.tr/api/error-logs';
   static const Duration _requestTimeout = Duration(seconds: 5);
-  static String? _cachedAppVersion;
+  static final http.Client _client = http.Client();
 
-  /// package_info_plus üzerinden versiyon bilgisini (örn. '1.7.0+25') alır ve önbelleğe alır.
   static Future<String> getAppVersion() async {
-    if (_cachedAppVersion != null) return _cachedAppVersion!;
-
     try {
       final info = await PackageInfo.fromPlatform();
       final version = info.version;
       final buildNumber = info.buildNumber;
-      _cachedAppVersion =
-          buildNumber.isNotEmpty ? '$version+$buildNumber' : version;
-      return _cachedAppVersion!;
+      return buildNumber.isNotEmpty ? '$version+$buildNumber' : version;
     } catch (e) {
       debugPrint('TelemetryService package_info_plus hatası: $e');
-      return _cachedAppVersion ?? '1.7.0+25';
+      return 'Version Error';
     }
   }
 
-  /// Senkron erişim veya geriye dönük uyumluluk için getter
-  static String get appVersion => _cachedAppVersion ?? '1.7.0+25';
-
-  static final http.Client _client = http.Client();
-  static String? _cachedUid;
-
-  /// Güvenli metin kırpıcı (Backend payload limitlerine uyum sağlar)
-  static String? _sanitize(dynamic val, {int maxLength = 2000}) {
-    if (val == null) return null;
-    final str = val.toString();
-    if (str.length <= maxLength) return str;
-    return '${str.substring(0, maxLength)}\n...[truncated]';
-  }
-
-  /// Aktif UID'yi döndürür:
-  /// 1. Supabase'e giriş yapılmışsa doğrudan Supabase kullanıcı UID'si
-  /// 2. Giriş yapılmamışsa (Gezgin) SharedPreferences'taki kalıcı cihaz ID'si
-  /// Bellekte önbelleğe alınarak her log çağrısında disk I/O yapılmasını engeller.
   static Future<String> getEffectiveUid() async {
     try {
       final supabaseUid = AuthService.currentUserId;
       if (supabaseUid != null && supabaseUid.isNotEmpty) {
-        _cachedUid = supabaseUid;
         return supabaseUid;
       }
     } catch (e) {
       debugPrint('TelemetryService Supabase UID alınamadı: $e');
     }
-
-    if (_cachedUid != null) return _cachedUid!;
 
     final prefs = await SharedPreferences.getInstance();
     String? localUid = prefs.getString(_uidKey);
@@ -68,13 +42,16 @@ class TelemetryService {
       localUid = const Uuid().v4();
       await prefs.setString(_uidKey, localUid);
     }
-    _cachedUid = localUid;
     return localUid;
   }
 
-  /// Aktif çalışma ortamının platform bilgisini standart ve detaylı biçimde döndürür:
-  /// - Web: 'web'
-  /// - Mobil/Masaüstü: 'android', 'ios', 'windows', 'macos', 'linux', 'fuchsia'
+  static String? _sanitize(dynamic val, {int maxLength = 2000}) {
+    if (val == null) return null;
+    final str = val.toString();
+    if (str.length <= maxLength) return str;
+    return '${str.substring(0, maxLength)}\n...[truncated]';
+  }
+
   static String get platformName {
     if (kIsWeb) return 'web';
     switch (defaultTargetPlatform) {
