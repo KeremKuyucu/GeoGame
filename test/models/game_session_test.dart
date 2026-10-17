@@ -298,23 +298,17 @@ void main() {
       expect(settings.themeMode, 'system');
       expect(settings.darkTheme, false);
       expect(settings.language, '');
-      expect(settings.childMode, false);
-      expect(settings.childModePin, '');
     });
 
     test('fromMap doğru doldurulmalı', () {
       final settings = AppSettings.fromMap({
         'themeMode': 'dark',
         'language': 'tur',
-        'childMode': true,
-        'childModePin': '1234',
       });
 
       expect(settings.themeMode, 'dark');
       expect(settings.darkTheme, true);
       expect(settings.language, 'tur');
-      expect(settings.childMode, true);
-      expect(settings.childModePin, '1234');
     });
 
     test('fromMap eski darkTheme alanını geriye dönük desteklemeli', () {
@@ -457,8 +451,6 @@ void main() {
         themeMode: 'light',
         language: 'tur',
         telemetryEnabled: false,
-        childMode: true,
-        childModePin: '9876',
       );
       final map = original.toMap();
       final restored = AppSettings.fromMap(map);
@@ -467,18 +459,6 @@ void main() {
       expect(restored.darkTheme, original.darkTheme);
       expect(restored.language, original.language);
       expect(restored.telemetryEnabled, original.telemetryEnabled);
-      expect(restored.childMode, original.childMode);
-      expect(restored.childModePin, original.childModePin);
-    });
-
-    test('childMode null güvenliği — null verilince false olmalı', () {
-      final settings = AppSettings.fromMap({'childMode': null});
-      expect(settings.childMode, false);
-    });
-
-    test('childModePin null güvenliği — null verilince boş string olmalı', () {
-      final settings = AppSettings.fromMap({'childModePin': null});
-      expect(settings.childModePin, '');
     });
 
     test('toMap tüm alanları içermeli', () {
@@ -488,8 +468,6 @@ void main() {
       expect(map.containsKey('darkTheme'), false);
       expect(map.containsKey('language'), true);
       expect(map.containsKey('telemetryEnabled'), true);
-      expect(map.containsKey('childMode'), true);
-      expect(map.containsKey('childModePin'), true);
     });
   });
 

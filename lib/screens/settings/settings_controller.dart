@@ -144,13 +144,6 @@ class AppSettings {
   String themeMode; // 'system', 'light', 'dark'
   String language;
   bool telemetryEnabled;
-  bool? _childMode;
-  bool get childMode => _childMode ?? false;
-  set childMode(bool? value) => _childMode = value ?? false;
-
-  String? _childModePin;
-  String get childModePin => _childModePin ?? '';
-  set childModePin(String? value) => _childModePin = value ?? '';
 
   /// Geriye dönük uyumluluk ve anlık kontrol için darkTheme:
   bool get darkTheme {
@@ -169,12 +162,8 @@ class AppSettings {
     bool? darkTheme,
     this.language = '',
     this.telemetryEnabled = true,
-    bool childMode = false,
-    String childModePin = '',
   })  : themeMode =
-            darkTheme != null ? (darkTheme ? 'dark' : 'light') : themeMode,
-        _childMode = childMode,
-        _childModePin = childModePin;
+            darkTheme != null ? (darkTheme ? 'dark' : 'light') : themeMode;
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     String mode = 'system';
@@ -189,9 +178,7 @@ class AppSettings {
     return AppSettings(
       themeMode: mode,
       language: map['language']?.toString() ?? '',
-      telemetryEnabled: map['telemetryEnabled'] ?? true,
-      childMode: map['childMode'] == true,
-      childModePin: map['childModePin']?.toString() ?? '',
+      telemetryEnabled: map['telemetryEnabled'] ?? true
     );
   }
 
@@ -199,8 +186,6 @@ class AppSettings {
         'themeMode': themeMode,
         'language': language,
         'telemetryEnabled': telemetryEnabled,
-        'childMode': childMode,
-        'childModePin': childModePin,
       };
 }
 
