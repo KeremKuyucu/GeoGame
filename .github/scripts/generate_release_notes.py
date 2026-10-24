@@ -22,7 +22,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 def get_current_version() -> str:
     pubspec = PROJECT_ROOT / "pubspec.yaml"

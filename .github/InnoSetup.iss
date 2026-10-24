@@ -9,13 +9,27 @@
 ;
 ; Local defaults (used when no /D flag is passed):
 #ifndef ProjectRoot
-  #define ProjectRoot "C:\Users\Kerem\Projects\geogame-flutter"
+  #define ProjectRoot AddBackslash(SourcePath) + ".."
 #endif
 #ifndef OutputDir
-  #define OutputDir "C:\Users\Kerem\Projects\Outputs"
+  #define OutputDir AddBackslash(SourcePath) + "..\installer_output"
 #endif
 #ifndef AppVersion
-  #define AppVersion "1.6.15"
+  #define FileHandle
+  #define FileLine
+  #define TempLine
+  #define AppVersion ""
+  #if FileHandle = FileOpen(AddBackslash(SourcePath) + "..\pubspec.yaml")
+    #for {FileLine = ""; !FileEof(FileHandle); FileLine = FileRead(FileHandle)} \
+      Pos("version:", Trim(FileLine)) == 1 ? ( \
+        TempLine = Trim(Copy(Trim(FileLine), 9)), \
+        Pos("+", TempLine) > 0 ? (AppVersion = Copy(TempLine, 1, Pos("+", TempLine) - 1)) : (AppVersion = TempLine) \
+      ) : 0
+    #expr FileClose(FileHandle)
+  #endif
+  #if AppVersion == ""
+    #define AppVersion "1.0.0"
+  #endif
 #endif
 
 [Setup]
