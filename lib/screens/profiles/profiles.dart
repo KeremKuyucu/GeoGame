@@ -140,6 +140,7 @@ class _ProfilesState extends State<Profiles> {
           avatarUrl: _controller.userAvatar,
           totalScore: _controller.totalScore,
           stats: _controller.statsData,
+          isOwnProfile: true,
         ),
       ),
     );

@@ -133,6 +133,7 @@ class LeaderboardController {
             avatarUrl: user['avatar_url'],
             totalScore: user['total_score'],
             stats: user,
+            isOwnProfile: false,
           ),
         ),
       ),

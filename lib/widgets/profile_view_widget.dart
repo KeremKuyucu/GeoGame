@@ -61,6 +61,7 @@ class ProfileViewWidget extends StatefulWidget {
   final String avatarUrl;
   final int totalScore;
   final Map<String, dynamic> stats;
+  final bool isOwnProfile;
 
   const ProfileViewWidget({
     super.key,
@@ -68,6 +69,7 @@ class ProfileViewWidget extends StatefulWidget {
     required this.avatarUrl,
     required this.totalScore,
     required this.stats,
+    this.isOwnProfile = true,
   });
 
   @override
@@ -87,6 +89,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
   }
 
   List<_CountryStatItem> _extractCountryStats() {
+    if (!widget.isOwnProfile) return [];
     final raw = widget.stats['country_stats'];
     final Map<String, dynamic> rawMap =
         raw is Map ? Map<String, dynamic>.from(raw) : {};
@@ -140,7 +143,8 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     final double overallAccuracy =
         totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0.0;
 
-    final allCountryStats = _extractCountryStats();
+    final bool showCountrySection = widget.isOwnProfile;
+    final allCountryStats = showCountrySection ? _extractCountryStats() : <_CountryStatItem>[];
     final int discoveredCount = allCountryStats.length;
 
     return SingleChildScrollView(
@@ -152,25 +156,28 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
           _buildHeaderCard(),
           const SizedBox(height: 16),
 
-          // 2. 4'lü Özet İstatistik Kartları (KPI)
+          // 2. Özet İstatistik Kartları (KPI)
           _buildQuickKpiGrid(
             totalCorrect: totalCorrect,
             totalWrong: totalWrong,
             overallAccuracy: overallAccuracy,
             discoveredCount: discoveredCount,
             isDark: isDark,
+            showDiscoveredCount: showCountrySection,
           ),
           const SizedBox(height: 20),
 
-          // 3. Sekme Seçici (Oyun Modları & Ülke Analizi)
-          _buildTabSelector(discoveredCount, isDark),
-          const SizedBox(height: 18),
-
-          // 4. Seçili Sekme İçeriği
-          if (_selectedTabIndex == 0)
-            _buildDetailedStatsCard(isDark)
-          else
-            _buildCountryAnalysisTab(allCountryStats, isDark),
+          // 3. Sekme Seçici & İçerik (Kendi profilinde oyun modları + ülke analizi; başkasının profilinde doğrudan modlar)
+          if (showCountrySection) ...[
+            _buildTabSelector(discoveredCount, isDark),
+            const SizedBox(height: 18),
+            if (_selectedTabIndex == 0)
+              _buildDetailedStatsCard(isDark)
+            else
+              _buildCountryAnalysisTab(allCountryStats, isDark),
+          ] else ...[
+            _buildDetailedStatsCard(isDark),
+          ],
         ],
       ),
     );
@@ -280,6 +287,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     required double overallAccuracy,
     required int discoveredCount,
     required bool isDark,
+    required bool showDiscoveredCount,
   }) {
     return Row(
       children: [
@@ -312,16 +320,18 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             isDark: isDark,
           ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _buildKpiCard(
-            label: Localization.t('profile.discovered_countries'),
-            value: '$discoveredCount',
-            icon: Icons.public_rounded,
-            color: Colors.amberAccent.shade400,
-            isDark: isDark,
+        if (showDiscoveredCount) ...[
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildKpiCard(
+              label: Localization.t('profile.discovered_countries'),
+              value: '$discoveredCount',
+              icon: Icons.public_rounded,
+              color: Colors.amberAccent.shade400,
+              isDark: isDark,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
