@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/screens/profiles/profiles_controller.dart';
 
 /// Gezgin (oturum açmamış) profil görünümü
@@ -17,6 +16,7 @@ class ProfilesGuestView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           Localization.t('profile.title').toUpperCase(),
           style: const TextStyle(
@@ -27,7 +27,6 @@ class ProfilesGuestView extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      drawer: const DrawerWidget(),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),

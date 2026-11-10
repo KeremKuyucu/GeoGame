@@ -192,6 +192,7 @@ class SettingsTile extends StatelessWidget {
   final bool isSwitch;
   final bool switchValue;
   final ValueChanged<bool>? onSwitchChanged;
+  final VoidCallback? onTap;
 
   const SettingsTile({
     super.key,
@@ -203,11 +204,13 @@ class SettingsTile extends StatelessWidget {
     this.isSwitch = false,
     this.switchValue = false,
     this.onSwitchChanged,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: Container(
         padding: const EdgeInsets.all(6),

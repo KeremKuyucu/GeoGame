@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/profile_view_widget.dart';
 import 'package:geogame/widgets/profile_guest_view.dart';
 import 'package:geogame/widgets/profile_offline_view.dart';
@@ -60,9 +59,9 @@ class _ProfilesState extends State<Profiles> {
               color: Colors.teal,
             ),
           ),
+          automaticallyImplyLeading: false,
           centerTitle: true,
         ),
-        drawer: const DrawerWidget(),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -74,6 +73,7 @@ class _ProfilesState extends State<Profiles> {
     if (_controller.isOffline) {
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(
             Localization.t('profile.title').toUpperCase(),
             style: const TextStyle(
@@ -92,7 +92,6 @@ class _ProfilesState extends State<Profiles> {
             ),
           ],
         ),
-        drawer: const DrawerWidget(),
         body: RefreshIndicator(
           onRefresh: () async {
             await _controller.fetchUserProfile();
@@ -111,6 +110,7 @@ class _ProfilesState extends State<Profiles> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           Localization.t('profile.title').toUpperCase(),
           style: const TextStyle(
@@ -129,7 +129,6 @@ class _ProfilesState extends State<Profiles> {
           ),
         ],
       ),
-      drawer: const DrawerWidget(),
       body: RefreshIndicator(
         onRefresh: () async {
           await _controller.fetchUserProfile();

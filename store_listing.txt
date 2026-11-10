@@ -1,0 +1,438 @@
+﻿Language: English (United States)
+App Name: GeoGame: World Geography Quiz
+Short Description: Conquer the globe! Master flags, capitals, borders & maps in 7 fun game modes.
+Full Description:
+Ready to explore the planet and prove your geography skills?
+
+GeoGame is a vibrant, next-generation geography game that goes far beyond repetitive flashcards—blending visual trivia, map exploration, and strategic puzzles into one addictive experience!
+
+Whether you want to master every world flag, memorize tricky capitals, decode royal coats of arms, or navigate across interactive continents, GeoGame makes learning effortless and exciting.
+
+Ideal for students, trivia champions, travelers, and curious minds of all ages!
+
+🎮 7 UNIQUE & ADDICTIVE GAME MODES
+
+🛡️ 1. COAT OF ARMS QUIZ [NEW!]
+Trace history and royal heritage! Examine official national emblems and heraldic crests to identify the country. Golden eagles, crowns, and lions are your ultimate clues!
+
+🚩 2. FLAG QUIZ
+Hundreds of flags from every corner of the earth! Can you tell apart famous twin flags like Romania vs. Chad, or Monaco vs. Indonesia?
+
+🏛️ 3. CAPITAL CITIES QUIZ
+Wait, isn't Sydney the capital of Australia? Learn and memorize every world capital effortlessly through fun, fast-paced rounds.
+
+🧭 4. DISTANCE GAME (Wordle-Style Geography)
+Guess the mystery country! With each guess, receive instant distance feedback (in km) and a compass direction pointing toward the target. Zero in on your destination step by step!
+
+🗺️ 5. BORDERLINE (Silhouette Quiz)
+Can you recognize a nation purely by its borders? Italy's boot shape is easy, but how well do you know the rest of the world?
+
+🛤️ 6. BORDER PATH (Navigation Puzzle)
+Where geography meets strategy! Travel from your starting country to the destination by hopping only between land borders in the fewest moves possible.
+
+🔍 7. FIND ON MAP (Interactive Map Game)
+Spot and tap requested nations directly on an interactive world map! Dive deep into oceans, continents, and remote islands.
+
+✨ POWERFUL GAME FEATURES
+
+🎯 Dual Play Modes:
+• Multiple Choice: Fast 4-button classic quiz.
+• Type & Search: Type country names directly to challenge your reflexes and memory!
+
+🌐 Custom Continent Filters:
+Focus on the entire globe or select specific continents (Europe, Asia, Africa, Americas, Oceania). Practice where you want, when you want.
+
+🏆 Global Live Leaderboard:
+Earn points across all 7 modes, compete against world geography masters, and climb to the top of the podium!
+
+👶 Safe Child Mode:
+Enable PIN-protected Child Mode to disable external links and online competition, creating a peaceful, family-friendly learning environment.
+
+🌙 Dark & Light Themes:
+Eye-friendly dark mode for evening sessions and crisp light theme for daytime play.
+
+📴 100% Offline Play:
+No internet? No problem! Play anywhere on the go. Offline scores are stored locally and automatically sync to the global leaderboard when you reconnect.
+
+🌍 7 Supported Languages:
+Full native support in English, Turkish, German, French, Spanish, Portuguese, and Russian.
+
+Pack your bags and test your worldly wisdom. Download GeoGame for free and start your global adventure today! 🚀
+
+--------------------------------------------------------------------------------
+
+Language: Turkish
+App Name: GeoGame: Coğrafya ve Bayrak
+Short Description: 7 eğlenceli oyunla bayrakları, başkentleri, sınırları ve dünyayı fethedin!
+Full Description:
+Dünya turuna çıkmaya ve coğrafya bilginizi test etmeye hazır mısınız?
+
+GeoGame, sıradan sıkıcı testleri unutturan; görsel zekâyı, harita keşfini ve bulmaca stratejisini bir araya getiren heyecan verici yeni nesil bir coğrafya oyunudur!
+
+İster dünya bayraklarını ezberleyin, ister şaşırtıcı başkentleri öğrenin, ister tarihi armaların sırrını çözün ya da interaktif haritada sınırları fethedin!
+
+Öğrenciler, sınavlara hazırlananlar, gezginler ve genel kültürünü zirveye taşımak isteyen herkes için tasarlandı.
+
+🎮 7 FARKLI VE HEYECAN DOLU OYUN MODU
+
+🛡️ 1. ARMA AVI (Coat of Arms) [YENİ!]
+Tarihin ve hanedanların izini sürün! Ülkelerin resmi devlet armalarını inceleyin, taçlar, kartallar ve aslanlar yardımıyla doğru ülkeyi bulun!
+
+🚩 2. BAYRAK AVI (Flag Quiz)
+Dünyanın dört bir yanından yüzlerce ülke bayrağı! Birbirine ikiz kadar benzeyen bayrakları ayırt edebilecek misiniz? (Monako mu, Endonezya mı? Romanya mı, Çad mı?)
+
+🏛️ 3. BAŞKENT AVI (Capitals Quiz)
+"Avustralya'nın başkenti Sidney değil miydi?" Tüm dünya başkentlerini eğlenerek, kalıcı bir şekilde hafızanıza kazıyın.
+
+🧭 4. MESAFE AVI (Wordle Tarzı Coğrafya)
+Gizli ülkeyi tahmin edin! Her tahmininizde hedefe olan mesafe (km) ve pusula yönü size yol göstersin. Adım adım doğru koordinata yaklaşın!
+
+🗺️ 5. SINIR HATTI (Borderline)
+Bir ülkeyi yalnızca sınır çizgilerinden ve silüetinden tanıyabilir misiniz? Çizme şeklindeki İtalya kolay, peki ya diğerleri?
+
+🛤️ 6. SINIR YOLU (Border Path Puzzle)
+Coğrafya ve strateji bir arada! Başlangıç ülkesinden hedefe yalnızca kara sınırlarını takip ederek en az hamleyle ulaşmaya çalışın.
+
+🔍 7. HARİTADA BUL (Interactive Map)
+İnteraktif dünya haritası üzerinde sorulan ülkeyi doğrudan haritaya dokunarak bulun! Kıtaların, adaların ve denizlerin derinliklerine dalın.
+
+✨ ÖNE ÇIKAN GELİŞMİŞ ÖZELLİKLER
+
+🎯 Çift Yanıtlama Modu:
+• Şıklı Mod: Hızlı tempolu 4 seçenekli klasik yarışma.
+• Yazma Modu: Ülke ismini kendiniz yazarak hafızanızı ve bilginizi maksimuma çıkarın.
+
+🌐 Kıtalar ve Özel Soru Havuzu:
+Tüm dünyayla mı yarışmak istiyorsunuz yoksa sadece Avrupa, Asya, Afrika, Amerika veya Okyanusya mı? İstediğiniz kıtaları seçin, soru havuzunu yönetin.
+
+🏆 Canlı Küresel Sıralama (Leaderboard):
+Her oyun modunda kazandığınız puanlarla dünya çapındaki coğrafya ustalarıyla yarışın, podyuma adınızı yazdırın!
+
+👶 Güvenli Çocuk Modu:
+PIN korumalı Çocuk Modu ile dış bağlantılar ve rekabet kısıtlanır; çocuklar için güvenli ve keyifli bir öğrenme alanına dönüşür.
+
+🌙 Karanlık ve Aydınlık Tema:
+Gözü yormayan modern karanlık mod ve ferah açık tema seçenekleri.
+
+📴 %100 Çevrimdışı (Offline) Desteği:
+İnternetiniz yokken de dilediğiniz yerde oynayın! Skorlarınız cihazınızda güvenle saklanır, internete bağlandığınız an buluta eşitlenir.
+
+🌍 7 Dil Desteği:
+Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Portekizce ve Rusça dillerinde eksiksiz deneyim.
+
+Dünya atlasını parmaklarınızın ucuna getirin. GeoGame'i hemen ücretsiz indirin ve dünya maceranıza başlayın! 🚀
+
+--------------------------------------------------------------------------------
+
+Language: German
+App Name: GeoGame: Geografie & Flaggen
+Short Description: Entdecke die Welt! Flaggen, Hauptstädte & Grenzen in 7 spannenden Spielmodi!
+Full Description:
+Bereit, die Welt zu entdecken und dein Geografiewissen zu testen?
+
+GeoGame ist ein modernes Geografie-Quiz, das weit über langweiliges Auswendiglernen hinausgeht. Es kombiniert visuelles Wissen, Kartenerkundung und spannende Rätselstrategie in einem fesselnden Spiel!
+
+Egal, ob du alle Weltflaggen meistern, knifflige Hauptstädte lernen, historische Wappen entschlüsseln oder interaktive Weltkarten erobern möchtest – GeoGame bietet alles!
+
+Perfekt für Schüler, Quiz-Fans, Weltenbummler und alle, die ihren Horizont erweitern möchten.
+
+🎮 7 EINZIGARTIGE SPIELMODI
+
+🛡️ 1. WAPPEN-QUIZ [NEU!]
+Entdecke königliche Geschichte! Untersuche offizielle Staatswappen und heraldische Symbole. Goldene Adler, Kronen und Löwen sind deine besten Hinweise!
+
+🚩 2. FLAGGEN-QUIZ
+Hunderte Nationalflaggen aus aller Welt! Kannst du knifflige Zwillingsflaggen wie Rumänien vs. Tschad oder Monaco vs. Indonesien unterscheiden?
+
+🏛️ 3. HAUPTSTÄDTE-QUIZ
+War die Hauptstadt von Australien nicht Sydney? Lerne mühelos alle Hauptstädte der Welt durch unterhaltsame Runden.
+
+🧭 4. DISTANZ-SPIEL (Wordle-Stil)
+Errate das geheime Land! Bei jedem Versuch erhältst du die Entfernung (in km) und eine Kompassrichtung. Nähere dich Schritt für Schritt dem Ziel!
+
+🗺️ 5. GRENZLINIEN (Silhouette Quiz)
+Erkennst du ein Land nur an seinen Umrissen? Der Stiefel von Italien ist einfach, aber wie steht es um den Rest der Welt?
+
+🛤️ 6. GRENZPFAD (Routen-Puzzle)
+Wo Geografie auf Strategie trifft! Reise vom Startland zum Zielland, indem du nur benachbarte Grenzländern mit möglichst wenigen Zügen anklickst.
+
+🔍 7. AUF DER KARTE FINDEN (Interaktive Karte)
+Tippe gesuchte Länder direkt auf einer dynamischen 3D-Weltkarte an! Erkunde Kontinente, Inseln und Meere.
+
+✨ BESONDERE FEATURES
+
+🎯 Zwei Eingabemodi:
+• Multiple Choice: Schneller 4-Tasten-Quizmodus.
+• Tippen & Suchen: Tippe den Ländernamen direkt ein, um Gedächtnis und Reflexe zu fordern!
+
+🌐 Kontinent-Filter:
+Wähle gezielt Kontinente aus (Europa, Asien, Afrika, Amerika, Ozeanien) oder spiele mit der ganzen Welt.
+
+🏆 Globale Live-Bestenliste:
+Sammle Punkte in allen 7 Modi, messe dich mit Spielern weltweit und erklimme das Siegerpodest!
+
+👶 Sicherer Kindermodus:
+PIN-geschützter Modus ohne externe Links oder Online-Wettbewerb für stressfreies Lernen.
+
+🌙 Dunkel- & Hell-Modus:
+Angenehmes Design für Tag und Nacht.
+
+📴 100% Offline spielbar:
+Kein Internet nötig! Spiele überall, deine Punkte werden bei der nächsten Verbindung automatisch synchronisiert.
+
+🌍 7 Sprachen:
+Vollständig lokalisiert auf Deutsch, Englisch, Türkisch, Französisch, Spanisch, Portugiesisch und Russisch.
+
+Lade GeoGame jetzt kostenlos herunter und starte dein weltweites Abenteuer! 🚀
+
+--------------------------------------------------------------------------------
+
+Language: French
+App Name: GeoGame: Quiz de Géographie
+Short Description: Drapeaux, capitales, frontières et cartes : 7 jeux de géographie captivants !
+Full Description:
+Prêt à explorer le monde et à tester vos connaissances en géographie ?
+
+GeoGame est un jeu de quiz géographique nouvelle génération qui va bien au-delà des questionnaires classiques : il combine mémoire visuelle, exploration cartographique et stratégie de puzzle dans une expérience passionnante !
+
+Que vous souhaitiez maîtriser tous les drapeaux du monde, retenir les capitales pièges, décoder des armoiries royales ou conquérir les continents sur une carte interactive, GeoGame a tout pour plaire !
+
+Idéal pour les étudiants, les passionnés de quiz, les voyageurs et les esprits curieux de tous âges.
+
+🎮 7 MODES DE JEU UNIQUES
+
+🛡️ 1. QUIZ ARMOIRIES [NOUVEAU !]
+Plongez dans l'histoire ! Analysez les armoiries et emblèmes officiels des pays pour les identifier. Aigles dorés, couronnes et lions sont vos meilleurs indices !
+
+🚩 2. QUIZ DRAPEAUX
+Des centaines de drapeaux nationaux des quatre coins du globe ! Saurez-vous distinguer les drapeaux jumeaux comme la Roumanie et le Tchad, ou Monaco et l'Indonésie ?
+
+🏛️ 3. QUIZ CAPITALES
+Attendez, la capitale de l'Australie n'est-elle pas Sydney ? Retenez chaque capitale sans effort grâce à des séries rapides et amusantes.
+
+🧭 4. JEU DE DISTANCE (Style Wordle)
+Devinez le pays mystère ! À chaque essai, recevez la distance exacte (en km) et une direction de boussole pointant vers la cible. Rapprochez-vous pas à pas !
+
+🗺️ 5. FRONTIÈRES (Silhouette Quiz)
+Pouvez-vous reconnaître une nation uniquement grâce à ses contours ? La botte de l'Italie est facile, mais qu'en est-il du reste du monde ?
+
+🛤️ 6. CHEMIN DE FRONTIÈRE (Puzzle Stratégique)
+La géographie rencontre la stratégie ! Voyagez du pays de départ au pays cible en ne cliquant que sur les pays voisins avec le moins de coups possible.
+
+🔍 7. TROUVER SUR LA CARTE (Carte Interactive)
+Touchez directement le pays demandé sur une carte du monde interactive ! Explorez les océans, les îles et les continents.
+
+✨ FONCTIONNALITÉS AVANCÉES
+
+🎯 Double mode de réponse :
+• Choix multiple : Mode classique et rapide à 4 options.
+• Saisie directe : Écrivez le nom du pays pour stimuler votre mémoire et vos réflexes !
+
+🌐 Filtres par continents :
+Concentrez-vous sur le monde entier ou ciblez des continents spécifiques (Europe, Asie, Afrique, Amériques, Océanie).
+
+🏆 Classement mondial en direct :
+Gagnez des points dans les 7 modes, défiez les maîtres de la géographie et hissez-vous sur le podium mondial !
+
+👶 Mode Enfant sécurisé :
+Protégé par code PIN, il désactive les liens externes et la compétition pour un apprentissage serein.
+
+🌙 Thèmes Sombre & Clair :
+Interface moderne et confortable de jour comme de nuit.
+
+📴 100% Jouable Hors-Ligne :
+Pas de Wi-Fi ? Aucun problème ! Jouez n'importe où, vos scores sont enregistrés localement et synchronisés dès votre reconnexion.
+
+🌍 7 langues incluses :
+Français, Anglais, Turc, Allemand, Espagnol, Portugais et Russe.
+
+Téléchargez GeoGame gratuitement dès aujourd'hui et commencez votre tour du monde ! 🚀
+
+--------------------------------------------------------------------------------
+
+Language: Spanish (Spain)
+App Name: GeoGame: Quiz de Geografía
+Short Description: ¡Domina banderas, capitales, mapas y fronteras en 7 divertidos modos de juego!
+Full Description:
+¿Listo para explorar el planeta y poner a prueba tus conocimientos de geografía?
+
+GeoGame es un juego de preguntas de geografía de última generación que va mucho más allá de los cuestionarios habituales: combina agilidad visual, exploración de mapas y estrategia de acertijos en una experiencia fascinante.
+
+Tanto si quieres dominar todas las banderas del mundo, memorizar capitales difíciles, descifrar escudos heráldicos o recorrer continentes en un mapa interactivo, ¡GeoGame lo tiene todo!
+
+Ideal para estudiantes, viajeros, amantes de las trivias y mentes curiosas de todas las edades.
+
+🎮 7 MODOS DE JUEGO ÚNICOS
+
+🛡️ 1. ESCUDOS NACIONALES [¡NUEVO!]
+¡Explora la historia y la herencia real! Analiza los escudos oficiales y emblemas heráldicos para adivinar el país. ¡Águilas doradas, coronas y leones son tus mayores pistas!
+
+🚩 2. QUIZ DE BANDERAS
+¡Cientos de banderas de todos los rincones del planeta! ¿Podrás distinguir banderas gemelas como Rumania vs. Chad, o Mónaco vs. Indonesia?
+
+🏛️ 3. QUIZ DE CAPITALES
+Espera, ¿la capital de Australia no es Sídney? Aprende y memoriza cada capital del mundo sin esfuerzo mediante partidas rápidas y divertidas.
+
+🧭 4. JUEGO DE DISTANCIA (Estilo Wordle)
+¡Adivina el país secreto! Con cada intento, recibe la distancia en tiempo real (en km) y la dirección de la brújula apuntando hacia el objetivo. ¡Aproxímate paso a paso!
+
+🗺️ 5. LÍNEAS FRONTERIZAS (Quiz de Siluetas)
+¿Puedes reconocer una nación solo por su contorno? La bota de Italia es fácil, pero ¿qué tal con el resto del mundo?
+
+🛤️ 6. RUTA FRONTERIZA (Puzle de Navegación)
+¡Estrategia y geografía unidas! Viaja desde el país inicial hasta el país de destino tocando solo países vecinos con la menor cantidad de movimientos.
+
+🔍 7. ENCONTRAR EN EL MAPA (Mapa Interactivo)
+¡Toca directamente el país solicitado en un mapa mundial interactivo! Explora continentes, islas y océanos.
+
+✨ CARACTERÍSTICAS DESTACADAS
+
+🎯 Doble modalidad de control:
+• Opción múltiple: Modo clásico y ágil de 4 botones.
+• Escribir y buscar: Escribe el nombre del país para poner a prueba tu memoria y reflejos.
+
+🌐 Filtros por continente:
+Juega con todo el mundo o selecciona continentes específicos (Europa, Asia, África, América, Oceanía).
+
+🏆 Clasificación global en vivo:
+¡Acumula puntos en los 7 modos, compite contra maestros de la geografía y sube a lo más alto del podio!
+
+👶 Modo Infantil seguro:
+Protegido por PIN, desactiva enlaces externos y competición para un aprendizaje familiar y seguro.
+
+🌙 Temas Oscuro y Claro:
+Interfaz moderna y cómoda tanto de día como de noche.
+
+📴 100% Sin Conexión (Offline):
+¿Sin internet? ¡No pasa nada! Juega donde quieras; tus puntuaciones se guardan en el dispositivo y se sincronizan al conectarte.
+
+🌍 7 idiomas disponibles:
+Español, Inglés, Turco, Alemán, Francés, Portugués y Ruso.
+
+¡Descarga GeoGame gratis hoy y comienza tu gran aventura por el mundo! 🚀
+
+--------------------------------------------------------------------------------
+
+Language: Portuguese (Brazil)
+App Name: GeoGame: Quiz de Geografia
+Short Description: Domine bandeiras, capitais, fronteiras e mapas em 7 modos de jogo divertidos!
+Full Description:
+Pronto para explorar o planeta e testar seus conhecimentos de geografia?
+
+O GeoGame é um jogo de perguntas e respostas de geografia de última geração que vai muito além dos quizzes comuns: combina memória visual, exploração de mapas e estratégia de enigmas em uma experiência viciante!
+
+Seja para dominar todas as bandeiras do mundo, memorizar capitais difíceis, decifrar brasões reais ou navegar por continentes em um mapa interativo, o GeoGame tem tudo!
+
+Ideal para estudantes, viajantes, fãs de curiosidades e mentes curiosas de todas as idades.
+
+🎮 7 MODOS DE JOGO INCRÍVEIS
+
+🛡️ 1. QUIZ DE BRASÕES [NOVO!]
+Descubra a história e as tradições reais! Analise brasões e emblemas oficiais de países para identificá-los. Águias douradas, coroas e leões são suas maiores pistas!
+
+🚩 2. QUIZ DE BANDEIRAS
+Centenas de bandeiras de todos os cantos do planeta! Você consegue diferenciar bandeiras gêmeas como Romênia vs. Chade, ou Mônaco vs. Indonésia?
+
+🏛️ 3. QUIZ DE CAPITAIS
+Espere, a capital da Austrália não é Sydney? Aprenda e memorize todas as capitais do mundo sem esforço com rodadas rápidas e divertidas.
+
+🧭 4. JOGO DA DISTÂNCIA (Estilo Wordle)
+Adivinhe o país misterioso! A cada palpite, receba a distância em tempo real (em km) e a direção da bússola apontando para o alvo. Aproxime-se passo a passo!
+
+🗺️ 5. LINHAS FRONTEIRIÇAS (Quiz de Silhuetas)
+Você consegue reconhecer um país apenas pelo seu contorno? A bota da Itália é fácil, mas e o resto do mundo?
+
+🛤️ 6. ROTA FRONTEIRIÇA (Quebra-Cabeça)
+Geografia e estratégia juntas! Viaje do país inicial até o destino clicando apenas em fronteiras vizinhas no menor número de movimentos possível.
+
+🔍 7. ENCONTRAR NO MAPA (Mapa Interativo)
+Toque diretamente no país solicitado em um mapa mundial interativo! Explore oceanos, ilhas e continentes.
+
+✨ RECURSOS PODEROSOS
+
+🎯 Dois modos de resposta:
+• Múltipla escolha: Modo clássico e rápido de 4 botões.
+• Digitar país: Digite o nome do país para desafiar seus reflexos e sua memória!
+
+🌐 Filtros personalizados de continentes:
+Pratique com o mundo inteiro ou escolha continentes específicos (Europa, Ásia, África, Américas, Oceania).
+
+🏆 Placar global em tempo real:
+Ganhe pontos em todos os 7 modos, dispute com mestres da geografia de todo o mundo e suba ao pódio!
+
+👶 Modo Infantil seguro:
+Protegido por PIN, desativa links externos e competição para um aprendizado tranquilo em família.
+
+🌙 Temas Claro e Escuro:
+Interface moderna e confortável tanto de dia quanto de noite.
+
+📴 100% Offline:
+Sem Wi-Fi? Sem problemas! Jogue onde quiser; seus pontos ficam salvos no aparelho e sincronizam assim que você se conectar.
+
+🌍 7 idiomas disponíveis:
+Português, Inglês, Turco, Alemão, Francês, Espanhol e Russo.
+
+Baixe o GeoGame gratuitamente hoje e embarque na sua aventura pelo mundo! 🚀
+
+--------------------------------------------------------------------------------
+
+Language: Russian
+App Name: GeoGame: География и Флаги
+Short Description: Флаги, столицы, границы и карты мира в 7 увлекательных географических играх!
+Full Description:
+Готовы исследовать планету и проверить свои знания по географии?
+
+GeoGame — это географическая игра нового поколения, которая выходит далеко за рамки обычных викторин. Она сочетает визуальную эрудицию, исследование карты и логические головоломки в одной увлекательной игре!
+
+Хотите выучить все флаги мира, запомнить сложные столицы, разгадать тайны государственных гербов или покорить континенты на интерактивной карте — в GeoGame есть всё!
+
+Идеально подходит для школьников, студентов, путешественников и любителей викторин всех возрастов.
+
+🎮 7 УНИКАЛЬНЫХ ИГРОВЫХ РЕЖИМОВ
+
+🛡️ 1. ВИКТОРИНА ПО ГЕРБАМ [НОВИНКА!]
+Прикоснитесь к истории! Изучайте официальные государственные гербы и символы, чтобы определить страну. Золотые орлы, короны и львы — ваши главные подсказки!
+
+🚩 2. ВИКТОРИНА ПО ФЛАГАМ
+Сотни национальных флагов со всех уголков Земли! Сможете отличить похожие флаги, такие как Румыния и Чад, или Монако и Индонезия?
+
+🏛️ 3. СТОЛИЦЫ МИРА
+Постойте, разве столица Австралии не Сидней? Запоминайте столицы всех стран легко и непринужденно благодаря динамичным раундам.
+
+🧭 4. УГАДАЙ РАССТОЯНИЕ (В стиле Wordle)
+Угадайте секретную страну! С каждой попыткой получайте точное расстояние (в км) и направление компаса, указывающее прямо на цель. Приближайтесь шаг за шагом!
+
+🗺️ 5. ГРАНИЦЫ И СИЛУЭТЫ
+Узнаете страну только по её контурам? Сапог Италии угадать легко, но как насчет остальных стран мира?
+
+🛤️ 6. ПУТЬ ПО ГРАНИЦАМ (Стратегическая головоломка)
+География и стратегия! Добейтесь цели, перемещаясь от начальной страны к конечной только через сухопутные границы за минимальное число ходов.
+
+🔍 7. НАЙТИ НА КАРТЕ (Интерактивная карта)
+Находите загаданную страну, нажимая прямо на динамическую 3D-карту мира! Исследуйте океаны, континенты и острова.
+
+✨ ПРОДВИНУТЫЕ ВОЗМОЖНОСТИ
+
+🎯 Два режима ответов:
+• Выбор из 4 вариантов: Быстрая классическая викторина.
+• Ввод названия вручную: Проверьте память и скорость реакции!
+
+🌐 Фильтры по континентам:
+Играйте со всеми странами мира или выбирайте конкретные континенты (Европа, Азия, Африка, Америка, Океания).
+
+🏆 Глобальная таблица лидеров:
+Зарабатывайте очки во всех 7 режимах, соревнуйтесь с эрудитами со всего мира и займите место на пьедестале!
+
+👶 Безопасный детский режим:
+Защита PIN-кодом отключает внешние ссылки и соревнование, создавая уютную и безопасную среду для детей.
+
+🌙 Темная и светлая темы:
+Комфортный современный интерфейс для дневных и вечерних занятий.
+
+📴 100% Игра офлайн:
+Нет интернета? Не проблема! Играйте где угодно; ваши рекорды сохраняются на устройстве и автоматически синхронизируются при подключении к сети.
+
+🌍 7 языков:
+Русский, Английский, Турецкий, Немецкий, Французский, Испанский и Португальский.
+
+Скачайте GeoGame бесплатно сегодня и отправляйтесь в кругосветное путешествие! 🚀

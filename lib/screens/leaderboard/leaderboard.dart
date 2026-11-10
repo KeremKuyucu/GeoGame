@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/leaderboard_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
 
@@ -42,6 +41,7 @@ class _LeaderboardState extends State<Leaderboard> {
             color: Colors.pink,
           ),
         ),
+        automaticallyImplyLeading: false,
         centerTitle: true,
         actions: [
           IconButton(
@@ -52,7 +52,6 @@ class _LeaderboardState extends State<Leaderboard> {
           ),
         ],
       ),
-      drawer: const DrawerWidget(),
       body: _controller.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(

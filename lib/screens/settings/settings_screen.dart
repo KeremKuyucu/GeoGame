@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/services/localization_service.dart';
-import 'package:geogame/widgets/drawer_widget.dart';
+import 'package:geogame/widgets/feedback_dialog.dart';
 import 'package:geogame/widgets/settings_widgets.dart';
 
 import 'package:geogame/screens/settings/settings_controller.dart';
@@ -55,25 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
-        leading: Builder(
-                builder: (context) => IconButton(
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.grey[800] : Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.menu_rounded,
-                      color: isDark ? Colors.white : Colors.black87,
-                      size: 20,
-                    ),
-                  ),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
-              ),
       ),
-      drawer: const DrawerWidget(),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -330,9 +313,107 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ],
           ),
+          const SizedBox(height: 25),
+
+          // Destek ve Hakkında Bölümü
+          SettingsSectionHeader(
+            title: Localization.t('feedback.title'),
+          ),
+          SettingsContainer(
+            isDark: isDark,
+            children: [
+              SettingsTile(
+                title: Localization.t('drawer.rate_play_store'),
+                icon: Icons.star_rate_rounded,
+                iconColor: Colors.amber.shade700,
+                isDark: isDark,
+                onTap: _launchPlayStore,
+              ),
+              SettingsDivider(isDark: isDark),
+              SettingsTile(
+                title: Localization.t('drawer.report_bug'),
+                icon: Icons.bug_report_rounded,
+                iconColor: Colors.deepOrangeAccent,
+                isDark: isDark,
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => const FeedbackDialog(),
+                  );
+                },
+              ),
+              SettingsDivider(isDark: isDark),
+              SettingsTile(
+                title: Localization.t('drawer.geogame_website'),
+                icon: Icons.public_rounded,
+                iconColor: Colors.redAccent,
+                isDark: isDark,
+                onTap: () => _launchURL('https://geogame.keremkuyucu.com.tr'),
+              ),
+              SettingsDivider(isDark: isDark),
+              SettingsTile(
+                title: Localization.t('drawer.geogame_github'),
+                icon: Icons.code_rounded,
+                iconColor: isDark ? Colors.white70 : Colors.black87,
+                isDark: isDark,
+                onTap: () => _launchURL('https://github.com/KeremKuyucu/GeoGame'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Footer
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  'GeoGame v1.7.0',
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[400] : Colors.grey[700],
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  Localization.t('drawer.creator'),
+                  style: TextStyle(
+                    color: isDark ? Colors.grey[600] : Colors.grey[500],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
         ],
       ),
     );
+  }
+
+  Future<void> _launchPlayStore() async {
+    final Uri marketUri =
+        Uri.parse('market://details?id=com.keremkuyucu.geogame');
+    final Uri webUri = Uri.parse(
+        'https://play.google.com/store/apps/details?id=com.keremkuyucu.geogame');
+
+    try {
+      if (await canLaunchUrl(marketUri)) {
+        await launchUrl(marketUri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Play Store linki açılamadı: $e');
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    final Uri uri = Uri.parse(urlString);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Link açılamadı: $urlString');
+    }
   }
 
   Future<bool?> _showTelemetryConfirmDialog(BuildContext context, bool isDark) {

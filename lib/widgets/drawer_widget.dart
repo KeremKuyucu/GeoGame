@@ -39,49 +39,123 @@ class DrawerWidget extends StatelessWidget {
   Widget _buildDrawerHeader(bool isDark) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue.shade700, Colors.purple.shade600],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(25)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))
-              ],
-            ),
-            child: const CircleAvatar(
-              radius: 35,
-              backgroundColor: Colors.white,
-              backgroundImage: AssetImage('assets/images/logo.webp'),
-            ),
-          ),
-          const SizedBox(width: 15),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'GeoGame',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                ),
-              )
-            ],
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(25)),
+        child: Stack(
+          children: [
+            // 1. Arka plan sinematik vitrin görseli
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/feature_graphic_1024x500.webp',
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            // 2. Metinlerin ve logonun öne çıkması için koyu degrade katmanı
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.35),
+                      Colors.black.withValues(alpha: 0.82),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // 3. Başlık içeriği (Logo ve GeoGame başlığı)
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 50,
+                bottom: 20,
+                left: 20,
+                right: 20,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        width: 2.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white,
+                      backgroundImage: AssetImage('assets/images/logo.webp'),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'GeoGame',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          Localization.t('nav.games').toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

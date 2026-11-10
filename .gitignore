@@ -195,3 +195,7 @@ secrets.properties
 /tmp/*.json
 installer_output/
 RELEASE_*.md
+
+# Antigravity & AI Agent tools
+.agents/
+

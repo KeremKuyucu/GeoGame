@@ -219,6 +219,9 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
                   backgroundImage: widget.avatarUrl.isNotEmpty
                       ? NetworkImage(widget.avatarUrl)
                       : null,
+                  onBackgroundImageError: widget.avatarUrl.isNotEmpty
+                      ? (_, __) {}
+                      : null,
                   backgroundColor: Colors.teal.shade800,
                   child: widget.avatarUrl.isEmpty
                       ? const Icon(Icons.person, size: 40, color: Colors.white70)

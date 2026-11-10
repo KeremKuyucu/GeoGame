@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/widgets/drawer_widget.dart';
 import 'package:geogame/widgets/mainscreen_widgets.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/auth_service.dart';
@@ -45,10 +44,10 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      drawer: const DrawerWidget(),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

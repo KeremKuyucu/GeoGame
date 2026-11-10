@@ -80,6 +80,8 @@ class LeaderboardPodiumItem extends StatelessWidget {
                 child: CircleAvatar(
                   radius: height / 2.5,
                   backgroundImage: NetworkImage(user['avatar_url']),
+                  onBackgroundImageError: (_, __) {},
+                  backgroundColor: Colors.grey.shade800,
                 ),
               ),
               Container(
@@ -154,7 +156,11 @@ class LeaderboardUserCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 15),
-              CircleAvatar(backgroundImage: NetworkImage(user['avatar_url'])),
+              CircleAvatar(
+                backgroundImage: NetworkImage(user['avatar_url']),
+                onBackgroundImageError: (_, __) {},
+                backgroundColor: Colors.grey.shade800,
+              ),
             ],
           ),
           title: Text(user['name'],
