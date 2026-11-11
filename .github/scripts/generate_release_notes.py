@@ -199,13 +199,10 @@ Respond ONLY with a valid JSON object with exactly two keys:
   "play_store_notes": "<en-US>\\n...\\n</en-US>\\n\\n<tr-TR>\\n...\\n</tr-TR>\\n\\n..."
 }}
 """
-
     models = [
-        "models/gemini-3.5-flash-lite",
-        "models/gemini-flash-latest",
-        "models/gemini-flash-lite-latest",
-        "models/gemini-2.5-flash",
-        "models/gemini-3.5-flash"
+        "models/gemini-3.8-flash",
+        "models/gemini-3.6-flash",
+        "models/gemini-3.5-flash-lite"
     ]
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
