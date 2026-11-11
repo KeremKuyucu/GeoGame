@@ -59,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 95.0),
         children: [
           // Hesap bölümü
           Container(

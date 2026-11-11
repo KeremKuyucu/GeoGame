@@ -19,7 +19,7 @@ class MainScreenGameGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.fromLTRB(20, topPadding ?? 100, 20, 20),
+      padding: EdgeInsets.fromLTRB(20, topPadding ?? 100, 20, 95),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 20,
@@ -50,7 +50,7 @@ class MainScreenGameList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: EdgeInsets.fromLTRB(20, topPadding ?? 100, 20, 20),
+      padding: EdgeInsets.fromLTRB(20, topPadding ?? 100, 20, 95),
       itemCount: gameMetadataList.length,
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.only(bottom: 25),

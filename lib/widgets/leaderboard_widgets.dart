@@ -55,6 +55,11 @@ class LeaderboardPodiumItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = controller.users[index];
     final color = controller.getRankColor(index);
+    final String avatarUrl = user['avatar_url']?.toString() ?? '';
+    final String name = (user['name']?.toString().trim().isNotEmpty ?? false)
+        ? user['name'].toString()
+        : Localization.t('player');
+    final bool hasAvatar = avatarUrl.trim().isNotEmpty;
 
     return GestureDetector(
       onTap: () => controller.navigateToProfile(context, user),
@@ -79,9 +84,19 @@ class LeaderboardPodiumItem extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   radius: height / 2.5,
-                  backgroundImage: NetworkImage(user['avatar_url']),
-                  onBackgroundImageError: (_, __) {},
-                  backgroundColor: Colors.grey.shade800,
+                  backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                  onBackgroundImageError: hasAvatar ? (_, __) {} : null,
+                  backgroundColor: color.withValues(alpha: 0.2),
+                  child: !hasAvatar
+                      ? Text(
+                          name.isNotEmpty ? name[0].toUpperCase() : '?',
+                          style: TextStyle(
+                            fontSize: height / 4,
+                            fontWeight: FontWeight.bold,
+                            color: color,
+                          ),
+                        )
+                      : null,
                 ),
               ),
               Container(
@@ -98,7 +113,7 @@ class LeaderboardPodiumItem extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
-              user['name'],
+              name,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -130,6 +145,15 @@ class LeaderboardUserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = controller.users[index];
+    final String avatarUrl = user['avatar_url']?.toString() ?? '';
+    final String name = (user['name']?.toString().trim().isNotEmpty ?? false)
+        ? user['name'].toString()
+        : Localization.t('player');
+    final bool hasAvatar = avatarUrl.trim().isNotEmpty;
+    final int totalScore = user['total_score'] is int
+        ? user['total_score'] as int
+        : (int.tryParse(user['total_score']?.toString() ?? '0') ?? 0);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
@@ -157,20 +181,30 @@ class LeaderboardUserCard extends StatelessWidget {
               ),
               const SizedBox(width: 15),
               CircleAvatar(
-                backgroundImage: NetworkImage(user['avatar_url']),
-                onBackgroundImageError: (_, __) {},
-                backgroundColor: Colors.grey.shade800,
+                backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                onBackgroundImageError: hasAvatar ? (_, __) {} : null,
+                backgroundColor:
+                    Theme.of(context).primaryColor.withValues(alpha: 0.15),
+                child: !hasAvatar
+                    ? Text(
+                        name.isNotEmpty ? name[0].toUpperCase() : '?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      )
+                    : null,
               ),
             ],
           ),
-          title: Text(user['name'],
+          title: Text(name,
               style: const TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Row(
             children: [
               const Icon(Icons.star, size: 14, color: Colors.amber),
               const SizedBox(width: 4),
               Text(
-                '${user['total_score']} ${Localization.t('leaderboard.score')}',
+                '$totalScore ${Localization.t('leaderboard.score')}',
                 style: const TextStyle(fontSize: 12),
               ),
             ],

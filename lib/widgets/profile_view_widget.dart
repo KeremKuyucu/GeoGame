@@ -148,7 +148,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     final int discoveredCount = allCountryStats.length;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+      padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 95.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

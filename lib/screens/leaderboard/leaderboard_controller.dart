@@ -51,9 +51,11 @@ class LeaderboardController {
 
       final Map<String, dynamic> userMap = {
         'rank': _toInt(row['rank']),
-        'uid': row['uid']?.toString(),
-        'name': row['full_name']?.toString(),
-        'avatar_url': row['avatar_url']?.toString(),
+        'uid': row['uid']?.toString() ?? '',
+        'name': (row['full_name'] != null && row['full_name'].toString().trim().isNotEmpty)
+            ? row['full_name'].toString()
+            : Localization.t('player'),
+        'avatar_url': row['avatar_url']?.toString() ?? '',
         'total_score': _toInt(row['total_score']),
       };
 
@@ -120,18 +122,24 @@ class LeaderboardController {
 
   /// Profil sayfasına yönlendirir
   void navigateToProfile(BuildContext context, Map<String, dynamic> user) {
+    final String name = (user['name']?.toString().trim().isNotEmpty ?? false)
+        ? user['name'].toString()
+        : Localization.t('player');
+    final String avatarUrl = user['avatar_url']?.toString() ?? '';
+    final int totalScore = _toInt(user['total_score']);
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(
-            title: Text(user['name']),
+            title: Text(name),
             centerTitle: true,
           ),
           body: ProfileViewWidget(
-            name: user['name'],
-            avatarUrl: user['avatar_url'],
-            totalScore: user['total_score'],
+            name: name,
+            avatarUrl: avatarUrl,
+            totalScore: totalScore,
             stats: user,
             isOwnProfile: false,
           ),

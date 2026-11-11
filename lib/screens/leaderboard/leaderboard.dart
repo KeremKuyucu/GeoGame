@@ -74,8 +74,7 @@ class _LeaderboardState extends State<Leaderboard> {
                             child: LeaderboardPodium(controller: _controller),
                           ),
                         SliverPadding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 95),
                           sliver: SliverList(
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {

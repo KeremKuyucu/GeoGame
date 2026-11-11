@@ -45,6 +45,8 @@ class _MainScaffoldState extends State<MainScaffold> {
         : 0;
 
     return Scaffold(
+      extendBody: true,
+      backgroundColor: Colors.transparent,
       resizeToAvoidBottomInset: false,
       body: IndexedStack(
         index: safeIndex,

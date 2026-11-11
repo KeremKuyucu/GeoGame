@@ -63,12 +63,12 @@ class CustomNavBar extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
                 color: isDark
-                    ? const Color(0xFF1B1B24).withValues(alpha: 0.88)
-                    : Colors.white.withValues(alpha: 0.92),
+                    ? const Color(0xFF161622).withValues(alpha: 0.68)
+                    : Colors.white.withValues(alpha: 0.70),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.12)
-                      : Colors.white.withValues(alpha: 0.6),
+                      ? Colors.white.withValues(alpha: 0.15)
+                      : Colors.white.withValues(alpha: 0.5),
                   width: 1.2,
                 ),
               ),
