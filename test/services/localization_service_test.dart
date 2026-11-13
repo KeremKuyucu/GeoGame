@@ -204,6 +204,8 @@ const Set<String> kUsedKeys = {
   'profile.offline_desc',
   'profile.offline_scores_safe_title',
   'profile.offline_scores_safe_desc',
+  'profile.guest_score_ready',
+  'profile.guest_score_info',
   'profile.total_correct',
   'profile.total_wrong',
   'profile.accuracy',

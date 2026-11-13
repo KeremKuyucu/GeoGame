@@ -226,6 +226,8 @@
     "offline_desc": "Se requiere una conexión a Internet activa para ver las estadísticas detalladas de su perfil y sus logros.",
     "offline_scores_safe_title": "¡Tus Puntuaciones Están Seguras!",
     "offline_scores_safe_desc": "Todos los juegos jugados sin conexión y los puntos obtenidos se guardan de forma segura en tu dispositivo. En cuanto haya conexión a Internet o inicies el juego, tus puntos se sincronizarán automáticamente con el servidor.",
+    "guest_score_ready": "Los puntos acumulados en tu dispositivo están listos para transferirse a tu cuenta.",
+    "guest_score_info": "A medida que juegas, los puntos se acumulan en tu dispositivo y se transfieren cuando creas una cuenta.",
     "total_correct": "Correcto",
     "total_wrong": "Incorrecto",
     "accuracy": "Precisión",

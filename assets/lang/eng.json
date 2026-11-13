@@ -226,6 +226,8 @@
     "offline_desc": "An active internet connection is required to view your detailed profile statistics and achievements.",
     "offline_scores_safe_title": "Your Scores Are Safe!",
     "offline_scores_safe_desc": "All games played offline and earned points are safely stored on your device. Once an internet connection is available or you launch the game, your points will be automatically synchronized with the server.",
+    "guest_score_ready": "Points accumulated on your device are ready to be transferred to your account.",
+    "guest_score_info": "As you play, points accumulate on your device and are transferred when you create an account.",
     "total_correct": "Correct",
     "total_wrong": "Wrong",
     "accuracy": "Accuracy",

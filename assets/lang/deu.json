@@ -226,6 +226,8 @@
     "offline_desc": "Eine aktive Internetverbindung ist erforderlich, um Ihre detaillierten Profilstatistiken und Erfolge anzuzeigen.",
     "offline_scores_safe_title": "Ihre Punkte sind sicher!",
     "offline_scores_safe_desc": "Alle offline gespielten Spiele und gesammelten Punkte werden sicher auf Ihrem Gerät gespeichert. Sobald eine Internetverbindung verfügbar ist oder Sie das Spiel starten, werden Ihre Punkte automatisch mit dem Server synchronisiert.",
+    "guest_score_ready": "Auf Ihrem Gerät gesammelte Punkte können auf Ihr Konto übertragen werden.",
+    "guest_score_info": "Beim Spielen sammeln sich Punkte auf Ihrem Gerät und werden übertragen, wenn Sie ein Konto erstellen.",
     "total_correct": "Richtig",
     "total_wrong": "Falsch",
     "accuracy": "Quote",

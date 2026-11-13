@@ -124,8 +124,8 @@ class ProfilesGuestView extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Text(
                                   pendingScore > 0
-                                      ? 'Cihazınızda biriken puanlar hesabınıza aktarılmaya hazır.'
-                                      : 'Oynadıkça puanlarınız cihazınızda birikir ve hesap açtığınızda aktarılır.',
+                                      ? Localization.t('profile.guest_score_ready')
+                                      : Localization.t('profile.guest_score_info'),
                                   style: TextStyle(
                                     fontSize: 12.5,
                                     color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,

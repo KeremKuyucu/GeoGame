@@ -226,6 +226,8 @@
     "offline_desc": "Profil istatistiklerinizi ve başarılarınızı güncel olarak görüntülemek için aktif bir internet bağlantısı gereklidir.",
     "offline_scores_safe_title": "Puanlarınız Güvende!",
     "offline_scores_safe_desc": "Çevrimdışı oynadığınız tüm oyunlar ve puanlarınız cihazınızda güvenle saklanmaktadır. İnternet bağlantınız sağlandığında veya oyunu açtığınızda puanlarınız otomatik olarak sunucuyla senkronize edilecektir.",
+    "guest_score_ready": "Cihazınızda biriken puanlar hesabınıza aktarılmaya hazır.",
+    "guest_score_info": "Oynadıkça puanlarınız cihazınızda birikir ve hesap açtığınızda aktarılır.",
     "total_correct": "Doğru",
     "total_wrong": "Yanlış",
     "accuracy": "Başarı",
