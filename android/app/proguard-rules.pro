@@ -26,6 +26,17 @@
 -keep class okhttp3.** { *; }
 -keep interface okhttp3.** { *; }
 
+# AndroidX WorkManager, Room & Startup (AdMob & Arka Plan Görevleri için zorunlu)
+-keep class androidx.work.** { *; }
+-keep class * extends androidx.work.Worker { *; }
+-keep class * extends androidx.work.ListenableWorker { *; }
+-keep class * extends androidx.work.InputMerger { *; }
+-keep class * extends androidx.room.RoomDatabase { *; }
+-keep @androidx.room.Entity class *
+-keep class * extends androidx.startup.Initializer { *; }
+-keep class androidx.startup.InitializationProvider { *; }
+-dontwarn androidx.room.paging.**
+
 # Keep annotations
 -keepattributes *Annotation*
 
