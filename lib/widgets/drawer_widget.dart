@@ -167,7 +167,7 @@ class DrawerWidget extends StatelessWidget {
         _buildListTile(
           icon: Icons.star_rate_rounded,
           iconColor: Colors.amber.shade700,
-          title: Localization.t('drawer.rate_play_store'),
+          title: Localization.t('settings.rate_play_store'),
           onTap: () {
             Navigator.pop(context);
             _launchPlayStore();
@@ -176,7 +176,7 @@ class DrawerWidget extends StatelessWidget {
         _buildListTile(
           icon: Icons.bug_report_rounded,
           iconColor: Colors.deepOrangeAccent,
-          title: Localization.t('drawer.report_bug'),
+          title: Localization.t('settings.report_bug'),
           onTap: () {
             Navigator.pop(context);
             showDialog(
@@ -188,7 +188,7 @@ class DrawerWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 16, top: 8, right: 16),
           child: Text(
-            Localization.t('drawer.feedback_note'),
+            Localization.t('settings.feedback_note'),
             style: TextStyle(
                 color: Colors.grey.shade500,
                 fontSize: 12,
@@ -231,19 +231,19 @@ class DrawerWidget extends StatelessWidget {
         _buildListTile(
           icon: Icons.language_rounded,
           iconColor: const Color(0xFF5865F2),
-          title: Localization.t('drawer.my_website'),
+          title: Localization.t('settings.my_website'),
           onTap: () => _launchURL('https://keremkuyucu.com.tr'),
         ),
         _buildListTile(
           icon: Icons.language_rounded,
           iconColor: Colors.redAccent,
-          title: Localization.t('drawer.geogame_website'),
+          title: Localization.t('settings.geogame_website'),
           onTap: () => _launchURL('https://geogame.keremkuyucu.com.tr'),
         ),
         _buildListTile(
           icon: Icons.terminal_rounded,
           iconColor: Colors.black87, // GitHub için siyah daha uygun
-          title: Localization.t('drawer.geogame_github'),
+          title: Localization.t('settings.geogame_github'),
           onTap: () => _launchURL('https://github.com/KeremKuyucu/GeoGame'),
         ),
       ],
@@ -256,7 +256,7 @@ class DrawerWidget extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            Localization.t('drawer.creator'),
+            Localization.t('settings.creator'),
             style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,

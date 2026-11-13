@@ -59,6 +59,13 @@ class ProfilesController {
   /// Stats verisini döndürür (null ise boş map)
   Map<String, dynamic> get statsData => userStats ?? {};
 
+  /// Tema durumuna göre arka plan renklerini döndürür
+  List<Color> getBackgroundColors(bool isDark) {
+    return isDark
+        ? [const Color(0xFF1A1A1A), const Color(0xFF000000)]
+        : [const Color(0xFFF5F7FA), const Color(0xFFC3CFE2)];
+  }
+
   /// Kullanıcı profil verilerini Supabase'den çeker
   Future<void> fetchUserProfile() async {
     final String? currentId = AuthService.currentUserId;

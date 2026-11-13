@@ -197,7 +197,15 @@
       "oceania": "Oceania",
       "antarctica": "Antarctica"
     },
-    "guest": "Traveler"
+    "guest": "Traveler",
+    "support_title": "Support & About",
+    "rate_play_store": "Rate on Play Store",
+    "report_bug": "Report Bug",
+    "feedback_note": "You can send your complaints or suggestions by clicking the button above.",
+    "my_website": "My Website",
+    "geogame_website": "GeoGame Website",
+    "geogame_github": "GeoGame Github",
+    "creator": "Creator: Kerem Kuyucu"
   },
   "profile": {
     "title": "Profile",
@@ -236,15 +244,9 @@
     "score": "Score",
     "load_error": "Leaderboard could not be loaded. Please check your internet connection.",
     "offline_title": "No Internet Connection",
-    "offline_desc": "An active internet connection is required to view the global leaderboard and live rankings. Please check your connection and try again."
-  },
-  "drawer": {
-    "rate_play_store": "Rate on Play Store",
-    "report_bug": "Report Bug",
-    "feedback_note": "You can send your complaints or suggestions by clicking the button above.",
-    "my_website": "My Website",
-    "geogame_website": "GeoGame Website",
-    "geogame_github": "GeoGame Github",
-    "creator": "Creator: Kerem Kuyucu"
+    "offline_desc": "An active internet connection is required to view the global leaderboard and live rankings. Please check your connection and try again.",
+    "you": "You",
+    "your_rank": "Your Rank",
+    "top_players": "Top Players"
   }
 }

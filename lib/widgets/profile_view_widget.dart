@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
@@ -5,29 +6,41 @@ import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/services/localization_service.dart';
 
-// --- Extension: GameType'a Görsel Özellikler Ekliyoruz ---
+// --- Extension: GameType'a Görsel ve Tema Özellikleri Ekliyoruz ---
 extension GameTypeUI on GameType {
   IconData get icon {
     return switch (this) {
-      GameType.flag => Icons.flag,
-      GameType.capital => Icons.location_city,
-      GameType.distance => Icons.straighten,
-      GameType.borderline => Icons.border_all,
-      GameType.borderpath => Icons.route,
-      GameType.findmap => Icons.explore,
-      GameType.coatofarms => Icons.shield,
+      GameType.flag => Icons.flag_rounded,
+      GameType.capital => Icons.location_city_rounded,
+      GameType.distance => Icons.straighten_rounded,
+      GameType.borderline => Icons.border_all_rounded,
+      GameType.borderpath => Icons.route_rounded,
+      GameType.findmap => Icons.explore_rounded,
+      GameType.coatofarms => Icons.shield_rounded,
     };
   }
 
   Color get color {
     return switch (this) {
-      GameType.flag => Colors.orangeAccent,
-      GameType.capital => Colors.purpleAccent,
-      GameType.distance => Colors.tealAccent,
-      GameType.borderline => Colors.pinkAccent,
-      GameType.borderpath => Colors.blueAccent,
-      GameType.findmap => Colors.greenAccent,
-      GameType.coatofarms => Colors.amberAccent,
+      GameType.flag => const Color(0xFFFF9800),
+      GameType.capital => const Color(0xFF9C27B0),
+      GameType.distance => const Color(0xFF00BCD4),
+      GameType.borderline => const Color(0xFFE91E63),
+      GameType.borderpath => const Color(0xFF2196F3),
+      GameType.findmap => const Color(0xFF4CAF50),
+      GameType.coatofarms => const Color(0xFFFFC107),
+    };
+  }
+
+  List<Color> get gradient {
+    return switch (this) {
+      GameType.flag => const [Color(0xFFFFB74D), Color(0xFFFF9800)],
+      GameType.capital => const [Color(0xFFBA68C8), Color(0xFF8E24AA)],
+      GameType.distance => const [Color(0xFF4DD0E1), Color(0xFF00ACC1)],
+      GameType.borderline => const [Color(0xFFF06292), Color(0xFFD81B60)],
+      GameType.borderpath => const [Color(0xFF64B5F6), Color(0xFF1E88E5)],
+      GameType.findmap => const [Color(0xFF81C784), Color(0xFF43A047)],
+      GameType.coatofarms => const [Color(0xFFFFD54F), Color(0xFFFFB300)],
     };
   }
 }
@@ -144,19 +157,28 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
         totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0.0;
 
     final bool showCountrySection = widget.isOwnProfile;
-    final allCountryStats = showCountrySection ? _extractCountryStats() : <_CountryStatItem>[];
+    final allCountryStats =
+        showCountrySection ? _extractCountryStats() : <_CountryStatItem>[];
     final int discoveredCount = allCountryStats.length;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 95.0),
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        16.0,
+        kToolbarHeight + MediaQuery.of(context).padding.top + 10.0,
+        16.0,
+        110.0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Profil Başlık Kartı (Avatar, İsim, Toplam Puan)
-          _buildHeaderCard(),
+          // 1. Profil Başlık Hero Kartı (Canlı Cam Efektli & Şampiyonluk Rozetli)
+          _buildHeaderCard(isDark),
           const SizedBox(height: 16),
 
-          // 2. Özet İstatistik Kartları (KPI)
+          // 2. Özet İstatistik Kartları (KPI Gridi)
           _buildQuickKpiGrid(
             totalCorrect: totalCorrect,
             totalWrong: totalWrong,
@@ -165,12 +187,12 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             isDark: isDark,
             showDiscoveredCount: showCountrySection,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
-          // 3. Sekme Seçici & İçerik (Kendi profilinde oyun modları + ülke analizi; başkasının profilinde doğrudan modlar)
+          // 3. Sekme Seçici & İçerik
           if (showCountrySection) ...[
             _buildTabSelector(discoveredCount, isDark),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             if (_selectedTabIndex == 0)
               _buildDetailedStatsCard(isDark)
             else
@@ -183,100 +205,187 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
-  Widget _buildHeaderCard() {
-    return Card(
-      elevation: 6,
-      shadowColor: Colors.black38,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [Colors.teal.shade900, const Color(0xFF0F3D35)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  /// Profil Başlık Kartı (Ana Temayla Uyumlu Canlı Hero Kart)
+  Widget _buildHeaderCard(bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6200EE).withValues(alpha: isDark ? 0.35 : 0.22),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
-        ),
-        child: Row(
-          children: [
-            Hero(
-              tag: 'profile_avatar',
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.tealAccent, width: 2.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.tealAccent.withValues(alpha: 0.2),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: 36,
-                  backgroundImage: widget.avatarUrl.isNotEmpty
-                      ? NetworkImage(widget.avatarUrl)
-                      : null,
-                  onBackgroundImageError: widget.avatarUrl.isNotEmpty
-                      ? (_, __) {}
-                      : null,
-                  backgroundColor: Colors.teal.shade800,
-                  child: widget.avatarUrl.isEmpty
-                      ? const Icon(Icons.person, size: 40, color: Colors.white70)
-                      : null,
-                ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        const Color(0xFF38146E).withValues(alpha: 0.90),
+                        const Color(0xFF1B1138).withValues(alpha: 0.95),
+                        const Color(0xFF100B22).withValues(alpha: 0.98),
+                      ]
+                    : [
+                        const Color(0xFF6200EE),
+                        const Color(0xFF7C4DFF),
+                        const Color(0xFF9038FF),
+                      ],
+              ),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: isDark ? 0.15 : 0.35),
+                width: 1.2,
               ),
             ),
-            const SizedBox(width: 18),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.name.trim().isNotEmpty
-                        ? widget.name
-                        : Localization.t('settings.guest'),
-                    style: const TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 0.4,
+            child: Row(
+              children: [
+                // Avatar & Parıldayan Çerçeve
+                Hero(
+                  tag: 'profile_avatar',
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFFFB300),
+                          Color(0xFFFF2A6D),
+                          Color(0xFFBB86FC),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFFB300).withValues(alpha: 0.35),
+                          blurRadius: 14,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
+                    child: CircleAvatar(
+                      radius: 36,
+                      backgroundImage: widget.avatarUrl.isNotEmpty
+                          ? NetworkImage(widget.avatarUrl)
+                          : null,
+                      onBackgroundImageError: widget.avatarUrl.isNotEmpty
+                          ? (_, __) {}
+                          : null,
+                      backgroundColor: isDark
+                          ? const Color(0xFF261845)
+                          : Colors.white,
+                      child: widget.avatarUrl.isEmpty
+                          ? Icon(
+                              Icons.person_rounded,
+                              size: 38,
+                              color: isDark ? Colors.white70 : const Color(0xFF6200EE),
+                            )
+                          : null,
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  _buildTotalScoreBadge(),
-                ],
-              ),
+                ),
+                const SizedBox(width: 16),
+
+                // İsim & Puan
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.name.trim().isNotEmpty
+                            ? widget.name
+                            : Localization.t('settings.guest'),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 0.4,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _buildTotalScoreBadge(),
+                          if (widget.isOwnProfile) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 9, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.16),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: Text(
+                                Localization.t('profile.title').toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  /// Toplam Puan Rozeti
   Widget _buildTotalScoreBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFB300), Color(0xFFFF8F00)],
+        ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFFB300).withValues(alpha: 0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.military_tech_rounded,
-              color: Colors.amberAccent, size: 18),
-          const SizedBox(width: 6),
+          const Icon(
+            Icons.emoji_events_rounded,
+            color: Colors.white,
+            size: 16,
+          ),
+          const SizedBox(width: 5),
           Text(
             '${widget.totalScore} ${Localization.t('leaderboard.score')}',
             style: const TextStyle(
-              color: Colors.amberAccent,
-              fontWeight: FontWeight.w800,
-              fontSize: 14.5,
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 13.5,
+              letterSpacing: 0.3,
             ),
           ),
         ],
@@ -284,6 +393,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
+  /// KPI Kartları Gridi
   Widget _buildQuickKpiGrid({
     required int totalCorrect,
     required int totalWrong,
@@ -299,7 +409,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             label: Localization.t('profile.total_correct'),
             value: totalCorrect.toString(),
             icon: Icons.check_circle_rounded,
-            color: Colors.greenAccent.shade400,
+            color: const Color(0xFF00E676),
             isDark: isDark,
           ),
         ),
@@ -309,7 +419,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             label: Localization.t('profile.total_wrong'),
             value: totalWrong.toString(),
             icon: Icons.cancel_rounded,
-            color: Colors.redAccent.shade200,
+            color: const Color(0xFFFF5252),
             isDark: isDark,
           ),
         ),
@@ -319,7 +429,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             label: Localization.t('profile.accuracy'),
             value: '%${overallAccuracy.toStringAsFixed(1)}',
             icon: Icons.pie_chart_rounded,
-            color: Colors.tealAccent.shade400,
+            color: const Color(0xFF00E5FF),
             isDark: isDark,
           ),
         ),
@@ -330,7 +440,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
               label: Localization.t('profile.discovered_countries'),
               value: '$discoveredCount',
               icon: Icons.public_rounded,
-              color: Colors.amberAccent.shade400,
+              color: const Color(0xFFFFB300),
               isDark: isDark,
             ),
           ),
@@ -339,6 +449,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
+  /// Tekil KPI Kartı
   Widget _buildKpiCard({
     required String label,
     required String value,
@@ -346,56 +457,93 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     required Color color,
     required bool isDark,
   }) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: color.withValues(alpha: isDark ? 0.2 : 0.3),
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: isDark ? 0.08 : 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      color: isDark ? const Color(0xFF162321) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : Colors.black87,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 6.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              color: isDark
+                  ? const Color(0xFF1E1E2C).withValues(alpha: 0.85)
+                  : Colors.white.withValues(alpha: 0.88),
+              border: Border.all(
+                color: color.withValues(alpha: isDark ? 0.28 : 0.35),
+                width: 1.2,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: color, size: 18),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  /// Sekme Seçici Kapsül Bar
   Widget _buildTabSelector(int discoveredCount, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF142220) : Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark
+            ? const Color(0xFF1C1C2A).withValues(alpha: 0.85)
+            : Colors.white.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? Colors.white10 : Colors.black12,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(4),
       child: Row(
@@ -414,7 +562,8 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             child: _buildTabButton(
               index: 1,
               icon: Icons.public_rounded,
-              title: '${Localization.t('profile.tab_countries')} ($discoveredCount)',
+              title:
+                  '${Localization.t('profile.tab_countries')} ($discoveredCount)',
               isSelected: _selectedTabIndex == 1,
               isDark: isDark,
             ),
@@ -424,6 +573,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
+  /// Sekme Butonu
   Widget _buildTabButton({
     required int index,
     required IconData icon,
@@ -432,7 +582,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     required bool isDark,
   }) {
     return InkWell(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(14),
       onTap: () {
         if (_selectedTabIndex != index) {
           setState(() => _selectedTabIndex = index);
@@ -442,17 +592,21 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.teal
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [Color(0xFF6200EE), Color(0xFF7C4DFF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(14),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.teal.withValues(alpha: 0.35),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  )
+                    color: const Color(0xFF6200EE).withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
                 ]
               : null,
         ),
@@ -471,8 +625,8 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
               child: Text(
                 title,
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  fontSize: 12.5,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   color: isSelected
                       ? Colors.white
                       : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
@@ -486,50 +640,96 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
+  /// Oyun Modları Detaylı İstatistik Kartı
   Widget _buildDetailedStatsCard(bool isDark) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-      color: isDark ? const Color(0xFF162321) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(22.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              Localization.t('profile.stats_title'),
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.blueGrey.shade900,
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.8,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: isDark
+                  ? const Color(0xFF1E1E2C).withValues(alpha: 0.85)
+                  : Colors.white.withValues(alpha: 0.90),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.09)
+                    : Colors.white.withValues(alpha: 0.8),
+                width: 1.2,
               ),
             ),
-            const SizedBox(height: 22),
-            ...GameType.values.map((type) {
-              final isLast = type == GameType.values.last;
-              final prefix = AppState.getGameModeKey(type);
-
-              return Column(
-                children: [
-                  _buildSection(prefix, type.icon, type.color, isDark),
-                  if (!isLast)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 18.0),
-                      child: Divider(
-                        color: isDark ? Colors.white10 : Colors.black12,
-                        height: 1,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF6200EE), Color(0xFFFF2A6D)],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.insights_rounded,
+                        color: Colors.white,
+                        size: 18,
                       ),
                     ),
-                ],
-              );
-            }),
-          ],
+                    const SizedBox(width: 10),
+                    Text(
+                      Localization.t('profile.stats_title'),
+                      style: TextStyle(
+                        color: isDark ? Colors.white : const Color(0xFF1F1F2C),
+                        fontSize: 16.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                ...GameType.values.map((type) {
+                  final isLast = type == GameType.values.last;
+                  final prefix = AppState.getGameModeKey(type);
+
+                  return Column(
+                    children: [
+                      _buildSection(prefix, type.icon, type.color, isDark),
+                      if (!isLast)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Divider(
+                            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
+                            height: 1,
+                          ),
+                        ),
+                    ],
+                  );
+                }),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
+  /// Oyun Modu Satırı
   Widget _buildSection(String prefix, IconData icon, Color color, bool isDark) {
     final int score = (widget.stats['score_$prefix'] ?? 0).toInt();
     final int correct = (widget.stats['${prefix}_correct'] ?? 0).toInt();
@@ -546,41 +746,53 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
+                    color: color.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: Icon(icon, color: color, size: 19),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   Localization.t('profile.$prefix'),
                   style: TextStyle(
-                    color: isDark ? Colors.white : Colors.blueGrey.shade800,
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : Colors.blueGrey.shade900,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
-            Text(
-              score.toString(),
-              style: TextStyle(
-                color: color,
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: isDark ? 0.2 : 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: color.withValues(alpha: 0.35),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                '$score P',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: LinearProgressIndicator(
             value: successRate,
-            backgroundColor: isDark ? Colors.black26 : Colors.grey.shade200,
-            color: color,
+            backgroundColor:
+                isDark ? Colors.black38 : Colors.grey.shade200,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
             minHeight: 8,
           ),
         ),
@@ -588,50 +800,106 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSmallStat(
-                Localization.t('profile.correct_label', args: [correct]),
-                Colors.green.shade400),
-            _buildSmallStat(
-                Localization.t('profile.wrong_label', args: [wrong]),
-                Colors.red.shade400),
-            _buildSmallStat('${(successRate * 100).toStringAsFixed(1)}%',
-                isDark ? Colors.white54 : Colors.blueGrey),
+            _buildSmallStatBadge(
+              icon: Icons.check_rounded,
+              label: Localization.t('profile.correct_label', args: [correct]),
+              color: const Color(0xFF00E676),
+              isDark: isDark,
+            ),
+            _buildSmallStatBadge(
+              icon: Icons.close_rounded,
+              label: Localization.t('profile.wrong_label', args: [wrong]),
+              color: const Color(0xFFFF5252),
+              isDark: isDark,
+            ),
+            _buildSmallStatBadge(
+              icon: Icons.percent_rounded,
+              label: '${(successRate * 100).toStringAsFixed(1)}%',
+              color: isDark ? const Color(0xFFBB86FC) : const Color(0xFF6200EE),
+              isDark: isDark,
+            ),
           ],
         ),
       ],
     );
   }
 
+  /// Küçük İstatistik Hapı
+  Widget _buildSmallStatBadge({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: isDark ? 0.12 : 0.08),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Ülke Analizi Sekmesi
   Widget _buildCountryAnalysisTab(
       List<_CountryStatItem> allCountryStats, bool isDark) {
     if (allCountryStats.isEmpty) {
-      return Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: isDark ? const Color(0xFF162321) : Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            children: [
-              const Icon(Icons.public_off_rounded,
-                  size: 54, color: Colors.grey),
-              const SizedBox(height: 16),
-              Text(
-                Localization.t('profile.no_country_stats'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.5,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  height: 1.4,
-                ),
-              ),
-            ],
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          color: isDark
+              ? const Color(0xFF1E1E2C).withValues(alpha: 0.85)
+              : Colors.white.withValues(alpha: 0.90),
+          border: Border.all(
+            color: isDark ? Colors.white10 : Colors.black12,
           ),
+        ),
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF6200EE).withValues(alpha: 0.15),
+              ),
+              child: const Icon(
+                Icons.public_off_rounded,
+                size: 46,
+                color: Color(0xFFBB86FC),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              Localization.t('profile.no_country_stats'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                height: 1.45,
+              ),
+            ),
+          ],
         ),
       );
     }
 
-    // 1. En Başarılı 5 Ülke (Top Mastered)
+    // 1. En Başarılı 5 Ülke
     final topMastered = List<_CountryStatItem>.from(allCountryStats)
       ..sort((a, b) {
         final scoreComp = b.score.compareTo(a.score);
@@ -640,7 +908,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
       });
     final top5 = topMastered.take(5).toList();
 
-    // 2. Geliştirilmesi Gereken 5 Ülke (En çok hata yapılanlar)
+    // 2. Geliştirilmesi Gereken 5 Ülke
     final needsPracticeList = allCountryStats.where((c) => c.wrong > 0).toList()
       ..sort((a, b) {
         final wrongComp = b.wrong.compareTo(a.wrong);
@@ -649,7 +917,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
       });
     final weak5 = needsPracticeList.take(5).toList();
 
-    // 3. Arama ve Sıralama Filtresi
+    // 3. Arama ve Filtreleme
     final filteredList = allCountryStats.where((item) {
       if (_searchQuery.trim().isEmpty) return true;
       final q = _searchQuery.toLowerCase().trim();
@@ -676,24 +944,24 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // En Başarılı Ülkeler Kartı
+        // En Başarılı Ülkeler
         if (top5.isNotEmpty) ...[
           _buildHighlightCountrySection(
             title: Localization.t('profile.top_countries'),
             icon: Icons.emoji_events_rounded,
-            iconColor: Colors.amberAccent,
+            iconColor: const Color(0xFFFFB300),
             items: top5,
             isDark: isDark,
           ),
           const SizedBox(height: 16),
         ],
 
-        // Geliştirilmesi Gereken Ülkeler Kartı
+        // Geliştirilmesi Gereken Ülkeler
         if (weak5.isNotEmpty) ...[
           _buildHighlightCountrySection(
             title: Localization.t('profile.weak_countries'),
             icon: Icons.trending_down_rounded,
-            iconColor: Colors.deepOrangeAccent,
+            iconColor: const Color(0xFFFF5252),
             items: weak5,
             isDark: isDark,
             isWeakSection: true,
@@ -701,111 +969,155 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
           const SizedBox(height: 16),
         ],
 
-        // Tüm Ülkeler Başlığı & Arama / Sıralama Kartı
-        Card(
-          elevation: 3,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          color: isDark ? const Color(0xFF162321) : Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // Tüm Ülkeler Kartı & Arama
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(18.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  color: isDark
+                      ? const Color(0xFF1E1E2C).withValues(alpha: 0.85)
+                      : Colors.white.withValues(alpha: 0.90),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.09)
+                        : Colors.white.withValues(alpha: 0.8),
+                    width: 1.2,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       '${Localization.t('profile.all_countries')} (${filteredList.length})',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 14),
+                    const SizedBox(height: 14),
 
-                // Arama Kutusu
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: Localization.t('profile.search_country'),
-                    hintStyle: TextStyle(
-                      fontSize: 13.5,
-                      color:
-                          isDark ? Colors.grey.shade500 : Colors.grey.shade400,
-                    ),
-                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                          )
-                        : null,
-                    isDense: true,
-                    filled: true,
-                    fillColor: isDark ? Colors.black26 : Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                ),
-                const SizedBox(height: 12),
-
-                // Sıralama Butonları
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildSortChip('score', Localization.t('leaderboard.score')),
-                      const SizedBox(width: 6),
-                      _buildSortChip(
-                          'correct', Localization.t('profile.total_correct')),
-                      const SizedBox(width: 6),
-                      _buildSortChip(
-                          'wrong', Localization.t('profile.total_wrong')),
-                      const SizedBox(width: 6),
-                      _buildSortChip('name', 'A-Z'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
-
-                // Ülke Listesi
-                if (filteredList.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: Center(
-                      child: Text(
-                        'Eşleşen ülke bulunamadı.',
-                        style: TextStyle(
-                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    // Arama Girişi
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: Localization.t('profile.search_country'),
+                        hintStyle: TextStyle(
+                          fontSize: 13.5,
+                          color: isDark
+                              ? Colors.grey.shade500
+                              : Colors.grey.shade400,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search_rounded,
+                          size: 20,
+                          color: Color(0xFF7C4DFF),
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear_rounded, size: 18),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() => _searchQuery = '');
+                                },
+                              )
+                            : null,
+                        isDense: true,
+                        filled: true,
+                        fillColor: isDark
+                            ? Colors.black26
+                            : Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF7C4DFF),
+                            width: 1.5,
+                          ),
                         ),
                       ),
+                      onChanged: (val) => setState(() => _searchQuery = val),
                     ),
-                  )
-                else
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: filteredList.length,
-                    separatorBuilder: (_, __) => Divider(
-                      height: 1,
-                      color: isDark ? Colors.white10 : Colors.black12,
+                    const SizedBox(height: 12),
+
+                    // Sıralama Çipleri
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildSortChip(
+                            'score',
+                            Localization.t('leaderboard.score'),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildSortChip(
+                            'correct',
+                            Localization.t('profile.total_correct'),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildSortChip(
+                            'wrong',
+                            Localization.t('profile.total_wrong'),
+                          ),
+                          const SizedBox(width: 6),
+                          _buildSortChip('name', 'A-Z'),
+                        ],
+                      ),
                     ),
-                    itemBuilder: (context, index) {
-                      final item = filteredList[index];
-                      return _buildCountryTile(item, isDark);
-                    },
-                  ),
-              ],
+                    const SizedBox(height: 14),
+
+                    // Ülke Listesi
+                    if (filteredList.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24.0),
+                        child: Center(
+                          child: Text(
+                            Localization.t('profile.no_country_stats'),
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredList.length,
+                        separatorBuilder: (_, __) => Divider(
+                          height: 1,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.06)
+                              : Colors.black.withValues(alpha: 0.06),
+                        ),
+                        itemBuilder: (context, index) {
+                          final item = filteredList[index];
+                          return _buildCountryTile(item, isDark);
+                        },
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -813,6 +1125,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
+  /// Öne Çıkan Ülkeler Yatay Kaydırılabilir Kartı
   Widget _buildHighlightCountrySection({
     required String title,
     required IconData icon,
@@ -821,109 +1134,157 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     required bool isDark,
     bool isWeakSection = false,
   }) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: isDark ? const Color(0xFF162321) : Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: iconColor.withValues(alpha: isDark ? 0.08 : 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(18.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: isDark
+                  ? const Color(0xFF1E1E2C).withValues(alpha: 0.85)
+                  : Colors.white.withValues(alpha: 0.90),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.09)
+                    : Colors.white.withValues(alpha: 0.8),
+                width: 1.2,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, color: iconColor, size: 22),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: iconColor.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon, color: iconColor, size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: items.map((c) {
+                      return Container(
+                        width: 135,
+                        margin: const EdgeInsets.only(right: 10),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? (isWeakSection
+                                  ? const Color(0xFFFF5252).withValues(alpha: 0.12)
+                                  : const Color(0xFF6200EE).withValues(alpha: 0.14))
+                              : (isWeakSection
+                                  ? const Color(0xFFFFEBEE)
+                                  : const Color(0xFFF3E8FF)),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isWeakSection
+                                ? const Color(0xFFFF5252).withValues(alpha: 0.35)
+                                : const Color(0xFF7C4DFF).withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              c.flagEmoji.isNotEmpty ? c.flagEmoji : '🌐',
+                              style: const TextStyle(fontSize: 28),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              c.name,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              isWeakSection
+                                  ? '${c.wrong} ${Localization.t('profile.total_wrong')}'
+                                  : '${c.score} P',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: isWeakSection
+                                    ? const Color(0xFFFF5252)
+                                    : const Color(0xFF6200EE),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '%${c.accuracy.toStringAsFixed(0)} ${Localization.t('profile.accuracy')}',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: isDark
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 14),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: items.map((c) {
-                  return Container(
-                    width: 130,
-                    margin: const EdgeInsets.only(right: 10),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.teal.shade900.withValues(alpha: 0.25)
-                          : Colors.teal.shade50.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isWeakSection
-                            ? Colors.redAccent.withValues(alpha: 0.3)
-                            : Colors.teal.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          c.flagEmoji.isNotEmpty ? c.flagEmoji : '🌐',
-                          style: const TextStyle(fontSize: 28),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          c.name,
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          isWeakSection
-                              ? '${c.wrong} ${Localization.t('profile.total_wrong')}'
-                              : '${c.score} P',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: isWeakSection
-                                ? Colors.redAccent
-                                : Colors.teal,
-                          ),
-                        ),
-                        Text(
-                          '%${c.accuracy.toStringAsFixed(0)} ${Localization.t('profile.accuracy')}',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
+  /// Sıralama Seçim Çipi
   Widget _buildSortChip(String type, String label) {
     final isSelected = _sortType == type;
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
-      selectedColor: Colors.teal,
+      selectedColor: const Color(0xFF6200EE),
+      backgroundColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isSelected
+              ? const Color(0xFF6200EE)
+              : Colors.grey.withValues(alpha: 0.3),
+        ),
+      ),
       labelStyle: TextStyle(
         fontSize: 12,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: isSelected ? Colors.white : Colors.grey.shade700,
       ),
       onSelected: (selected) {
@@ -932,41 +1293,48 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
     );
   }
 
+  /// Ülke Satır Öğesi
   Widget _buildCountryTile(_CountryStatItem item, bool isDark) {
     final accuracyColor = item.accuracy >= 80
-        ? Colors.greenAccent.shade400
-        : (item.accuracy >= 50 ? Colors.amberAccent.shade400 : Colors.redAccent);
+        ? const Color(0xFF00E676)
+        : (item.accuracy >= 50
+            ? const Color(0xFFFFB300)
+            : const Color(0xFFFF5252));
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         children: [
-          // Bayrak
+          // Bayrak Squircle
           Container(
-            width: 36,
-            height: 28,
+            width: 40,
+            height: 32,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: isDark ? Colors.white10 : Colors.black12,
+              borderRadius: BorderRadius.circular(8),
+              color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+              border: Border.all(
+                color: isDark ? Colors.white12 : Colors.black12,
+              ),
             ),
             child: Text(
               item.flagEmoji.isNotEmpty ? item.flagEmoji : '🌐',
-              style: const TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 19),
             ),
           ),
           const SizedBox(width: 12),
 
-          // Ülke Adı ve Doğru/Yanlış
+          // Ülke Adı ve İstatistikler
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -976,41 +1344,47 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
                   children: [
                     Text(
                       '${item.correct} D',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green.shade400,
+                        color: Color(0xFF00E676),
                       ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       '•',
                       style: TextStyle(
-                          fontSize: 11,
-                          color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+                        fontSize: 11,
+                        color: isDark
+                            ? Colors.grey.shade500
+                            : Colors.grey.shade400,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       '${item.wrong} Y',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red.shade400,
+                        color: Color(0xFFFF5252),
                       ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       '•',
                       style: TextStyle(
-                          fontSize: 11,
-                          color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+                        fontSize: 11,
+                        color: isDark
+                            ? Colors.grey.shade500
+                            : Colors.grey.shade400,
+                      ),
                     ),
                     const SizedBox(width: 6),
                     Text(
                       '%${item.accuracy.toStringAsFixed(0)}',
                       style: TextStyle(
                         fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                         color: accuracyColor,
                       ),
                     ),
@@ -1024,33 +1398,21 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.teal.withValues(alpha: isDark ? 0.2 : 0.1),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Colors.teal.withValues(alpha: 0.3),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6200EE), Color(0xFF7C4DFF)],
               ),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               '${item.score} P',
               style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: Colors.teal,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSmallStat(String label, Color color) {
-    return Text(
-      label,
-      style: TextStyle(
-        color: color,
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
       ),
     );
   }

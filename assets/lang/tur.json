@@ -197,7 +197,15 @@
       "oceania": "Okyanusya",
       "antarctica": "Antarktika"
     },
-    "guest": "Gezgin"
+    "guest": "Gezgin",
+    "support_title": "Destek & Hakkında",
+    "rate_play_store": "Play Store'da Değerlendir",
+    "report_bug": "Hata Bildir",
+    "feedback_note": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
+    "my_website": "Benim Websitem",
+    "geogame_website": "GeoGame Website",
+    "geogame_github": "GeoGame Github",
+    "creator": "Yapımcı: Kerem Kuyucu"
   },
   "profile": {
     "title": "Profil",
@@ -236,15 +244,9 @@
     "score": "Puan",
     "load_error": "Sıralama yüklenemedi. Lütfen internetinizi kontrol edin.",
     "offline_title": "İnternet Bağlantısı Yok",
-    "offline_desc": "Liderlik sıralamasını ve anlık skorları görüntülemek için internet bağlantısı gereklidir. Lütfen bağlantınızı kontrol edip tekrar deneyin."
-  },
-  "drawer": {
-    "rate_play_store": "Play Store'da Değerlendir",
-    "report_bug": "Hata Bildir",
-    "feedback_note": "Şikayet veya önerinizi yukarıdaki butona tıklayarak bize iletebilirsiniz.",
-    "my_website": "Benim Websitem",
-    "geogame_website": "GeoGame Website",
-    "geogame_github": "GeoGame Github",
-    "creator": "Yapımcı: Kerem Kuyucu"
+    "offline_desc": "Liderlik sıralamasını ve anlık skorları görüntülemek için internet bağlantısı gereklidir. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
+    "you": "Sen",
+    "your_rank": "Senin Sıralaman",
+    "top_players": "Zirvedekiler"
   }
 }

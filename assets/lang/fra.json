@@ -197,7 +197,15 @@
       "oceania": "Océanie",
       "antarctica": "Antarctique"
     },
-    "guest": "Voyageur"
+    "guest": "Voyageur",
+    "support_title": "Aide & À propos",
+    "rate_play_store": "Évaluer sur le Play Store",
+    "report_bug": "Signaler un bug",
+    "feedback_note": "Vous pouvez envoyer vos remarques ou suggestions en cliquant sur le bouton ci-dessus.",
+    "my_website": "Mon site web",
+    "geogame_website": "Site web de GeoGame",
+    "geogame_github": "GitHub de GeoGame",
+    "creator": "Créateur : Kerem Kuyucu"
   },
   "profile": {
     "title": "Profil",
@@ -236,15 +244,9 @@
     "score": "Score",
     "load_error": "Impossible de charger le classement. Veuillez vérifier votre connexion Internet.",
     "offline_title": "Pas de connexion Internet",
-    "offline_desc": "Une connexion Internet active est requise pour afficher le classement mondial et les scores en direct. Veuillez vérifier votre connexion et réessayer."
-  },
-  "drawer": {
-    "rate_play_store": "Évaluer sur le Play Store",
-    "report_bug": "Signaler un bug",
-    "feedback_note": "Vous pouvez envoyer vos remarques ou suggestions en cliquant sur le bouton ci-dessus.",
-    "my_website": "Mon site web",
-    "geogame_website": "Site web de GeoGame",
-    "geogame_github": "GitHub de GeoGame",
-    "creator": "Créateur : Kerem Kuyucu"
+    "offline_desc": "Une connexion Internet active est requise pour afficher le classement mondial et les scores en direct. Veuillez vérifier votre connexion et réessayer.",
+    "you": "Vous",
+    "your_rank": "Votre Rang",
+    "top_players": "Meilleurs Joueurs"
   }
 }

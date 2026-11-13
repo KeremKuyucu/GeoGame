@@ -105,6 +105,71 @@ class LeaderboardController {
     }
   }
 
+  /// Sıralama podyum gradient renkleri
+  List<Color> getRankGradient(int index) {
+    switch (index) {
+      case 0:
+        return const [Color(0xFFFFE082), Color(0xFFFFB300), Color(0xFFFF8F00)];
+      case 1:
+        return const [Color(0xFFFFFFFF), Color(0xFFCFD8DC), Color(0xFF90A4AE)];
+      case 2:
+        return const [Color(0xFFFFD180), Color(0xFFD78C53), Color(0xFFA1887F)];
+      default:
+        return const [Color(0xFF8C52FF), Color(0xFF5CE1E6)];
+    }
+  }
+
+  /// Sıralama podyum ışıltı rengi
+  Color getRankGlowColor(int index) {
+    switch (index) {
+      case 0:
+        return const Color(0xFFFFB300).withValues(alpha: 0.5);
+      case 1:
+        return const Color(0xFFB0BEC5).withValues(alpha: 0.4);
+      case 2:
+        return const Color(0xFFCD7F32).withValues(alpha: 0.4);
+      default:
+        return Colors.transparent;
+    }
+  }
+
+  /// Tema durumuna göre arka plan renklerini döndürür (MainScreen ile birebir uyumlu)
+  List<Color> getBackgroundColors(bool isDark) {
+    return isDark
+        ? [const Color(0xFF1A1A1A), const Color(0xFF000000)]
+        : [const Color(0xFFF5F7FA), const Color(0xFFC3CFE2)];
+  }
+
+  /// Giriş yapmış kullanıcının UID'si
+  String? get currentUserId => _supabase.auth.currentUser?.id;
+
+  /// Belirtilen kullanıcının oturum açmış kullanıcı olup olmadığını kontrol eder
+  bool isCurrentUser(Map<String, dynamic> user) {
+    final uid = currentUserId;
+    if (uid == null || uid.isEmpty) return false;
+    return user['uid'] == uid;
+  }
+
+  /// Oturum açmış kullanıcının sıralamadaki sırası (1 tabanlı)
+  int? get currentUserRank {
+    final uid = currentUserId;
+    if (uid == null || uid.isEmpty) return null;
+    for (int i = 0; i < users.length; i++) {
+      if (users[i]['uid'] == uid) return i + 1;
+    }
+    return null;
+  }
+
+  /// Oturum açmış kullanıcının leaderboard verisi
+  Map<String, dynamic>? get currentUserEntry {
+    final uid = currentUserId;
+    if (uid == null || uid.isEmpty) return null;
+    for (final u in users) {
+      if (u['uid'] == uid) return u;
+    }
+    return null;
+  }
+
   /// Sıralama yazı rengi
   Color getRankTextColor(int index) {
     if (index < 3) return Colors.white;
@@ -131,19 +196,41 @@ class LeaderboardController {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text(name),
-            centerTitle: true,
-          ),
-          body: ProfileViewWidget(
-            name: name,
-            avatarUrl: avatarUrl,
-            totalScore: totalScore,
-            stats: user,
-            isOwnProfile: false,
-          ),
-        ),
+        builder: (context) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              title: Text(
+                name,
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                  color: isDark ? Colors.white : const Color(0xFF2C2C3E),
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+            body: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: getBackgroundColors(isDark),
+                ),
+              ),
+              child: ProfileViewWidget(
+                name: name,
+                avatarUrl: avatarUrl,
+                totalScore: totalScore,
+                stats: user,
+                isOwnProfile: false,
+              ),
+            ),
+          );
+        },
       ),
     );
   }

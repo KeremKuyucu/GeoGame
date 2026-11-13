@@ -197,7 +197,15 @@
       "oceania": "Ozeanien",
       "antarctica": "Antarktis"
     },
-    "guest": "Reisender"
+    "guest": "Reisender",
+    "support_title": "Hilfe & Über",
+    "rate_play_store": "Im Play Store bewerten",
+    "report_bug": "Fehler melden",
+    "feedback_note": "Du kannst Beschwerden oder Vorschläge senden, indem du auf die Schaltfläche oben klickst.",
+    "my_website": "Meine Webseite",
+    "geogame_website": "GeoGame Webseite",
+    "geogame_github": "GeoGame GitHub",
+    "creator": "Entwickler: Kerem Kuyucu"
   },
   "profile": {
     "title": "Profil",
@@ -236,15 +244,9 @@
     "score": "Punkte",
     "load_error": "Bestenliste konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung.",
     "offline_title": "Keine Internetverbindung",
-    "offline_desc": "Eine aktive Internetverbindung ist erforderlich, um die globale Bestenliste und Live-Ranglisten anzuzeigen. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
-  },
-  "drawer": {
-    "rate_play_store": "Im Play Store bewerten",
-    "report_bug": "Fehler melden",
-    "feedback_note": "Du kannst Beschwerden oder Vorschläge senden, indem du auf die Schaltfläche oben klickst.",
-    "my_website": "Meine Webseite",
-    "geogame_website": "GeoGame Webseite",
-    "geogame_github": "GeoGame GitHub",
-    "creator": "Entwickler: Kerem Kuyucu"
+    "offline_desc": "Eine aktive Internetverbindung ist erforderlich, um die globale Bestenliste und Live-Ranglisten anzuzeigen. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "you": "Du",
+    "your_rank": "Deine Platzierung",
+    "top_players": "Top-Spieler"
   }
 }

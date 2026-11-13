@@ -317,13 +317,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
           // Destek ve Hakkında Bölümü
           SettingsSectionHeader(
-            title: Localization.t('feedback.title'),
+            title: Localization.t('settings.support_title'),
           ),
           SettingsContainer(
             isDark: isDark,
             children: [
               SettingsTile(
-                title: Localization.t('drawer.rate_play_store'),
+                title: Localization.t('settings.rate_play_store'),
                 icon: Icons.star_rate_rounded,
                 iconColor: Colors.amber.shade700,
                 isDark: isDark,
@@ -331,7 +331,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               SettingsDivider(isDark: isDark),
               SettingsTile(
-                title: Localization.t('drawer.report_bug'),
+                title: Localization.t('settings.report_bug'),
                 icon: Icons.bug_report_rounded,
                 iconColor: Colors.deepOrangeAccent,
                 isDark: isDark,
@@ -344,7 +344,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               SettingsDivider(isDark: isDark),
               SettingsTile(
-                title: Localization.t('drawer.geogame_website'),
+                title: Localization.t('settings.geogame_website'),
                 icon: Icons.public_rounded,
                 iconColor: Colors.redAccent,
                 isDark: isDark,
@@ -352,7 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               SettingsDivider(isDark: isDark),
               SettingsTile(
-                title: Localization.t('drawer.geogame_github'),
+                title: Localization.t('settings.geogame_github'),
                 icon: Icons.code_rounded,
                 iconColor: isDark ? Colors.white70 : Colors.black87,
                 isDark: isDark,
@@ -376,7 +376,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  Localization.t('drawer.creator'),
+                  Localization.t('settings.creator'),
                   style: TextStyle(
                     color: isDark ? Colors.grey[600] : Colors.grey[500],
                     fontSize: 12,
