@@ -51,6 +51,7 @@ concurrency:
 # ── Environment variables shared across all jobs ─────────────────────────────
 env:
   FLUTTER_CHANNEL: stable
+  FLUTTER_VERSION: '3.47.9'
   PACKAGE_NAME: com.keremkuyucu.geogame
 
 # ============================================================
@@ -86,9 +87,10 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
-          cache-key: flutter-${{ env.FLUTTER_CHANNEL }}-${{ hashFiles('pubspec.lock') }}
+          cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
 
       # ── Java 17 (required for Android build) ──────────────
       - name: Set up Java 17
@@ -167,9 +169,10 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
-          cache-key: flutter-${{ env.FLUTTER_CHANNEL }}-${{ hashFiles('pubspec.lock') }}
+          cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
 
       # ── Dependencies ──────────────────────────────────────
       - name: Flutter pub get
@@ -210,9 +213,10 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: ${{ env.FLUTTER_CHANNEL }}
           cache: true
-          cache-key: flutter-${{ env.FLUTTER_CHANNEL }}-${{ hashFiles('pubspec.lock') }}
+          cache-key: flutter-${{ env.FLUTTER_VERSION }}-${{ hashFiles('pubspec.lock') }}
 
       # ── Extract version ───────────────────────────────────
       - name: Extract version
