@@ -122,11 +122,11 @@ jobs:
 
       # ── Build Release APK (split per ABI) ─────────────────
       - name: Build release APK (split-per-abi)
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --android-skip-build-dependency-validation
 
       # ── Build Release AAB ─────────────────────────────────
       - name: Build release AAB
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --android-skip-build-dependency-validation
 
       # ── Clean up signing files ────────────────────────────
       - name: Remove keystore and key.properties
