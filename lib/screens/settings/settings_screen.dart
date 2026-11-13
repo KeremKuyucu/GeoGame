@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:geogame/models/app_context.dart';
@@ -18,11 +19,26 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final SettingsController _controller = SettingsController();
+  String _appVersion = '';
 
   @override
   void initState() {
     super.initState();
     AppState.userNotifier.addListener(_onUserChanged);
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = 'GeoGame v${info.version}';
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading app version: $e');
+    }
   }
 
   @override
@@ -367,7 +383,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               children: [
                 Text(
-                  'GeoGame v1.7.0',
+                  _appVersion.isNotEmpty ? _appVersion : 'GeoGame',
                   style: TextStyle(
                     color: isDark ? Colors.grey[400] : Colors.grey[700],
                     fontSize: 13,
