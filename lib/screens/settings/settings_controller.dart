@@ -91,17 +91,21 @@ class SettingsController {
 
   static Future<void> applyTheme([String? mode]) async {
     final theme = mode ?? settings.themeMode;
-    switch (theme) {
-      case 'dark':
-        await ThemeModeBuilderConfig.setDark();
-        break;
-      case 'light':
-        await ThemeModeBuilderConfig.setLight();
-        break;
-      case 'system':
-      default:
-        await ThemeModeBuilderConfig.setSystem();
-        break;
+    try {
+      switch (theme) {
+        case 'dark':
+          await ThemeModeBuilderConfig.setDark();
+          break;
+        case 'light':
+          await ThemeModeBuilderConfig.setLight();
+          break;
+        case 'system':
+        default:
+          await ThemeModeBuilderConfig.setSystem();
+          break;
+      }
+    } catch (e) {
+      debugPrint('⚠️ applyTheme hatası: $e');
     }
   }
 

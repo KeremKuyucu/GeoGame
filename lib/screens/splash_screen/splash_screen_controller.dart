@@ -41,6 +41,9 @@ class SplashScreenController {
       GameLogService.syncPendingLogs().catchError((e) {
         debugPrint('⚠️ GameLogService.syncPendingLogs error: $e');
       });
+
+      // Tema modunu uygula (ThemeModeBuilder mount edildikten sonra çağrılır)
+      await SettingsController.applyTheme();
     } catch (e) {
       debugPrint('❌ SplashScreenController initialize error: $e');
     }
