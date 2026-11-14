@@ -20,12 +20,23 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final SettingsController _controller = SettingsController();
   String _appVersion = '';
+  bool _isPrivacyOptionsRequired = false;
 
   @override
   void initState() {
     super.initState();
     AppState.userNotifier.addListener(_onUserChanged);
     _loadAppVersion();
+    _checkPrivacyOptions();
+  }
+
+  Future<void> _checkPrivacyOptions() async {
+    final bool required = await AdService.isPrivacyOptionsRequired();
+    if (mounted && required != _isPrivacyOptionsRequired) {
+      setState(() {
+        _isPrivacyOptionsRequired = required;
+      });
+    }
   }
 
   Future<void> _loadAppVersion() async {
@@ -54,42 +65,93 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color backgroundColor =
-        isDark ? const Color(0xFF000000) : const Color(0xFFF2F2F7);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(
-          Localization.t('settings.title').toUpperCase(),
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-            color: Colors.orange,
-          ),
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF9800).withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.tune_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              Localization.t('settings.title').toUpperCase(),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                color: isDark ? Colors.white : const Color(0xFF2C2C3E),
+                fontSize: 18,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
       ),
-      body: ListView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 95.0),
-        children: [
-          // Hesap bölümü
-          Container(
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: _controller.getBackgroundColors(isDark),
+          ),
+        ),
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            16.0,
+            kToolbarHeight + MediaQuery.of(context).padding.top + 8,
+            16.0,
+            95.0,
+          ),
+          children: [
+            // Hesap bölümü
+            Container(
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1E1E2C).withValues(alpha: 0.85)
+                    : Colors.white.withValues(alpha: 0.90),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : Colors.white.withValues(alpha: 0.8),
+                  width: 1.2,
                 ),
-              ],
-            ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
             child: !_controller.isAuthenticated
                 ? SettingsGuestCard(
                     controller: _controller,
@@ -191,7 +253,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 isDark: isDark,
                 onLanguageChanged: () => setState(() {}),
               ),
-              if (AdService.isSupported) ...[
+              if (AdService.isSupported && _isPrivacyOptionsRequired) ...[
                 SettingsDivider(isDark: isDark),
                 ListTile(
                   contentPadding:
@@ -404,8 +466,9 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 30),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Future<void> _launchPlayStore() async {
     final Uri marketUri =

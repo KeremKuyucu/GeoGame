@@ -10,10 +10,21 @@ import 'package:geogame/services/auth_service.dart';
 class ProfilesController {
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  static Map<String, dynamic>? _cachedUserStats;
+  static String? _cachedUserId;
+
   Map<String, dynamic>? userStats;
   bool isLoading = true;
   bool isOffline = false;
   String? errorMessage;
+
+  ProfilesController() {
+    final currentId = AuthService.currentUserId;
+    if (_cachedUserStats != null && _cachedUserId == currentId) {
+      userStats = Map<String, dynamic>.from(_cachedUserStats!);
+      isLoading = false;
+    }
+  }
 
   /// Kullanıcı giriş yapmış mı?
   bool get isAuthenticated => AuthService.isAuthenticated;
@@ -70,7 +81,9 @@ class ProfilesController {
   Future<void> fetchUserProfile() async {
     final String? currentId = AuthService.currentUserId;
 
-    isLoading = true;
+    if (userStats == null) {
+      isLoading = true;
+    }
     errorMessage = null;
     isOffline = false;
 
@@ -86,18 +99,24 @@ class ProfilesController {
           .select()
           .eq('uid', currentId)
           .maybeSingle()
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 10));
 
       if (data != null) {
         userStats = _parseProfileData(data);
+        _cachedUserStats = userStats;
+        _cachedUserId = currentId;
       } else {
         userStats = null;
+        _cachedUserStats = null;
+        _cachedUserId = null;
       }
       isLoading = false;
     } catch (e) {
       debugPrint('❌ Profil yükleme hatası: $e');
-      isOffline = true;
-      errorMessage = 'Hata: $e';
+      if (userStats == null) {
+        isOffline = true;
+        errorMessage = 'Hata: $e';
+      }
       isLoading = false;
     }
   }

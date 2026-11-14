@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -68,6 +69,33 @@ class TelemetryService {
       case TargetPlatform.fuchsia:
         return 'fuchsia';
     }
+  }
+
+  /// Global Flutter ve Platform hata yakalayıcılarını kurar
+  static void setupErrorHandling() {
+    // Global hata yakalama (Flutter UI & Framework hataları)
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      sendError(
+        event: 'flutter_uncaught_error',
+        message: details.exceptionAsString(),
+        stackTrace: details.stack,
+        metadata: {
+          'library': details.library,
+          if (details.context != null) 'context': details.context.toString(),
+        },
+      );
+    };
+
+    // Asenkron ve platform seviyesi yakalanmamış hatalar
+    PlatformDispatcher.instance.onError = (error, stack) {
+      sendError(
+        event: 'platform_uncaught_error',
+        message: error.toString(),
+        stackTrace: stack,
+      );
+      return false;
+    };
   }
 
   /// Uygulama açılışında arka planda çağrılacak telemetri metodu (her açılışta gönderilir)

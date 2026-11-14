@@ -158,131 +158,116 @@ class _LeaderboardState extends State<Leaderboard> {
                       )
                     : _controller.users.isEmpty
                         ? const LeaderboardEmptyState()
-                        : Stack(
-                            children: [
-                              CustomScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(
-                                  parent: BouncingScrollPhysics(),
+                        : CustomScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(
+                              parent: BouncingScrollPhysics(),
+                            ),
+                            slivers: [
+                              // AppBar boşluğu
+                              SliverToBoxAdapter(
+                                child: SizedBox(
+                                  height: kToolbarHeight +
+                                      MediaQuery.of(context).padding.top +
+                                      8,
                                 ),
-                                slivers: [
-                                  // AppBar boşluğu
-                                  SliverToBoxAdapter(
-                                    child: SizedBox(
-                                      height: kToolbarHeight +
-                                          MediaQuery.of(context).padding.top +
-                                          8,
-                                    ),
-                                  ),
-
-                                  // Şampiyonluk Podyumu (İlk 3 sıra)
-                                  if (_controller.hasPodium)
-                                    SliverToBoxAdapter(
-                                      child: LeaderboardPodium(
-                                          controller: _controller),
-                                    ),
-
-                                  // Liste Başlığı (Zirvedekiler)
-                                  if (_controller.listUserCount > 0)
-                                    SliverToBoxAdapter(
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            22, 14, 22, 10),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF7C4DFF)
-                                                    .withValues(alpha: 0.15),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              child: const Icon(
-                                                Icons.format_list_numbered_rounded,
-                                                size: 16,
-                                                color: Color(0xFF9E7BFF),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              Localization.t('leaderboard.top_players'),
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w800,
-                                                letterSpacing: 0.5,
-                                                color: isDark
-                                                    ? Colors.grey.shade300
-                                                    : Colors.grey.shade800,
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 8, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? Colors.white.withValues(alpha: 0.08)
-                                                    : Colors.black.withValues(alpha: 0.05),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Text(
-                                                '${_controller.users.length} ${Localization.t('nav.rank')}',
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: isDark
-                                                      ? Colors.grey.shade400
-                                                      : Colors.grey.shade600,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                  // 4. sıra ve sonrası oyuncu kartları
-                                  SliverPadding(
-                                    padding: EdgeInsets.fromLTRB(
-                                      16,
-                                      4,
-                                      16,
-                                      _controller.currentUserRank != null
-                                          ? 175
-                                          : 105,
-                                    ),
-                                    sliver: SliverList(
-                                      delegate: SliverChildBuilderDelegate(
-                                        (context, index) {
-                                          final listIndex =
-                                              _controller.getActualIndex(index);
-                                          if (listIndex >=
-                                              _controller.users.length) {
-                                            return null;
-                                          }
-                                          return LeaderboardUserCard(
-                                            controller: _controller,
-                                            index: listIndex,
-                                          );
-                                        },
-                                        childCount: _controller.listUserCount,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ),
 
-                              // Kullanıcının Kendi Sıralaması (Yüzen Alt Bar)
-                              if (_controller.currentUserRank != null)
-                                Positioned(
-                                  left: 16,
-                                  right: 16,
-                                  bottom: 92,
-                                  child: LeaderboardMyRankBar(
-                                    controller: _controller,
+                              // Şampiyonluk Podyumu (İlk 3 sıra)
+                              if (_controller.hasPodium)
+                                SliverToBoxAdapter(
+                                  child: RepaintBoundary(
+                                    child: LeaderboardPodium(
+                                        controller: _controller),
                                   ),
                                 ),
+
+                              // Liste Başlığı (Zirvedekiler)
+                              if (_controller.listUserCount > 0)
+                                SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        22, 14, 22, 10),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF7C4DFF)
+                                                .withValues(alpha: 0.15),
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          child: const Icon(
+                                            Icons.format_list_numbered_rounded,
+                                            size: 16,
+                                            color: Color(0xFF9E7BFF),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          Localization.t('leaderboard.top_players'),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 0.5,
+                                            color: isDark
+                                                ? Colors.grey.shade300
+                                                : Colors.grey.shade800,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? Colors.white.withValues(alpha: 0.08)
+                                                : Colors.black.withValues(alpha: 0.05),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Text(
+                                            '${_controller.users.length} ${Localization.t('nav.rank')}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: isDark
+                                                  ? Colors.grey.shade400
+                                                  : Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                              // 4. sıra ve sonrası oyuncu kartları
+                              SliverPadding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  4,
+                                  16,
+                                  100,
+                                ),
+                                sliver: SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      final listIndex =
+                                          _controller.getActualIndex(index);
+                                      if (listIndex >=
+                                          _controller.users.length) {
+                                        return null;
+                                      }
+                                      return LeaderboardUserCard(
+                                        controller: _controller,
+                                        index: listIndex,
+                                      );
+                                    },
+                                    childCount: _controller.listUserCount,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
               ),

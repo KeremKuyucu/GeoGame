@@ -10,14 +10,19 @@ import 'package:geogame/widgets/profile_view_widget.dart';
 class LeaderboardController {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  List<Map<String, dynamic>> users = [];
-  bool isLoading = true;
+  static List<Map<String, dynamic>>? _cachedUsers;
+
+  List<Map<String, dynamic>> users =
+      _cachedUsers != null ? List.from(_cachedUsers!) : [];
+  bool isLoading = _cachedUsers == null;
   bool isOffline = false;
   String? errorMessage;
 
   /// Leaderboard verisini Supabase'den çeker
   Future<void> fetchLeaderboard() async {
-    isLoading = true;
+    if (users.isEmpty) {
+      isLoading = true;
+    }
     errorMessage = null;
     isOffline = false;
 
@@ -26,15 +31,17 @@ class LeaderboardController {
           .from('leaderboard_v2')
           .select()
           .limit(100)
-          .timeout(const Duration(seconds: 4));
+          .timeout(const Duration(seconds: 10));
 
       if ((response as List).isEmpty) {
         users = [];
+        _cachedUsers = [];
         isLoading = false;
         return;
       }
 
       users = _parseLeaderboardData(response);
+      _cachedUsers = users;
       isLoading = false;
     } catch (e) {
       debugPrint('❌ Leaderboard Error: $e');

@@ -135,6 +135,20 @@ class AdService {
     }
   }
 
+  /// Kullanıcının bölgesine göre (ör. Avrupa Birliği / GDPR) gizlilik / rıza
+  /// tercihlerinin gösterilmesi zorunlu mu kontrol eder.
+  static Future<bool> isPrivacyOptionsRequired() async {
+    if (!isSupported) return false;
+    try {
+      final status =
+          await ConsentInformation.instance.getPrivacyOptionsRequirementStatus();
+      return status == PrivacyOptionsRequirementStatus.required;
+    } catch (e) {
+      debugPrint('AdService: isPrivacyOptionsRequired hatası: $e');
+      return false;
+    }
+  }
+
   /// Kullanıcının hedeflenmiş reklam ve gizlilik tercihlerini açar.
   static void showPrivacyOptionsForm(BuildContext context) {
     if (!isSupported) return;
@@ -146,9 +160,12 @@ class AdService {
             'AdService: Gizlilik formu hatası: ${formError.message}',
           );
           if (context.mounted) {
+            final String message = formError.message.toLowerCase().contains('not required')
+                ? 'Bulunduğunuz bölgede (ör. Türkiye) GDPR / AB reklam onay formu zorunlu değildir.'
+                : formError.message;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(formError.message),
+                content: Text(message),
                 behavior: SnackBarBehavior.floating,
               ),
             );

@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:geogame/models/app_context.dart';
-import 'package:geogame/services/auth_ui_service.dart';
 
 class AuthController {
-  // State
-  bool isGoogleLoading = false;
-
   // Colors
   static const Color primaryColor = Color(0xFF4A00E0);
   static const Color secondaryColor = Color(0xFF8E2DE2);
-
-  Future<AuthResult> handleGoogleLogin() async {
-    return await AuthUIService.performGoogleSignIn();
-  }
 
   void navigateToHome(BuildContext context) {
     AppState.selectedIndex = 0;

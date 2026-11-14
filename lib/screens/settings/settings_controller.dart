@@ -58,6 +58,13 @@ class SettingsController {
   bool get antarcticaEnabled => gameFilter.antarctic;
   bool get includeNonUN => gameFilter.includeNonUN;
 
+  /// Tema durumuna göre arka plan renklerini döndürür (Tüm ekranlarla birebir uyumlu)
+  List<Color> getBackgroundColors(bool isDark) {
+    return isDark
+        ? [const Color(0xFF1A1A1A), const Color(0xFF000000)]
+        : [const Color(0xFFF5F7FA), const Color(0xFFC3CFE2)];
+  }
+
   Future<void> signOut() => AuthService.signOut();
   Future<void> navigateToAuth(BuildContext context) =>
       Navigator.pushNamed(context, '/auth');
@@ -81,9 +88,10 @@ class SettingsController {
   void setButtonMode(bool value) =>
       _save(() => gameFilter.isButtonMode = value);
 
-  Future<void> setThemeMode(String value) async {
-    settings.themeMode = value;
-    switch (value) {
+
+  static Future<void> applyTheme([String? mode]) async {
+    final theme = mode ?? settings.themeMode;
+    switch (theme) {
       case 'dark':
         await ThemeModeBuilderConfig.setDark();
         break;
@@ -95,6 +103,11 @@ class SettingsController {
         await ThemeModeBuilderConfig.setSystem();
         break;
     }
+  }
+
+  Future<void> setThemeMode(String value) async {
+    settings.themeMode = value;
+    await applyTheme(value);
     await PreferencesService.saveConfig();
   }
 

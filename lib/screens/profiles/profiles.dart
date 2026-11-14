@@ -147,7 +147,7 @@ class _ProfilesState extends State<Profiles> {
       return ProfilesGuestView(controller: _controller);
     }
 
-    if (_controller.isOffline) {
+    if (_controller.isOffline && _controller.userStats == null) {
       return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: buildCustomAppBar(actions: [buildRefreshAction()]),

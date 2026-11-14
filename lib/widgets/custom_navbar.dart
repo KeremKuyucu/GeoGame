@@ -16,7 +16,6 @@ class CustomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).primaryColor;
     final activeColor = isDark ? const Color(0xFFBB86FC) : const Color(0xFF6200EE);
     final inactiveColor = isDark ? const Color(0xFF8E8E96) : const Color(0xFF6C6C74);
 

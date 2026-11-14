@@ -1,6 +1,4 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/screens/leaderboard/leaderboard_controller.dart';
 
@@ -154,13 +152,17 @@ class LeaderboardPodiumItem extends StatelessWidget {
       _ => Icons.star_rounded,
     };
 
-    return GestureDetector(
-      onTap: () => controller.navigateToProfile(context, user),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Taç / Rozet İkonu
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => controller.navigateToProfile(context, user),
+        borderRadius: BorderRadius.circular(20),
+        splashColor: glowColor.withValues(alpha: 0.25),
+        highlightColor: glowColor.withValues(alpha: 0.12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Taç / Rozet İkonu
           Container(
             padding: EdgeInsets.all(isCenter ? 6 : 4),
             decoration: BoxDecoration(
@@ -209,7 +211,13 @@ class LeaderboardPodiumItem extends StatelessWidget {
                 padding: const EdgeInsets.all(3),
                 child: CircleAvatar(
                   radius: avatarRadius,
-                  backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
+                  backgroundImage: hasAvatar
+                      ? ResizeImage(
+                          NetworkImage(avatarUrl),
+                          width: (avatarRadius * 3).toInt(),
+                          height: (avatarRadius * 3).toInt(),
+                        )
+                      : null,
                   onBackgroundImageError: hasAvatar ? (_, __) {} : null,
                   backgroundColor: isDark
                       ? const Color(0xFF2C2C3E)
@@ -325,16 +333,9 @@ class LeaderboardPodiumItem extends StatelessWidget {
                         gradientColors.last.withValues(alpha: isCenter ? 0.35 : 0.20),
                       ],
               ),
-              border: Border(
-                top: BorderSide(color: color, width: isCenter ? 2.5 : 1.8),
-                left: BorderSide(
-                  color: color.withValues(alpha: isDark ? 0.25 : 0.4),
-                  width: 1,
-                ),
-                right: BorderSide(
-                  color: color.withValues(alpha: isDark ? 0.25 : 0.4),
-                  width: 1,
-                ),
+              border: Border.all(
+                color: color.withValues(alpha: isDark ? 0.35 : 0.55),
+                width: isCenter ? 2.0 : 1.5,
               ),
               boxShadow: [
                 BoxShadow(
@@ -369,7 +370,8 @@ class LeaderboardPodiumItem extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 }
 
@@ -404,387 +406,216 @@ class LeaderboardUserCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isMe
+              ? (isDark
+                  ? const [
+                      Color(0xFF2C194D),
+                      Color(0xFF38153A),
+                    ]
+                  : const [
+                      Color(0xFFF1E6FF),
+                      Color(0xFFFFEBF2),
+                    ])
+              : (isDark
+                  ? const [
+                      Color(0xFF1E1E2C),
+                      Color(0xFF151520),
+                    ]
+                  : const [
+                      Colors.white,
+                      Color(0xFFF7F9FC),
+                    ]),
+        ),
+        border: Border.all(
+          color: isMe
+              ? const Color(0xFFBB86FC).withValues(alpha: 0.8)
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.09)
+                  : Colors.white.withValues(alpha: 0.7)),
+          width: isMe ? 1.8 : 1.0,
+        ),
         boxShadow: [
           BoxShadow(
             color: isMe
                 ? const Color(0xFF6200EE).withValues(alpha: isDark ? 0.35 : 0.20)
                 : Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
-            blurRadius: isMe ? 16 : 10,
-            offset: const Offset(0, 4),
+            blurRadius: isMe ? 14 : 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isMe
-                    ? (isDark
-                        ? [
-                            const Color(0xFF6200EE).withValues(alpha: 0.30),
-                            const Color(0xFFFF2A6D).withValues(alpha: 0.20),
-                          ]
-                        : [
-                            const Color(0xFF6200EE).withValues(alpha: 0.12),
-                            const Color(0xFFFF2A6D).withValues(alpha: 0.08),
-                          ])
-                    : (isDark
-                        ? [
-                            const Color(0xFF1E1E2C).withValues(alpha: 0.75),
-                            const Color(0xFF151520).withValues(alpha: 0.85),
-                          ]
-                        : [
-                            Colors.white.withValues(alpha: 0.88),
-                            const Color(0xFFF7F9FC).withValues(alpha: 0.92),
-                          ]),
-              ),
-              border: Border.all(
-                color: isMe
-                    ? const Color(0xFFBB86FC).withValues(alpha: 0.8)
-                    : (isDark
-                        ? Colors.white.withValues(alpha: 0.09)
-                        : Colors.white.withValues(alpha: 0.7)),
-                width: isMe ? 1.8 : 1.0,
-              ),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => controller.navigateToProfile(context, user),
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  child: Row(
-                    children: [
-                      // Sıra Rozeti (Top 10 için canlı mor/indigo gradyan)
-                      Container(
-                        width: 38,
-                        height: 38,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          gradient: isTopTen
-                              ? LinearGradient(
-                                  colors: [
-                                    const Color(0xFF7C4DFF).withValues(alpha: 0.25),
-                                    const Color(0xFF651FFF).withValues(alpha: 0.40),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                )
-                              : null,
-                          color: isTopTen
-                              ? null
-                              : (isDark
-                                  ? Colors.white.withValues(alpha: 0.06)
-                                  : Colors.black.withValues(alpha: 0.04)),
-                          border: isTopTen
-                              ? Border.all(
-                                  color: const Color(0xFF7C4DFF).withValues(alpha: 0.6),
-                                  width: 1.2,
-                                )
-                              : null,
-                        ),
-                        child: Text(
-                          '$rank',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            color: isTopTen
-                                ? const Color(0xFF9E7BFF)
-                                : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Avatar
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isMe
-                                ? const Color(0xFFFF2A6D)
-                                : (isDark ? Colors.white24 : Colors.grey.shade300),
-                            width: isMe ? 2 : 1,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 20,
-                          backgroundImage:
-                              hasAvatar ? NetworkImage(avatarUrl) : null,
-                          onBackgroundImageError:
-                              hasAvatar ? (_, __) {} : null,
-                          backgroundColor:
-                              Theme.of(context).primaryColor.withValues(alpha: 0.18),
-                          child: !hasAvatar
-                              ? Text(
-                                  name.isNotEmpty ? name[0].toUpperCase() : '?',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // İsim & Alt Bilgiler
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: isDark ? Colors.white : Colors.black87,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (isMe) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 7, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFF6200EE), Color(0xFFFF2A6D)],
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      Localization.t('leaderboard.you').toUpperCase(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 3),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.star_rounded,
-                                  size: 15,
-                                  color: Colors.amber,
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  '$totalScore ${Localization.t('leaderboard.score')}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Detay Ok İkonu
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : Colors.black.withValues(alpha: 0.04),
-                        ),
-                        child: Icon(
-                          Icons.chevron_right_rounded,
-                          size: 18,
-                          color: isDark ? Colors.white54 : Colors.black45,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Kullanıcının Kendi Sıralamasını Sabit Gösteren Yüzen Alt Panel
-class LeaderboardMyRankBar extends StatelessWidget {
-  final LeaderboardController controller;
-
-  const LeaderboardMyRankBar({super.key, required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final int? myRank = controller.currentUserRank;
-    final myEntry = controller.currentUserEntry;
-
-    if (myRank == null || myEntry == null) {
-      return const SizedBox.shrink();
-    }
-
-    final int score = myEntry['total_score'] is int
-        ? myEntry['total_score'] as int
-        : (int.tryParse(myEntry['total_score']?.toString() ?? '0') ?? 0);
-    final String avatarUrl = myEntry['avatar_url']?.toString() ?? '';
-    final String name = (myEntry['name']?.toString().trim().isNotEmpty ?? false)
-        ? myEntry['name'].toString()
-        : Localization.t('player');
-    final bool hasAvatar = avatarUrl.trim().isNotEmpty;
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF6200EE).withValues(alpha: isDark ? 0.45 : 0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [
-                        const Color(0xFF2A164D).withValues(alpha: 0.92),
-                        const Color(0xFF1E1435).withValues(alpha: 0.95),
-                      ]
-                    : [
-                        const Color(0xFFF3E8FF).withValues(alpha: 0.95),
-                        Colors.white.withValues(alpha: 0.95),
-                      ],
-              ),
-              border: Border.all(
-                color: const Color(0xFFBB86FC).withValues(alpha: 0.7),
-                width: 1.5,
-              ),
-            ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => controller.navigateToProfile(context, user),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                // Sıralama Rozeti
+                // Sıra Rozeti (Top 10 için canlı mor/indigo gradyan)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF6200EE), Color(0xFFFF2A6D)],
-                    ),
                     borderRadius: BorderRadius.circular(12),
+                    gradient: isTopTen
+                        ? LinearGradient(
+                            colors: [
+                              const Color(0xFF7C4DFF).withValues(alpha: 0.25),
+                              const Color(0xFF651FFF).withValues(alpha: 0.40),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: isTopTen
+                        ? null
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : Colors.black.withValues(alpha: 0.04)),
+                    border: isTopTen
+                        ? Border.all(
+                            color: const Color(0xFF7C4DFF).withValues(alpha: 0.6),
+                            width: 1.2,
+                          )
+                        : null,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.military_tech_rounded,
-                          size: 16, color: Colors.white),
-                      const SizedBox(width: 4),
-                      Text(
-                        '#$myRank',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    '$rank',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      color: isTopTen
+                          ? const Color(0xFF9E7BFF)
+                          : (isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+                      fontSize: 15,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
 
                 // Avatar
-                CircleAvatar(
-                  radius: 17,
-                  backgroundImage: hasAvatar ? NetworkImage(avatarUrl) : null,
-                  onBackgroundImageError: hasAvatar ? (_, __) {} : null,
-                  backgroundColor: const Color(0xFF6200EE).withValues(alpha: 0.2),
-                  child: !hasAvatar
-                      ? Text(
-                          name.isNotEmpty ? name[0].toUpperCase() : '?',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF6200EE),
-                          ),
-                        )
-                      : null,
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isMe
+                          ? const Color(0xFFFF2A6D)
+                          : (isDark ? Colors.white24 : Colors.grey.shade300),
+                      width: isMe ? 2 : 1,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: hasAvatar
+                        ? ResizeImage(
+                            NetworkImage(avatarUrl),
+                            width: 80,
+                            height: 80,
+                          )
+                        : null,
+                    onBackgroundImageError:
+                        hasAvatar ? (_, __) {} : null,
+                    backgroundColor:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.18),
+                    child: !hasAvatar
+                        ? Text(
+                            name.isNotEmpty ? name[0].toUpperCase() : '?',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          )
+                        : null,
+                  ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
 
-                // Başlık & Puan
+                // İsim & Alt Bilgiler
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        Localization.t('leaderboard.your_rank'),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (isMe) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF6200EE), Color(0xFFFF2A6D)],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                Localization.t('leaderboard.you').toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                      Text(
-                        '$score ${Localization.t('leaderboard.score')}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFFFFB300),
-                        ),
+                      const SizedBox(height: 3),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 15,
+                            color: Colors.amber,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '$totalScore ${Localization.t('leaderboard.score')}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
 
-                // Profil Butonu
-                TextButton(
-                  onPressed: () => controller.navigateToProfile(context, myEntry),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF6200EE).withValues(alpha: 0.15),
-                    foregroundColor: const Color(0xFFBB86FC),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                // Detay Ok İkonu
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.black.withValues(alpha: 0.04),
                   ),
-                  child: Text(
-                    Localization.t('nav.profile'),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    size: 18,
+                    color: isDark ? Colors.white54 : Colors.black45,
                   ),
                 ),
               ],

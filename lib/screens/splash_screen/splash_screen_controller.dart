@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:theme_mode_builder/theme_mode_builder.dart';
 
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
+import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/bonus_service.dart';
 import 'package:geogame/services/game_log_service.dart';
+import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/services/telemetry_service.dart';
 
 class SplashScreenController {
   Future<void> initialize() async {
     try {
-      await Country.loadCountries();
+      AdService.initialize();
+      TelemetryService.init();
+      AuthService.initAuthStateListener();
+
+      await Future.wait([
+        Country.loadCountries(),
+        Localization.init(),
+      ]);
       AppState.activePool = SettingsController.filteredCountries;
 
-      // İnternet olmasa bile uygulamanın açılışını engellememesi için timeout ve hata koruması
+      // timeout ve hata koruması
       await AuthService.checkSession().timeout(
         const Duration(seconds: 2),
         onTimeout: () {
@@ -32,19 +41,6 @@ class SplashScreenController {
       GameLogService.syncPendingLogs().catchError((e) {
         debugPrint('⚠️ GameLogService.syncPendingLogs error: $e');
       });
-
-      switch (SettingsController.settings.themeMode) {
-        case 'dark':
-          await ThemeModeBuilderConfig.setDark();
-          break;
-        case 'light':
-          await ThemeModeBuilderConfig.setLight();
-          break;
-        case 'system':
-        default:
-          await ThemeModeBuilderConfig.setSystem();
-          break;
-      }
     } catch (e) {
       debugPrint('❌ SplashScreenController initialize error: $e');
     }

@@ -1,59 +1,27 @@
-import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:theme_mode_builder/theme_mode_builder.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:geogame/app_routes.dart';
-
-import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/services/localization_service.dart';
+import 'package:geogame/app.dart';
+import 'package:geogame/config/supabase_config.dart';
+import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/services/telemetry_service.dart';
-import 'package:geogame/services/ad_service.dart';
-
-import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/widgets/restart_widget.dart';
-import 'package:geogame/models/app_context.dart';
-
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Global hata yakalama (Flutter UI & Framework hataları)
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    TelemetryService.sendError(
-      event: 'flutter_uncaught_error',
-      message: details.exceptionAsString(),
-      stackTrace: details.stack,
-      metadata: {
-        'library': details.library,
-        if (details.context != null) 'context': details.context.toString(),
-      },
-    );
-  };
+  TelemetryService.setupErrorHandling();
 
-  // Asenkron ve platform seviyesi yakalanmamış hatalar
-  PlatformDispatcher.instance.onError = (error, stack) {
-    TelemetryService.sendError(
-      event: 'platform_uncaught_error',
-      message: error.toString(),
-      stackTrace: stack,
-    );
-    return false;
-  };
+  await Future.wait([
+    Supabase.initialize(
+      url: SupabaseConfig.url,
+      publishableKey: SupabaseConfig.publishableKey,
+    ),
+    PreferencesService.loadConfig(),
+  ]);
 
-  await Supabase.initialize(
-    url: 'https://brgwnlbgasameiuuoxte.supabase.co',
-    publishableKey: 'sb_publishable_dYkNlqj0PL3jZsq2Kt0Yyg_pi1gyIdl',
-  );
-  await PreferencesService.loadConfig();
-  await Localization.init();
-
-  TelemetryService.init();
-  AdService.initialize();
-  AuthService.initAuthStateListener();
+  await SettingsController.applyTheme();
 
   runApp(
     const RestartWidget(
@@ -61,41 +29,3 @@ void main() async {
     ),
   );
 }
-
-class Geogame extends StatelessWidget {
-  const Geogame({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ThemeModeBuilder(
-      builder: (BuildContext context, ThemeMode themeMode) {
-        return MaterialApp(
-          scaffoldMessengerKey: AppState.scaffoldMessengerKey,
-          debugShowCheckedModeBanner: false,
-          title: 'GeoGame',
-          themeMode: themeMode,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              brightness: Brightness.light,
-              seedColor: Colors.red,
-            ),
-            useMaterial3: true,
-          ),
-          darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              brightness: Brightness.dark,
-              seedColor: Colors.red,
-            ),
-            useMaterial3: true,
-          ),
-          initialRoute: '/',
-          onGenerateRoute: AppRoutes.generateRoute,
-          onUnknownRoute: (_) => MaterialPageRoute(
-            builder: (context) => const SplashScreen(),
-          ),
-        );
-      },
-    );
-  }
-}
-

@@ -35,13 +35,43 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(
-          Localization.t('GeoGame').toUpperCase(),
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-            color: Color(0xff6200ee),
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6200EE), Color(0xFFFF2A6D)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6200EE).withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.sports_esports_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              Localization.t('GeoGame').toUpperCase(),
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2,
+                color: isDark ? Colors.white : const Color(0xFF2C2C3E),
+                fontSize: 18,
+              ),
+            ),
+          ],
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,

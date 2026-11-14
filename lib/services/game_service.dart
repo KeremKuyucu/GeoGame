@@ -23,6 +23,13 @@ class GameService {
   static List<GameButton> _buttons = [];
   static final List<String> _distanceGuesses = [];
 
+  // --- Shuffle Bag & Soru Seçim Hafızası ---
+  static List<Country> _unaskedDeck = [];
+  static final List<String> _recentTargetIso3s = [];
+  static final List<String> _lastRoundOptionIso3s = [];
+  static final List<String> _recentBorderPathStarts = [];
+  static int _lastPoolSize = 0;
+
   static GameButton buttonAt(int index) => _buttons[index];
   static int get buttonCount => _buttons.length;
 
@@ -42,6 +49,11 @@ class GameService {
 
   static Future<void> initializeGame(GameType type) async {
     _currentGameType = type;
+    // Oyun başladığında deste ve geçmişi temizle ki yeni taze bir deste oluşsun
+    _unaskedDeck.clear();
+    _lastRoundOptionIso3s.clear();
+    _lastPoolSize = 0;
+
     final multiplier = _poolMultiplier();
     final scores = getInitialScores(type, multiplier);
     debugPrint(
@@ -125,23 +137,57 @@ class GameService {
       return;
     }
 
-    // Hedef ülkeyi rastgele seç
-    AppState.targetCountry = available.pickRandom(_random);
+    // Deste boşsa veya havuz filtreleri değiştiyse desteyi yeniden doldur
+    final bool poolChanged = _lastPoolSize != available.length ||
+        _unaskedDeck.any((c) => !available.any((a) => a.iso3 == c.iso3));
+
+    if (_unaskedDeck.isEmpty || poolChanged) {
+      _lastPoolSize = available.length;
+      final newDeck = List<Country>.from(available)..shuffle(_random);
+
+      // Yeni destenin ilk çekilecek elemanı (son eleman), az önce sorulmuş ülkeyle
+      // aynıysa üst üste gelmemesi için destenin içindeki farklı bir ülkeyle takas et
+      if (_recentTargetIso3s.isNotEmpty && newDeck.length > 1) {
+        final lastAsked = _recentTargetIso3s.last;
+        if (newDeck.last.iso3 == lastAsked) {
+          final swapIndex = _random.nextInt(newDeck.length - 1);
+          final temp = newDeck.last;
+          newDeck.last = newDeck[swapIndex];
+          newDeck[swapIndex] = temp;
+        }
+      }
+      _unaskedDeck = newDeck;
+    }
+
+    // Desteden sıradaki hedef ülkeyi çek (tüm havuz bitene kadar tekrar etmez)
+    final target = _unaskedDeck.removeLast();
+    AppState.targetCountry = target;
+
+    // Geçmiş tamponuna ekle (en fazla 15 eleman)
+    _recentTargetIso3s.add(target.iso3);
+    if (_recentTargetIso3s.length > 15) {
+      _recentTargetIso3s.removeAt(0);
+    }
 
     // Çeldiricileri optimize edilmiş algoritma ile seç
-    final distractors = _getDistractors(available, AppState.targetCountry);
+    final distractors = _getDistractors(available, target);
 
     // Seçenekleri oluştur ve karıştır
-    final options = [AppState.targetCountry, ...distractors]..shuffle(_random);
+    final options = [target, ...distractors]..shuffle(_random);
     _buttons = GameButton.createButtons(options);
+
+    // Sonraki soruda aynı şıkların tekrar gelmemesi için son şıkları kaydet
+    _lastRoundOptionIso3s
+      ..clear()
+      ..addAll(options.map((c) => c.iso3));
 
     GameLogService.startNewQuestion();
   }
 
-  /// Optimize edilmiş çeldirici algoritması
+  /// Optimize edilmiş, tekrar önleyici çeldirici algoritması
   static List<Country> _getDistractors(
       List<Country> available, Country target) {
-    // 1. Aynı kıtadan adayları filtrele (Stream/Iterables kullanarak memory allocation'ı azalt)
+    // 1. Aynı kıtadan adayları filtrele
     final sameContinentCandidates = available
         .where((c) =>
             c.iso3 != target.iso3 &&
@@ -150,12 +196,28 @@ class GameService {
 
     final distractors = <Country>[];
 
-    // Aynı kıtadan rastgele 3 tane al
+    // Bir önceki soruda şık olarak çıkmamış "taze" aynı kıta ülkelerini önceliklendir
     if (sameContinentCandidates.isNotEmpty) {
-      distractors.addAll(sameContinentCandidates.pickRandomCount(3, _random));
+      final freshSameContinent = sameContinentCandidates
+          .where((c) => !_lastRoundOptionIso3s.contains(c.iso3))
+          .toList();
+
+      if (freshSameContinent.length >= 3) {
+        distractors.addAll(freshSameContinent.pickRandomCount(3, _random));
+      } else {
+        distractors.addAll(freshSameContinent);
+        final remainingSameContinent = sameContinentCandidates
+            .where((c) => !distractors.any((d) => d.iso3 == c.iso3))
+            .toList();
+        final neededFromSame = math.min(3 - distractors.length, remainingSameContinent.length);
+        if (neededFromSame > 0) {
+          distractors.addAll(
+              remainingSameContinent.pickRandomCount(neededFromSame, _random));
+        }
+      }
     }
 
-    // Eğer yetmediyse, kalan havuzdan rastgele tamamla
+    // 2. Eğer aynı kıtadan 3 tane çıkmadıysa, kalan havuzdan tamamla
     if (distractors.length < 3) {
       final needed = 3 - distractors.length;
       final otherCandidates = available
@@ -164,7 +226,24 @@ class GameService {
               !distractors.any((d) => d.iso3 == c.iso3))
           .toList();
 
-      distractors.addAll(otherCandidates.pickRandomCount(needed, _random));
+      // Havuzdan da öncelikle önceki soruda şıklarda yer almamış ülkeleri seç
+      final freshOther = otherCandidates
+          .where((c) => !_lastRoundOptionIso3s.contains(c.iso3))
+          .toList();
+
+      if (freshOther.length >= needed) {
+        distractors.addAll(freshOther.pickRandomCount(needed, _random));
+      } else {
+        distractors.addAll(freshOther);
+        final stillNeeded = 3 - distractors.length;
+        final restCandidates = otherCandidates
+            .where((c) => !distractors.any((d) => d.iso3 == c.iso3))
+            .toList();
+        if (stillNeeded > 0 && restCandidates.isNotEmpty) {
+          distractors.addAll(restCandidates.pickRandomCount(
+              math.min(stillNeeded, restCandidates.length), _random));
+        }
+      }
     }
 
     return distractors;
@@ -313,15 +392,22 @@ class GameService {
   // --------------------------------------------------------------------------
 
   static BorderPathGameData? createBorderPathGame() {
-    // Sınır komşusu olan ülkeleri filtrele (sadece bir kez yapılmalı aslında ama şimdilik burada kalsın)
     final connectedCountries =
         AppState.activePool.where((c) => c.borders.isNotEmpty).toList();
 
     if (connectedCountries.length < 2) return null;
 
+    // Son sorulmamış başlangıç ülkelerini önceliklendir (aynı soru tekrarını engeller)
+    final freshStartCandidates = connectedCountries
+        .where((c) => !_recentBorderPathStarts.contains(c.iso3))
+        .toList();
+    final startPool = freshStartCandidates.length >= 2
+        ? freshStartCandidates
+        : connectedCountries;
+
     // Deneme sayısını sınırlayarak sonsuz döngüyü engelle
-    for (int i = 0; i < 15; i++) {
-      final startCountry = connectedCountries.pickRandom(_random);
+    for (int i = 0; i < 20; i++) {
+      final startCountry = startPool.pickRandom(_random);
 
       // BFS ile erişilebilir mesafeleri al
       // NOT: _countryMap artık önbellekten geliyor, performans kaybı yok.
@@ -336,6 +422,12 @@ class GameService {
 
       if (validTargets.isNotEmpty) {
         final targetCountry = validTargets.pickRandom(_random);
+
+        _recentBorderPathStarts.add(startCountry.iso3);
+        if (_recentBorderPathStarts.length > 5) {
+          _recentBorderPathStarts.removeAt(0);
+        }
+
         return BorderPathGameData(
           startCountry: startCountry,
           targetCountry: targetCountry,
