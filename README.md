@@ -16,9 +16,9 @@
 **GeoGame** is a modern, cross-platform geography trivia and strategy game designed to test and sharpen your world knowledge through interactive challenges.
 
 * 🎮 **7 Unique Game Modes:** Coat of Arms, Flags, Capitals, Distance (Wordle-style), Borderline, Border Path, and Interactive Map.
-* 📱 **Cross-Platform:** Available on **Android**, **Windows (Desktop)**, and **Web**.
+* 📱 **Cross-Platform:** Available on **Android** and **Web**.
 * 🌐 **Full 7-Language Localization:** English 🇬🇧, Turkish 🇹🇷, German 🇩🇪, French 🇫🇷, Spanish 🇪🇸, Portuguese 🇵🇹, Russian 🇷🇺.
-* 🏆 **Competitive & Social:** Real-time global leaderboards, detailed player stats, and secure PIN-protected Child Mode.
+* 🏆 **Competitive & Social:** Real-time global leaderboards, detailed player stats.
 * 📴 **Offline Ready:** Play without an internet connection; scores automatically sync when reconnected.
 
 ---
@@ -26,7 +26,7 @@
 ## 🚀 Play & Download
 
 * 🌐 [**Official Web App**](https://geogame.keremkuyucu.com.tr) – Play instantly in your browser.
-* 📦 [**GitHub Releases**](https://github.com/keremkuyucu/GeoGame/releases/latest) – Download Windows desktop installers and Android APKs.
+* 📦 [**GitHub Releases**](https://github.com/keremkuyucu/GeoGame/releases/latest) – Download Android APKs.
 * 📱 [**Google Play Store**](https://play.google.com/store/apps/details?id=com.keremkuyucu.geogame) – Get it on your Android device.
 
 ---
@@ -80,9 +80,6 @@ To build and run the project locally:
 
 3. **Run the App:**
    ```bash
-   # Windows Desktop
-   flutter run -d windows
-
    # Android Device / Emulator
    flutter run -d android
 

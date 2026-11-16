@@ -45,9 +45,6 @@ Focus on the entire globe or select specific continents (Europe, Asia, Africa, A
 🏆 Global Live Leaderboard:
 Earn points across all 7 modes, compete against world geography masters, and climb to the top of the podium!
 
-👶 Safe Child Mode:
-Enable PIN-protected Child Mode to disable external links and online competition, creating a peaceful, family-friendly learning environment.
-
 🌙 Dark & Light Themes:
 Eye-friendly dark mode for evening sessions and crisp light theme for daytime play.
 
