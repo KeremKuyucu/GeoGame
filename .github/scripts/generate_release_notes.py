@@ -161,34 +161,44 @@ You MUST strictly follow the format, style, and tone of this official repository
 {gh_template}
 
 Strict Rules for GitHub Notes:
-1. English Section First:
-   - Header format: "## 📦 Version {version} – <Concise, Impactful Title Highlighting Key Additions>"
-   - "### 🚀 Changes":
-     - Group into bold topic categories (e.g., "**Feature or System Name:**").
+1. English ONLY:
+   - Generate release notes purely in English. Do NOT include any Turkish section, translations, or separators.
+2. Title Format:
+   - Start directly with: "## <Short Release Title in English>" (e.g., "## Architecture Refactoring & Build Automation").
+   - DO NOT repeat or include the version number (e.g., do NOT write "GeoGame v{version}" or "Version {version}") in the title or anywhere in the body, as GitHub Release already displays the version number in its header.
+3. Categories and Order:
+   - "> **⚠️ Breaking Changes**":
+     - Place this blockquote at the very top ONLY if there are breaking changes (e.g., breaking API alterations, migration requirements, minimum SDK bumps):
+       > **⚠️ Breaking Changes**
+       > - Description of breaking change
+     - CRITICAL: If there are NO breaking changes, COMPLETELY OMIT AND SKIP this block entirely. Do NOT output the header, do NOT write "(if any)", and do NOT write "None".
+   - "### 🚀 Features & Improvements":
+     - Group into bold topic categories (e.g., "* **Feature or Improvement Name:**").
      - Include detailed sub-bullets explaining the technical architecture, key classes/files, and user impact.
      - DO NOT invent generic filler (such as "minor UI glitches" or "routine maintenance") if specific features or workflows were added in the commits!
-   - "### 🐛 Bug Fixes": Specific bug fixes with brief cause and resolution. If none, write "* None."
-   - "### ⚠️ Breaking Changes (if any)": If none, write "* None."
-2. Separator line: "---"
-3. Turkish Section Second:
-   - Header format: "## 📦 Sürüm {version} – <Türkçe Açıklayıcı Başlık>"
-   - "### 🚀 Değişiklikler": Match the English section bullet-for-bullet in rich, fluent, natural Turkish.
-   - "### 🐛 Hata Düzeltmeleri": Açıklayıcı hata düzeltmeleri listesi. Yoksa "* Yok."
-   - "### ⚠️ Kırıcı Değişiklikler (varsa)": Yoksa "* Yok."
+   - "### 🐛 Bug Fixes":
+     - Specific bug fixes with brief cause and resolution. If none, write "* None."
+4. Do NOT output instruction remnants such as "(if any)" or "(varsa)".
 
 ============================================================
 REQUIREMENT 2: Google Play Store Release Notes (RELEASE_PLAY_STORE_{version}.md)
 ============================================================
-You MUST follow this template and provide exactly 7 localized release notes using <locale>...</locale> tags:
+You MUST follow this template and provide localized release notes for all 7 supported languages of GeoGame:
+1. eng -> <en-US> (English)
+2. tur -> <tr-TR> (Türkçe)
+3. deu -> <de-DE> (Deutsch)
+4. spa -> <es-ES> (Español)
+5. fra -> <fr-FR> (Français)
+6. por -> <pt-BR> and <pt-PT> (Português)
+7. rus -> <ru-RU> (Русский)
 
 {play_template}
 
-Locales required:
-<en-US>, <tr-TR>, <de-DE>, <fr-FR>, <pt-PT>, <ru-RU>, <es-ES>
-
-CRITICAL PLAY STORE CONSTRAINTS:
-- HARD LIMIT: Each language's text inside <locale> and </locale> MUST BE UNDER 500 CHARACTERS (Google Play Console strictly rejects anything over 500).
-- User-facing, engaging, highlighting the most exciting features and stability improvements.
+CRITICAL PLAY STORE INSTRUCTIONS:
+- Full Localization Required: Unlike GitHub notes (which are English-only), Google Play Store notes MUST BE FULLY LOCALIZED AND TRANSLATED into ALL 7 supported languages above, especially <tr-TR> (Türkçe) and <pt-BR> / <pt-PT> (Português).
+- ABSOLUTELY NO PLACEHOLDERS: NEVER output placeholder text (e.g. "buraya girin", "enter here", "[...]", "yapıştırın") or leave tags blank. Every single locale tag MUST contain fully written, engaging, and professional release notes.
+- HARD LIMIT: Each language's text inside <locale> and </locale> MUST BE UNDER 500 CHARACTERS (Google Play Console strictly rejects anything over 500 characters). Aim for 250-400 characters per locale.
+- Tone: User-facing, engaging, highlighting the most exciting features and stability improvements for players.
 
 ============================================================
 RESPONSE FORMAT:
@@ -234,20 +244,30 @@ Respond ONLY with a valid JSON object with exactly two keys:
 
 def validate_play_store_notes(content: str) -> bool:
     print("\n[*] Validating Play Store character limits (Max 500 per locale):")
-    locales = ["en-US", "tr-TR", "de-DE", "fr-FR", "pt-PT", "ru-RU", "es-ES"]
+    required_locales = ["en-US", "tr-TR", "de-DE", "es-ES", "fr-FR", "ru-RU"]
+    pt_found = ("<pt-BR>" in content) or ("<pt-PT>" in content)
+
+    pattern = r"<([a-zA-Z]{2}-[a-zA-Z]{2})>\s*(.*?)\s*</\1>"
+    matches = dict(re.findall(pattern, content, re.DOTALL))
+
     all_ok = True
-    for loc in locales:
-        pattern = rf"<{loc}>(.*?)</{loc}>"
-        match = re.search(pattern, content, re.DOTALL)
-        if match:
-            text = match.group(1).strip()
-            char_count = len(text)
-            status = "OK" if char_count <= 500 else "EXCEEDED"
-            if char_count > 500:
-                all_ok = False
-            print(f"    - {loc}: {char_count} chars [{status}]")
-        else:
-            print(f"    - {loc}: NOT FOUND (warning)")
+    for loc, text in matches.items():
+        text = text.strip()
+        char_count = len(text)
+        is_placeholder = any(p in text.lower() for p in ["buraya girin", "enter here", "[", "yapıştırın"])
+        status = "OK" if char_count <= 500 and not is_placeholder else "INVALID"
+        if char_count > 500 or is_placeholder:
+            all_ok = False
+        print(f"    - {loc}: {char_count} chars [{status}]" + (" (PLACEHOLDER DETECTED!)" if is_placeholder else ""))
+
+    for req in required_locales:
+        if req not in matches:
+            print(f"    - {req}: NOT FOUND (warning)")
+            all_ok = False
+    if not pt_found:
+        print("    - pt-BR / pt-PT: NOT FOUND (warning)")
+        all_ok = False
+
     return all_ok
 
 

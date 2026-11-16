@@ -1,63 +1,39 @@
-# Release Template / Sürüm Şablonu
+# Release Template
 
-Bu dosyayı yeni sürüm notları yazarken şablon olarak kullanın.
-Aşağıdaki şablonu kopyalayıp `[PLACEHOLDER]` kısımlarını doldurun.
-Dosya adı RELEASE_X.X.X.md olacak.
+Use this file as a template when writing release notes for GeoGame.
+Copy the template below and fill in the placeholders.
+File name: `RELEASE_X.X.X.md`
+
 ---
 
-## 📦 Version [X.X.X] – [Short Title in English]
+## [Short Release Title]
 
-### 🚀 Changes
+> **⚠️ Breaking Changes**
+> - [Breaking change description]
 
-* **[Feature/Fix Name]:**
-  [Description of the change in English]
+### 🚀 Features & Improvements
 
-* **[Feature/Fix Name]:**
-  [Description of the change in English]
+* **[Feature/Improvement Name]:**
+  [Description of the feature or improvement]
 
-* **[Feature/Fix Name]:**
-  [Description of the change in English]
+* **[Feature/Improvement Name]:**
+  [Description of the feature or improvement]
 
 ### 🐛 Bug Fixes
 
 * [Bug fix description]
 * [Bug fix description]
 
-### ⚠️ Breaking Changes (if any)
-
-* [Breaking change description]
-
 ---
 
-## 📦 Sürüm [X.X.X] – [Kısa Başlık Türkçe]
+# Example
 
-### 🚀 Değişiklikler
+## Architecture Refactoring & Build Automation
 
-* **[Özellik/Düzeltme Adı]:**
-  [Değişikliğin Türkçe açıklaması]
+> **⚠️ Breaking Changes**
+> - Minimum supported Android SDK bumped from API 21 to API 24.
 
-* **[Özellik/Düzeltme Adı]:**
-  [Değişikliğin Türkçe açıklaması]
-
-* **[Özellik/Düzeltme Adı]:**
-  [Değişikliğin Türkçe açıklaması]
-
-### 🐛 Hata Düzeltmeleri
-
-* [Hata düzeltmesi açıklaması]
-* [Hata düzeltmesi açıklaması]
-
-### ⚠️ Kırıcı Değişiklikler (varsa)
-
-* [Kırıcı değişiklik açıklaması]
-
----
-
-# Örnek / Example
-
-## 📦 Version 1.5.6 – Architecture Refactoring & Build Automation
-
-### 🚀 Changes
+### 🚀 Features & Improvements
 
 * **Authentication System Refactoring:**
   Separated UI logic from core authentication service with new `AuthUIService` and `AuthScreen` components.
@@ -76,38 +52,16 @@ Dosya adı RELEASE_X.X.X.md olacak.
 
 ---
 
-## 📦 Sürüm 1.5.6 – Mimari Yeniden Yapılandırma ve Derleme Otomasyonu
+# Emoji Reference
 
-### 🚀 Değişiklikler
-
-* **Kimlik Doğrulama Sistemi Yeniden Yapılandırması:**
-  UI mantığı, yeni `AuthUIService` ve `AuthScreen` bileşenleriyle çekirdek servisten ayrıldı.
-
-* **Gelişmiş Derleme Otomasyonu:**
-  - Klavye navigasyonu ile interaktif platform seçim menüsü
-  - Akıllı algılamalı GitHub Release otomasyonu
-
-* **Güvenlik İyileştirmeleri:**
-  Android imza bilgileri harici `key.properties` dosyasına taşındı.
-
-### 🐛 Hata Düzeltmeleri
-
-* Android cihazlarda güncelleme bildiriminin görünmemesi düzeltildi
-* Import bağımlılık sorunları giderildi
-
----
-
-# Emoji Referansı / Emoji Reference
-
-| Emoji | Kullanım / Usage |
-|-------|------------------|
-| 📦 | Sürüm başlığı / Version header |
-| 🚀 | Yeni özellikler / New features |
-| 🐛 | Hata düzeltmeleri / Bug fixes |
-| ⚠️ | Kırıcı değişiklikler / Breaking changes |
-| 🔒 | Güvenlik / Security |
-| ⚡ | Performans / Performance |
-| 🎨 | UI/UX değişiklikleri / UI/UX changes |
-| 🔧 | Yapılandırma / Configuration |
-| 📝 | Dokümantasyon / Documentation |
-| 🌐 | Yerelleştirme / Localization |
+| Emoji | Usage |
+|-------|-------|
+| 🚀 | Features & improvements |
+| 🐛 | Bug fixes |
+| ⚠️ | Breaking changes |
+| 🔒 | Security |
+| ⚡ | Performance |
+| 🎨 | UI/UX changes |
+| 🔧 | Configuration |
+| 📝 | Documentation |
+| 🌐 | Localization |
