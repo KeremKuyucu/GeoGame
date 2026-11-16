@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/auth_service.dart';
 
@@ -30,10 +29,10 @@ class ProfilesController {
   bool get isAuthenticated => AuthService.isAuthenticated;
 
   /// Kullanıcı adı
-  String get userName => AppState.user.name;
+  String get userName => AuthService.user.name;
 
   /// Kullanıcı avatar URL'si
-  String get userAvatar => AppState.user.avatarUrl;
+  String get userAvatar => AuthService.user.avatarUrl;
 
   /// Toplam skor
   int get totalScore {
@@ -160,7 +159,7 @@ class ProfilesController {
     result['country_stats'] = countryStatsData;
 
     for (var type in GameType.values) {
-      final String mode = AppState.getGameModeKey(type);
+      final String mode = type.key;
       final dynamic rawModeStat = modesData[mode];
       final modeStat = rawModeStat is Map ? Map<String, dynamic>.from(rawModeStat) : {};
 

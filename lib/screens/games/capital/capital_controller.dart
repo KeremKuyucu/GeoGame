@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
@@ -25,7 +25,7 @@ class CapitalGameController {
 
   Color get accentColor => const Color(0xFF673AB7);
 
-  String get targetCapital => AppState.targetCountry.capital;
+  String get targetCapital => Country.targetCountry.capital;
 
   bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
   bool get isDark => SettingsController.settings.darkTheme;

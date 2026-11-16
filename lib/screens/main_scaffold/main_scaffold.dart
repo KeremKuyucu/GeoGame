@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/widgets/custom_navbar.dart';
 import 'package:geogame/app_routes.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/screens/main_scaffold/main_scaffold_controller.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -25,12 +25,12 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   void initState() {
     super.initState();
-    AppState.userNotifier.addListener(_onUserChanged);
+    AuthService.userNotifier.addListener(_onUserChanged);
   }
 
   @override
   void dispose() {
-    AppState.userNotifier.removeListener(_onUserChanged);
+    AuthService.userNotifier.removeListener(_onUserChanged);
     super.dispose();
   }
 

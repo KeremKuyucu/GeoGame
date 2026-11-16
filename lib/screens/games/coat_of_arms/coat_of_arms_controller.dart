@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
@@ -25,9 +25,9 @@ class CoatOfArmsGameController {
 
   Color get accentColor => const Color(0xFF7B1FA2);
 
-  String get targetCoatOfArmsUrl => AppState.targetCountry.coatOfArmsUrl;
+  String get targetCoatOfArmsUrl => Country.targetCountry.coatOfArmsUrl;
   String get targetCountryName =>
-      AppState.targetCountry.getLocalizedName(SettingsController.settings.language);
+      Country.targetCountry.getLocalizedName(SettingsController.settings.language);
 
   bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
 

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:geogame/models/app_context.dart';
 
 /// MainScaffold için controller
 class MainScaffoldController {
+  static int selectedIndex = 0;
+
   /// Tab değişikliğini işler
   void onTabChanged(
       BuildContext context, int index, VoidCallback onStateChanged) {
@@ -12,10 +13,10 @@ class MainScaffoldController {
       currentFocus.unfocus();
     }
 
-    AppState.selectedIndex = index;
+    selectedIndex = index;
     onStateChanged();
   }
 
   /// Mevcut tab index'i döndürür
-  int get currentIndex => AppState.selectedIndex;
+  int get currentIndex => selectedIndex;
 }

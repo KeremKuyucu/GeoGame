@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
@@ -30,12 +30,12 @@ class BorderLineGameController {
   bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
   bool get isDark => SettingsController.settings.darkTheme;
 
-  String get targetIso3 => AppState.targetCountry.iso3;
+  String get targetIso3 => Country.targetCountry.iso3;
 
   Future<void> initializeGame() async {
     await GameService.initializeGame(GameType.borderline);
     countryShapePathFuture =
-        GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);
+        GeoJsonService.loadCountryPath(Country.targetCountry.iso3);
   }
 
   Future<bool> checkAnswer(int index) async {
@@ -50,7 +50,7 @@ class BorderLineGameController {
 
     if (isCorrect) {
       countryShapePathFuture =
-          GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);
+          GeoJsonService.loadCountryPath(Country.targetCountry.iso3);
     }
 
     return isCorrect;
@@ -60,7 +60,7 @@ class BorderLineGameController {
     final String passCountry = await GameService.handlePass();
     textController.clear();
     countryShapePathFuture =
-        GeoJsonService.loadCountryPath(AppState.targetCountry.iso3);
+        GeoJsonService.loadCountryPath(Country.targetCountry.iso3);
     return passCountry;
   }
 

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/telemetry_service.dart';
@@ -63,7 +63,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
       await Supabase.instance.client.from('feedbacks').insert({
         'sebep': sebep,
         'message': message,
-        'isim': AppState.user.name,
+        'isim': AuthService.user.name,
         'user_id': user.id,
         'app': 'GeoGame',
       });

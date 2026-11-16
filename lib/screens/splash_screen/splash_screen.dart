@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:geogame/widgets/splash_screen_widgets.dart';
-
 import 'package:geogame/screens/splash_screen/splash_screen_controller.dart';
 
 class SplashScreen extends StatefulWidget {

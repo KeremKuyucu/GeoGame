@@ -1,48 +1,29 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:theme_mode_builder/theme_mode_builder.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:geogame/models/app_settings.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold_controller.dart';
+import 'package:geogame/services/ad_service.dart';
 import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/preferences_service.dart';
+import 'package:geogame/widgets/feedback_dialog.dart';
 import 'package:geogame/widgets/restart_widget.dart';
+
+export 'package:geogame/models/app_settings.dart';
+export 'package:geogame/models/countries.dart' show GameFilter;
 
 class SettingsController {
   static AppSettings settings = AppSettings();
   static GameFilter gameFilter = GameFilter();
   static String get language => settings.language;
-  static List<Country> get filteredCountries {
-    final f = gameFilter;
-    if (AppState.allCountries.isEmpty ||
-        (!f.northAmerica &&
-            !f.southAmerica &&
-            !f.asia &&
-            !f.africa &&
-            !f.europe &&
-            !f.oceania &&
-            !f.antarctic)) {
-      debugPrint('🌍 [SettingsController] Hiçbir kıta seçili değil veya ülke listesi boş (0 ülke).');
-      return [];
-    }
-    final countries = AppState.allCountries.where((c) {
-      if (!f.includeNonUN && !c.isUNMember) return false;
-      return (f.europe && c.continents.contains('Europe')) ||
-          (f.asia && c.continents.contains('Asia')) ||
-          (f.africa && c.continents.contains('Africa')) ||
-          (f.oceania && c.continents.contains('Oceania')) ||
-          (f.northAmerica && c.continents.contains('North America')) ||
-          (f.southAmerica && c.continents.contains('South America')) ||
-          (f.antarctic &&
-              (c.continents.contains('Antarctica') ||
-                  c.continents.contains('Antarctic')));
-    }).toList();
-    return countries;
-  }
+  static List<Country> get filteredCountries => Country.filter(gameFilter);
 
   bool get isAuthenticated => AuthService.isAuthenticated;
-  String get userName => AppState.user.name;
-  String get userAvatar => AppState.user.avatarUrl;
+  String get userName => AuthService.user.name;
+  String get userAvatar => AuthService.user.avatarUrl;
   String get themeMode => settings.themeMode;
   bool get isDarkTheme => settings.darkTheme;
   bool get isButtonMode => gameFilter.isButtonMode;
@@ -80,7 +61,7 @@ class SettingsController {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16)));
   Future<void> restartApp(BuildContext context) async {
-    AppState.selectedIndex = 0;
+    MainScaffoldController.selectedIndex = 0;
     await Localization.init();
     if (context.mounted) RestartWidget.restartApp(context);
   }
@@ -126,25 +107,19 @@ class SettingsController {
     if (code == language) return;
     settings.language = code;
     await PreferencesService.saveConfig();
-    await Localization.changeLanguage(code);
+    await Localization.loadLanguage(code);
     if (context.mounted) await restartApp(context);
   }
 
-  void setEuropeFilter(bool value) =>
-      _updatePool(() => gameFilter.europe = value);
+  void setEuropeFilter(bool value) => _updatePool(() => gameFilter.europe = value);
   void setAsiaFilter(bool value) => _updatePool(() => gameFilter.asia = value);
-  void setAfricaFilter(bool value) =>
-      _updatePool(() => gameFilter.africa = value);
-  void setNorthAmericaFilter(bool value) =>
-      _updatePool(() => gameFilter.northAmerica = value);
-  void setSouthAmericaFilter(bool value) =>
-      _updatePool(() => gameFilter.southAmerica = value);
-  void setOceaniaFilter(bool value) =>
-      _updatePool(() => gameFilter.oceania = value);
-  void setAntarcticaFilter(bool value) =>
-      _updatePool(() => gameFilter.antarctic = value);
-  void setIncludeNonUN(bool value) =>
-      _updatePool(() => gameFilter.includeNonUN = value);
+  void setAfricaFilter(bool value) => _updatePool(() => gameFilter.africa = value);
+  void setNorthAmericaFilter(bool value) => _updatePool(() => gameFilter.northAmerica = value);
+  void setSouthAmericaFilter(bool value) => _updatePool(() => gameFilter.southAmerica = value);
+  void setOceaniaFilter(bool value) => _updatePool(() => gameFilter.oceania = value);
+  void setAntarcticaFilter(bool value) => _updatePool(() => gameFilter.antarctic = value);
+  void setIncludeNonUN(bool value) => _updatePool(() => gameFilter.includeNonUN = value);
+
   static void _save(void Function() update) {
     update();
     PreferencesService.saveConfig();
@@ -152,99 +127,134 @@ class SettingsController {
 
   static void _updatePool(void Function() update) {
     update();
-    AppState.activePool = filteredCountries;
+    Country.updateActivePool(gameFilter);
     PreferencesService.saveConfig();
   }
-}
 
-class AppSettings {
-  String themeMode; // 'system', 'light', 'dark'
-  String language;
-  bool telemetryEnabled;
+  // --- Sürüm ve Gizlilik Bilgileri ---
+  String appVersion = '';
+  bool isPrivacyOptionsRequired = false;
 
-  /// Geriye dönük uyumluluk ve anlık kontrol için darkTheme:
-  bool get darkTheme {
-    if (themeMode == 'dark') return true;
-    if (themeMode == 'light') return false;
-    // 'system' varsayılanında cihazın parlaklığına bakar:
-    return PlatformDispatcher.instance.platformBrightness == Brightness.dark;
-  }
-
-  set darkTheme(bool value) {
-    themeMode = value ? 'dark' : 'light';
-  }
-
-  AppSettings({
-    String themeMode = 'system',
-    bool? darkTheme,
-    this.language = '',
-    this.telemetryEnabled = true,
-  })  : themeMode =
-            darkTheme != null ? (darkTheme ? 'dark' : 'light') : themeMode;
-
-  factory AppSettings.fromMap(Map<String, dynamic> map) {
-    String mode = 'system';
-    if (map['themeMode'] != null && map['themeMode'].toString().isNotEmpty) {
-      mode = map['themeMode'].toString();
-    } else if (map['theme'] != null && map['theme'].toString().isNotEmpty) {
-      mode = map['theme'].toString();
-    } else if (map['darkTheme'] != null) {
-      mode = map['darkTheme'] == true ? 'dark' : 'light';
+  Future<String> loadAppVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      appVersion = 'GeoGame v${info.version}';
+    } catch (e) {
+      debugPrint('Error loading app version: $e');
+      appVersion = 'GeoGame';
     }
+    return appVersion;
+  }
 
-    return AppSettings(
-      themeMode: mode,
-      language: map['language']?.toString() ?? '',
-      telemetryEnabled: map['telemetryEnabled'] ?? true
+  Future<bool> checkPrivacyOptionsRequired() async {
+    isPrivacyOptionsRequired = await AdService.isPrivacyOptionsRequired();
+    return isPrivacyOptionsRequired;
+  }
+
+  void showAdPreferences(BuildContext context) {
+    AdService.showPrivacyOptionsForm(context);
+  }
+
+  // --- Oturum Yönetimi ---
+  Future<void> handleSignOut(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final successMessage = Localization.t('auth.logout_success');
+    await signOut();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(successMessage),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 
-  Map<String, dynamic> toMap() => {
-        'themeMode': themeMode,
-        'language': language,
-        'telemetryEnabled': telemetryEnabled,
-      };
-}
+  // --- Harici Bağlantılar ---
+  Future<void> launchPlayStore() async {
+    final Uri marketUri =
+        Uri.parse('market://details?id=com.keremkuyucu.geogame');
+    final Uri webUri = Uri.parse(
+        'https://play.google.com/store/apps/details?id=com.keremkuyucu.geogame');
 
-class GameFilter {
-  bool northAmerica,
-      southAmerica,
-      asia,
-      africa,
-      europe,
-      oceania,
-      antarctic,
-      includeNonUN,
-      isButtonMode;
-  GameFilter(
-      {this.northAmerica = true,
-      this.southAmerica = true,
-      this.asia = true,
-      this.africa = true,
-      this.europe = true,
-      this.oceania = true,
-      this.antarctic = true,
-      this.isButtonMode = true,
-      this.includeNonUN = false});
-  factory GameFilter.fromMap(Map<String, dynamic> map) => GameFilter(
-      northAmerica: map['northAmerica'] ?? true,
-      southAmerica: map['southAmerica'] ?? true,
-      asia: map['asia'] ?? true,
-      africa: map['africa'] ?? true,
-      europe: map['europe'] ?? true,
-      oceania: map['oceania'] ?? true,
-      antarctic: map['antarctic'] ?? true,
-      isButtonMode: map['isButtonMode'] ?? true,
-      includeNonUN: map['includeNonUN'] ?? false);
-  Map<String, dynamic> toMap() => {
-        'northAmerica': northAmerica,
-        'southAmerica': southAmerica,
-        'asia': asia,
-        'africa': africa,
-        'europe': europe,
-        'oceania': oceania,
-        'antarctic': antarctic,
-        'isButtonMode': isButtonMode,
-        'includeNonUN': includeNonUN
-      };
+    try {
+      if (await canLaunchUrl(marketUri)) {
+        await launchUrl(marketUri, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(webUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Play Store linki açılamadı: $e');
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> launchURL(String urlString) async {
+    final Uri uri = Uri.parse(urlString);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Link açılamadı: $urlString');
+    }
+  }
+
+  Future<void> openWebsite() => launchURL('https://geogame.keremkuyucu.com.tr');
+  Future<void> openGitHub() => launchURL('https://github.com/KeremKuyucu/GeoGame');
+
+  void showFeedbackDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => const FeedbackDialog(),
+    );
+  }
+
+  // --- Telemetri İşlemleri ---
+  Future<bool?> showTelemetryConfirmDialog(BuildContext context, bool isDark) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          Localization.t('settings.telemetry_dialog_title'),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          Localization.t('settings.telemetry_dialog_message'),
+          style: TextStyle(
+            color: isDark ? Colors.grey[300] : Colors.grey[700],
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              Localization.t('settings.telemetry_cancel'),
+              style: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(Localization.t('settings.telemetry_disable')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> handleTelemetryChange(
+      BuildContext context, bool targetValue, bool isDark) async {
+    if (!targetValue) {
+      final shouldDisable = await showTelemetryConfirmDialog(context, isDark);
+      if (shouldDisable != true) return;
+    }
+    setTelemetryEnabled(targetValue);
+  }
 }

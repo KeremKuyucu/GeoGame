@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/profile_view_widget.dart';
@@ -70,7 +69,7 @@ class LeaderboardController {
       int calcTotalWrong = 0;
 
       for (var type in GameType.values) {
-        final String mode = AppState.getGameModeKey(type);
+        final String mode = type.key;
         final modeStat = modesData[mode] ?? {};
 
         final score = _toInt(modeStat['score']);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/widgets/profile_view_widget.dart';
 import 'package:geogame/widgets/profile_guest_view.dart';
@@ -21,7 +21,7 @@ class _ProfilesState extends State<Profiles> {
   @override
   void initState() {
     super.initState();
-    AppState.userNotifier.addListener(_onUserChanged);
+    AuthService.userNotifier.addListener(_onUserChanged);
     _controller.fetchUserProfile().then((_) {
       if (!mounted) return;
       setState(() {});
@@ -38,7 +38,7 @@ class _ProfilesState extends State<Profiles> {
 
   @override
   void dispose() {
-    AppState.userNotifier.removeListener(_onUserChanged);
+    AuthService.userNotifier.removeListener(_onUserChanged);
     super.dispose();
   }
 

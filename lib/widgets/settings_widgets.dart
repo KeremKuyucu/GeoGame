@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/services/auth_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 
@@ -95,7 +95,7 @@ class SettingsProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasAvatar = AppState.user.avatarUrl.trim().isNotEmpty;
+    final bool hasAvatar = AuthService.user.avatarUrl.trim().isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -116,7 +116,7 @@ class SettingsProfileCard extends StatelessWidget {
               radius: 35,
               backgroundImage: hasAvatar
                   ? ResizeImage(
-                      NetworkImage(AppState.user.avatarUrl),
+                      NetworkImage(AuthService.user.avatarUrl),
                       width: 140,
                       height: 140,
                     )
@@ -127,8 +127,8 @@ class SettingsProfileCard extends StatelessWidget {
                   : Colors.grey[200],
               child: !hasAvatar
                   ? Text(
-                      AppState.user.name.isNotEmpty
-                          ? AppState.user.name[0].toUpperCase()
+                      AuthService.user.name.isNotEmpty
+                          ? AuthService.user.name[0].toUpperCase()
                           : '?',
                       style: const TextStyle(
                         fontSize: 26,
@@ -145,7 +145,7 @@ class SettingsProfileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  AppState.user.name,
+                  AuthService.user.name,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,

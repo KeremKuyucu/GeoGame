@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game/guess_result.dart';
@@ -50,7 +49,7 @@ class DistanceInputDashboard extends StatelessWidget {
               if (textEditingValue.text.isEmpty) {
                 return const Iterable<Country>.empty();
               }
-              return AppState.allCountries.where((Country country) {
+              return Country.all.where((Country country) {
                 final String name =
                     country.getLocalizedName(Localization.currentLanguage);
                 return name

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
@@ -25,8 +25,8 @@ class FlagGameController {
 
   Color get accentColor => const Color(0xFF009688);
 
-  String get targetIso2 => AppState.targetCountry.iso2;
-  String get targetFlagUrl => AppState.targetCountry.flagUrl;
+  String get targetIso2 => Country.targetCountry.iso2;
+  String get targetFlagUrl => Country.targetCountry.flagUrl;
 
   bool get isButtonMode => SettingsController.gameFilter.isButtonMode;
 

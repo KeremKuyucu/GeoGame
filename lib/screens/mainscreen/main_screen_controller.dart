@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold_controller.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/localization_service.dart';
@@ -90,7 +90,7 @@ class MainScreenController {
 
   /// Ayarlar sayfasına yönlendirir
   void navigateToSettings() {
-    AppState.selectedIndex = 3;
+    MainScaffoldController.selectedIndex = 3;
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/home',

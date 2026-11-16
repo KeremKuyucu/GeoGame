@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
@@ -109,7 +108,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
 
     if (rawMap.isEmpty) return [];
 
-    final countryMap = {for (var c in AppState.allCountries) c.iso3: c};
+    final countryMap = {for (var c in Country.all) c.iso3: c};
     final currentLang = SettingsController.settings.language;
 
     final List<_CountryStatItem> items = [];
@@ -705,7 +704,7 @@ class _ProfileViewWidgetState extends State<ProfileViewWidget> {
                 const SizedBox(height: 20),
                 ...GameType.values.map((type) {
                   final isLast = type == GameType.values.last;
-                  final prefix = AppState.getGameModeKey(type);
+                  final prefix = type.key;
 
                   return Column(
                     children: [

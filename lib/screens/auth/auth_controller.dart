@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/screens/main_scaffold/main_scaffold_controller.dart';
 
 class AuthController {
   // Colors
@@ -7,7 +7,7 @@ class AuthController {
   static const Color secondaryColor = Color(0xFF8E2DE2);
 
   void navigateToHome(BuildContext context) {
-    AppState.selectedIndex = 0;
+    MainScaffoldController.selectedIndex = 0;
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 

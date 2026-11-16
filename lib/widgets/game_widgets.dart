@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/game_log_service.dart';
@@ -42,15 +41,8 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
         onPressed: () => GameScaffold.handleGameExit(context),
       ),
-      actions: [
-        if (!kIsWeb)
-          ValueListenableBuilder<bool>(
-            valueListenable: AppState.childModeNotifier,
-            builder: (context, isChild, _) {
-              if (isChild) return const SizedBox.shrink();
-              return const _BonusButton();
-            },
-          ),
+      actions: const [
+        if (!kIsWeb) _BonusButton(),
       ],
     );
   }
@@ -382,7 +374,7 @@ class GameKeyboardModeUI extends StatelessWidget {
             if (textEditingValue.text.isEmpty) {
               return const Iterable<Country>.empty();
             }
-            return AppState.allCountries.where((Country country) {
+            return Country.all.where((Country country) {
               final String name =
                   country.getLocalizedName(Localization.currentLanguage);
               return name
