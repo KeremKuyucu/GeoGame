@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:geogame/services/preferences_service.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
+import 'package:geogame/services/preferences_service.dart';
 
-class Localization {
+abstract final class Localization {
   static const Map<String, String> languages = {
     'eng': 'English',
     'tur': 'Türkçe',
@@ -66,30 +65,27 @@ class Localization {
 
   static Map<String, dynamic>? _localizedStrings;
   static String _currentLanguage = '';
+
   static List<String> get supportedLanguages => languages.keys.toList();
   static String get currentLanguage => _currentLanguage;
 
   static String getDisplayName(String iso3Code) =>
       languages[iso3Code] ?? iso3Code;
-        
+
   static Future<void> init() async {
     String language = SettingsController.settings.language;
 
-    if (language.isEmpty) {
+    if (language.isEmpty || !languages.containsKey(language)) {
       final systemLanguage = PlatformDispatcher.instance.locale.languageCode;
-
       language = _iso2ToIso3[systemLanguage] ?? 'eng';
-
       SettingsController.settings.language = language;
-
       await PreferencesService.saveConfig();
     }
 
-    await changeLanguage(language);
+    await loadLanguage(language);
   }
 
-  /// Çalışma anında dil değiştirme
-  static Future<void> changeLanguage(String iso3Code) async {
+  static Future<void> loadLanguage(String iso3Code) async {
     if (!languages.containsKey(iso3Code)) iso3Code = 'eng';
 
     try {
@@ -102,12 +98,11 @@ class Localization {
     } catch (e) {
       debugPrint('❌ Language File Could Not Be Loaded ($iso3Code): $e');
 
-      // Hata durumunda (örneğin dosya yoksa) İngilizceyi yüklemeyi dene
       if (iso3Code != 'eng') {
         debugPrint('⚠️ Switching to English (fallback)...');
-        await changeLanguage('eng');
+        await loadLanguage('eng');
       } else {
-        _localizedStrings = {}; // Hiçbir şey yoksa boş map ata
+        _localizedStrings = {}; 
       }
     }
   }
@@ -129,8 +124,8 @@ class Localization {
       }
     }
 
-    // Artık 'current' direkt olarak String değeridir.
-    // Eski yapıdaki ['tur'] seçimine gerek kalmadı çünkü dosya zaten Türkçe.
+    if (current == null) return key;
+
     String text = current.toString();
 
     // Argümanları yerleştir ({0}, {1} vb.)
