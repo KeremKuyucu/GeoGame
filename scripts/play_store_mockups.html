@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoGame - Google Play Store Screenshot Mockup Generator</title>
+  <style>
+    :root {
+      --bg: #0c0c12;
+      --card-bg: #161622;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #9c27b0;
+      --text: #ffffff;
+      --text-muted: #8e8ea0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 30px 20px;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      max-width: 920px;
+      margin: 0 auto 30px auto;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #FF9800, #E91E63, #9C27B0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.desc {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    /* Toolbar & Actions */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6200ee, #9c27b0);
+      color: #fff;
+      padding: 13px 26px;
+      font-size: 15px;
+      box-shadow: 0 6px 20px rgba(98, 0, 238, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(98, 0, 238, 0.55);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 12px 22px;
+      font-size: 14px;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
+    }
+
+    /* Sub-bar: Language & Filter */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+
+    .control-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 5px 10px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .control-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      padding: 7px 15px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(156, 39, 176, 0.35);
+      border-color: #9c27b0;
+      color: #fff;
+    }
+
+    /* Drag & drop info box */
+    .drop-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 14px 20px;
+      max-width: 800px;
+      margin: 0 auto 30px auto;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .drop-zone.dragover {
+      border-color: #9c27b0;
+      background: rgba(156, 39, 176, 0.12);
+      color: #fff;
+    }
+    .drop-zone b { color: #fff; }
+
+    /* Alert banner for file:// CORS */
+    .alert-banner {
+      display: none;
+      background: rgba(255, 152, 0, 0.12);
+      border: 1px solid rgba(255, 152, 0, 0.4);
+      color: #ffb74d;
+      padding: 12px 18px;
+      border-radius: 12px;
+      max-width: 800px;
+      margin: 0 auto 25px auto;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    /* Cards Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 9 / 16;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      margin-bottom: 14px;
+      background: #111;
+      display: block;
+    }
+
+    .card-info {
+      width: 100%;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .file-badge {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      color: #80cbc4;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-ok { color: #81c784; }
+    .status-warn { color: #ffb74d; }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .btn-card-dl {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 10px 14px;
+      font-size: 13px;
+      border-radius: 10px;
+      justify-content: center;
+    }
+    .btn-card-dl:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-card-upload {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+    .btn-card-upload:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Editable text section inside card */
+    .edit-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      cursor: pointer;
+      margin-top: 8px;
+      text-decoration: underline;
+    }
+    .edit-panel {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .edit-panel.open { display: block; }
+    .edit-group {
+      margin-bottom: 8px;
+      text-align: left;
+    }
+    .edit-group label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .edit-group input {
+      width: 100%;
+      background: #0f0f16;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+    }
+    .edit-group input:focus {
+      border-color: #9c27b0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>GeoGame Play Store Screenshot Mockups</h1>
+    <p class="desc">
+      In-game screenshots dynamically loaded from the <code>screenshots/</code> directory 
+      and fitted into clean, high-resolution 1080x1920 phone mockups for Google Play Store.
+    </p>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="downloadAll()">🚀 Download All (1080x1920 PNG)</button>
+      <button class="btn-secondary" onclick="document.getElementById('folderInput').click()">📁 Select screenshots Folder</button>
+      <button class="btn-secondary" onclick="document.getElementById('filesInput').click()">🖼️ Select Image Files</button>
+    </div>
+
+    <!-- Hidden file inputs -->
+    <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFileSelect(this.files)">
+    <input type="file" id="filesInput" multiple accept="image/png,image/jpeg,image/webp" style="display: none;" onchange="handleFileSelect(this.files)">
+
+    <!-- Alert for CORS / file:// -->
+    <div id="alertBanner" class="alert-banner">
+      ⚠️ <b>Local File Security (file://):</b> Screenshots could not be loaded via relative path (<code>../screenshots/</code>).<br>
+      Please click <b>"📁 Select screenshots Folder"</b> above to choose the <code>screenshots</code> folder, or drag and drop your screenshot PNG files onto this page.
+    </div>
+
+    <!-- Controls Row: Language Switcher & Showcase Filter -->
+    <div class="controls-row">
+      <!-- Language Switcher: English by default -->
+      <div class="control-group">
+        <span class="control-label">🌐 Text Language:</span>
+        <button class="tab-btn active" id="langEnBtn" onclick="setLanguage('en')">🇬🇧 English (Default)</button>
+        <button class="tab-btn" id="langTrBtn" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="control-group">
+        <span class="control-label">📱 Showcase Filter:</span>
+        <button class="tab-btn active" id="filterPlayStore" onclick="setFilter('playstore')">⭐ Play Store Top 7</button>
+        <button class="tab-btn" id="filterAll" onclick="setFilter('all')">📋 All Screens (11)</button>
+      </div>
+    </div>
+
+    <!-- Drop Zone -->
+    <div id="dropZone" class="drop-zone">
+      📂 Tip: Drag and drop the <b>screenshots</b> folder or any PNG images anywhere onto this page.
+    </div>
+  </header>
+
+  <div class="grid" id="container"></div>
+
+  <script>
+    // Varsayılan Dil: English (en)
+    let currentLang = 'en';
+    let currentFilter = 'playstore'; // 'playstore' veya 'all'
+
+    // 11 Ekran Görüntüsü Tanımı - İngilizce Varsayılan ve Türkçe Destekli
+    const slides = [
+      {
+        id: "1_lobi",
+        file: "mainlobi.png",
+        gradTop: "#3A1C71",
+        gradMid: "#2E1256",
+        gradBottom: "#120726",
+        accent: "#9C27B0",
+        featured: true,
+        en: {
+          badge: "GEOGAME • EXPLORE THE WORLD",
+          title: "7 UNIQUE GAME MODES",
+          subtitle: "Flags, Capitals, Borders, and Beyond!"
+        },
+        tr: {
+          badge: "GEOGAME • DÜNYAYI KEŞFET",
+          title: "7 FARKLI OYUN MODU",
+          subtitle: "Bayraklar, Başkentler, Sınırlar ve Daha Fazlası!"
+        }
+      },
+      {
+        id: "2_bayrak",
+        file: "flag_game.png",
+        gradTop: "#1B5E20",
+        gradMid: "#0D3813",
+        gradBottom: "#051808",
+        accent: "#4CAF50",
+        featured: true,
+        en: {
+          badge: "FLAG QUIZ • GEOGRAPHY TRIVIA",
+          title: "MASTER WORLD FLAGS",
+          subtitle: "Challenge Your Memory with Flags from Every Nation!"
+        },
+        tr: {
+          badge: "BAYRAK AVI • BİLGİ YARIŞMASI",
+          title: "DÜNYA BAYRAKLARINI TANI",
+          subtitle: "Yüzlerce Ülke Bayrağı ile Hafızanı Sına!"
+        }
+      },
+      {
+        id: "3_mesafe",
+        file: "distance_game.png",
+        gradTop: "#0D47A1",
+        gradMid: "#082B66",
+        gradBottom: "#03122E",
+        accent: "#2196F3",
+        featured: true,
+        en: {
+          badge: "DISTANCE HUNT • GEOGRAPHY WORDLE",
+          title: "COMPASS & DISTANCE CLUES",
+          subtitle: "Guess the Mystery Country with Distance & Direction!"
+        },
+        tr: {
+          badge: "MESAFE AVI • WORDLE COĞRAFYA",
+          title: "PUSULA VE MESAFE İPUÇLARI",
+          subtitle: "Mesafe ve Yön Bilgisiyle Gizli Ülkeyi Bul!"
+        }
+      },
+      {
+        id: "4_baskent",
+        file: "capital_game.png",
+        gradTop: "#4A148C",
+        gradMid: "#2D0B59",
+        gradBottom: "#120426",
+        accent: "#AB47BC",
+        featured: true,
+        en: {
+          badge: "CAPITAL QUIZ • MEMORY CHALLENGE",
+          title: "LEARN WORLD CAPITALS",
+          subtitle: "Fast-Paced Rounds to Master Every Capital City!"
+        },
+        tr: {
+          badge: "BAŞKENT AVI • HAFIZA OYUNU",
+          title: "TÜM BAŞKENTLERİ ÖĞREN",
+          subtitle: "Hızlı ve Eğlenceli Turlarla Başkentleri Ezberle!"
+        }
+      },
+      {
+        id: "5_harita",
+        file: "findmap_game.png",
+        gradTop: "#006064",
+        gradMid: "#00363A",
+        gradBottom: "#001A1C",
+        accent: "#00BCD4",
+        featured: true,
+        en: {
+          badge: "MAP FINDER • INTERACTIVE ATLAS",
+          title: "TAP & PINPOINT THE WORLD",
+          subtitle: "Locate Nations on the Interactive World Map!"
+        },
+        tr: {
+          badge: "HARİTADA BUL • İNTERAKTİF ATLAS",
+          title: "DOKUN VE DÜNYAYI BUL",
+          subtitle: "İnteraktif Dünya Haritasında Ülkeleri Keşfet!"
+        }
+      },
+      {
+        id: "6_arma",
+        file: "coatofarms_game.png",
+        gradTop: "#512DA8",
+        gradMid: "#311B92",
+        gradBottom: "#150A42",
+        accent: "#7E57C2",
+        featured: true,
+        en: {
+          badge: "COAT OF ARMS • HERALDIC QUIZ",
+          title: "OFFICIAL COATS OF ARMS",
+          subtitle: "Recognize Nations by Their Emblems & History!"
+        },
+        tr: {
+          badge: "ARMA AVI • YENİ OYUN MODU",
+          title: "DEVLET ARMALARI VE TARİH",
+          subtitle: "Resmi Devlet Armalarıyla Ülkeleri Tanı!"
+        }
+      },
+      {
+        id: "7_liderlik",
+        file: "leaderboard.png",
+        gradTop: "#E65100",
+        gradMid: "#BF360C",
+        gradBottom: "#1A0600",
+        accent: "#FF9800",
+        featured: true,
+        en: {
+          badge: "GLOBAL LEADERBOARD • COMPETE",
+          title: "CLIMB WORLD RANKINGS",
+          subtitle: "Compete with Geography Masters Around the Globe!"
+        },
+        tr: {
+          badge: "KÜRESEL SIRALAMA • REKABET",
+          title: "DÜNYA ÇAPINDA YARIŞ",
+          subtitle: "En İyiler Arasına Gir, Podyuma Adını Yazdır!"
+        }
+      },
+      {
+        id: "8_siniryolu",
+        file: "borderpath_game.png",
+        gradTop: "#1A237E",
+        gradMid: "#0D1352",
+        gradBottom: "#040620",
+        accent: "#3F51B5",
+        featured: false,
+        en: {
+          badge: "BORDER PATH • ROUTE PUZZLE",
+          title: "CONNECT BORDERING NATIONS",
+          subtitle: "Navigate Through Bordering Countries to the Target!"
+        },
+        tr: {
+          badge: "SINIR YOLU • ROTA BULMACA",
+          title: "KOMŞU ÜLKELERİ BAĞLA",
+          subtitle: "Sınır Komşularını Adım Adım Takip Et!"
+        }
+      },
+      {
+        id: "9_sinirhatti",
+        file: "borderline_game.png",
+        gradTop: "#004D40",
+        gradMid: "#002D26",
+        gradBottom: "#001411",
+        accent: "#009688",
+        featured: false,
+        en: {
+          badge: "BORDERLINE • GEOGRAPHY TRIVIA",
+          title: "GUESS BORDER NEIGHBORS",
+          subtitle: "Test Your Knowledge of Land Border Neighbors!"
+        },
+        tr: {
+          badge: "SINIR HATTI • KOMŞULUK AVI",
+          title: "ÜLKE SINIRLARINI TAHMİN ET",
+          subtitle: "Hangi Ülkeler Birbiriyle Komşu?"
+        }
+      },
+      {
+        id: "10_profil",
+        file: "profile.png",
+        gradTop: "#37474F",
+        gradMid: "#21272B",
+        gradBottom: "#101416",
+        accent: "#607D8B",
+        featured: false,
+        en: {
+          badge: "PROFILE & STATS • TRACK PROGRESS",
+          title: "TRACK YOUR MASTERY",
+          subtitle: "Win Rates, Badges, and Career Milestones!"
+        },
+        tr: {
+          badge: "PROFİL & İSTATİSTİKLER",
+          title: "GELİŞİMİNİ TAKİP ET",
+          subtitle: "Kazanma Oranları, Rozetler ve Başarılar!"
+        }
+      },
+      {
+        id: "11_ayarlar",
+        file: "settings.png",
+        gradTop: "#263238",
+        gradMid: "#161D21",
+        gradBottom: "#0B0E10",
+        accent: "#78909C",
+        featured: false,
+        en: {
+          badge: "SETTINGS & THEMES • CUSTOMIZE",
+          title: "PERSONALIZE YOUR GAME",
+          subtitle: "Dark & Light Themes, Sound Effects, and Haptics!"
+        },
+        tr: {
+          badge: "ÖZELLEŞTİRME & TEMALAR",
+          title: "DENEYİMİNİ KİŞİSELLEŞTİR",
+          subtitle: "Ses, Titreşim, Koyu & Açık Tema Seçenekleri!"
+        }
+      }
+    ];
+
+    // Aktif dil metinlerini döndürür
+    function getSlideTexts(s) {
+      return s[currentLang] || s.en;
+    }
+
+    // Görsel havuzu (dosya adı -> Image nesnesi)
+    const imageCache = {};
+    const canvasMap = {};
+    const statusMap = {};
+
+    // Belirli bir slide için görsel nesnesini döndürür veya yükler
+    function getImageForSlide(s, onLoaded) {
+      const key = s.file.toLowerCase();
+      if (imageCache[key]) {
+        return imageCache[key];
+      }
+
+      const img = new Image();
+      if (window.location.protocol.startsWith('http')) {
+        img.crossOrigin = 'anonymous';
+      }
+
+      img.onload = () => {
+        updateCardStatus(s.id, true);
+        if (onLoaded) onLoaded();
+      };
+
+      img.onerror = () => {
+        updateCardStatus(s.id, false);
+        document.getElementById('alertBanner').style.display = 'block';
+        if (onLoaded) onLoaded();
+      };
+
+      // Dinamik dosya yolu: scripts klasöründen screenshots klasörüne
+      img.src = `../screenshots/${s.file}`;
+      imageCache[key] = img;
+      return img;
+    }
+
+    function updateCardStatus(slideId, isSuccess) {
+      const badge = statusMap[slideId];
+      if (badge) {
+        if (isSuccess) {
+          badge.className = 'status-badge status-ok';
+          badge.innerHTML = currentLang === 'tr' ? '● Görsel Hazır' : '● Ready';
+        } else {
+          badge.className = 'status-badge status-warn';
+          badge.innerHTML = currentLang === 'tr' ? '▲ Dosya Bekleniyor' : '▲ Waiting for File';
+        }
+      }
+    }
+
+    // 1080x1920 Slide Çizim Fonksiyonu
+    function renderSlide(s, canvas) {
+      const ctx = canvas.getContext('2d');
+      const W = 1080;
+      const H = 1920;
+      canvas.width = W;
+      canvas.height = H;
+
+      const texts = getSlideTexts(s);
+
+      // 1. Zengin degrade arka plan
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, s.gradTop);
+      grad.addColorStop(0.4, s.gradMid);
+      grad.addColorStop(1, s.gradBottom);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Arka plan ortam ışıltısı (Radial glow)
+      const glow = ctx.createRadialGradient(W / 2, 800, 50, W / 2, 800, 700);
+      glow.addColorStop(0, s.accent + '33');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      // 3. Arka plan dekoratif çizgileri / radar halkaları
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 2;
+      [300, 500, 750, 1050].forEach(r => {
+        ctx.beginPath();
+        ctx.arc(W / 2, 900, r, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // 4. Üst Rozet (Pill Badge)
+      ctx.font = 'bold 20px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      const badgeW = ctx.measureText(texts.badge).width + 60;
+      const badgeH = 52;
+      const badgeX = (W - badgeW) / 2;
+      const badgeY = 100;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 26, true, true);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(texts.badge, W / 2, badgeY + 33);
+
+      // 5. Ana Başlık (Title)
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 4;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 56px "Segoe UI", sans-serif';
+      ctx.fillText(texts.title, W / 2, 225);
+
+      // 6. Alt Başlık (Subtitle)
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 2;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.font = '600 27px "Segoe UI", sans-serif';
+      ctx.fillText(texts.subtitle, W / 2, 290);
+      ctx.shadowColor = 'transparent';
+
+      // 7. Telefon Çerçevesi (Device Mockup)
+      const phoneW = 740;
+      const phoneH = 1500;
+      const phoneX = (W - phoneW) / 2;
+      const phoneY = 380;
+      const phoneRadius = 58;
+
+      // Derin telefon gölgesi
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+      ctx.shadowBlur = 60;
+      ctx.shadowOffsetY = 35;
+      ctx.fillStyle = '#1C1C1E';
+      roundRect(ctx, phoneX, phoneY, phoneW, phoneH, phoneRadius, true, false);
+      ctx.shadowColor = 'transparent';
+
+      // Telefon dış titanyum çerçevesi
+      ctx.strokeStyle = '#3A3A3C';
+      ctx.lineWidth = 10;
+      roundRect(ctx, phoneX, phoneY, phoneW, phoneH, phoneRadius, false, true);
+
+      // 8. Ekran içi görseli (Clipping mask ile)
+      const screenMargin = 14;
+      const screenX = phoneX + screenMargin;
+      const screenY = phoneY + screenMargin;
+      const screenW = phoneW - screenMargin * 2;
+      const screenH = phoneH - screenMargin * 2;
+      const screenRadius = phoneRadius - 8;
+
+      ctx.save();
+      ctx.beginPath();
+      roundRect(ctx, screenX, screenY, screenW, screenH, screenRadius, false, false);
+      ctx.clip();
+
+      const img = getImageForSlide(s, () => renderSlide(s, canvas));
+
+      if (img && img.complete && img.naturalWidth > 0) {
+        // Ekran görüntüsü en-boy oranını bozmadan cover yap
+        const imgRatio = img.naturalWidth / img.naturalHeight;
+        const screenRatio = screenW / screenH;
+        let drawW = screenW;
+        let drawH = screenH;
+        let drawX = screenX;
+        let drawY = screenY;
+
+        if (imgRatio > screenRatio) {
+          drawW = screenH * imgRatio;
+          drawX = screenX - (drawW - screenW) / 2;
+        } else {
+          drawH = screenW / imgRatio;
+          drawY = screenY - (drawH - screenH) / 2;
+        }
+
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+        // 9. Dynamic Island (Ekranın üstündeki hap ada)
+        const islandW = 150;
+        const islandH = 32;
+        const islandX = (W - islandW) / 2;
+        const islandY = screenY + 16;
+        ctx.fillStyle = '#000000';
+        roundRect(ctx, islandX, islandY, islandW, islandH, 16, true, false);
+
+        // Minik kamera parıltısı
+        ctx.fillStyle = '#1A1A24';
+        ctx.beginPath();
+        ctx.arc(islandX + islandW - 22, islandY + 16, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 10. Ekran cam parlaması (Sleek glass reflection)
+        const glass = ctx.createLinearGradient(screenX, screenY, screenX + screenW, screenY + screenH * 0.7);
+        glass.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+        glass.addColorStop(0.3, 'rgba(255, 255, 255, 0.04)');
+        glass.addColorStop(0.5, 'transparent');
+        ctx.fillStyle = glass;
+        ctx.fillRect(screenX, screenY, screenW, screenH);
+      } else {
+        // Görsel henüz yüklenmemişse şık bir yer tutucu çiz
+        ctx.fillStyle = '#101018';
+        ctx.fillRect(screenX, screenY, screenW, screenH);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.textAlign = 'center';
+        ctx.font = '600 32px "Segoe UI", sans-serif';
+        ctx.fillText('📷 ' + s.file, screenX + screenW / 2, screenY + screenH / 2 - 20);
+        ctx.font = '400 22px "Segoe UI", sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+        ctx.fillText(currentLang === 'tr' ? 'Görsel bekleniyor...' : 'Awaiting image file...', screenX + screenW / 2, screenY + screenH / 2 + 25);
+      }
+
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
+    }
+
+    // Grid Kartlarını İnşa Et
+    const container = document.getElementById('container');
+
+    function buildCards() {
+      container.innerHTML = '';
+
+      slides.forEach((s, idx) => {
+        if (currentFilter === 'playstore' && !s.featured) {
+          return;
+        }
+
+        const texts = getSlideTexts(s);
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = 'card_' + s.id;
+
+        const canvas = document.createElement('canvas');
+        canvasMap[s.id] = canvas;
+
+        const info = document.createElement('div');
+        info.className = 'card_info card-info';
+
+        const fileBadge = document.createElement('span');
+        fileBadge.className = 'file-badge';
+        fileBadge.innerText = s.file;
+
+        const statusBadge = document.createElement('span');
+        statusBadge.className = 'status-badge status-warn';
+        statusBadge.innerHTML = currentLang === 'tr' ? '● Kontrol ediliyor...' : '● Checking...';
+        statusMap[s.id] = statusBadge;
+
+        info.appendChild(fileBadge);
+        info.appendChild(statusBadge);
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+
+        const btnDl = document.createElement('button');
+        btnDl.className = 'btn-card-dl';
+        btnDl.innerText = currentLang === 'tr' ? `💾 ${idx + 1}. Görseli İndir` : `💾 Download #${idx + 1}`;
+        btnDl.onclick = () => downloadCanvas(canvas, `screenshot_${idx + 1}_${s.id}.png`);
+
+        const filePicker = document.createElement('input');
+        filePicker.type = 'file';
+        filePicker.accept = 'image/*';
+        filePicker.style.display = 'none';
+        filePicker.onchange = (e) => {
+          if (e.target.files && e.target.files[0]) {
+            loadFileIntoSlide(s, e.target.files[0]);
+          }
+        };
+
+        const btnUpload = document.createElement('button');
+        btnUpload.className = 'btn-card-upload';
+        btnUpload.innerText = currentLang === 'tr' ? '📁 Değiştir' : '📁 Replace';
+        btnUpload.title = currentLang === 'tr' ? 'Bu slide için özel dosya seç' : 'Select custom image file for this slide';
+        btnUpload.onclick = () => filePicker.click();
+
+        actions.appendChild(btnDl);
+        actions.appendChild(btnUpload);
+        actions.appendChild(filePicker);
+
+        // Düzenleme Bölümü (Badge, Title, Subtitle)
+        const toggleEdit = document.createElement('button');
+        toggleEdit.className = 'edit-toggle';
+        toggleEdit.innerText = currentLang === 'tr' ? '✏️ Metinleri Düzenle' : '✏️ Edit Texts';
+
+        const editPanel = document.createElement('div');
+        editPanel.className = 'edit-panel';
+        editPanel.innerHTML = `
+          <div class="edit-group">
+            <label>${currentLang === 'tr' ? 'Rozet (Badge):' : 'Badge:'}</label>
+            <input type="text" value="${escapeHtml(texts.badge)}" onchange="updateSlideText('${s.id}', 'badge', this.value)">
+          </div>
+          <div class="edit-group">
+            <label>${currentLang === 'tr' ? 'Başlık (Title):' : 'Title:'}</label>
+            <input type="text" value="${escapeHtml(texts.title)}" onchange="updateSlideText('${s.id}', 'title', this.value)">
+          </div>
+          <div class="edit-group">
+            <label>${currentLang === 'tr' ? 'Alt Başlık (Subtitle):' : 'Subtitle:'}</label>
+            <input type="text" value="${escapeHtml(texts.subtitle)}" onchange="updateSlideText('${s.id}', 'subtitle', this.value)">
+          </div>
+        `;
+
+        toggleEdit.onclick = () => {
+          editPanel.classList.toggle('open');
+          toggleEdit.innerText = editPanel.classList.contains('open') 
+            ? (currentLang === 'tr' ? '▲ Kapat' : '▲ Close') 
+            : (currentLang === 'tr' ? '✏️ Metinleri Düzenle' : '✏️ Edit Texts');
+        };
+
+        card.appendChild(canvas);
+        card.appendChild(info);
+        card.appendChild(actions);
+        card.appendChild(toggleEdit);
+        card.appendChild(editPanel);
+        container.appendChild(card);
+
+        renderSlide(s, canvas);
+      });
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/"/g, '&quot;');
+    }
+
+    function updateSlideText(slideId, field, value) {
+      const slide = slides.find(x => x.id === slideId);
+      if (slide) {
+        if (!slide[currentLang]) slide[currentLang] = {};
+        slide[currentLang][field] = value;
+        const canvas = canvasMap[slideId];
+        if (canvas) renderSlide(slide, canvas);
+      }
+    }
+
+    // Dil Değiştirme
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('langEnBtn').className = 'tab-btn ' + (lang === 'en' ? 'active' : '');
+      document.getElementById('langTrBtn').className = 'tab-btn ' + (lang === 'tr' ? 'active' : '');
+      buildCards();
+    }
+
+    // Vitrin Filtresi Değiştirme
+    function setFilter(type) {
+      currentFilter = type;
+      document.getElementById('filterPlayStore').className = 'tab-btn ' + (type === 'playstore' ? 'active' : '');
+      document.getElementById('filterAll').className = 'tab-btn ' + (type === 'all' ? 'active' : '');
+      buildCards();
+    }
+
+    // Dosya Seçildiğinde (Klasör veya Dosya Listesi)
+    function handleFileSelect(fileList) {
+      if (!fileList || fileList.length === 0) return;
+
+      for (const file of fileList) {
+        const name = file.name.toLowerCase();
+        const blobUrl = URL.createObjectURL(file);
+
+        const img = new Image();
+        img.onload = () => {
+          imageCache[name] = img;
+          // Eşleşen slide'ları güncelle
+          slides.forEach(s => {
+            if (s.file.toLowerCase() === name) {
+              updateCardStatus(s.id, true);
+              const canvas = canvasMap[s.id];
+              if (canvas) renderSlide(s, canvas);
+            }
+          });
+        };
+        img.src = blobUrl;
+      }
+
+      document.getElementById('alertBanner').style.display = 'none';
+    }
+
+    // Tek bir slide'a doğrudan dosya atama
+    function loadFileIntoSlide(s, file) {
+      const blobUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        imageCache[s.file.toLowerCase()] = img;
+        updateCardStatus(s.id, true);
+        const canvas = canvasMap[s.id];
+        if (canvas) renderSlide(s, canvas);
+      };
+      img.src = blobUrl;
+    }
+
+    // Drag and Drop Yönetimi
+    const dropZone = document.getElementById('dropZone');
+    ['dragenter', 'dragover'].forEach(eventName => {
+      document.body.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      document.body.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+      });
+    });
+
+    document.body.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (e.dataTransfer && e.dataTransfer.files) {
+        handleFileSelect(e.dataTransfer.files);
+      }
+    });
+
+    // İndirme Fonksiyonları
+    function downloadCanvas(canvas, filename) {
+      try {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        const msg = currentLang === 'tr' ? (
+          "⚠️ Güvenlik Uyarısı (CORS / Yerel Dosya):\n\n" +
+          "HTML sayfası doğrudan dosya yöneticisinden (file://) açıldığında tarayıcılar " +
+          "güvenlik kuralı gereği yerel görselin dışarı aktarılmasına (toDataURL) izin vermez.\n\n" +
+          "ÇÖZÜM:\n" +
+          "1. Sayfanın üstündeki '📁 Select screenshots Folder' butonuna tıklayarak screenshots klasörünü seçin.\n" +
+          "2. Veya ekran görüntüsü dosyalarını sayfaya sürükleyip bırakın.\n" +
+          "3. Veya bu klasörü yerel bir web sunucusuyla (Live Server vb.) açın."
+        ) : (
+          "⚠️ Browser Security (CORS / Local File):\n\n" +
+          "When an HTML file is opened directly via file://, browsers block canvas export (toDataURL) " +
+          "due to local origin restrictions.\n\n" +
+          "SOLUTION:\n" +
+          "1. Click '📁 Select screenshots Folder' above and choose the screenshots folder.\n" +
+          "2. Or drag and drop your PNG screenshots directly onto this page.\n" +
+          "3. Or serve this directory with a local HTTP server (Live Server, python -m http.server, etc.)."
+        );
+        alert(msg);
+        document.getElementById('folderInput').click();
+      }
+    }
+
+    function downloadAll() {
+      let delay = 0;
+      const visibleSlides = slides.filter(s => currentFilter === 'all' || s.featured);
+
+      visibleSlides.forEach((s, idx) => {
+        setTimeout(() => {
+          const canvas = canvasMap[s.id];
+          if (canvas) {
+            downloadCanvas(canvas, `screenshot_${idx + 1}_${s.id}.png`);
+          }
+        }, delay);
+        delay += 400;
+      });
+    }
+
+    // İlk Yükleme
+    buildCards();
+  </script>
+</body>
+</html>
