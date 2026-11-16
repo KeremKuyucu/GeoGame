@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
 
 /// GeoJSON dosyalarını yükleme ve Flutter Path'e dönüştürme işlemlerini
 /// yöneten servis. Tüm oyunlarda ortak olarak kullanılır.
@@ -200,17 +200,17 @@ class GeoJsonService {
   }
 
   /// Tüm dünya haritasını tek dosyadan yükler (Simplified).
-  /// AppState.allCountries listesini kullanarak tüm ülkeleri tek tek yükler.
+  /// Country.all listesini kullanarak tüm ülkeleri tek tek yükler.
   static Future<Map<String, Path>> loadWorldMapSimplified() async {
     final Map<String, Path> result = {};
 
-    // AppState'deki kayıtlı ülkeler üzerinden gidiyoruz
-    if (AppState.allCountries.isEmpty) {
-      debugPrint('Warning: AppState.allCountries is empty during map load.');
+    // Country.all içindeki kayıtlı ülkeler üzerinden gidiyoruz
+    if (Country.all.isEmpty) {
+      debugPrint('Warning: Country.all is empty during map load.');
       return result;
     }
 
-    final futures = AppState.allCountries.map((country) async {
+    final futures = Country.all.map((country) async {
       try {
         final iso = country.iso3;
         final isoKey = iso.toLowerCase();

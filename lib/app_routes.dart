@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/countries.dart';
 import 'package:geogame/screens/splash_screen/splash_screen.dart';
 import 'package:geogame/screens/games/borderline/borderline_screen.dart';
 import 'package:geogame/screens/games/borderpath/borderpath_screen.dart';
@@ -52,7 +52,7 @@ class AppRoutes {
         name.startsWith('com.keremkuyucu.geogame');
 
     if (isLoginCallback) {
-      if (AppState.allCountries.isEmpty) {
+      if (Country.all.isEmpty) {
         return MaterialPageRoute(
           builder: (context) => const SplashScreen(),
         );
@@ -64,7 +64,7 @@ class AppRoutes {
     }
 
     // Uygulama henüz başlatılmamışsa → Splash önce, sonra hedefe git
-    if (AppState.allCountries.isEmpty) {
+    if (Country.all.isEmpty) {
       return MaterialPageRoute(
         builder: (context) => SplashScreen(
           onInitialized: () {

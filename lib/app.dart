@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:theme_mode_builder/theme_mode_builder.dart';
 
 import 'package:geogame/app_routes.dart';
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/screens/splash_screen/splash_screen.dart';
 
 /// GeoGame ana uygulama widget'ı (MaterialApp, Temalar ve Rotalar)
 class Geogame extends StatelessWidget {
+  static final GlobalKey<ScaffoldMessengerState> messengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   const Geogame({super.key});
 
   @override
@@ -14,7 +16,7 @@ class Geogame extends StatelessWidget {
     return ThemeModeBuilder(
       builder: (BuildContext context, ThemeMode themeMode) {
         return MaterialApp(
-          scaffoldMessengerKey: AppState.scaffoldMessengerKey,
+          scaffoldMessengerKey: messengerKey,
           debugShowCheckedModeBanner: false,
           title: 'GeoGame',
           themeMode: themeMode,

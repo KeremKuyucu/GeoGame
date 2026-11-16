@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
-enum GameType { flag, capital, distance, borderline, borderpath, findmap, coatofarms }
+enum GameType {
+  flag,
+  capital,
+  distance,
+  borderline,
+  borderpath,
+  findmap,
+  coatofarms;
+
+  String get key => name;
+}
 
 /// Oyun kural bilgilerini tutan sınıf
 class GameRule {

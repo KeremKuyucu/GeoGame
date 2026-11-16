@@ -1,12 +1,69 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'package:geogame/models/app_context.dart';
+// lib/models/countries.dart
 
-// lib/models/country.dart
+class GameFilter {
+  bool northAmerica,
+      southAmerica,
+      asia,
+      africa,
+      europe,
+      oceania,
+      antarctic,
+      includeNonUN,
+      isButtonMode;
+
+  GameFilter({
+    this.northAmerica = true,
+    this.southAmerica = true,
+    this.asia = true,
+    this.africa = true,
+    this.europe = true,
+    this.oceania = true,
+    this.antarctic = true,
+    this.isButtonMode = true,
+    this.includeNonUN = false,
+  });
+
+  factory GameFilter.fromMap(Map<String, dynamic> map) => GameFilter(
+        northAmerica: map['northAmerica'] ?? true,
+        southAmerica: map['southAmerica'] ?? true,
+        asia: map['asia'] ?? true,
+        africa: map['africa'] ?? true,
+        europe: map['europe'] ?? true,
+        oceania: map['oceania'] ?? true,
+        antarctic: map['antarctic'] ?? true,
+        isButtonMode: map['isButtonMode'] ?? true,
+        includeNonUN: map['includeNonUN'] ?? false,
+      );
+
+  Map<String, dynamic> toMap() => {
+        'northAmerica': northAmerica,
+        'southAmerica': southAmerica,
+        'asia': asia,
+        'africa': africa,
+        'europe': europe,
+        'oceania': oceania,
+        'antarctic': antarctic,
+        'isButtonMode': isButtonMode,
+        'includeNonUN': includeNonUN,
+      };
+}
 
 class Country {
+  // --- Global Ülke Durumu (State) ---
+  static List<Country> all = [];
+  static List<Country> activePool = [];
+  static Country targetCountry = Country.empty();
+  static Country tempCountry = Country.empty();
+
+  /// Geriye dönük uyumluluk için getter & setter
+  static List<Country> get allCountries => all;
+  static set allCountries(List<Country> value) => all = value;
+
+  // --- Ülke Özellikleri ---
   final String iso3;
   final String iso2;
   final String englishName;
@@ -83,11 +140,8 @@ class Country {
       capital: capitalData,
       continents: List<String>.from(json['continents'] ?? []),
       isUNMember: json['unMember'] ?? false,
-
-      // ✅ GÜNCELLENEN KISIM
       latitude: (json['detailed_lat'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['detailed_lng'] as num?)?.toDouble() ?? 0.0,
-
       borders: List<String>.from(json['borders'] ?? []),
       area: (json['area'] as num?)?.toDouble() ?? 0.0,
       coatOfArmsUrl: coatUrl,
@@ -97,7 +151,6 @@ class Country {
 
   // --- Yardımcı Metodlar ---
   String getLocalizedName(String languageCode) {
-    // translations map'inde dil kodu anahtar olarak var mı?
     if (translations.containsKey(languageCode)) {
       return translations[languageCode]['common'] ?? englishName;
     }
@@ -110,24 +163,57 @@ class Country {
     final String english = englishName.toLowerCase().trim();
     final String input = guess.toLowerCase().trim();
 
-    // Hem yerel dildeki isme hem de İngilizce isme göre doğru kabul eder
     return input == localized || input == english;
   }
 
-  static Future<void> loadCountries() async {
+  /// Kıta ve BM filtrelerine göre ülkeleri filtreler
+  static List<Country> filter(GameFilter f) {
+    if (all.isEmpty ||
+        (!f.northAmerica &&
+            !f.southAmerica &&
+            !f.asia &&
+            !f.africa &&
+            !f.europe &&
+            !f.oceania &&
+            !f.antarctic)) {
+      debugPrint('🌍 [Country] Hiçbir kıta seçili değil veya ülke listesi boş (0 ülke).');
+      return [];
+    }
+    return all.where((c) {
+      if (!f.includeNonUN && !c.isUNMember) return false;
+      return (f.europe && c.continents.contains('Europe')) ||
+          (f.asia && c.continents.contains('Asia')) ||
+          (f.africa && c.continents.contains('Africa')) ||
+          (f.oceania && c.continents.contains('Oceania')) ||
+          (f.northAmerica && c.continents.contains('North America')) ||
+          (f.southAmerica && c.continents.contains('South America')) ||
+          (f.antarctic &&
+              (c.continents.contains('Antarctica') ||
+                  c.continents.contains('Antarctic')));
+    }).toList();
+  }
+
+  /// Aktif soru havuzunu filtreye göre günceller
+  static void updateActivePool(GameFilter f) {
+    activePool = filter(f);
+  }
+
+  static Future<void> loadCountries([GameFilter? initialFilter]) async {
     try {
       final String response =
           await rootBundle.loadString('assets/countries.json');
       final List<dynamic> data = json.decode(response);
 
-      AppState.allCountries =
-          data.map((item) => Country.fromJson(item)).toList();
+      all = data.map((item) => Country.fromJson(item)).toList();
+      debugPrint('✅ Countries Loaded Successfully: ${all.length}');
 
-      debugPrint(
-          '✅ Countries Loaded Successfully: ${AppState.allCountries.length}');
+      if (initialFilter != null) {
+        updateActivePool(initialFilter);
+      }
     } catch (e) {
       debugPrint('❌ CRITICAL ERROR: Could not load countries! $e');
-      AppState.allCountries = [];
+      all = [];
+      activePool = [];
     }
   }
 }

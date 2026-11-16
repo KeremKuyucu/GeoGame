@@ -26,7 +26,7 @@ class PreferencesService {
       debugPrint('✅ Settings and preferences loaded.');
     } catch (e) {
       debugPrint('❌ Config Loading Error: $e');
-      // Hata durumunda varsayılan değerlerle devam edilir (AppState zaten varsayılanla başlar)
+      // Hata durumunda varsayılan değerlerle devam edilir
     }
   }
 
@@ -38,7 +38,6 @@ class PreferencesService {
       final Map<String, dynamic> data = {
         ...SettingsController.settings.toMap(),
         ...SettingsController.gameFilter.toMap(),
-        // ...AppState.stats.toMap(),
       };
 
       await prefs.setString(_storageKey, jsonEncode(data));
