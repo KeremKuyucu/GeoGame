@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
+import 'package:geogame/models/game/game_session.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
 import 'package:geogame/services/geojson_service.dart';
@@ -44,8 +44,8 @@ class FindMapGameController {
       SettingsController.settings.darkTheme ? Colors.white : Colors.black87;
 
   bool get isDark => SettingsController.settings.darkTheme;
-  int get correctAnswers => GameLogService.correctCount;
-  int get wrongAnswers => GameLogService.wrongCount;
+  int get correctAnswers => GameSession.current.correctCount;
+  int get wrongAnswers => GameSession.current.wrongCount;
 
   Future<void> initializeGame() async {
     try {
@@ -85,7 +85,7 @@ class FindMapGameController {
 
       // Ülke modelini bul ve listeye ekle
       try {
-        final country = AppState.allCountries.firstWhere(
+        final country = Country.all.firstWhere(
           (c) => c.iso3 == iso,
         );
         countries.add(country);
@@ -99,7 +99,7 @@ class FindMapGameController {
           smallCountryCenters[iso] = bounds.center;
         }
       } catch (_) {
-        // AppState içinde olmayan bir ISO kodu varsa (örn: disputed territories), atla.
+        // Country.all içinde olmayan bir ISO kodu varsa (örn: disputed territories), atla.
         continue;
       }
     }
@@ -109,7 +109,7 @@ class FindMapGameController {
     if (countryPaths.isEmpty) return;
 
     // Aktif havuzdan (Ayarlarda seçili kıtalar vs.) bir ülke seç
-    final possibleTargets = AppState.activePool
+    final possibleTargets = Country.activePool
         .where((c) => countryPaths.containsKey(c.iso3))
         .toList();
 
@@ -124,7 +124,7 @@ class FindMapGameController {
       targetCountry = possibleTargets[Random().nextInt(possibleTargets.length)];
     }
 
-    GameLogService.startNewQuestion();
+    GameSession.current.startNewQuestion();
   }
 
   Matrix4 mapMatrix = Matrix4.identity();
@@ -223,21 +223,15 @@ class FindMapGameController {
     HapticService.correct();
     final target = targetCountry;
     if (target != null) {
-      final scoreEarned = hintUsed ? 0 : GameLogService.currentQuestionScore;
-      final wrongCount = GameLogService.currentQuestionWrongCount;
-      final startTime = GameLogService.currentQuestionStartTime;
-
-      if (!hintUsed) {
-        GameLogService.submitCorrect();
-      }
+      final result = GameSession.current.submitCorrect(
+        customScore: hintUsed ? 0 : null,
+      );
 
       await GameLogService.logQuestion(
         gameType: 'findmap',
         correctAnswer: target.iso3,
         options: [target.iso3],
-        wrongCount: wrongCount,
-        scoreEarned: scoreEarned,
-        questionStartTime: startTime,
+        result: result,
       );
     }
     startNewRound();
@@ -245,7 +239,7 @@ class FindMapGameController {
 
   void handleWrongAnswer() {
     HapticService.wrong();
-    GameLogService.submitWrong();
+    GameSession.current.submitWrong();
   }
 
   void dispose() {

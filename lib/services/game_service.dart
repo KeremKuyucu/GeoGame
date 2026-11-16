@@ -2,11 +2,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/app.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game/game_button.dart';
 import 'package:geogame/models/game/guess_result.dart';
 import 'package:geogame/models/game/border_path_data.dart';
+import 'package:geogame/models/game/game_session.dart';
 import 'package:geogame/models/game_metadata.dart';
 
 import 'package:geogame/services/game_log_service.dart';
@@ -36,7 +37,7 @@ class GameService {
   static Map<String, Country>? _cachedCountryMap;
   static Map<String, Country> get _countryMap {
     if (_cachedCountryMap == null || _cachedCountryMap!.isEmpty) {
-      _cachedCountryMap = {for (var c in AppState.allCountries) c.iso3: c};
+      _cachedCountryMap = {for (var c in Country.all) c.iso3: c};
     }
     return _cachedCountryMap!;
   }
@@ -58,7 +59,7 @@ class GameService {
     final scores = getInitialScores(type, multiplier);
     debugPrint(
         '🎯 Havuz çarpanı: ${multiplier.toStringAsFixed(2)}x '
-        '(${AppState.activePool.length}/${AppState.allCountries.length} ülke) '
+        '(${Country.activePool.length}/${Country.all.length} ülke) '
         '→ start=${scores['start']}, min=${scores['min']}, maxPenalty=${scores['maxPenalty']}');
 
     GameLogService.resetSession(
@@ -83,8 +84,8 @@ class GameService {
   /// - Çok küçük havuz (10/195)   → ~0.34x
   /// - Minimum sınır              → 0.3x
   static double _poolMultiplier() {
-    final total = AppState.allCountries.length;
-    final pool  = AppState.activePool.length;
+    final total = Country.all.length;
+    final pool  = Country.activePool.length;
     if (total == 0) return 1.0;
     final ratio = pool / total;
     return (ratio * 0.7 + 0.3).clamp(0.3, 1.0);
@@ -121,14 +122,14 @@ class GameService {
     List<Country> available;
     if (_currentGameType == GameType.coatofarms) {
       final pool =
-          AppState.activePool.where((c) => c.coatOfArmsUrl.isNotEmpty).toList();
+          Country.activePool.where((c) => c.coatOfArmsUrl.isNotEmpty).toList();
       available = pool.length >= 4
           ? pool
-          : AppState.allCountries
+          : Country.all
               .where((c) => c.coatOfArmsUrl.isNotEmpty)
               .toList();
     } else {
-      available = AppState.activePool;
+      available = Country.activePool;
     }
 
     if (available.length < 4) {
@@ -161,7 +162,7 @@ class GameService {
 
     // Desteden sıradaki hedef ülkeyi çek (tüm havuz bitene kadar tekrar etmez)
     final target = _unaskedDeck.removeLast();
-    AppState.targetCountry = target;
+    Country.targetCountry = target;
 
     // Geçmiş tamponuna ekle (en fazla 15 eleman)
     _recentTargetIso3s.add(target.iso3);
@@ -255,35 +256,27 @@ class GameService {
 
   static Future<bool> checkStandardAnswer(
       String answer, GameType type, int? buttonIndex) async {
-    final isCorrect = AppState.targetCountry
+    final isCorrect = Country.targetCountry
         .checkAnswer(answer.trim(), SettingsController.settings.language);
 
     if (isCorrect) {
       HapticService.correct();
-      final countryName = AppState.targetCountry
+      final countryName = Country.targetCountry
           .getLocalizedName(SettingsController.settings.language);
       showCorrectSnackBar(countryName);
 
-      final scoreEarned = GameLogService.currentQuestionScore;
-      final wrongCount = GameLogService.currentQuestionWrongCount;
-      final startTime = GameLogService.currentQuestionStartTime;
-      final options = _buttons.map((b) => b.country.iso3).toList();
-      final correctAnswer = AppState.targetCountry.iso3;
-
-      GameLogService.submitCorrect();
+      final result = GameSession.current.submitCorrect();
       await GameLogService.logQuestion(
-        gameType: AppState.getGameModeKey(type),
-        correctAnswer: correctAnswer,
-        options: options,
-        wrongCount: wrongCount,
-        scoreEarned: scoreEarned,
-        questionStartTime: startTime,
+        gameType: type.key,
+        correctAnswer: Country.targetCountry.iso3,
+        options: _buttons.map((b) => b.country.iso3).toList(),
+        result: result,
       );
       await startNewRound();
       return true;
     } else {
       HapticService.wrong();
-      GameLogService.submitWrong();
+      GameSession.current.submitWrong();
       _disableButton(buttonIndex);
       return false;
     }
@@ -300,8 +293,8 @@ class GameService {
   static Future<String> handlePass() async {
     HapticService.pass();
     _distanceGuesses.clear();
-    GameLogService.submitPass();
-    final passCountryName = AppState.targetCountry
+    GameSession.current.submitPass();
+    final passCountryName = Country.targetCountry
         .getLocalizedName(SettingsController.settings.language);
     await startNewRound();
     return passCountryName;
@@ -321,10 +314,10 @@ class GameService {
       return null;
     }
 
-    AppState.tempCountry = guessedCountry;
+    Country.tempCountry = guessedCountry;
     _distanceGuesses.add(guessedCountry.iso3);
 
-    final target = AppState.targetCountry;
+    final target = Country.targetCountry;
 
     // Mesafeyi ve yönü hesapla
     final distance = _calculateDistance(
@@ -349,26 +342,20 @@ class GameService {
           target.getLocalizedName(SettingsController.settings.language);
       showCorrectSnackBar(countryName);
 
-      final scoreEarned = GameLogService.currentQuestionScore;
-      final wrongCount = GameLogService.currentQuestionWrongCount;
-      final startTime = GameLogService.currentQuestionStartTime;
-      final correctAnswer = target.iso3;
       final options = List<String>.from(_distanceGuesses);
       _distanceGuesses.clear();
 
-      GameLogService.submitCorrect();
+      final result = GameSession.current.submitCorrect();
       await GameLogService.logQuestion(
         gameType: 'distance',
-        correctAnswer: correctAnswer,
+        correctAnswer: target.iso3,
         options: options,
-        wrongCount: wrongCount,
-        scoreEarned: scoreEarned,
-        questionStartTime: startTime,
+        result: result,
       );
       await startNewRound();
     } else {
       HapticService.wrong();
-      GameLogService.submitWrong();
+      GameSession.current.submitWrong();
     }
 
     return GuessResultModel(
@@ -382,7 +369,7 @@ class GameService {
   }
 
   static Country? _findCountryByName(String name) {
-    return AppState.allCountries.firstWhereOrNull(
+    return Country.all.firstWhereOrNull(
       (c) => c.checkAnswer(name, SettingsController.settings.language),
     );
   }
@@ -393,7 +380,7 @@ class GameService {
 
   static BorderPathGameData? createBorderPathGame() {
     final connectedCountries =
-        AppState.activePool.where((c) => c.borders.isNotEmpty).toList();
+        Country.activePool.where((c) => c.borders.isNotEmpty).toList();
 
     if (connectedCountries.length < 2) return null;
 
@@ -473,7 +460,7 @@ class GameService {
   static Future<void> completeBorderPathGame(
       int moves, int optimalMoves,
       {Country? targetCountry, Country? startCountry}) async {
-    final country = targetCountry ?? AppState.targetCountry;
+    final country = targetCountry ?? Country.targetCountry;
     final countryName =
         country.getLocalizedName(SettingsController.settings.language);
     if (countryName.isNotEmpty) {
@@ -482,30 +469,26 @@ class GameService {
 
     final scoreEarned = calculateBorderPathScore(moves, optimalMoves);
     final wrongCount = math.max(0, moves - optimalMoves);
-    final startTime = GameLogService.currentQuestionStartTime;
-    final correctAnswer = country.iso3;
     final options = startCountry != null
         ? [startCountry.iso3, country.iso3]
         : [country.iso3];
 
-    GameLogService.submitCorrect();
-    if (wrongCount > 0) {
-      GameLogService.addWrongAnswers(wrongCount);
-    }
+    final result = GameSession.current.submitCorrect(
+      customScore: scoreEarned,
+      customWrongCount: wrongCount,
+    );
 
     await GameLogService.logQuestion(
       gameType: 'borderpath',
-      correctAnswer: correctAnswer,
+      correctAnswer: country.iso3,
       options: options,
-      wrongCount: wrongCount,
-      scoreEarned: scoreEarned,
-      questionStartTime: startTime,
+      result: result,
     );
   }
 
   /// Doğru cevap verildiğinde alttan yeşil bildirim (SnackBar) gösterir.
   static void showCorrectSnackBar(String countryName) {
-    final messenger = AppState.scaffoldMessengerKey.currentState;
+    final messenger = Geogame.messengerKey.currentState;
     if (messenger == null) return;
 
     final message = countryName.isNotEmpty
@@ -558,7 +541,7 @@ class GameService {
 
     for (String borderIso3 in lastCountry.borders) {
       final Country? neighbor =
-          AppState.allCountries.where((c) => c.iso3 == borderIso3).firstOrNull;
+          Country.all.where((c) => c.iso3 == borderIso3).firstOrNull;
 
       if (neighbor != null && !currentPath.contains(neighbor)) {
         neighbors.add(neighbor);

@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geogame/models/app_context.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
@@ -216,9 +215,9 @@ void main() {
   // FİLTRELENMİŞ ÜLKELER
   // ===========================================================================
 
-  group('AppState.filteredCountries', () {
+  group('Country.filter', () {
     setUp(() {
-      AppState.allCountries = [
+      Country.all = [
         Country(
           iso3: 'TUR',
           iso2: 'TR',
@@ -298,7 +297,7 @@ void main() {
     });
 
     tearDown(() {
-      AppState.allCountries = [];
+      Country.all = [];
       SettingsController.gameFilter = GameFilter();
     });
 
@@ -351,7 +350,7 @@ void main() {
     });
 
     test('sadece Antarktika ve nonUN açıkken Antarktika ülkeleri dönmeli', () {
-      AppState.allCountries.add(Country(
+      Country.all.add(Country(
         iso3: 'ATA',
         iso2: 'AQ',
         englishName: 'Antarctica',

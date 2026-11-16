@@ -1,20 +1,25 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/user_profile.dart';
 import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/localization_service.dart';
 
 class AuthService {
   static final SupabaseClient _supabase = Supabase.instance.client;
-  static const String _cachedUserNameKey = 'cached_user_name';
-  static const String _cachedUserAvatarKey = 'cached_user_avatar';
+
+  // --- Global Kullanıcı Durumu (State) ---
+  static final ValueNotifier<UserProfile> userNotifier =
+      ValueNotifier<UserProfile>(UserProfile.anonymous());
+
+  static UserProfile get user => userNotifier.value;
+  static set user(UserProfile profile) {
+    userNotifier.value = profile;
+  }
 
   static String get redirectUrl {
     if (kIsWeb) {
       return '${Uri.base.origin}/';
     }
-
     return 'com.keremkuyucu.geogame://login-callback/';
   }
 
@@ -29,7 +34,6 @@ class AuthService {
       if (!success) {
         return Localization.t('auth.error_login_failed');
       }
-
       return null;
     } on AuthException catch (e) {
       debugPrint('AuthException in Google Sign-In: ${e.message}');
@@ -40,85 +44,36 @@ class AuthService {
     }
   }
 
-  /// Çevrimdışı durumlar için yerel olarak saklanan profil bilgilerini yükler
-  static Future<void> loadCachedUser() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final name = prefs.getString(_cachedUserNameKey);
-      final avatar = prefs.getString(_cachedUserAvatarKey);
-      if (name != null && name.isNotEmpty) {
-        AppState.user = UserProfile(
-          name: name,
-          avatarUrl: avatar ?? '',
-        );
-        debugPrint('📦 Cached user loaded: $name');
-      }
-    } catch (e) {
-      debugPrint('Error loading cached user: $e');
-    }
+  static void syncUserData(User authUser) {
+    final meta = authUser.userMetadata ?? {};
+    final String name =
+        (meta['full_name'] ?? meta['name'])?.toString().trim() ??
+            Localization.t('settings.guest');
+    final String avatar =
+        (meta['avatar_url'] ?? meta['picture'])?.toString().trim() ??
+            'https://robohash.org/${authUser.id}';
+
+    user = UserProfile(
+      name: name,
+      avatarUrl: avatar,
+    );
   }
 
-  /// Profil bilgilerini yerel SharedPreferences'a önbelleğe alır
-  static Future<void> _cacheUserProfile(String name, String avatar) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_cachedUserNameKey, name);
-      await prefs.setString(_cachedUserAvatarKey, avatar);
-    } catch (e) {
-      debugPrint('Error caching user profile: $e');
-    }
-  }
-
-  static Future<void> syncUserData(User authUser) async {
-    try {
-      final profileData = await _supabase
-          .from('profiles')
-          .select('full_name, avatar_url')
-          .eq('uid', authUser.id)
-          .maybeSingle()
-          .timeout(const Duration(seconds: 2));
-
-      final String name = profileData?['full_name']?.toString().trim() ??
-          Localization.t('settings.guest');
-
-      final String avatar = profileData?['avatar_url']?.toString().trim() ??
-          'https://robohash.org/${authUser.id}';
-
-      AppState.user = UserProfile(
-        name: name,
-        avatarUrl: avatar,
-      );
-
-      await _cacheUserProfile(name, avatar);
-
-      debugPrint('✅ User synced: $name, Avatar: $avatar');
-    } catch (e) {
-      debugPrint('❌ Profile sync error (offline?): $e');
-      await loadCachedUser();
-    }
-  }
-
-  /// Global Supabase Auth durum dinleyicisi
   static void initAuthStateListener() {
-    _supabase.auth.onAuthStateChange.listen((data) async {
+    _supabase.auth.onAuthStateChange.listen((data) {
       final AuthChangeEvent event = data.event;
       final Session? session = data.session;
       debugPrint('🔔 Supabase Auth State Changed: $event');
-      // Yalnızca ilk oturum açma ve yeni oturumda senkronize et.
-      // tokenRefreshed / userUpdated kasıtlı olarak hariç tutuldu:
-      // bunlar periyodik olarak tetiklenerek gereksiz Supabase sorgusu ve
-      // UI rebuild döngüsüne yol açıyor.
+
       if (event == AuthChangeEvent.signedIn ||
-          event == AuthChangeEvent.initialSession) {
+          event == AuthChangeEvent.initialSession ||
+          event == AuthChangeEvent.userUpdated) {
         if (session?.user != null) {
-          await syncUserData(session!.user);
-          // Giriş yapıldığında yerelde biriken Gezgin loglarını hesaba aktar
-          GameLogService.syncPendingLogs().catchError((e) {
-            debugPrint('⚠️ Gezgin logları aktarılırken hata: $e');
-          });
+          syncUserData(session!.user);
+          GameLogService.syncPendingLogs();
         }
       } else if (event == AuthChangeEvent.signedOut) {
-        AppState.user = UserProfile.anonymous();
+        user = UserProfile.anonymous();
       }
     });
   }
@@ -129,25 +84,17 @@ class AuthService {
     } catch (e) {
       debugPrint('Supabase exit error: $e');
     }
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_cachedUserNameKey);
-      await prefs.remove(_cachedUserAvatarKey);
-    } catch (_) {}
-    AppState.user = UserProfile.anonymous();
+    user = UserProfile.anonymous();
+  }
+
+  static void restoreSessionSync() {
+    final user = _supabase.auth.currentUser;
+    if (user != null) {
+      syncUserData(user);
+    }
   }
 
   static bool get isAuthenticated => _supabase.auth.currentUser != null;
   static String? get currentUserId => _supabase.auth.currentUser?.id;
   static User? get currentUser => _supabase.auth.currentUser;
-
-  static Future<void> checkSession() async {
-    final session = _supabase.auth.currentSession;
-    if (session != null) {
-      // Önce yerel önbellekteki veriyi anında yükle
-      await loadCachedUser();
-      // Ardından internet bağlantısı varsa arka planda/timeout ile güncelle
-      await syncUserData(session.user);
-    }
-  }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:geogame/models/app_context.dart';
+import 'package:geogame/models/game/game_session.dart';
+import 'package:geogame/models/user_profile.dart';
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game/game_button.dart';
+import 'package:geogame/models/game/question_log.dart';
 import 'package:geogame/screens/settings/settings_controller.dart';
-import 'package:geogame/services/game_log_service.dart';
 
 void main() {
   group('GameSession', () {
@@ -211,6 +212,62 @@ void main() {
       session.submitPass();
       expect(session.lastQuestionScoreEarned, 0);
       expect(session.lastQuestionWrongCount, 1);
+    });
+
+    test('submitCorrect QuestionResult döndürmeli ve custom parametreleri desteklemeli', () {
+      session.reset(startScore: 50, minScore: 20);
+
+      // 1 yanlış ardından doğru cevap
+      session.submitWrong();
+      final result = session.submitCorrect();
+
+      expect(result.scoreEarned, 40);
+      expect(result.wrongCount, 1);
+      expect(result.startTime, isNotNull);
+      expect(session.totalScore, 40);
+
+      // Özel puan ve yanlış sayısı ile submitCorrect (BorderPath senaryosu)
+      final customResult = session.submitCorrect(customScore: 90, customWrongCount: 2);
+      expect(customResult.scoreEarned, 90);
+      expect(customResult.wrongCount, 2);
+      expect(session.totalScore, 130);
+      expect(session.wrongCount, 3); // 1 önceki + 2 custom
+    });
+  });
+
+  // ===========================================================================
+  // QUESTION LOG MODEL TESTLERİ
+  // ===========================================================================
+
+  group('QuestionLog Model', () {
+    test('QuestionLog.fromResult ve JSON serialize/deserialize tutarlı olmalı', () {
+      final now = DateTime.now().toUtc();
+
+      final log = QuestionLog.fromResult(
+        gameType: 'flag',
+        correctAnswer: 'TUR',
+        options: ['TUR', 'DEU', 'FRA', 'ITA'],
+        result: QuestionResult(scoreEarned: 45, wrongCount: 1, startTime: now),
+      );
+
+      expect(log.gameType, 'flag');
+      expect(log.correctAnswer, 'TUR');
+      expect(log.wrongCount, 1);
+      expect(log.scoreEarned, 45);
+      expect(log.options.length, 4);
+
+      final json = log.toJson();
+      final restored = QuestionLog.fromJson(json);
+
+      expect(restored.questionId, log.questionId);
+      expect(restored.gameType, log.gameType);
+      expect(restored.correctAnswer, log.correctAnswer);
+      expect(restored.wrongCount, log.wrongCount);
+      expect(restored.scoreEarned, log.scoreEarned);
+
+      final payload = log.toSupabasePayload('user-123');
+      expect(payload['user_id'], 'user-123');
+      expect(payload['question_id'], log.questionId);
     });
   });
 

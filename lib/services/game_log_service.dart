@@ -1,166 +1,228 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:geogame/services/telemetry_service.dart';
-import 'package:uuid/uuid.dart';
 
+import 'package:geogame/models/game/game_session.dart';
+import 'package:geogame/models/game/question_log.dart';
 import 'package:geogame/services/auth_service.dart';
-import 'package:geogame/services/bonus_service.dart';
+import 'package:geogame/services/telemetry_service.dart';
 
-class GameLogService {
+/// Soru log kuyruğunu yerelde (offline) tutan ve backend ile senkronize eden servis
+abstract final class GameLogService {
   static final _supabase = Supabase.instance.client;
   static const String _unsentLogsKey = 'question_logs';
-  static const _uuid = Uuid();
-  static final _session = GameSession();
 
-  static int get totalScore => _session.totalScore;
-  static int get correctCount => _session.correctCount;
-  static int get wrongCount => _session.wrongCount;
-  static int get currentQuestionScore => _session.currentQuestionScore;
+  /// Eşzamanlı okuma/yazma çakışmalarını önleyen kilit
+  static Future<void> _lock = Future.value();
+  static bool _isSyncing = false;
+
+  static Future<T> _synchronized<T>(Future<T> Function() action) {
+    final completer = Completer<T>();
+    _lock = _lock.then((_) async {
+      try {
+        final result = await action();
+        completer.complete(result);
+      } catch (e, st) {
+        completer.completeError(e, st);
+      }
+    });
+    return completer.future;
+  }
+
+  // ---------------------------------------------------------------------------
+  // GAME SESSION DELEGATES (Geriye dönük uyumluluk ve kolay erişim)
+  // ---------------------------------------------------------------------------
+
+  static GameSession get session => GameSession.current;
+  static int get totalScore => GameSession.current.totalScore;
+  static int get correctCount => GameSession.current.correctCount;
+  static int get wrongCount => GameSession.current.wrongCount;
+  static int get currentQuestionScore =>
+      GameSession.current.currentQuestionScore;
   static int get currentQuestionWrongCount =>
-      _session.currentQuestionWrongCount;
+      GameSession.current.currentQuestionWrongCount;
   static DateTime get currentQuestionStartTime =>
-      _session.currentQuestionStartTime;
-  static int get lastQuestionScoreEarned => _session.lastQuestionScoreEarned;
-  static int get lastQuestionWrongCount => _session.lastQuestionWrongCount;
+      GameSession.current.currentQuestionStartTime;
+  static int get lastQuestionScoreEarned =>
+      GameSession.current.lastQuestionScoreEarned;
+  static int get lastQuestionWrongCount =>
+      GameSession.current.lastQuestionWrongCount;
 
   static void resetSession({
     required int startScore,
     required int minScore,
     int? maxWrongPenalty,
   }) =>
-      _session.reset(
+      GameSession.current.reset(
         startScore: startScore,
         minScore: minScore,
         maxWrongPenalty: maxWrongPenalty,
       );
 
-  static void startNewQuestion() => _session.startNewQuestion();
-  static void submitCorrect() => _session.submitCorrect();
-  static void submitWrong() => _session.submitWrong();
-  static void submitPass() => _session.submitPass();
-  static void addWrongAnswers(int count) => _session.wrongCount += count;
+  static void startNewQuestion() => GameSession.current.startNewQuestion();
+  static QuestionResult submitCorrect({
+    int? customScore,
+    int? customWrongCount,
+  }) =>
+      GameSession.current.submitCorrect(
+        customScore: customScore,
+        customWrongCount: customWrongCount,
+      );
+  static void submitWrong() => GameSession.current.submitWrong();
+  static void submitPass() => GameSession.current.submitPass();
 
-  static String startNewSession() {
-    return _uuid.v4();
-  }
+  // ---------------------------------------------------------------------------
+  // QUEUE & LOGGING
+  // ---------------------------------------------------------------------------
 
   /// Her cevaplanan soruda kuyruğa yazar.
+  /// Doğrudan [QuestionResult] veya tek tek parametreleri kabul eder.
   static Future<void> logQuestion({
     required String gameType,
     required String correctAnswer,
     required List<dynamic> options,
-    required int wrongCount,
-    required int scoreEarned,
+    int? wrongCount,
+    int? scoreEarned,
     DateTime? questionStartTime,
+    QuestionResult? result,
   }) async {
-    final startTime = questionStartTime ?? _session.currentQuestionStartTime;
-    final questionId = _uuid.v4();
+    final finalWrongCount = result?.wrongCount ?? wrongCount ?? 0;
+    final finalScoreEarned = result?.scoreEarned ?? scoreEarned ?? 0;
+    final finalStartTime =
+        result?.startTime ?? questionStartTime ?? DateTime.now().toUtc();
 
-    final log = {
-      'game_type': gameType,
-      'question_id': questionId,
-      'options': options,
-      'correct_answer': correctAnswer,
-      'wrong_count': wrongCount,
-      'score_earned': scoreEarned,
-      'played_at': startTime.toIso8601String(),
-    };
+    final log = QuestionLog.create(
+      gameType: gameType,
+      correctAnswer: correctAnswer,
+      options: options,
+      wrongCount: finalWrongCount,
+      scoreEarned: finalScoreEarned,
+      playedAt: finalStartTime,
+    );
 
-    final prefs = await SharedPreferences.getInstance();
-    final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
-    rawList.add(jsonEncode(log));
-    await prefs.setStringList(_unsentLogsKey, rawList);
+    await _synchronized(() async {
+      final prefs = await SharedPreferences.getInstance();
+      final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
+      rawList.add(jsonEncode(log.toJson()));
+      await prefs.setStringList(_unsentLogsKey, rawList);
+    });
   }
 
   /// Yerelde bekleyen (henüz senkronize edilmemiş) toplam puanı hesaplar.
   static Future<int> getPendingScore() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
-      int total = 0;
-      for (final item in rawList) {
-        final log = jsonDecode(item) as Map<String, dynamic>;
-        total += (log['score_earned'] as num?)?.toInt() ?? 0;
+    return _synchronized(() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
+        int total = 0;
+        for (final item in rawList) {
+          final log = jsonDecode(item) as Map<String, dynamic>;
+          total += (log['score_earned'] as num?)?.toInt() ?? 0;
+        }
+        return total;
+      } catch (_) {
+        return 0;
       }
-      return total;
-    } catch (_) {
-      return 0;
-    }
+    });
   }
 
   /// Yerelde bekleyen toplam soru sayısını döndürür.
   static Future<int> getPendingQuestionCount() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
-      return rawList.length;
-    } catch (_) {
-      return 0;
-    }
+    return _synchronized(() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
+        return rawList.length;
+      } catch (_) {
+        return 0;
+      }
+    });
   }
 
-  /// Toplu (Batch) sync: Tüm bekleyen logları tek bir HTTP isteğinde gönderir.
+  /// Toplu (Batch) sync: Bekleyen logları backend'e gönderir.
+  /// Ağ isteği sırasında yeni soru logları eklense dahi veri kaybı oluşmaz;
+  /// sadece başarıyla gönderilen ID'ler kuyruktan silinir.
   static Future<void> syncPendingLogs() async {
+    if (_isSyncing) return;
     if (!AuthService.isAuthenticated) return;
 
     final uid = AuthService.currentUserId;
     if (uid == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
-
-    if (rawList.isEmpty) return;
-
-    debugPrint('🔄 Sync: ${rawList.length} question log toplu gönderiliyor');
-
-    final List<Map<String, dynamic>> payloadList = [];
-
-    for (final item in rawList) {
-      try {
-        final log = jsonDecode(item) as Map<String, dynamic>;
-        payloadList.add({
-          'user_id': uid,
-          'game_type': log['game_type'],
-          'question_id': log['question_id'],
-          'options': log['options'],
-          'correct_answer': log['correct_answer'],
-          'wrong_count': log['wrong_count'],
-          'score_earned': log['score_earned'],
-          'played_at': log['played_at'],
-        });
-      } catch (e) {
-        debugPrint('⚠️ Bozuk log atlandı: $e');
-      }
-    }
-
-    if (payloadList.isEmpty) {
-      await prefs.remove(_unsentLogsKey);
-      return;
-    }
-
+    _isSyncing = true;
     try {
-      // Tek seferde batch insert (Postgrest Upsert desteğiyle)
+      // 1. Bekleyen logların güvenli anlık görüntüsünü al
+      final List<QuestionLog> pendingBatch = await _synchronized(() async {
+        final prefs = await SharedPreferences.getInstance();
+        final rawList = prefs.getStringList(_unsentLogsKey) ?? <String>[];
+        final List<QuestionLog> logs = [];
+        for (final item in rawList) {
+          try {
+            logs.add(
+                QuestionLog.fromJson(jsonDecode(item) as Map<String, dynamic>));
+          } catch (e) {
+            debugPrint('⚠️ Bozuk log atlandı: $e');
+          }
+        }
+        return logs;
+      });
+
+      if (pendingBatch.isEmpty) return;
+
+      debugPrint(
+          '🔄 Sync: ${pendingBatch.length} question log toplu gönderiliyor');
+
+      final payloadList =
+          pendingBatch.map((log) => log.toSupabasePayload(uid)).toList();
+
+      // 2. Ağ çağrısı (Supabase batch upsert)
       await _supabase
           .from('question_logs')
           .upsert(
             payloadList,
-            onConflict: 'question_id', // Çakışma olursa ez geç (idempotent)
+            onConflict: 'question_id',
             ignoreDuplicates: true,
           )
           .timeout(const Duration(seconds: 10));
 
-      // İşlem başarılıysa yerel kuyruğu tamamen temizle
-      await prefs.remove(_unsentLogsKey);
-      debugPrint('✅ Question logs sync başarıyla tamamlandı');
+      // 3. SADECE başarıyla gönderilen question_id'leri kuyruktan temizle
+      final sentIds = pendingBatch.map((l) => l.questionId).toSet();
+
+      await _synchronized(() async {
+        final prefs = await SharedPreferences.getInstance();
+        final currentRaw = prefs.getStringList(_unsentLogsKey) ?? <String>[];
+        final remaining = <String>[];
+
+        for (final item in currentRaw) {
+          try {
+            final data = jsonDecode(item) as Map<String, dynamic>;
+            final id = data['question_id'] as String?;
+            if (id == null || !sentIds.contains(id)) {
+              remaining.add(item);
+            }
+          } catch (_) {
+            // Bozuk elemanları atla
+          }
+        }
+
+        if (remaining.isEmpty) {
+          await prefs.remove(_unsentLogsKey);
+        } else {
+          await prefs.setStringList(_unsentLogsKey, remaining);
+        }
+      });
+
+      debugPrint(
+          '✅ Question logs sync başarıyla tamamlandı (Gönderilen: ${sentIds.length})');
     } on PostgrestException catch (e) {
       debugPrint('❌ Question log sync PostgrestException: $e');
       TelemetryService.sendError(
         event: 'question_log_sync_error',
         message: e.message,
-        metadata: {'code': e.code, 'count': payloadList.length},
+        metadata: {'code': e.code},
       );
     } catch (e, stack) {
       debugPrint('❌ Question log sync genel hata: $e');
@@ -168,87 +230,9 @@ class GameLogService {
         event: 'question_log_sync_error',
         message: e.toString(),
         stackTrace: stack,
-        metadata: {'count': payloadList.length},
       );
+    } finally {
+      _isSyncing = false;
     }
-  }
-}
-
-class GameSession {
-  int totalScore = 0;
-  int correctCount = 0;
-  int wrongCount = 0;
-  int passCount = 0;
-
-  String sessionId = '';
-
-  int _startScore = 50;
-  int _minScore = 20;
-  int? _maxWrongPenalty;
-
-  int currentQuestionScore = 50;
-  int currentQuestionWrongCount = 0;
-  DateTime currentQuestionStartTime = DateTime.now().toUtc();
-
-  int lastQuestionScoreEarned = 0;
-  int lastQuestionWrongCount = 0;
-
-  void reset({
-    required int startScore,
-    required int minScore,
-    int? maxWrongPenalty,
-  }) {
-    totalScore = 0;
-    correctCount = 0;
-    wrongCount = 0;
-    passCount = 0;
-
-    sessionId = const Uuid().v4();
-
-    _startScore = startScore;
-    _minScore = minScore;
-    _maxWrongPenalty = maxWrongPenalty;
-
-    currentQuestionScore = _startScore;
-    startNewQuestion();
-  }
-
-  void startNewQuestion() {
-    currentQuestionWrongCount = 0;
-    currentQuestionStartTime = DateTime.now().toUtc();
-    currentQuestionScore = _startScore;
-  }
-
-  void submitCorrect() {
-    correctCount++;
-
-    final multiplied = currentQuestionScore * BonusService.scoreMultiplier;
-    lastQuestionScoreEarned = multiplied;
-    lastQuestionWrongCount = currentQuestionWrongCount;
-
-    totalScore += multiplied;
-    currentQuestionScore = _startScore;
-  }
-
-  void submitWrong() {
-    wrongCount++;
-    currentQuestionWrongCount++;
-
-    final proportional = (_startScore * 0.2).round();
-    final cap = _maxWrongPenalty ?? _startScore;
-    final penalty = proportional.clamp(1, cap);
-
-    currentQuestionScore -= penalty;
-
-    if (currentQuestionScore < _minScore) {
-      currentQuestionScore = _minScore;
-    }
-  }
-
-  void submitPass() {
-    passCount++;
-    lastQuestionScoreEarned = 0;
-    lastQuestionWrongCount = currentQuestionWrongCount;
-    currentQuestionScore = _startScore;
   }
 }

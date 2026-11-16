@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'package:geogame/models/countries.dart';
 import 'package:geogame/models/game/border_path_data.dart';
+import 'package:geogame/models/game/game_session.dart';
 import 'package:geogame/models/game_metadata.dart';
 import 'package:geogame/services/game_service.dart';
-import 'package:geogame/services/game_log_service.dart';
 import 'package:geogame/services/geojson_service.dart';
 import 'package:geogame/services/localization_service.dart';
 import 'package:geogame/services/haptic_service.dart';
@@ -83,7 +83,7 @@ class BorderPathGameController {
 
   Future<void> startNextRound({bool passMode = false}) async {
     isLoadingMaps = true;
-    if (passMode) GameLogService.submitPass();
+    if (passMode) GameSession.current.submitPass();
     final data = GameService.createBorderPathGame();
     await loadLevel(data);
   }
@@ -154,7 +154,7 @@ class BorderPathGameController {
   }
 
   String getPerformanceText() {
-    final score = GameLogService.totalScore;
+    final score = GameSession.current.totalScore;
     if (score == 100) return Localization.t('game_borderpath.perf_perfect');
     if (score >= 80) return Localization.t('game_borderpath.perf_great');
     if (score >= 60) return Localization.t('game_borderpath.perf_good');
@@ -162,7 +162,7 @@ class BorderPathGameController {
   }
 
   Color getPerformanceColor() {
-    final score = GameLogService.totalScore;
+    final score = GameSession.current.totalScore;
     if (score == 100) return Colors.green;
     if (score >= 80) return Colors.blue;
     if (score >= 60) return Colors.orange;
