@@ -50,16 +50,16 @@
 ### 🎮 Gameplay Modes
 | Coat of Arms | Flag Quiz | Capital Quiz | Distance Game |
 | :---: | :---: | :---: | :---: |
-| <img src="screenshots/coatofarms_game.png" width="180"/> | <img src="screenshots/flag_game.png" width="180"/> | <img src="screenshots/capital_game.png" width="180"/> | <img src="screenshots/distance_game.png" width="180"/> |
+| <img src="store/screenshots/coatofarms_game.png" width="180"/> | <img src="store/screenshots/flag_game.png" width="180"/> | <img src="store/screenshots/capital_game.png" width="180"/> | <img src="store/screenshots/distance_game.png" width="180"/> |
 
 | Border Path | Borderline | Find on Map | Settings & Themes |
 | :---: | :---: | :---: | :---: |
-| <img src="screenshots/borderpath_game.png" width="180"/> | <img src="screenshots/borderline_game.png" width="180"/> | <img src="screenshots/findmap_game.png" width="180"/> | <img src="screenshots/settings.png" width="180"/> |
+| <img src="store/screenshots/borderpath_game.png" width="180"/> | <img src="store/screenshots/borderline_game.png" width="180"/> | <img src="store/screenshots/findmap_game.png" width="180"/> | <img src="store/screenshots/settings.png" width="180"/> |
 
 ### 🏆 Menu & Community
 | Main Lobby | Global Leaderboard | Profile & Stats |
 | :---: | :---: | :---: |
-| <img src="screenshots/mainlobi.png" width="220"/> | <img src="screenshots/leaderboard.png" width="220"/> | <img src="screenshots/profile.png" width="220"/> |
+| <img src="store/screenshots/mainlobi.png" width="220"/> | <img src="store/screenshots/leaderboard.png" width="220"/> | <img src="store/screenshots/profile.png" width="220"/> |
 
 ---
 
@@ -88,7 +88,7 @@ To build and run the project locally:
    ```
 
 4. **Useful Scripts (`scripts/`):**
-   * `scripts/take_screenshots.ps1`: Interactive ADB tool to take full-screen device screenshots into `screenshots/`.
+   * `scripts/take_screenshots.ps1`: Interactive ADB tool to take full-screen device screenshots into `store/screenshots/`.
    * `scripts/upload_play_store.py`: Resumable AAB upload tool for Google Play Console.
 
 ---

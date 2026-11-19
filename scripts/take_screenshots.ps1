@@ -1,10 +1,10 @@
-﻿#requires -version 5.1
+#requires -version 5.1
 <#
 .SYNOPSIS
     GeoGame - Otomatik Ekran Goruntusu Yakalayici (Screenshots Tool)
 .DESCRIPTION
     Calisan Android emulatoru veya bagli cihazdan Play Store & README icin
-    yuksek cozunurluklu ekran goruntulerini tek tusla 'screenshots/' klasorune kaydeder.
+    yuksek cozunurluklu ekran goruntulerini tek tusla 'store/screenshots/' klasorune kaydeder.
 #>
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -23,7 +23,7 @@ function Write-Warn ([string]$msg) { Write-Host "   [!] $msg" -ForegroundColor Y
 function Write-Info ([string]$msg) { Write-Host "   [i] $msg" -ForegroundColor DarkGray }
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$screenshotsDir = Join-Path $projectRoot "screenshots"
+$screenshotsDir = Join-Path (Join-Path $projectRoot "store") "screenshots"
 
 if (-not (Test-Path $screenshotsDir)) {
     New-Item -ItemType Directory -Path $screenshotsDir -Force | Out-Null
@@ -121,7 +121,7 @@ function Save-ScreenCapture ([string]$fileName, [string]$label) {
             $len = (Get-Item $destPath).Length
             if ($len -gt 1000) {
                 $sizeKB = [math]::Round($len / 1KB)
-                Write-Ok "Kaydedildi: screenshots/$fileName ($sizeKB KB)"
+                Write-Ok "Kaydedildi: store/screenshots/$fileName ($sizeKB KB)"
                 return $true
             }
         }

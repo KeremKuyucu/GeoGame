@@ -331,7 +331,7 @@
 
     <!-- Alert for CORS / file:// -->
     <div id="alertBanner" class="alert-banner">
-      ⚠️ <b>Local File Security (file://):</b> Screenshots could not be loaded via relative path (<code>../screenshots/</code>).<br>
+      ⚠️ <b>Local File Security (file://):</b> Screenshots could not be loaded via relative path (<code>screenshots/</code>).<br>
       Please click <b>"📁 Select screenshots Folder"</b> above to choose the <code>screenshots</code> folder, or drag and drop your screenshot PNG files onto this page.
     </div>
 
@@ -611,8 +611,8 @@
         if (onLoaded) onLoaded();
       };
 
-      // Dinamik dosya yolu: scripts klasöründen screenshots klasörüne
-      img.src = `../screenshots/${s.file}`;
+      // Dinamik dosya yolu: store klasöründen screenshots klasörüne
+      img.src = `screenshots/${s.file}`;
       imageCache[key] = img;
       return img;
     }
