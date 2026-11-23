@@ -1,7 +1,7 @@
 name: geogame
 description: "A location guessing game based on maps, available on Android and Web"
 publish_to: none
-version: 2.1.0+32
+version: 2.1.1+33
 environment:
   sdk: '>=3.4.3 <4.0.0'
 

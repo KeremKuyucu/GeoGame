@@ -29,6 +29,7 @@ class LeaderboardController {
       final response = await _supabase
           .from('leaderboard_v2')
           .select()
+          .order('rank', ascending: true)
           .limit(100)
           .timeout(const Duration(seconds: 10));
 
